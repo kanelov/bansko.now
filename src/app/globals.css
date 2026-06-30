@@ -1,0 +1,100 @@
+@import "tailwindcss";
+
+:root {
+  --paper: #faf8f2;
+  --stone: #e7e0d2;
+  --ink: #171611;
+  --forest: #183b2a;
+  --moss: #4f6f52;
+  --sage: #dfe8d8;
+  --clay: #b6653c;
+  --sand: #f2eadb;
+}
+
+@theme inline {
+  --color-paper: var(--paper);
+  --color-forest: var(--forest);
+  --color-moss: var(--moss);
+  --color-sage: var(--sage);
+  --color-clay: var(--clay);
+  --font-sans: "Inter", "Segoe UI", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Georgia", "Times New Roman", serif;
+  --shadow-soft: 0 18px 45px rgba(38, 31, 22, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+  letter-spacing: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-sans);
+}
+
+a {
+  text-decoration: none;
+}
+
+::selection {
+  background: var(--sage);
+  color: var(--forest);
+}
+
+.text-stone-650 {
+  color: #5f5a50;
+}
+
+.text-forest {
+  color: var(--forest);
+}
+
+.text-moss {
+  color: var(--moss);
+}
+
+.text-clay {
+  color: var(--clay);
+}
+
+.bg-paper {
+  background-color: var(--paper);
+}
+
+.bg-forest {
+  background-color: var(--forest);
+}
+
+.bg-moss {
+  background-color: var(--moss);
+}
+
+.bg-sage {
+  background-color: var(--sage);
+}
+
+.bg-clay {
+  background-color: var(--clay);
+}
+
+.border-clay {
+  border-color: var(--clay);
+}
+
+.decoration-sage {
+  text-decoration-color: var(--sage);
+}
+
+.shadow-soft {
+  box-shadow: var(--shadow-soft);
+}
+
+.article-body > :first-child {
+  margin-top: 0;
+}
