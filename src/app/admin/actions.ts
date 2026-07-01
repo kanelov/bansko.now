@@ -22,6 +22,25 @@ function booleanValue(formData: FormData, key: string) {
   return formData.get(key) === "on" || formData.get(key) === "true";
 }
 
+function integerValue(formData: FormData, key: string, fallback = 0) {
+  const value = stringValue(formData, key);
+  const parsed = value ? Number.parseInt(value, 10) : Number.NaN;
+
+  return Number.isFinite(parsed) ? parsed : fallback;
+}
+
+function uuidValue(formData: FormData, key: string) {
+  const value = stringValue(formData, key);
+
+  return value && /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value)
+    ? value
+    : null;
+}
+
+function looksExternalUrl(value: string) {
+  return /^(https?:|mailto:|tel:)/i.test(value);
+}
+
 function jsonLines(formData: FormData, key: string) {
   const value = stringValue(formData, key);
 
@@ -44,6 +63,13 @@ function revalidateEditorialPaths() {
   revalidatePath("/articles");
   revalidatePath("/sitemap.xml");
   revalidatePath("/feed.xml");
+}
+
+function revalidateSiteChrome() {
+  revalidatePath("/", "layout");
+  revalidatePath("/");
+  revalidatePath("/articles");
+  revalidatePath("/admin/settings");
 }
 
 export async function signInAction(formData: FormData) {
@@ -266,4 +292,93 @@ export async function saveSettingsAction(formData: FormData) {
 
   revalidatePath("/");
   revalidatePath("/admin/settings");
+}
+
+export async function saveNavigationAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const rowKeys = formData
+    .getAll("navigation_row_key")
+    .map((value) => (typeof value === "string" ? value : null))
+    .filter(Boolean) as string[];
+
+  for (const rowKey of rowKeys) {
+    const id = uuidValue(formData, `navigation_id_${rowKey}`);
+    const label = stringValue(formData, `navigation_label_${rowKey}`);
+    const href = stringValue(formData, `navigation_href_${rowKey}`);
+    const shouldDelete = booleanValue(formData, `navigation_delete_${rowKey}`);
+
+    if (shouldDelete) {
+      if (id) {
+        await supabase.from("navigation_items").delete().eq("id", id);
+      }
+      continue;
+    }
+
+    if (!label || !href) {
+      continue;
+    }
+
+    const payload = {
+      label,
+      href,
+      icon_name: stringValue(formData, `navigation_icon_name_${rowKey}`),
+      sort_order: integerValue(formData, `navigation_sort_order_${rowKey}`),
+      is_external: booleanValue(formData, `navigation_is_external_${rowKey}`) || looksExternalUrl(href),
+      open_in_new_tab: booleanValue(formData, `navigation_open_in_new_tab_${rowKey}`),
+      is_active: booleanValue(formData, `navigation_is_active_${rowKey}`),
+      aria_label: stringValue(formData, `navigation_aria_label_${rowKey}`)
+    };
+
+    if (id) {
+      await supabase.from("navigation_items").update(payload).eq("id", id);
+    } else {
+      await supabase.from("navigation_items").upsert(payload, { onConflict: "href" });
+    }
+  }
+
+  revalidateSiteChrome();
+}
+
+export async function saveSocialLinksAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const rowKeys = formData
+    .getAll("social_row_key")
+    .map((value) => (typeof value === "string" ? value : null))
+    .filter(Boolean) as string[];
+
+  for (const rowKey of rowKeys) {
+    const id = uuidValue(formData, `social_id_${rowKey}`);
+    const platform = stringValue(formData, `social_platform_${rowKey}`);
+    const label = stringValue(formData, `social_label_${rowKey}`);
+    const url = stringValue(formData, `social_url_${rowKey}`);
+    const shouldDelete = booleanValue(formData, `social_delete_${rowKey}`);
+
+    if (shouldDelete) {
+      if (id) {
+        await supabase.from("social_links").delete().eq("id", id);
+      }
+      continue;
+    }
+
+    if (!platform || !label || !url) {
+      continue;
+    }
+
+    const payload = {
+      platform: platform.toLowerCase(),
+      label,
+      url,
+      icon_name: stringValue(formData, `social_icon_name_${rowKey}`) || platform.toLowerCase(),
+      sort_order: integerValue(formData, `social_sort_order_${rowKey}`),
+      is_active: booleanValue(formData, `social_is_active_${rowKey}`)
+    };
+
+    if (id) {
+      await supabase.from("social_links").update(payload).eq("id", id);
+    } else {
+      await supabase.from("social_links").upsert(payload, { onConflict: "platform" });
+    }
+  }
+
+  revalidateSiteChrome();
 }

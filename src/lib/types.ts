@@ -85,6 +85,32 @@ export type SiteSettings = {
   updated_at?: string;
 };
 
+export type NavigationItem = {
+  id: string;
+  label: string;
+  href: string;
+  icon_name: string | null;
+  sort_order: number;
+  is_external: boolean;
+  open_in_new_tab: boolean;
+  is_active: boolean;
+  aria_label: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type SocialLink = {
+  id: string;
+  platform: string;
+  label: string;
+  url: string;
+  icon_name: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at?: string;
+  updated_at?: string;
+};
+
 export type MediaItem = {
   id: string;
   file_url: string;
@@ -125,6 +151,18 @@ export type Database = {
         Row: SiteSettings;
         Insert: Partial<SiteSettings>;
         Update: Partial<SiteSettings>;
+        Relationships: [];
+      };
+      navigation_items: {
+        Row: NavigationItem;
+        Insert: Partial<NavigationItem> & Pick<NavigationItem, "label" | "href">;
+        Update: Partial<NavigationItem>;
+        Relationships: [];
+      };
+      social_links: {
+        Row: SocialLink;
+        Insert: Partial<SocialLink> & Pick<SocialLink, "platform" | "label" | "url">;
+        Update: Partial<SocialLink>;
         Relationships: [];
       };
       media: {

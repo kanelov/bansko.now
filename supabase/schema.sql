@@ -86,6 +86,38 @@ create table if not exists public.site_settings (
   updated_at timestamptz default now()
 );
 
+create table if not exists public.navigation_items (
+  id uuid primary key default gen_random_uuid(),
+  label text not null,
+  href text not null,
+  icon_name text,
+  sort_order integer not null default 100,
+  is_external boolean not null default false,
+  open_in_new_tab boolean not null default false,
+  is_active boolean not null default true,
+  aria_label text,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create unique index if not exists navigation_items_href_unique_idx
+on public.navigation_items (href);
+
+create table if not exists public.social_links (
+  id uuid primary key default gen_random_uuid(),
+  platform text not null,
+  label text not null,
+  url text not null,
+  icon_name text,
+  sort_order integer not null default 100,
+  is_active boolean not null default true,
+  created_at timestamptz default now(),
+  updated_at timestamptz default now()
+);
+
+create unique index if not exists social_links_platform_unique_idx
+on public.social_links (platform);
+
 alter table public.site_settings
   add column if not exists hero_media_type text default 'image' check (hero_media_type in ('image', 'video', 'embed')),
   add column if not exists hero_image_url text,
@@ -126,12 +158,24 @@ create trigger site_settings_set_updated_at
 before update on public.site_settings
 for each row execute function public.set_updated_at();
 
+drop trigger if exists navigation_items_set_updated_at on public.navigation_items;
+create trigger navigation_items_set_updated_at
+before update on public.navigation_items
+for each row execute function public.set_updated_at();
+
+drop trigger if exists social_links_set_updated_at on public.social_links;
+create trigger social_links_set_updated_at
+before update on public.social_links
+for each row execute function public.set_updated_at();
+
 create index if not exists articles_status_published_at_idx on public.articles(status, published_at desc);
 create index if not exists articles_category_id_idx on public.articles(category_id);
 create index if not exists articles_is_featured_idx on public.articles(is_featured) where is_featured = true;
 create index if not exists article_tags_tag_id_idx on public.article_tags(tag_id);
 create index if not exists categories_slug_idx on public.categories(slug);
 create index if not exists tags_slug_idx on public.tags(slug);
+create index if not exists navigation_items_active_sort_idx on public.navigation_items(is_active, sort_order);
+create index if not exists social_links_active_sort_idx on public.social_links(is_active, sort_order);
 
 alter table public.articles enable row level security;
 alter table public.categories enable row level security;
@@ -139,6 +183,8 @@ alter table public.tags enable row level security;
 alter table public.article_tags enable row level security;
 alter table public.media enable row level security;
 alter table public.site_settings enable row level security;
+alter table public.navigation_items enable row level security;
+alter table public.social_links enable row level security;
 
 grant select on public.articles to anon;
 grant select on public.categories to anon;
@@ -146,6 +192,8 @@ grant select on public.tags to anon;
 grant select on public.article_tags to anon;
 grant select on public.media to anon;
 grant select on public.site_settings to anon;
+grant select on public.navigation_items to anon;
+grant select on public.social_links to anon;
 
 grant select, insert, update, delete on public.articles to authenticated;
 grant select, insert, update, delete on public.categories to authenticated;
@@ -153,6 +201,8 @@ grant select, insert, update, delete on public.tags to authenticated;
 grant select, insert, update, delete on public.article_tags to authenticated;
 grant select, insert, update, delete on public.media to authenticated;
 grant select, insert, update, delete on public.site_settings to authenticated;
+grant select, insert, update, delete on public.navigation_items to authenticated;
+grant select, insert, update, delete on public.social_links to authenticated;
 
 drop policy if exists "Published articles are public" on public.articles;
 create policy "Published articles are public"
@@ -355,6 +405,80 @@ for delete
 to authenticated
 using (public.is_admin());
 
+drop policy if exists "Active navigation items are public" on public.navigation_items;
+create policy "Active navigation items are public"
+on public.navigation_items
+for select
+to anon
+using (is_active = true);
+
+drop policy if exists "Admins can read all navigation items" on public.navigation_items;
+drop policy if exists "Authenticated users can read active navigation items and admins all" on public.navigation_items;
+create policy "Authenticated users can read active navigation items and admins all"
+on public.navigation_items
+for select
+to authenticated
+using (is_active = true or (select public.is_admin()));
+
+drop policy if exists "Admins can insert navigation items" on public.navigation_items;
+create policy "Admins can insert navigation items"
+on public.navigation_items
+for insert
+to authenticated
+with check (public.is_admin());
+
+drop policy if exists "Admins can update navigation items" on public.navigation_items;
+create policy "Admins can update navigation items"
+on public.navigation_items
+for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+drop policy if exists "Admins can delete navigation items" on public.navigation_items;
+create policy "Admins can delete navigation items"
+on public.navigation_items
+for delete
+to authenticated
+using (public.is_admin());
+
+drop policy if exists "Active social links are public" on public.social_links;
+create policy "Active social links are public"
+on public.social_links
+for select
+to anon
+using (is_active = true);
+
+drop policy if exists "Admins can read all social links" on public.social_links;
+drop policy if exists "Authenticated users can read active social links and admins all" on public.social_links;
+create policy "Authenticated users can read active social links and admins all"
+on public.social_links
+for select
+to authenticated
+using (is_active = true or (select public.is_admin()));
+
+drop policy if exists "Admins can insert social links" on public.social_links;
+create policy "Admins can insert social links"
+on public.social_links
+for insert
+to authenticated
+with check (public.is_admin());
+
+drop policy if exists "Admins can update social links" on public.social_links;
+create policy "Admins can update social links"
+on public.social_links
+for update
+to authenticated
+using (public.is_admin())
+with check (public.is_admin());
+
+drop policy if exists "Admins can delete social links" on public.social_links;
+create policy "Admins can delete social links"
+on public.social_links
+for delete
+to authenticated
+using (public.is_admin());
+
 insert into public.categories (name, slug, description, seo_title, seo_description)
 values
   ('Сега', 'now', 'Какво се случва днес, тази седмица и този сезон в Банско.', 'Сега в Банско | Bansko NOW', 'Актуални идеи, събития и полезни новини за Банско.'),
@@ -397,6 +521,41 @@ values (
   'Любо Канелов'
 )
 on conflict do nothing;
+
+insert into public.navigation_items (label, href, icon_name, sort_order, is_external, open_in_new_tab, is_active, aria_label)
+values
+  ('Сега', '/now', 'clock', 10, false, false, true, null),
+  ('Събития', '/events', 'calendar-days', 20, false, false, true, null),
+  ('Открий Банско', '/explore', 'compass', 30, false, false, true, null),
+  ('Природа', '/nature', 'mountain', 40, false, false, true, null),
+  ('Култура', '/culture', 'masks-theater', 50, false, false, true, null),
+  ('Живот', '/living', 'users', 60, false, false, true, null),
+  ('Храна', '/food', 'utensils', 70, false, false, true, null),
+  ('Art Studio', '/art-studio', 'palette', 80, false, false, true, null),
+  ('Bansko Collection', '/bansko-collection', 'bag-shopping', 90, false, false, true, null),
+  ('Общност', '/#community', 'users', 100, false, false, true, null)
+on conflict (href) do nothing;
+
+insert into public.social_links (platform, label, url, icon_name, sort_order, is_active)
+select 'facebook', 'Facebook група', facebook_group_url, 'facebook', 10, true
+from public.site_settings
+where facebook_group_url is not null and facebook_group_url <> ''
+limit 1
+on conflict (platform) do nothing;
+
+insert into public.social_links (platform, label, url, icon_name, sort_order, is_active)
+select 'instagram', 'Instagram', instagram_url, 'instagram', 20, true
+from public.site_settings
+where instagram_url is not null and instagram_url <> ''
+limit 1
+on conflict (platform) do nothing;
+
+insert into public.social_links (platform, label, url, icon_name, sort_order, is_active)
+select 'youtube', 'YouTube', youtube_url, 'youtube', 30, true
+from public.site_settings
+where youtube_url is not null and youtube_url <> ''
+limit 1
+on conflict (platform) do nothing;
 
 insert into storage.buckets (id, name, public)
 values ('bansko-media', 'bansko-media', true)

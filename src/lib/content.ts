@@ -1,8 +1,14 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import { categoryDefinitions, fallbackHeroImage, fallbackSettings } from "@/lib/defaults";
-import type { ArticleWithCategory, Category, MediaItem, SiteSettings, Tag } from "@/lib/types";
+import {
+  categoryDefinitions,
+  fallbackHeroImage,
+  fallbackNavigationItems,
+  fallbackSettings,
+  fallbackSocialLinks
+} from "@/lib/defaults";
+import type { ArticleWithCategory, Category, MediaItem, NavigationItem, SiteSettings, SocialLink, Tag } from "@/lib/types";
 
-export { categoryDefinitions, fallbackHeroImage, fallbackSettings };
+export { categoryDefinitions, fallbackHeroImage, fallbackNavigationItems, fallbackSettings, fallbackSocialLinks };
 
 const sampleArticle: ArticleWithCategory = {
   id: "sample",
@@ -70,6 +76,90 @@ export async function getSiteSettings(): Promise<SiteSettings> {
 
   const { data } = await supabase.from("site_settings").select("*").limit(1).maybeSingle();
   return data ?? fallbackSettings;
+}
+
+export async function getNavigationItems(): Promise<NavigationItem[]> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return fallbackNavigationItems;
+  }
+
+  const { data, error } = await supabase
+    .from("navigation_items")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("label", { ascending: true });
+
+  if (error || !data?.length) {
+    return fallbackNavigationItems;
+  }
+
+  return data as NavigationItem[];
+}
+
+export async function getAllNavigationItems(): Promise<NavigationItem[]> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return fallbackNavigationItems;
+  }
+
+  const { data, error } = await supabase
+    .from("navigation_items")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("label", { ascending: true });
+
+  if (error || !data?.length) {
+    return fallbackNavigationItems;
+  }
+
+  return data as NavigationItem[];
+}
+
+export async function getSocialLinks(settings?: SiteSettings): Promise<SocialLink[]> {
+  const resolvedSettings = settings ?? (await getSiteSettings());
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return fallbackSocialLinks(resolvedSettings);
+  }
+
+  const { data, error } = await supabase
+    .from("social_links")
+    .select("*")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("label", { ascending: true });
+
+  if (error || !data?.length) {
+    return fallbackSocialLinks(resolvedSettings);
+  }
+
+  return data as SocialLink[];
+}
+
+export async function getAllSocialLinks(settings?: SiteSettings): Promise<SocialLink[]> {
+  const resolvedSettings = settings ?? (await getSiteSettings());
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return fallbackSocialLinks(resolvedSettings);
+  }
+
+  const { data, error } = await supabase
+    .from("social_links")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("label", { ascending: true });
+
+  if (error || !data?.length) {
+    return fallbackSocialLinks(resolvedSettings);
+  }
+
+  return data as SocialLink[];
 }
 
 export async function getCategories(): Promise<Category[]> {

@@ -8,6 +8,7 @@ import { ArticleTableOfContents } from "@/components/public/article-table-of-con
 import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
+import { ScrollToTopButton } from "@/components/public/scroll-to-top-button";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { SourceLinks } from "@/components/public/source-links";
@@ -256,6 +257,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
       {faqSchema ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} /> : null}
+      <ScrollToTopButton />
       <SiteFooter settings={settings} />
     </div>
   );
