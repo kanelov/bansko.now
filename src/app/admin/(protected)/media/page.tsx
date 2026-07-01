@@ -72,7 +72,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
           />
         </label>
         <div>
-          <button type="submit" className="rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white">
+          <button type="submit" className="admin-button admin-button-forest px-6 py-3 text-sm font-semibold">
             Качи изображение
           </button>
         </div>

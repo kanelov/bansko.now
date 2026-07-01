@@ -31,7 +31,7 @@ export type TocItem = {
 
 export type MarkdownTextColor = "stone" | "forest" | "moss" | "clay" | "ink" | "white";
 
-const blockPattern = /:::([a-z]+)\n([\s\S]*?)\n:::/g;
+const blockPattern = /^[ \t]*:::\s*([a-z]+)[ \t]*\r?\n([\s\S]*?)\r?\n[ \t]*:::[ \t]*(?=\r?\n|$)/gm;
 const supportedBlocks = new Set(["text", "gallery", "callout", "faq", "video", "button"]);
 const textColors = new Set<MarkdownTextColor>(["stone", "forest", "moss", "clay", "ink", "white"]);
 
@@ -39,6 +39,8 @@ export function splitMarkdownBlocks(content: string): MarkdownBlock[] {
   const blocks: MarkdownBlock[] = [];
   let cursor = 0;
   let match: RegExpExecArray | null;
+
+  blockPattern.lastIndex = 0;
 
   while ((match = blockPattern.exec(content))) {
     const type = match[1];
@@ -92,7 +94,7 @@ export function parseFaqItems(content: string): FaqItem[] {
 export function getFaqItemsFromMarkdown(content: string): FaqItem[] {
   return splitMarkdownBlocks(content)
     .filter((block): block is { type: "faq"; content: string } => block.type === "faq")
-    .flatMap((block) => parseFaqItems(block.content));
+    .flatMap((block) => parseFaqItems(parseTextBlockOptions(block.content).body));
 }
 
 export function parseVideoBlock(content: string) {
@@ -172,6 +174,7 @@ export function getHeadingId(text: string) {
 }
 
 function stripCustomBlocks(content: string) {
+  blockPattern.lastIndex = 0;
   return content.replace(blockPattern, "");
 }
 

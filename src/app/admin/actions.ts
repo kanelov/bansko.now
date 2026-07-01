@@ -18,6 +18,11 @@ function stringValue(formData: FormData, key: string) {
   return typeof value === "string" && value.trim() ? value.trim() : null;
 }
 
+function rawStringValue(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value : "";
+}
+
 function booleanValue(formData: FormData, key: string) {
   return formData.get(key) === "on" || formData.get(key) === "true";
 }
@@ -137,7 +142,7 @@ export async function upsertArticleAction(formData: FormData) {
   const { supabase } = await requireAdmin();
   const id = stringValue(formData, "id");
   const title = stringValue(formData, "title") || "Нова статия";
-  const content = stringValue(formData, "content") || "";
+  const content = rawStringValue(formData, "content");
   const intent = stringValue(formData, "intent");
   const selectedStatus = (stringValue(formData, "status") || "draft") as "draft" | "published" | "scheduled";
   const status = intent === "publish" ? "published" : selectedStatus;

@@ -221,7 +221,7 @@ export default async function AdminSettingsPage() {
           </label>
         </section>
 
-        <button className="w-fit rounded-full bg-white px-6 py-3 text-sm font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100">
+        <button className="admin-button admin-button-primary w-fit px-6 py-3 text-sm font-semibold">
           Save settings
         </button>
       </form>
@@ -241,7 +241,7 @@ export default async function AdminSettingsPage() {
           <MenuRow rowKey="new-1" />
           <MenuRow rowKey="new-2" />
         </div>
-        <button className="w-fit rounded-full bg-white px-6 py-3 text-sm font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100">
+        <button className="admin-button admin-button-primary w-fit px-6 py-3 text-sm font-semibold">
           Save menu
         </button>
       </form>
@@ -260,7 +260,7 @@ export default async function AdminSettingsPage() {
           <SocialRow rowKey="new-1" />
           <SocialRow rowKey="new-2" />
         </div>
-        <button className="w-fit rounded-full bg-white px-6 py-3 text-sm font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100">
+        <button className="admin-button admin-button-primary w-fit px-6 py-3 text-sm font-semibold">
           Save social links
         </button>
       </form>

@@ -25,7 +25,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           ))}
         </nav>
         <form action={signOutAction} className="absolute bottom-6 left-6 right-6">
-          <button className="w-full rounded-full border border-white/25 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white hover:text-stone-950">
+          <button className="admin-button admin-button-secondary w-full px-4 py-2 text-sm font-semibold">
             Изход
           </button>
         </form>
@@ -35,7 +35,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
           <Link href="/admin" className="font-serif text-xl font-semibold lg:hidden">
             Bansko NOW
           </Link>
-          <Link href="/admin/articles/new" className="rounded-full bg-white px-5 py-2 text-sm font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100">
+          <Link href="/admin/articles/new" className="admin-button admin-button-primary px-5 py-2 text-sm font-semibold">
             New Article
           </Link>
         </header>

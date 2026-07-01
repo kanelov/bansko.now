@@ -26,7 +26,7 @@ export default async function AdminDashboardPage() {
           <p className="text-sm font-semibold uppercase text-stone-400">Admin</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold">Dashboard</h1>
         </div>
-        <Link href="/admin/articles/new" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-stone-950">
+        <Link href="/admin/articles/new" className="admin-button admin-button-primary px-5 py-3 text-sm font-semibold">
           New Article
         </Link>
       </div>

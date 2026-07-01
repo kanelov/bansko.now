@@ -60,7 +60,7 @@ export default async function AdminLoginPage({
               required
             />
           </label>
-          <button className="mt-2 rounded-full bg-white px-6 py-3 text-sm font-semibold text-stone-950">
+          <button className="admin-button admin-button-primary mt-2 px-6 py-3 text-sm font-semibold">
             Вход
           </button>
         </form>

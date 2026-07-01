@@ -23,7 +23,7 @@ export default async function AdminArticlesPage() {
           <p className="text-sm font-semibold uppercase text-stone-400">Content</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold">Articles</h1>
         </div>
-        <Link href="/admin/articles/new" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100">
+        <Link href="/admin/articles/new" className="admin-button admin-button-primary px-5 py-3 text-sm font-semibold">
           New Article
         </Link>
       </div>
@@ -55,18 +55,18 @@ export default async function AdminArticlesPage() {
                     <td className="px-4 py-4">{getSeoScore(article)}/100</td>
                     <td className="px-4 py-4">
                       <div className="flex flex-wrap gap-2">
-                        <Link href={`/admin/articles/${article.id}/edit` as Route} className="rounded-full bg-white px-3 py-1.5 text-xs font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100">
+                        <Link href={`/admin/articles/${article.id}/edit` as Route} className="admin-button admin-button-primary px-3 py-1.5 text-xs font-semibold">
                           Edit
                         </Link>
                         {article.status === "published" ? (
-                          <Link href={getArticlePath(article) as Route} className="rounded-full border border-white/20 px-3 py-1.5 text-xs font-semibold">
+                          <Link href={getArticlePath(article) as Route} className="admin-button admin-button-secondary px-3 py-1.5 text-xs font-semibold">
                             Preview
                           </Link>
                         ) : null}
                         {article.status !== "published" ? (
                           <form action={publishArticleAction}>
                             <input type="hidden" name="id" value={article.id} />
-                            <button className="rounded-full bg-sage px-3 py-1.5 text-xs font-semibold text-stone-950 shadow-sm transition hover:bg-white">
+                            <button className="admin-button admin-button-sage px-3 py-1.5 text-xs font-semibold">
                               Publish
                             </button>
                           </form>

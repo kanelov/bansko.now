@@ -629,7 +629,7 @@ export function ArticleEditorForm({
           type="submit"
           name="intent"
           value="draft"
-          className="rounded-full border border-white/20 px-6 py-3 text-sm font-semibold text-white"
+          className="admin-button admin-button-secondary px-6 py-3 text-sm font-semibold"
         >
           Запази чернова
         </button>
@@ -637,7 +637,7 @@ export function ArticleEditorForm({
           type="submit"
           name="intent"
           value="publish"
-          className="rounded-full bg-white px-6 py-3 text-sm font-semibold text-stone-950"
+          className="admin-button admin-button-primary px-6 py-3 text-sm font-semibold"
         >
           Публикувай
         </button>
