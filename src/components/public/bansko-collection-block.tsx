@@ -20,7 +20,7 @@ export function BanskoCollectionBlock() {
           </div>
           <Link
             href="/bansko-collection"
-            className="inline-flex justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100"
+            className="inline-flex justify-center rounded-full bg-white px-6 py-3 text-sm font-semibold text-stone-950 shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-stone-100 hover:shadow-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
           >
             Разгледай Bansko Collection
           </Link>

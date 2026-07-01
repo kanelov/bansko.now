@@ -21,7 +21,7 @@ export function SourceLinks({ links }: { links: Json }) {
       <ul className="mt-4 grid gap-2 text-sm text-stone-700">
         {sourceLinks.map((link) => (
           <li key={link}>
-            <a href={link} className="break-words text-forest underline underline-offset-4">
+            <a href={link} className="break-words text-forest underline underline-offset-4" target="_blank" rel="noopener noreferrer">
               {link}
             </a>
           </li>

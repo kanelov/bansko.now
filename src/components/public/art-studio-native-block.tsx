@@ -21,7 +21,7 @@ export function ArtStudioNativeBlock() {
           </div>
           <Link
             href="/art-studio"
-            className="mt-8 inline-flex rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-moss"
+            className="mt-8 inline-flex rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:bg-moss hover:shadow-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest"
           >
             Виж Art Studio услугите
           </Link>

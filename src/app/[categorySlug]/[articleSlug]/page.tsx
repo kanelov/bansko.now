@@ -3,6 +3,8 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
 import { ArticleCard } from "@/components/public/article-card";
+import { ArticleShareActions } from "@/components/public/article-share-actions";
+import { ArticleTableOfContents } from "@/components/public/article-table-of-contents";
 import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
@@ -19,7 +21,7 @@ import {
   getTagsForArticle
 } from "@/lib/content";
 import { siteUrl } from "@/lib/env";
-import { getFaqItemsFromMarkdown } from "@/lib/markdown-blocks";
+import { getArticleToc, getFaqItemsFromMarkdown } from "@/lib/markdown-blocks";
 
 type Params = Promise<{ categorySlug: string; articleSlug: string }>;
 
@@ -34,6 +36,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   const title = article.seo_title || article.title;
   const description = article.seo_description || article.excerpt || undefined;
   const image = article.og_image_url || article.featured_image_url || fallbackHeroImage;
+  const canonical = article.canonical_url || `${siteUrl}${getArticlePath(article)}`;
 
   return {
     title: {
@@ -41,7 +44,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     },
     description,
     alternates: {
-      canonical: article.canonical_url || getArticlePath(article)
+      canonical
     },
     robots: {
       index: article.robots_index,
@@ -51,6 +54,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       title: article.og_title || title,
       description: article.og_description || description,
       type: "article",
+      url: canonical,
       publishedTime: article.published_at || undefined,
       modifiedTime: article.updated_at || undefined,
       authors: [article.author_name || "Любо Канелов"],
@@ -77,6 +81,26 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
+function stripMarkdownForSchema(value: string) {
+  return value
+    .replace(/:::([a-z]+)\n([\s\S]*?)\n:::/g, "$2")
+    .replace(/!\[([^\]]*)\]\([^)]+\)/g, "$1")
+    .replace(/\[([^\]]+)\]\([^)]+\)/g, "$1")
+    .replace(/[`*_>#~-]+/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function wordCount(value: string) {
+  const text = stripMarkdownForSchema(value);
+
+  if (!text) {
+    return 0;
+  }
+
+  return text.split(/\s+/).length;
+}
+
 export default async function ArticlePage({ params }: { params: Params }) {
   const { categorySlug, articleSlug } = await params;
   const [article, settings] = await Promise.all([getArticleBySlug(articleSlug), getSiteSettings()]);
@@ -96,26 +120,48 @@ export default async function ArticlePage({ params }: { params: Params }) {
   const articleUrl = `${siteUrl}${getArticlePath(article)}`;
   const publishedDate = formatDate(article.published_at);
   const updatedDate = formatDate(article.updated_at);
+  const tocItems = getArticleToc(article.content);
+  const articleWordCount = wordCount(article.content);
 
   const articleSchema = {
     "@context": "https://schema.org",
     "@type": article.schema_type || "Article",
+    url: articleUrl,
     headline: article.title,
     description: article.seo_description || article.excerpt,
-    image,
+    image: [
+      {
+        "@type": "ImageObject",
+        url: image,
+        caption: article.featured_image_alt || article.title,
+        representativeOfPage: true
+      }
+    ],
+    thumbnailUrl: image,
     datePublished: article.published_at,
     dateModified: article.updated_at,
+    inLanguage: "bg-BG",
+    isAccessibleForFree: true,
+    wordCount: articleWordCount || undefined,
     author: {
       "@type": "Person",
       name: article.author_name || settings.default_author_name || "Любо Канелов"
     },
     publisher: {
       "@type": "Organization",
-      name: "Bansko NOW"
+      name: "Bansko NOW",
+      url: siteUrl
     },
     articleSection: category.name,
+    about: {
+      "@type": "Thing",
+      name: category.name
+    },
     keywords: tags.map((tag) => tag.name).join(", "),
-    mainEntityOfPage: articleUrl
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": articleUrl
+    }
   };
   const faqItems = getFaqItemsFromMarkdown(article.content);
   const faqSchema = faqItems.length
@@ -127,7 +173,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
           name: item.question,
           acceptedAnswer: {
             "@type": "Answer",
-            text: item.answer
+            text: stripMarkdownForSchema(item.answer)
           }
         }))
       }
@@ -147,7 +193,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
     <div>
       <SiteHeader />
       <main>
-        <article className="mx-auto max-w-5xl px-4 py-10 sm:px-6 lg:px-8">
+        <article className="mx-auto max-w-[900px] px-4 py-10 sm:px-6 lg:px-8">
           <nav className="text-sm text-stone-500">
             <Link href="/">Начало</Link>
             <span className="px-2">/</span>
@@ -168,16 +214,23 @@ export default async function ArticlePage({ params }: { params: Params }) {
               <span>{article.author_name || settings.default_author_name || "Любо Канелов"}</span>
               <span>{article.reading_time || 1} мин. четене</span>
             </div>
+            <ArticleShareActions title={article.title} url={articleUrl} />
           </header>
 
           <figure className="mt-10">
-            <img src={image} alt={article.featured_image_alt || article.title} className="aspect-[16/10] w-full rounded-3xl object-cover" />
+            <img
+              src={image}
+              alt={article.featured_image_alt || article.title}
+              className="aspect-[16/10] w-full rounded-3xl object-cover"
+              decoding="async"
+            />
             {article.featured_image_alt ? (
               <figcaption className="mt-3 text-sm text-stone-500">{article.featured_image_alt}</figcaption>
             ) : null}
           </figure>
 
-          <div className="mx-auto mt-12 max-w-3xl">
+          <div className="mt-12">
+            <ArticleTableOfContents items={tocItems} />
             <MarkdownRenderer content={article.content} />
             <SourceLinks links={article.source_links} />
           </div>

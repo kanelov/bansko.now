@@ -3,11 +3,13 @@
 import { useMemo, useRef, useState } from "react";
 import { upsertArticleAction } from "@/app/admin/actions";
 import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
+import { ArticleTableOfContents } from "@/components/public/article-table-of-contents";
 import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SEOChecklist } from "@/components/admin/seo-checklist";
 import { fallbackSettings } from "@/lib/defaults";
+import { getArticleToc } from "@/lib/markdown-blocks";
 import { getSeoScore } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
 import type { ArticleStatus, ArticleWithCategory, Category, MediaItem } from "@/lib/types";
@@ -123,16 +125,24 @@ const visualBlocks = [
   },
   {
     label: "Callout",
-    snippet: "\n\n:::callout\nКратък редакторски акцент, полезен съвет или важна бележка.\n:::\n"
+    snippet: "\n\n:::callout\ncolor: forest\n\nКратък редакторски акцент, полезен съвет или важна бележка.\n:::\n"
+  },
+  {
+    label: "Text color",
+    snippet: "\n\n:::text\ncolor: clay\n\nТекст с избран цвят за редакционен акцент.\n:::\n"
   },
   {
     label: "Video",
     snippet: "\n\n:::video\nhttps://example.com/video.mp4\nКратко описание на видеото.\n:::\n"
   },
   {
+    label: "Button",
+    snippet: "\n\n:::button\ntext: Виж повече\nurl: https://example.com\nstyle: primary\n:::\n"
+  },
+  {
     label: "FAQ",
     snippet:
-      "\n\n:::faq\n### Въпрос за Банско?\nКратък и полезен отговор.\n\n### Втори въпрос?\nОще един ясен отговор.\n:::\n"
+      "\n\n:::faq\ncolor: stone\n\n### Въпрос за Банско?\nКратък и полезен отговор.\n\n### Втори въпрос?\nОще един ясен отговор.\n:::\n"
   }
 ];
 
@@ -148,6 +158,7 @@ export function ArticleEditorForm({
   const [activeTab, setActiveTab] = useState<Tab>("content");
   const [draft, setDraft] = useState<Draft>(() => initialDraft(article));
   const contentRef = useRef<HTMLTextAreaElement>(null);
+  const previewToc = useMemo(() => getArticleToc(draft.content || ""), [draft.content]);
   const seoArticle = useMemo<Partial<ArticleWithCategory>>(
     () => ({
       ...article,
@@ -590,7 +601,7 @@ export function ArticleEditorForm({
 
       {activeTab === "preview" ? (
         <section className="grid gap-8 rounded-2xl bg-paper p-5 text-stone-950">
-          <article className="mx-auto max-w-3xl">
+          <article className="mx-auto max-w-[900px]">
             <p className="text-sm font-semibold uppercase text-moss">Preview</p>
             <h1 className="mt-3 font-serif text-5xl font-semibold leading-tight">{draft.title || "Заглавие"}</h1>
             {draft.excerpt ? <p className="mt-5 text-xl leading-8 text-stone-650">{draft.excerpt}</p> : null}
@@ -602,6 +613,7 @@ export function ArticleEditorForm({
               />
             ) : null}
             <div className="mt-10">
+              <ArticleTableOfContents items={previewToc} />
               <MarkdownRenderer content={draft.content || "## Подзаглавие\n\nТекстът на статията ще се покаже тук."} />
             </div>
           </article>
