@@ -104,6 +104,7 @@ a {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
+  cursor: pointer;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
   transition:
     transform 180ms ease,
@@ -162,4 +163,16 @@ a {
 .admin-button-sage:hover {
   background: #fff;
   color: var(--forest);
+}
+
+.admin-button-danger {
+  border: 1px solid rgba(252, 165, 165, 0.45);
+  background: #7f1d1d;
+  color: #fff;
+}
+
+.admin-button-danger:hover {
+  border-color: rgba(254, 202, 202, 0.8);
+  background: #991b1b;
+  color: #fff;
 }

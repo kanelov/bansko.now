@@ -77,6 +77,26 @@ function revalidateSiteChrome() {
   revalidatePath("/admin/settings");
 }
 
+function storagePathFromPublicUrl(fileUrl: string | null) {
+  if (!fileUrl) {
+    return null;
+  }
+
+  const marker = `/storage/v1/object/public/${mediaBucket}/`;
+
+  try {
+    const parsed = new URL(fileUrl);
+    const markerIndex = parsed.pathname.indexOf(marker);
+
+    return markerIndex >= 0 ? decodeURIComponent(parsed.pathname.slice(markerIndex + marker.length)) : null;
+  } catch {
+    const markerIndex = fileUrl.indexOf(marker);
+    const rawPath = markerIndex >= 0 ? fileUrl.slice(markerIndex + marker.length).split("?")[0] : null;
+
+    return rawPath ? decodeURIComponent(rawPath) : null;
+  }
+}
+
 export async function signInAction(formData: FormData) {
   const supabase = await createSupabaseServerClient();
 
@@ -212,6 +232,81 @@ export async function publishArticleAction(formData: FormData) {
 
   revalidateEditorialPaths();
   revalidatePath("/admin/articles");
+}
+
+export async function deleteArticleAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+
+  if (!id) {
+    redirect("/admin/articles?error=missing-id");
+  }
+
+  const { error } = await supabase.from("articles").delete().eq("id", id);
+
+  if (error) {
+    redirect(`/admin/articles?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidateEditorialPaths();
+  revalidatePath("/admin/articles");
+  redirect("/admin/articles?deleted=1");
+}
+
+export async function deleteCategoryAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+
+  if (!id) {
+    redirect("/admin/categories?error=missing-id");
+  }
+
+  const { data: category } = await supabase.from("categories").select("slug").eq("id", id).maybeSingle();
+  const { error } = await supabase.from("categories").delete().eq("id", id);
+
+  if (error) {
+    redirect(`/admin/categories?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidateEditorialPaths();
+  revalidatePath("/admin/categories");
+  revalidatePath("/admin/articles");
+
+  if (category?.slug) {
+    revalidatePath(`/${category.slug}`);
+  }
+
+  redirect("/admin/categories?deleted=1");
+}
+
+export async function deleteMediaAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+
+  if (!id) {
+    redirect("/admin/media?error=missing-id");
+  }
+
+  const { data: mediaItem } = await supabase.from("media").select("file_url").eq("id", id).maybeSingle();
+  const storagePath = storagePathFromPublicUrl(mediaItem?.file_url ?? null);
+
+  if (storagePath) {
+    const { error: storageError } = await supabase.storage.from(mediaBucket).remove([storagePath]);
+
+    if (storageError) {
+      redirect(`/admin/media?error=${encodeURIComponent(storageError.message)}`);
+    }
+  }
+
+  const { error } = await supabase.from("media").delete().eq("id", id);
+
+  if (error) {
+    redirect(`/admin/media?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/media");
+  redirect("/admin/media?deleted=1");
 }
 
 export async function uploadMediaAction(formData: FormData) {

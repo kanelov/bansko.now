@@ -1,8 +1,10 @@
 import Link from "next/link";
 import type { Route } from "next";
-import { publishArticleAction } from "@/app/admin/actions";
+import { deleteArticleAction, publishArticleAction } from "@/app/admin/actions";
 import { getAllAdminArticles, getArticleCategory, getArticlePath } from "@/lib/content";
 import { getSeoScore } from "@/lib/seo";
+
+type SearchParams = Promise<{ deleted?: string; error?: string }>;
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -13,8 +15,8 @@ function formatDate(value: string | null) {
   }).format(new Date(value));
 }
 
-export default async function AdminArticlesPage() {
-  const articles = await getAllAdminArticles();
+export default async function AdminArticlesPage({ searchParams }: { searchParams: SearchParams }) {
+  const [params, articles] = await Promise.all([searchParams, getAllAdminArticles()]);
 
   return (
     <div className="grid gap-8">
@@ -28,9 +30,21 @@ export default async function AdminArticlesPage() {
         </Link>
       </div>
 
+      {params.deleted ? (
+        <div className="rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">
+          Статията е изтрита.
+        </div>
+      ) : null}
+
+      {params.error ? (
+        <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+          {params.error}
+        </div>
+      ) : null}
+
       <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
         <div className="overflow-x-auto">
-          <table className="w-full min-w-[900px] text-left text-sm">
+          <table className="w-full min-w-[980px] text-left text-sm">
             <thead className="bg-white/10 text-stone-300">
               <tr>
                 <th className="px-4 py-3">Title</th>
@@ -71,6 +85,18 @@ export default async function AdminArticlesPage() {
                             </button>
                           </form>
                         ) : null}
+                        <details>
+                          <summary className="admin-button admin-button-danger list-none px-3 py-1.5 text-xs font-semibold">
+                            Delete
+                          </summary>
+                          <form action={deleteArticleAction} className="mt-2 grid min-w-44 gap-2 rounded-xl border border-red-300/20 bg-red-950/30 p-3">
+                            <input type="hidden" name="id" value={article.id} />
+                            <p className="text-xs leading-5 text-red-100">Потвърди изтриването.</p>
+                            <button className="admin-button admin-button-danger px-3 py-1.5 text-xs font-semibold">
+                              Confirm delete
+                            </button>
+                          </form>
+                        </details>
                       </div>
                     </td>
                   </tr>

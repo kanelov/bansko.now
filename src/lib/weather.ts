@@ -8,6 +8,17 @@ export type BanskoWeather = {
   min: number | null;
   max: number | null;
   precipitationProbability: number | null;
+  forecast: BanskoWeatherDay[];
+};
+
+export type BanskoWeatherDay = {
+  date: string | null;
+  label: string;
+  condition: string;
+  min: number | null;
+  max: number | null;
+  windSpeed: number | null;
+  precipitationProbability: number | null;
 };
 
 const weatherCodes: Record<number, string> = {
@@ -32,6 +43,24 @@ const weatherCodes: Record<number, string> = {
   95: "Буря"
 };
 
+const forecastLabels = ["Днес", "Утре", "+2 дни"];
+
+function conditionFromCode(code: number | null | undefined) {
+  return typeof code === "number" ? weatherCodes[code] || "Променливо" : "Променливо";
+}
+
+function fallbackForecast(): BanskoWeatherDay[] {
+  return forecastLabels.map((label) => ({
+    date: null,
+    label,
+    condition: "Очаква данни",
+    min: null,
+    max: null,
+    windSpeed: null,
+    precipitationProbability: null
+  }));
+}
+
 export async function getBanskoWeather(): Promise<BanskoWeather> {
   const url = new URL(openMeteoBaseUrl);
   url.searchParams.set("latitude", "41.8383");
@@ -42,10 +71,10 @@ export async function getBanskoWeather(): Promise<BanskoWeather> {
   );
   url.searchParams.set(
     "daily",
-    "temperature_2m_max,temperature_2m_min,precipitation_probability_max"
+    "weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max,precipitation_probability_max"
   );
   url.searchParams.set("timezone", "Europe/Sofia");
-  url.searchParams.set("forecast_days", "1");
+  url.searchParams.set("forecast_days", "3");
 
   try {
     const response = await fetch(url, { next: { revalidate: 1800 } });
@@ -62,22 +91,35 @@ export async function getBanskoWeather(): Promise<BanskoWeather> {
         wind_speed_10m?: number;
       };
       daily?: {
+        time?: string[];
+        weather_code?: number[];
         temperature_2m_max?: number[];
         temperature_2m_min?: number[];
+        wind_speed_10m_max?: number[];
         precipitation_probability_max?: number[];
       };
     };
 
     const code = data.current?.weather_code;
+    const forecast = forecastLabels.map((label, index) => ({
+      date: data.daily?.time?.[index] ?? null,
+      label,
+      condition: conditionFromCode(data.daily?.weather_code?.[index]),
+      min: data.daily?.temperature_2m_min?.[index] ?? null,
+      max: data.daily?.temperature_2m_max?.[index] ?? null,
+      windSpeed: data.daily?.wind_speed_10m_max?.[index] ?? null,
+      precipitationProbability: data.daily?.precipitation_probability_max?.[index] ?? null
+    }));
 
     return {
       temperature: data.current?.temperature_2m ?? null,
       apparentTemperature: data.current?.apparent_temperature ?? null,
-      condition: typeof code === "number" ? weatherCodes[code] || "Променливо" : "Променливо",
+      condition: conditionFromCode(code),
       windSpeed: data.current?.wind_speed_10m ?? null,
-      min: data.daily?.temperature_2m_min?.[0] ?? null,
-      max: data.daily?.temperature_2m_max?.[0] ?? null,
-      precipitationProbability: data.daily?.precipitation_probability_max?.[0] ?? null
+      min: forecast[0]?.min ?? null,
+      max: forecast[0]?.max ?? null,
+      precipitationProbability: forecast[0]?.precipitationProbability ?? null,
+      forecast
     };
   } catch {
     return {
@@ -87,7 +129,8 @@ export async function getBanskoWeather(): Promise<BanskoWeather> {
       windSpeed: null,
       min: null,
       max: null,
-      precipitationProbability: null
+      precipitationProbability: null,
+      forecast: fallbackForecast()
     };
   }
 }

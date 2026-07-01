@@ -81,15 +81,20 @@ function SocialIconLink({ link }: { link: SocialLink }) {
   );
 }
 
-function AdminLink() {
+function AdminLink({ showLabel = false }: { showLabel?: boolean }) {
   return (
     <Link
       href="/admin"
       aria-label="Админ панел"
       title="Админ панел"
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 text-forest transition hover:border-forest hover:bg-forest hover:text-white"
+      className={
+        showLabel
+          ? "inline-flex h-9 items-center gap-2 rounded-full border border-stone-300 bg-white/60 px-3 text-sm font-medium text-forest transition hover:border-forest hover:bg-forest hover:text-white"
+          : "inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 text-forest transition hover:border-forest hover:bg-forest hover:text-white"
+      }
     >
       <IconGlyph name="user-shield" className="h-4 w-4" />
+      {showLabel ? <span>Админ</span> : null}
     </Link>
   );
 }
@@ -124,7 +129,7 @@ export async function SiteHeader() {
           {socialLinks.map((link) => (
             <SocialIconLink key={link.id} link={link} />
           ))}
-          <AdminLink />
+          <AdminLink showLabel />
         </div>
 
         <details className="group relative lg:hidden">
@@ -145,7 +150,7 @@ export async function SiteHeader() {
               {socialLinks.map((link) => (
                 <SocialIconLink key={link.id} link={link} />
               ))}
-              <AdminLink />
+              <AdminLink showLabel />
             </div>
           </div>
         </details>

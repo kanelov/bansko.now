@@ -1,9 +1,10 @@
-import { uploadMediaAction } from "@/app/admin/actions";
+import { deleteMediaAction, uploadMediaAction } from "@/app/admin/actions";
 import { getMediaItems } from "@/lib/content";
 
-type SearchParams = Promise<{ uploaded?: string; error?: string }>;
+type SearchParams = Promise<{ uploaded?: string; deleted?: string; error?: string }>;
 
 const errorMessages: Record<string, string> = {
+  "missing-id": "Липсва валиден запис за изтриване.",
   "missing-file": "Избери файл за качване.",
   "invalid-type": "Може да качваш само изображения или видео файлове.",
   "file-too-large": "Изображението трябва да е до 8 MB, а видеото до 80 MB."
@@ -27,6 +28,12 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
       {params.uploaded ? (
         <div className="rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">
           Изображението е качено и записано в media библиотеката.
+        </div>
+      ) : null}
+
+      {params.deleted ? (
+        <div className="rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">
+          Файлът е изтрит от media библиотеката.
         </div>
       ) : null}
 
@@ -110,6 +117,20 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
                     value={item.file_url}
                     className="w-full rounded-xl border border-stone-200 bg-stone-50 px-3 py-2 text-xs text-stone-600"
                   />
+                  <details>
+                    <summary className="admin-button admin-button-danger list-none px-4 py-2 text-xs font-semibold">
+                      Изтрий файл
+                    </summary>
+                    <form action={deleteMediaAction} className="mt-3 grid gap-3 rounded-xl border border-red-200 bg-red-50 p-3">
+                      <input type="hidden" name="id" value={item.id} />
+                      <p className="text-xs leading-5 text-red-900">
+                        Това изтрива записа и файла от Supabase Storage, ако е качен в `bansko-media`.
+                      </p>
+                      <button className="admin-button admin-button-danger px-4 py-2 text-xs font-semibold">
+                        Потвърди изтриване
+                      </button>
+                    </form>
+                  </details>
                 </div>
               </article>
             ))}

@@ -169,8 +169,13 @@ export async function getCategories(): Promise<Category[]> {
     return categoryDefinitions;
   }
 
-  const { data } = await supabase.from("categories").select("*").order("created_at");
-  return data?.length ? data : categoryDefinitions;
+  const { data, error } = await supabase.from("categories").select("*").order("created_at");
+
+  if (error) {
+    return categoryDefinitions;
+  }
+
+  return (data ?? []) as Category[];
 }
 
 export async function getCategoryBySlug(slug: string): Promise<Category | null> {
@@ -180,8 +185,13 @@ export async function getCategoryBySlug(slug: string): Promise<Category | null> 
     return categoryDefinitions.find((category) => category.slug === slug) ?? null;
   }
 
-  const { data } = await supabase.from("categories").select("*").eq("slug", slug).maybeSingle();
-  return data ?? categoryDefinitions.find((category) => category.slug === slug) ?? null;
+  const { data, error } = await supabase.from("categories").select("*").eq("slug", slug).maybeSingle();
+
+  if (error) {
+    return categoryDefinitions.find((category) => category.slug === slug) ?? null;
+  }
+
+  return data ?? null;
 }
 
 export async function getPublishedArticles(options?: {
