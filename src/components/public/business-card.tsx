@@ -6,16 +6,17 @@ import type { BusinessWithRelations } from "@/lib/types";
 
 export function BusinessCard({ business, featured = false }: { business: BusinessWithRelations; featured?: boolean }) {
   const tier = getEffectiveBusinessTier(business);
-  const isPremium = tier === "premium" || tier === "homepage";
+  const isSpotlight = tier === "homepage";
+  const isLarge = isSpotlight && featured;
 
   return (
     <article
       className={[
         "overflow-hidden rounded-2xl border bg-white shadow-soft transition hover:-translate-y-1 hover:shadow-[0_24px_55px_rgba(38,31,22,0.13)]",
-        isPremium || featured ? "border-forest/25 md:grid md:grid-cols-[1.05fr_0.95fr]" : "border-stone-200"
+        isLarge ? "border-forest/25 md:grid md:grid-cols-[1.05fr_0.95fr]" : "border-stone-200"
       ].join(" ")}
     >
-      <BusinessMedia business={business} className={`aspect-[4/3] overflow-hidden bg-sage ${isPremium || featured ? "h-full min-h-64" : ""}`} />
+      <BusinessMedia business={business} className={`aspect-[4/3] overflow-hidden bg-sage ${isLarge ? "h-full min-h-64" : ""}`} />
       <div className="flex flex-col p-5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{business.category}</span>

@@ -18,9 +18,9 @@ export function BusinessDirectoryView({ businesses }: { businesses: BusinessWith
       }),
     [businesses, category, feature]
   );
-  const firstPremiumIndex = filtered.findIndex((business) => {
+  const spotlightIndex = filtered.findIndex((business) => {
     const tier = getEffectiveBusinessTier(business);
-    return tier === "premium" || tier === "homepage";
+    return tier === "homepage";
   });
 
   return (
@@ -51,8 +51,8 @@ export function BusinessDirectoryView({ businesses }: { businesses: BusinessWith
       {filtered.length ? (
         <div className="grid gap-5 md:grid-cols-2">
           {filtered.map((business, index) => (
-            <div key={business.id} className={index === firstPremiumIndex ? "md:col-span-2" : ""}>
-              <BusinessCard business={business} featured={index === firstPremiumIndex} />
+            <div key={business.id} className={index === spotlightIndex ? "md:col-span-2" : ""}>
+              <BusinessCard business={business} featured={index === spotlightIndex} />
             </div>
           ))}
         </div>

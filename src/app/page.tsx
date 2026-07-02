@@ -10,6 +10,7 @@ import { LatestArticles } from "@/components/public/latest-articles";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { WeatherWidget } from "@/components/public/weather-widget";
+import { getBusinessVideoEmbedUrl } from "@/lib/business-public";
 import {
   categoryDefinitions,
   fallbackHeroImage,
@@ -29,8 +30,22 @@ const todayCards: { title: string; text: string; href: string }[] = [
 function HeroMedia({ settings }: { settings: SiteSettings }) {
   const imageUrl = settings.hero_image_url || settings.default_og_image || fallbackHeroImage;
   const imageAlt = settings.hero_image_alt || "Банско и Пирин";
+  const hostedVideoEmbedUrl = getBusinessVideoEmbedUrl(settings.hero_video_url);
+  const embedUrl = getBusinessVideoEmbedUrl(settings.hero_embed_url) || settings.hero_embed_url;
 
   if (settings.hero_media_type === "video" && settings.hero_video_url) {
+    if (hostedVideoEmbedUrl) {
+      return (
+        <iframe
+          src={hostedVideoEmbedUrl}
+          title="Bansko NOW hero video"
+          className="absolute inset-0 h-full w-full scale-110 border-0"
+          allow="autoplay; fullscreen; picture-in-picture"
+          allowFullScreen
+        />
+      );
+    }
+
     return (
       <video
         src={settings.hero_video_url}
@@ -44,12 +59,12 @@ function HeroMedia({ settings }: { settings: SiteSettings }) {
     );
   }
 
-  if (settings.hero_media_type === "embed" && settings.hero_embed_url) {
+  if (settings.hero_media_type === "embed" && embedUrl) {
     return (
       <iframe
-        src={settings.hero_embed_url}
+        src={embedUrl}
         title="Bansko NOW hero video"
-        className="absolute inset-0 h-full w-full scale-110 border-0 object-cover"
+        className="absolute inset-0 h-full w-full scale-110 border-0"
         allow="autoplay; fullscreen; picture-in-picture"
         allowFullScreen
       />

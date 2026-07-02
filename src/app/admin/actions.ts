@@ -384,14 +384,17 @@ export async function saveSettingsAction(formData: FormData) {
     default_author_name: stringValue(formData, "default_author_name") || "Любо Канелов"
   };
 
-  if (id) {
-    await supabase.from("site_settings").update(payload).eq("id", id);
-  } else {
-    await supabase.from("site_settings").insert(payload);
+  const { error } = id
+    ? await supabase.from("site_settings").update(payload).eq("id", id)
+    : await supabase.from("site_settings").insert(payload);
+
+  if (error) {
+    redirect(`/admin/settings?error=${encodeURIComponent(error.message)}`);
   }
 
   revalidatePath("/");
   revalidatePath("/admin/settings");
+  redirect("/admin/settings?saved=1");
 }
 
 export async function saveNavigationAction(formData: FormData) {

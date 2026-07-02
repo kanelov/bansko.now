@@ -127,7 +127,10 @@ function SocialRow({ item, rowKey }: { item?: SocialLink; rowKey: string }) {
   );
 }
 
-export default async function AdminSettingsPage() {
+type SearchParams = Promise<{ saved?: string; error?: string }>;
+
+export default async function AdminSettingsPage({ searchParams }: { searchParams: SearchParams }) {
+  const params = await searchParams;
   const settings = await getSiteSettings();
   const [navigationItems, socialLinks] = await Promise.all([getAllNavigationItems(), getAllSocialLinks(settings)]);
 
@@ -147,6 +150,16 @@ export default async function AdminSettingsPage() {
         <p className="text-sm font-semibold uppercase text-stone-400">Configuration</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Settings</h1>
       </div>
+      {params.saved ? (
+        <div className="max-w-3xl rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">
+          Settings са запазени.
+        </div>
+      ) : null}
+      {params.error ? (
+        <div className="max-w-3xl rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+          {params.error}
+        </div>
+      ) : null}
       <form action={saveSettingsAction} className="grid max-w-3xl gap-6 rounded-2xl border border-white/10 bg-white/5 p-6">
         {settings.id !== "fallback" ? <input type="hidden" name="id" value={settings.id} /> : null}
         <section className="grid gap-5">
@@ -189,7 +202,7 @@ export default async function AdminSettingsPage() {
           </label>
           <label className="grid gap-2 text-sm font-semibold">
             Hosted video URL
-            <input name="hero_video_url" defaultValue={settings.hero_video_url || ""} className={fieldClass()} placeholder="https://.../bansko-hero.mp4" />
+            <input name="hero_video_url" defaultValue={settings.hero_video_url || ""} className={fieldClass()} placeholder="MP4/WebM URL или YouTube/Vimeo URL" />
           </label>
           <label className="grid gap-2 text-sm font-semibold">
             Video poster URL
@@ -201,7 +214,7 @@ export default async function AdminSettingsPage() {
           </label>
           <label className="grid gap-2 text-sm font-semibold">
             Embed URL
-            <input name="hero_embed_url" defaultValue={settings.hero_embed_url || ""} className={fieldClass()} placeholder="https://www.youtube.com/embed/..." />
+            <input name="hero_embed_url" defaultValue={settings.hero_embed_url || ""} className={fieldClass()} placeholder="YouTube, Vimeo или /embed/ URL" />
           </label>
         </section>
 
