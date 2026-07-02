@@ -60,7 +60,35 @@ export function getDirectionsUrl(business: Pick<Business, "latitude" | "longitud
   return `https://www.google.com/maps/search/?api=1&query=${query}`;
 }
 
-export function getBusinessVideoEmbedUrl(videoLink: string | null | undefined) {
+function videoSearchParams(provider: "youtube" | "vimeo", id: string, autoplay?: boolean) {
+  if (!autoplay) {
+    return "";
+  }
+
+  const params =
+    provider === "youtube"
+      ? new URLSearchParams({
+          autoplay: "1",
+          mute: "1",
+          loop: "1",
+          playlist: id,
+          controls: "0",
+          playsinline: "1",
+          rel: "0",
+          modestbranding: "1"
+        })
+      : new URLSearchParams({
+          autoplay: "1",
+          muted: "1",
+          loop: "1",
+          background: "1",
+          controls: "0"
+        });
+
+  return `?${params.toString()}`;
+}
+
+export function getBusinessVideoEmbedUrl(videoLink: string | null | undefined, options?: { autoplay?: boolean }) {
   if (!videoLink) {
     return null;
   }
@@ -71,17 +99,17 @@ export function getBusinessVideoEmbedUrl(videoLink: string | null | undefined) {
 
     if (host === "youtu.be") {
       const id = url.pathname.split("/").filter(Boolean)[0];
-      return id ? `https://www.youtube.com/embed/${id}` : null;
+      return id ? `https://www.youtube.com/embed/${id}${videoSearchParams("youtube", id, options?.autoplay)}` : null;
     }
 
-    if (host === "youtube.com" || host === "m.youtube.com") {
+    if (host === "youtube.com" || host === "m.youtube.com" || host === "youtube-nocookie.com") {
       const id = url.searchParams.get("v") || url.pathname.split("/").filter(Boolean).at(-1);
-      return id ? `https://www.youtube.com/embed/${id}` : null;
+      return id ? `https://www.youtube.com/embed/${id}${videoSearchParams("youtube", id, options?.autoplay)}` : null;
     }
 
     if (host === "vimeo.com" || host === "player.vimeo.com") {
       const id = url.pathname.split("/").filter(Boolean).at(-1);
-      return id ? `https://player.vimeo.com/video/${id}` : null;
+      return id ? `https://player.vimeo.com/video/${id}${videoSearchParams("vimeo", id, options?.autoplay)}` : null;
     }
 
     return videoLink.includes("/embed/") || videoLink.includes("player.vimeo.com") ? videoLink : null;

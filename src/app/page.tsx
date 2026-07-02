@@ -30,8 +30,8 @@ const todayCards: { title: string; text: string; href: string }[] = [
 function HeroMedia({ settings }: { settings: SiteSettings }) {
   const imageUrl = settings.hero_image_url || settings.default_og_image || fallbackHeroImage;
   const imageAlt = settings.hero_image_alt || "Банско и Пирин";
-  const hostedVideoEmbedUrl = getBusinessVideoEmbedUrl(settings.hero_video_url);
-  const embedUrl = getBusinessVideoEmbedUrl(settings.hero_embed_url) || settings.hero_embed_url;
+  const hostedVideoEmbedUrl = getBusinessVideoEmbedUrl(settings.hero_video_url, { autoplay: true });
+  const embedUrl = getBusinessVideoEmbedUrl(settings.hero_embed_url, { autoplay: true }) || settings.hero_embed_url;
 
   if (settings.hero_media_type === "video" && settings.hero_video_url) {
     if (hostedVideoEmbedUrl) {
@@ -40,7 +40,7 @@ function HeroMedia({ settings }: { settings: SiteSettings }) {
           src={hostedVideoEmbedUrl}
           title="Bansko NOW hero video"
           className="absolute inset-0 h-full w-full scale-110 border-0"
-          allow="autoplay; fullscreen; picture-in-picture"
+          allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
           allowFullScreen
         />
       );
@@ -65,7 +65,7 @@ function HeroMedia({ settings }: { settings: SiteSettings }) {
         src={embedUrl}
         title="Bansko NOW hero video"
         className="absolute inset-0 h-full w-full scale-110 border-0"
-        allow="autoplay; fullscreen; picture-in-picture"
+        allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
         allowFullScreen
       />
     );

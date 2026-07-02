@@ -73,11 +73,11 @@ function SocialIconLink({ link }: { link: SocialLink }) {
       href={link.url}
       aria-label={link.label}
       title={link.label}
-      className="inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 text-forest transition hover:border-forest hover:bg-forest hover:text-white"
+      className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 text-forest transition hover:border-forest hover:bg-forest hover:text-white"
       target="_blank"
       rel="noopener noreferrer"
     >
-      <IconGlyph name={link.icon_name || link.platform} className="h-4 w-4" />
+      <IconGlyph name={link.icon_name || link.platform} className="h-4 w-4 text-current transition group-hover:text-white" />
     </a>
   );
 }
@@ -90,12 +90,12 @@ function AdminLink({ showLabel = false }: { showLabel?: boolean }) {
       title="Админ панел"
       className={
         showLabel
-          ? "inline-flex h-9 items-center gap-2 rounded-full border border-stone-300 bg-white/60 px-3 text-sm font-medium text-forest transition hover:border-forest hover:bg-forest hover:text-white"
-          : "inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 text-forest transition hover:border-forest hover:bg-forest hover:text-white"
+          ? "group inline-flex h-9 items-center gap-2 rounded-full border border-stone-300 bg-white/60 px-3 text-sm font-medium text-forest transition hover:border-forest hover:bg-forest hover:text-white"
+          : "group inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 text-forest transition hover:border-forest hover:bg-forest hover:text-white"
       }
     >
-      <IconGlyph name="user-shield" className="h-4 w-4" />
-      {showLabel ? <span>Админ</span> : null}
+      <IconGlyph name="user-shield" className="h-4 w-4 text-current transition group-hover:text-white" />
+      {showLabel ? <span className="transition group-hover:text-white">Админ</span> : null}
     </Link>
   );
 }
