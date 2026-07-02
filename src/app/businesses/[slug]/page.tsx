@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { BusinessMedia } from "@/components/public/business-media";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
@@ -114,9 +115,7 @@ export default async function BusinessProfilePage({ params }: { params: Params }
           {business.video_link ? (
             <section className="rounded-3xl border border-stone-200 bg-white p-6 shadow-soft">
               <p className="text-sm font-semibold uppercase text-moss">Видео</p>
-              <a href={business.video_link} target="_blank" rel="noopener noreferrer" className="mt-3 inline-flex rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss">
-                Отвори видеото
-              </a>
+              <BusinessMedia business={business} className="mt-4 aspect-video overflow-hidden rounded-2xl bg-sage" preferVideo />
             </section>
           ) : null}
 

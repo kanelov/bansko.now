@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { BusinessMedia } from "@/components/public/business-media";
 import { getBusinessPath, getDirectionsUrl, getEffectiveBusinessTier } from "@/lib/business-public";
 import { getHomepageSpotlightBusiness } from "@/lib/businesses";
 
@@ -14,11 +15,7 @@ export async function BusinessSpotlightBlock() {
 
   return (
     <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-soft md:grid md:grid-cols-[0.95fr_1.05fr]">
-      {business.images?.[0] ? (
-        <img src={business.images[0]} alt={business.name} className="aspect-[4/3] h-full w-full object-cover" loading="lazy" />
-      ) : (
-        <div className="flex aspect-[4/3] h-full items-center justify-center bg-sage text-forest">Bansko NOW Local</div>
-      )}
+      <BusinessMedia business={business} className="aspect-[4/3] h-full overflow-hidden bg-sage" preferVideo />
       <div className="p-8 sm:p-10">
         <p className="text-sm font-semibold uppercase text-moss">Местен фокус</p>
         <div className="mt-4 flex flex-wrap gap-2">

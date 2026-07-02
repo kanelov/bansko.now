@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
+import { BusinessMedia } from "@/components/public/business-media";
 import {
   businessCategories,
   getBusinessPath,
@@ -95,9 +96,7 @@ export function IllustratedBusinessMap({
       <aside className="rounded-3xl border border-stone-200 bg-white p-5 shadow-soft">
         {selected ? (
           <div>
-            {selected.images?.[0] ? (
-              <img src={selected.images[0]} alt={selected.name} className="aspect-[4/3] w-full rounded-2xl object-cover" />
-            ) : null}
+            <BusinessMedia business={selected} className="aspect-[4/3] overflow-hidden rounded-2xl bg-sage" />
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{selected.category}</span>
               {getEffectiveBusinessTier(selected) !== "free" ? (

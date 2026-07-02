@@ -52,6 +52,21 @@ function linesValue(formData: FormData, key: string) {
     .filter(Boolean);
 }
 
+function faqLinesValue(formData: FormData, key: string) {
+  return rawStringValue(formData, key)
+    .split(/\n+/)
+    .map((line) => {
+      const [question, ...answerParts] = line.split("|");
+      const answer = answerParts.join("|").trim();
+
+      return {
+        question: question?.trim() || "",
+        answer
+      };
+    })
+    .filter((item) => item.question && item.answer);
+}
+
 function normalizeDate(value: string | null) {
   return value ? new Date(value).toISOString() : null;
 }
@@ -178,6 +193,8 @@ export async function updateBusinessAction(formData: FormData) {
     website_url: stringValue(formData, "website_url"),
     instagram_url: stringValue(formData, "instagram_url"),
     facebook_url: stringValue(formData, "facebook_url"),
+    images: linesValue(formData, "images_input"),
+    faqs: faqLinesValue(formData, "faqs_input"),
     features: linesValue(formData, "features_input"),
     requested_services: linesValue(formData, "requested_services_input"),
     status: businessStatusValue(stringValue(formData, "status")),

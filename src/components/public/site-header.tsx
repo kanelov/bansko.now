@@ -3,6 +3,7 @@ import type { Route } from "next";
 import { getNavigationItems, getSiteSettings, getSocialLinks } from "@/lib/content";
 import type { NavigationItem, SocialLink } from "@/lib/types";
 import { IconGlyph } from "./icon-glyph";
+import { SiteSearch } from "./site-search";
 
 function isExternalUrl(href: string) {
   return /^(https?:|mailto:|tel:)/i.test(href);
@@ -19,7 +20,7 @@ function linkProps(href: string, openInNewTab?: boolean) {
 
 function DesktopMenuItem({ item }: { item: NavigationItem }) {
   const className =
-    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm font-medium text-stone-700 transition hover:bg-white/70 hover:text-forest";
+    "inline-flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white";
   const label = (
     <>
       <IconGlyph name={item.icon_name} className="h-3.5 w-3.5 shrink-0" />
@@ -43,10 +44,10 @@ function DesktopMenuItem({ item }: { item: NavigationItem }) {
 }
 
 function MobileMenuItem({ item }: { item: NavigationItem }) {
-  const className = "flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100";
+  const className = "group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white";
   const label = (
     <>
-      <IconGlyph name={item.icon_name} className="h-4 w-4 shrink-0 text-forest" />
+      <IconGlyph name={item.icon_name} className="h-4 w-4 shrink-0 text-forest transition group-hover:text-white" />
       <span>{item.label}</span>
     </>
   );
@@ -119,13 +120,11 @@ export async function SiteHeader() {
         <div className="hidden shrink-0 items-center gap-2 lg:flex">
           <Link
             href="/articles"
-            className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-forest hover:bg-white hover:text-forest"
+            className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-forest hover:bg-forest hover:text-white"
           >
             Всички статии
           </Link>
-          <span className="inline-flex h-9 w-9 items-center justify-center rounded-full bg-white/70 text-stone-400 shadow-soft" aria-label="Търсене">
-            <IconGlyph name="magnifying-glass" className="h-4 w-4" />
-          </span>
+          <SiteSearch />
           {socialLinks.map((link) => (
             <SocialIconLink key={link.id} link={link} />
           ))}
@@ -141,8 +140,9 @@ export async function SiteHeader() {
               {navItems.map((item) => (
                 <MobileMenuItem key={item.id} item={item} />
               ))}
-              <Link href="/articles" className="flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 hover:bg-stone-100">
-                <IconGlyph name="newspaper" className="h-4 w-4 text-forest" />
+              <SiteSearch compact />
+              <Link href="/articles" className="group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white">
+                <IconGlyph name="newspaper" className="h-4 w-4 text-forest transition group-hover:text-white" />
                 Всички статии
               </Link>
             </nav>

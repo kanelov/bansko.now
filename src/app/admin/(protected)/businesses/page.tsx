@@ -22,6 +22,24 @@ function textAreaValue(value: string[] | null | undefined) {
   return (value ?? []).join("\n");
 }
 
+function faqTextAreaValue(value: unknown) {
+  return Array.isArray(value)
+    ? value
+        .map((item) => {
+          if (!item || typeof item !== "object") {
+            return "";
+          }
+
+          const record = item as Record<string, unknown>;
+          const question = typeof record.question === "string" ? record.question.trim() : "";
+          const answer = typeof record.answer === "string" ? record.answer.trim() : "";
+          return question && answer ? `${question} | ${answer}` : "";
+        })
+        .filter(Boolean)
+        .join("\n")
+    : "";
+}
+
 function formatDate(value: string | null) {
   return value ? new Date(value).toLocaleDateString("bg-BG") : "—";
 }
@@ -128,6 +146,26 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                       <input name="instagram_url" defaultValue={business.instagram_url ?? ""} placeholder="Instagram" className="rounded-xl border border-stone-300 px-4 py-3" />
                     </div>
                     <input name="facebook_url" defaultValue={business.facebook_url ?? ""} placeholder="Facebook" className="rounded-xl border border-stone-300 px-4 py-3" />
+                    <label className="grid gap-2 text-sm font-semibold">
+                      Image URLs
+                      <textarea
+                        name="images_input"
+                        defaultValue={textAreaValue(business.images)}
+                        rows={4}
+                        className="rounded-xl border border-stone-300 px-4 py-3"
+                        placeholder="Един URL на ред. Първият е основната снимка."
+                      />
+                    </label>
+                    <label className="grid gap-2 text-sm font-semibold">
+                      FAQs
+                      <textarea
+                        name="faqs_input"
+                        defaultValue={faqTextAreaValue(business.faqs)}
+                        rows={4}
+                        className="rounded-xl border border-stone-300 px-4 py-3"
+                        placeholder="Въпрос | Отговор"
+                      />
+                    </label>
                     <div className="grid gap-4 md:grid-cols-2">
                       <textarea name="features_input" defaultValue={textAreaValue(business.features)} rows={5} className="rounded-xl border border-stone-300 px-4 py-3" placeholder={businessFeatures.join("\n")} />
                       <textarea name="requested_services_input" defaultValue={textAreaValue(business.requested_services)} rows={5} className="rounded-xl border border-stone-300 px-4 py-3" placeholder={businessServices.join("\n")} />

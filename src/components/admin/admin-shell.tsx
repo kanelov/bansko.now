@@ -20,7 +20,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
         </Link>
         <nav className="mt-10 grid gap-2">
           {adminNav.map((item) => (
-            <Link key={item.href} href={item.href} className="rounded-xl px-3 py-2 text-sm text-stone-200 hover:bg-white/10">
+            <Link key={item.href} href={item.href} className="rounded-xl px-3 py-2 text-sm text-stone-200 transition hover:bg-white hover:text-stone-950">
               {item.label}
             </Link>
           ))}

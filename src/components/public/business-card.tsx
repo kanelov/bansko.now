@@ -1,11 +1,11 @@
 import Link from "next/link";
 import type { Route } from "next";
+import { BusinessMedia } from "@/components/public/business-media";
 import { getBusinessPath, getDirectionsUrl, getEffectiveBusinessTier } from "@/lib/business-public";
 import type { BusinessWithRelations } from "@/lib/types";
 
 export function BusinessCard({ business, featured = false }: { business: BusinessWithRelations; featured?: boolean }) {
   const tier = getEffectiveBusinessTier(business);
-  const image = business.images?.[0];
   const isPremium = tier === "premium" || tier === "homepage";
 
   return (
@@ -15,15 +15,7 @@ export function BusinessCard({ business, featured = false }: { business: Busines
         isPremium || featured ? "border-forest/25 md:grid md:grid-cols-[1.05fr_0.95fr]" : "border-stone-200"
       ].join(" ")}
     >
-      <div className={isPremium || featured ? "min-h-64" : ""}>
-        {image ? (
-          <img src={image} alt={business.name} className="aspect-[4/3] h-full w-full object-cover" loading="lazy" />
-        ) : (
-          <div className="flex aspect-[4/3] h-full w-full items-center justify-center bg-sage text-sm font-semibold text-forest">
-            Bansko NOW
-          </div>
-        )}
-      </div>
+      <BusinessMedia business={business} className={`aspect-[4/3] overflow-hidden bg-sage ${isPremium || featured ? "h-full min-h-64" : ""}`} />
       <div className="flex flex-col p-5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{business.category}</span>
