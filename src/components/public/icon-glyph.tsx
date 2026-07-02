@@ -67,6 +67,7 @@ const aliases: Record<string, string> = {
   "shopping-bag": "bag-shopping",
   theatre: "masks-theater",
   theater: "masks-theater",
+  "location-dot": "map-location-dot",
   search: "magnifying-glass",
   admin: "user-shield",
   x: "x-twitter",

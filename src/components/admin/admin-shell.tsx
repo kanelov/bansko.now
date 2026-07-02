@@ -5,6 +5,7 @@ import type { Route } from "next";
 const adminNav: { href: Route; label: string }[] = [
   { href: "/admin", label: "Dashboard" },
   { href: "/admin/articles", label: "Articles" },
+  { href: "/admin/businesses", label: "Businesses" },
   { href: "/admin/categories", label: "Categories" },
   { href: "/admin/media", label: "Media" },
   { href: "/admin/settings", label: "Settings" }

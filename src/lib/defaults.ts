@@ -111,8 +111,9 @@ export const fallbackNavigationItems: NavigationItem[] = [
   { id: "culture", label: "Култура", href: "/culture", icon_name: "masks-theater", sort_order: 50, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null },
   { id: "living", label: "Живот", href: "/living", icon_name: "users", sort_order: 60, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null },
   { id: "food", label: "Храна", href: "/food", icon_name: "utensils", sort_order: 70, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null },
-  { id: "art-studio", label: "Art Studio", href: "/art-studio", icon_name: "palette", sort_order: 80, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null },
-  { id: "bansko-collection", label: "Bansko Collection", href: "/bansko-collection", icon_name: "bag-shopping", sort_order: 90, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null },
+  { id: "businesses", label: "Бизнеси", href: "/businesses", icon_name: "location-dot", sort_order: 80, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null },
+  { id: "art-studio", label: "Art Studio", href: "/art-studio", icon_name: "palette", sort_order: 90, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null },
+  { id: "bansko-collection", label: "Bansko Collection", href: "/bansko-collection", icon_name: "bag-shopping", sort_order: 100, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null },
   { id: "community", label: "Общност", href: "/#community", icon_name: "users", sort_order: 100, is_external: false, open_in_new_tab: false, is_active: true, aria_label: null }
 ];
 

@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
 import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
+import { BusinessSpotlightBlock } from "@/components/public/business-spotlight-block";
 import { CategoryCard } from "@/components/public/category-card";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { FeaturedArticle } from "@/components/public/featured-article";
@@ -115,6 +116,8 @@ export default async function HomePage() {
           </section>
 
           <FeaturedArticle article={featuredArticle} />
+
+          <BusinessSpotlightBlock />
 
           <LatestArticles articles={articles} />
 

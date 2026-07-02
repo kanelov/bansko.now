@@ -1,12 +1,18 @@
 import type { MetadataRoute } from "next";
+import { getBusinessPath } from "@/lib/business-public";
+import { getApprovedBusinesses } from "@/lib/businesses";
 import { getCategories, getPublishedArticles, getArticlePath } from "@/lib/content";
 import { categoryDefinitions } from "@/lib/defaults";
 import { siteUrl } from "@/lib/env";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [categories, articles] = await Promise.all([getCategories(), getPublishedArticles({ limit: 200 })]);
+  const [categories, articles, businesses] = await Promise.all([
+    getCategories(),
+    getPublishedArticles({ limit: 200 }),
+    getApprovedBusinesses()
+  ]);
   const now = new Date();
-  const staticRoutes = ["", "/articles", "/about", "/contact", "/privacy", "/terms"];
+  const staticRoutes = ["", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/about", "/contact", "/privacy", "/terms"];
 
   return [
     ...staticRoutes.map((route) => ({
@@ -24,6 +30,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ...articles.map((article) => ({
       url: `${siteUrl}${getArticlePath(article)}`,
       lastModified: article.updated_at ? new Date(article.updated_at) : now,
+      changeFrequency: "monthly" as const,
+      priority: 0.7
+    })),
+    ...businesses.map((business) => ({
+      url: `${siteUrl}${getBusinessPath(business)}`,
+      lastModified: business.updated_at ? new Date(business.updated_at) : now,
       changeFrequency: "monthly" as const,
       priority: 0.7
     }))

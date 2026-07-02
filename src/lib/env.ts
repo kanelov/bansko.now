@@ -17,3 +17,7 @@ export function isSupabaseConfigured() {
 
 export const openMeteoBaseUrl =
   process.env.OPEN_METEO_API_BASE_URL || "https://api.open-meteo.com/v1/forecast";
+
+export const resendApiKey = process.env.RESEND_API_KEY || null;
+export const adminNotificationEmail = process.env.ADMIN_NOTIFICATION_EMAIL || null;
+export const emailFrom = process.env.EMAIL_FROM || "Bansko NOW <onboarding@resend.dev>";

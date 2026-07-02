@@ -21,6 +21,7 @@ export async function SiteFooter({ settings }: { settings: SiteSettings }) {
           <div className="mt-4 grid gap-2 text-sm text-stone-100">
             <Link href="/about">За проекта</Link>
             <Link href="/contact">Контакт</Link>
+            <Link href="/businesses">Местни бизнеси</Link>
             <Link href="/art-studio">Art Studio</Link>
             <Link href="/bansko-collection">Bansko Collection</Link>
           </div>

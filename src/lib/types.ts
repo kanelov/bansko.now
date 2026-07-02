@@ -120,6 +120,115 @@ export type MediaItem = {
   created_at: string;
 };
 
+export type BusinessStatus = "draft" | "approved" | "rejected";
+export type BusinessTier = "free" | "featured" | "premium" | "homepage";
+export type BusinessPaymentStatus = "unpaid" | "pending" | "paid" | "expired";
+
+export type BusinessFaq = {
+  question: string;
+  answer: string;
+};
+
+export type BusinessListingPlan = {
+  id: string;
+  name: string;
+  slug: string;
+  tier: BusinessTier;
+  period_months: number;
+  price: number | null;
+  currency: string;
+  stripe_payment_link: string | null;
+  description: string | null;
+  benefits: string[] | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type Business = {
+  id: string;
+  name: string;
+  slug: string;
+  category: string;
+  description: string | null;
+  address: string;
+  latitude: number | null;
+  longitude: number | null;
+  video_link: string | null;
+  website_url: string | null;
+  instagram_url: string | null;
+  facebook_url: string | null;
+  images: string[] | null;
+  faqs: Json;
+  features: string[] | null;
+  status: BusinessStatus;
+  listing_tier: BusinessTier;
+  requested_plan_id: string | null;
+  active_plan_id: string | null;
+  payment_status: BusinessPaymentStatus;
+  paid_until: string | null;
+  is_homepage_spotlight: boolean;
+  homepage_spotlight_until: string | null;
+  priority: number;
+  map_pin_x: number | null;
+  map_pin_y: number | null;
+  show_on_illustrated_map: boolean;
+  requested_services: string[] | null;
+  admin_notes: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessContact = {
+  id: string;
+  business_id: string;
+  owner_name: string;
+  owner_phone: string | null;
+  owner_email: string;
+  created_at: string;
+};
+
+export type BusinessWithRelations = Business & {
+  contact?: BusinessContact | null;
+  business_contacts?: BusinessContact[] | null;
+  requested_plan?: BusinessListingPlan | null;
+  active_plan?: BusinessListingPlan | null;
+};
+
+export type BusinessDirectorySettings = {
+  id: string;
+  intro_title: string | null;
+  intro_description: string | null;
+  premium_offer_title: string | null;
+  premium_offer_description: string | null;
+  map_image_url: string | null;
+  map_image_alt: string | null;
+  notification_email: string | null;
+  about_title: string | null;
+  about_eyebrow: string | null;
+  about_description: string | null;
+  about_body: string | null;
+  about_image_url: string | null;
+  contact_title: string | null;
+  contact_description: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type ContactMessage = {
+  id: string;
+  name: string;
+  email: string;
+  phone: string | null;
+  subject: string | null;
+  message: string;
+  status: "new" | "read" | "archived";
+  created_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -179,6 +288,36 @@ export type Database = {
           alt_text: string | null;
           caption: string | null;
         }>;
+        Relationships: [];
+      };
+      business_listing_plans: {
+        Row: BusinessListingPlan;
+        Insert: Partial<BusinessListingPlan> & Pick<BusinessListingPlan, "name" | "slug">;
+        Update: Partial<BusinessListingPlan>;
+        Relationships: [];
+      };
+      businesses: {
+        Row: Business;
+        Insert: Partial<Business> & Pick<Business, "name" | "slug" | "category" | "address">;
+        Update: Partial<Business>;
+        Relationships: [];
+      };
+      business_contacts: {
+        Row: BusinessContact;
+        Insert: Partial<BusinessContact> & Pick<BusinessContact, "business_id" | "owner_name" | "owner_email">;
+        Update: Partial<BusinessContact>;
+        Relationships: [];
+      };
+      business_directory_settings: {
+        Row: BusinessDirectorySettings;
+        Insert: Partial<BusinessDirectorySettings>;
+        Update: Partial<BusinessDirectorySettings>;
+        Relationships: [];
+      };
+      contact_messages: {
+        Row: ContactMessage;
+        Insert: Partial<ContactMessage> & Pick<ContactMessage, "name" | "email" | "message">;
+        Update: Partial<ContactMessage>;
         Relationships: [];
       };
     };
