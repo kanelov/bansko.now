@@ -51,47 +51,47 @@ a {
   color: #5f5a50;
 }
 
-.text-forest {
+:where(.text-forest) {
   color: var(--forest);
 }
 
-.text-moss {
+:where(.text-moss) {
   color: var(--moss);
 }
 
-.text-clay {
+:where(.text-clay) {
   color: var(--clay);
 }
 
-.bg-paper {
+:where(.bg-paper) {
   background-color: var(--paper);
 }
 
-.bg-forest {
+:where(.bg-forest) {
   background-color: var(--forest);
 }
 
-.bg-moss {
+:where(.bg-moss) {
   background-color: var(--moss);
 }
 
-.bg-sage {
+:where(.bg-sage) {
   background-color: var(--sage);
 }
 
-.bg-clay {
+:where(.bg-clay) {
   background-color: var(--clay);
 }
 
-.border-clay {
+:where(.border-clay) {
   border-color: var(--clay);
 }
 
-.decoration-sage {
+:where(.decoration-sage) {
   text-decoration-color: var(--sage);
 }
 
-.shadow-soft {
+:where(.shadow-soft) {
   box-shadow: var(--shadow-soft);
 }
 
@@ -105,7 +105,7 @@ summary:hover svg,
 a:hover .text-forest,
 button:hover .text-forest,
 summary:hover .text-forest {
-  color: currentColor;
+  color: inherit;
 }
 
 .admin-button {
