@@ -99,13 +99,35 @@ a {
   margin-top: 0;
 }
 
-a:hover svg,
-button:hover svg,
-summary:hover svg,
-a:hover .text-forest,
-button:hover .text-forest,
-summary:hover .text-forest {
+button,
+[role="button"],
+summary {
   color: inherit;
+}
+
+:is(a, button, summary, [role="button"]) svg,
+:is(a, button, summary, [role="button"]) svg * {
+  fill: currentColor;
+}
+
+:is(a, button, summary, [role="button"]).bg-forest,
+:is(a, button, summary, [role="button"]).bg-moss,
+:is(a, button, summary, [role="button"]).hover\:bg-forest:hover,
+:is(a, button, summary, [role="button"]).hover\:bg-moss:hover,
+.admin-button-forest,
+.admin-button-forest:hover,
+.admin-button-danger,
+.admin-button-danger:hover {
+  color: #fff !important;
+}
+
+:is(a, button, summary, [role="button"]).bg-forest *,
+:is(a, button, summary, [role="button"]).bg-moss *,
+:is(a, button, summary, [role="button"]).hover\:bg-forest:hover *,
+:is(a, button, summary, [role="button"]).hover\:bg-moss:hover *,
+.admin-button-forest *,
+.admin-button-danger * {
+  color: inherit !important;
 }
 
 .admin-button {
