@@ -2,7 +2,6 @@
 
 import { useMemo, useRef, useState } from "react";
 import { upsertArticleAction } from "@/app/admin/actions";
-import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
 import { ArticleTableOfContents } from "@/components/public/article-table-of-contents";
 import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
@@ -58,6 +57,25 @@ function dateInput(value: string | null | undefined) {
 
 function lines(value: unknown) {
   return Array.isArray(value) ? value.filter(Boolean).join("\n") : "";
+}
+
+function ArtStudioPreviewBlock() {
+  return (
+    <section className="rounded-3xl border border-stone-200 bg-[#f7f2e8] p-6 shadow-soft">
+      <p className="text-sm font-semibold uppercase text-moss">Art Studio към Bansko NOW</p>
+      <h2 className="mt-3 font-serif text-3xl font-semibold text-stone-950">Визуални услуги с характер</h2>
+      <p className="mt-4 text-base leading-7 text-stone-650">
+        Preview блокът показва как ще стои Art Studio CTA в статията. Реалните услуги се управляват от CMS секцията в админа.
+      </p>
+      <div className="mt-5 grid gap-3 sm:grid-cols-3">
+        {["Fine Art печат", "Canvas печат", "Визуално представяне"].map((service) => (
+          <div key={service} className="rounded-2xl bg-white p-4 text-sm font-semibold text-stone-800 shadow-soft">
+            {service}
+          </div>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 function initialDraft(article?: ArticleWithCategory | null): Draft {
@@ -618,7 +636,7 @@ export function ArticleEditorForm({
             </div>
           </article>
           <SEOChecklist article={seoArticle} />
-          {draft.show_art_studio_block ? <ArtStudioNativeBlock /> : null}
+          {draft.show_art_studio_block ? <ArtStudioPreviewBlock /> : null}
           {draft.show_bansko_collection_block ? <BanskoCollectionBlock /> : null}
           {draft.show_facebook_cta ? <FacebookGroupCTA settings={fallbackSettings} /> : null}
         </section>

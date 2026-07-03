@@ -22,12 +22,16 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     title: business.seo_title || `${business.name} в Банско | Bansko NOW`,
     description: business.seo_description || business.description || `${business.name} - ${business.category} в Банско.`,
-    alternates: { canonical: `${siteUrl}/businesses/${business.slug}` },
+    alternates: { canonical: business.canonical_url || `${siteUrl}/businesses/${business.slug}` },
     openGraph: {
-      title: business.name,
-      description: business.description || business.address,
-      images: business.images?.[0] ? [business.images[0]] : undefined,
+      title: business.og_title || business.seo_title || business.name,
+      description: business.og_description || business.seo_description || business.description || business.address,
+      images: business.og_image_url || business.images?.[0] ? [business.og_image_url || business.images?.[0] || ""] : undefined,
       type: "website"
+    },
+    robots: {
+      index: business.robots_index ?? true,
+      follow: business.robots_follow ?? true
     }
   };
 }
@@ -43,7 +47,7 @@ export default async function BusinessProfilePage({ params }: { params: Params }
   const faqs = parseBusinessFaqs(business.faqs);
   const schema = {
     "@context": "https://schema.org",
-    "@type": "LocalBusiness",
+    "@type": business.schema_type || "LocalBusiness",
     name: business.name,
     description: business.description,
     image: business.images || [],

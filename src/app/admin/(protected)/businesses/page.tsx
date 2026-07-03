@@ -146,6 +146,14 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                       <input name="instagram_url" defaultValue={business.instagram_url ?? ""} placeholder="Instagram" className="rounded-xl border border-stone-300 px-4 py-3" />
                     </div>
                     <input name="facebook_url" defaultValue={business.facebook_url ?? ""} placeholder="Facebook" className="rounded-xl border border-stone-300 px-4 py-3" />
+                    <div className="rounded-2xl bg-stone-50 p-4">
+                      <p className="text-sm font-semibold uppercase text-moss">Private contact</p>
+                      <div className="mt-4 grid gap-4 md:grid-cols-3">
+                        <input name="owner_name" defaultValue={business.contact?.owner_name ?? ""} placeholder="Owner name" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="owner_email" defaultValue={business.contact?.owner_email ?? ""} placeholder="Owner email" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="owner_phone" defaultValue={business.contact?.owner_phone ?? ""} placeholder="Owner phone" className="rounded-xl border border-stone-300 px-4 py-3" />
+                      </div>
+                    </div>
                     <label className="grid gap-2 text-sm font-semibold">
                       Image URLs
                       <textarea
@@ -223,9 +231,27 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                       Show on illustrated map
                     </label>
                     <textarea name="admin_notes" defaultValue={business.admin_notes ?? ""} rows={3} className="rounded-xl border border-stone-300 px-4 py-3" placeholder="Admin notes" />
-                    <div className="grid gap-4 md:grid-cols-2">
-                      <input name="seo_title" defaultValue={business.seo_title ?? ""} placeholder="SEO title" className="rounded-xl border border-stone-300 px-4 py-3" />
-                      <input name="seo_description" defaultValue={business.seo_description ?? ""} placeholder="SEO description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                    <div className="rounded-2xl bg-stone-50 p-4">
+                      <p className="text-sm font-semibold uppercase text-moss">SEO</p>
+                      <div className="mt-4 grid gap-4 md:grid-cols-2">
+                        <input name="seo_title" defaultValue={business.seo_title ?? ""} placeholder="SEO title" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="seo_description" defaultValue={business.seo_description ?? ""} placeholder="SEO description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="canonical_url" defaultValue={business.canonical_url ?? ""} placeholder="Canonical URL" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="og_image_url" defaultValue={business.og_image_url ?? ""} placeholder="OG image URL" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="og_title" defaultValue={business.og_title ?? ""} placeholder="OG title" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="og_description" defaultValue={business.og_description ?? ""} placeholder="OG description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="schema_type" defaultValue={business.schema_type ?? "LocalBusiness"} placeholder="Schema type" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <div className="flex flex-wrap items-center gap-4 text-sm font-semibold">
+                          <label className="flex items-center gap-2">
+                            <input type="checkbox" name="robots_index" defaultChecked={business.robots_index ?? true} />
+                            Index
+                          </label>
+                          <label className="flex items-center gap-2">
+                            <input type="checkbox" name="robots_follow" defaultChecked={business.robots_follow ?? true} />
+                            Follow
+                          </label>
+                        </div>
+                      </div>
                     </div>
                     <button className="admin-button admin-button-forest px-5 py-3 text-sm font-semibold">Save business</button>
                   </form>

@@ -13,7 +13,15 @@ export type Category = {
   description: string | null;
   seo_title: string | null;
   seo_description: string | null;
+  canonical_url?: string | null;
+  og_title?: string | null;
+  og_description?: string | null;
+  og_image_url?: string | null;
+  robots_index?: boolean;
+  robots_follow?: boolean;
+  schema_type?: string | null;
   created_at?: string;
+  updated_at?: string;
 };
 
 export type Tag = {
@@ -120,6 +128,52 @@ export type MediaItem = {
   created_at: string;
 };
 
+export type EditablePage = {
+  id: string;
+  title: string;
+  slug: string;
+  eyebrow: string | null;
+  excerpt: string | null;
+  content: string | null;
+  hero_image_url: string | null;
+  hero_image_alt: string | null;
+  cta_label: string | null;
+  cta_url: string | null;
+  status: "draft" | "published";
+  seo_title: string | null;
+  seo_description: string | null;
+  canonical_url: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image_url: string | null;
+  robots_index: boolean;
+  robots_follow: boolean;
+  schema_type: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArtStudioService = {
+  id: string;
+  title: string;
+  slug: string;
+  description: string | null;
+  image_url: string | null;
+  image_alt: string | null;
+  button_label: string | null;
+  button_url: string | null;
+  price_label: string | null;
+  features: string[] | null;
+  is_premium: boolean;
+  is_active: boolean;
+  sort_order: number;
+  seo_title: string | null;
+  seo_description: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type BusinessStatus = "draft" | "approved" | "rejected";
 export type BusinessTier = "free" | "featured" | "premium" | "homepage";
 export type BusinessPaymentStatus = "unpaid" | "pending" | "paid" | "expired";
@@ -178,6 +232,13 @@ export type Business = {
   admin_notes: string | null;
   seo_title: string | null;
   seo_description: string | null;
+  canonical_url: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image_url: string | null;
+  robots_index: boolean;
+  robots_follow: boolean;
+  schema_type: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -288,6 +349,18 @@ export type Database = {
           alt_text: string | null;
           caption: string | null;
         }>;
+        Relationships: [];
+      };
+      editable_pages: {
+        Row: EditablePage;
+        Insert: Partial<EditablePage> & Pick<EditablePage, "title" | "slug">;
+        Update: Partial<EditablePage>;
+        Relationships: [];
+      };
+      art_studio_services: {
+        Row: ArtStudioService;
+        Insert: Partial<ArtStudioService> & Pick<ArtStudioService, "title" | "slug">;
+        Update: Partial<ArtStudioService>;
         Relationships: [];
       };
       business_listing_plans: {

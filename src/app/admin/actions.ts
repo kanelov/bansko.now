@@ -70,6 +70,17 @@ function revalidateEditorialPaths() {
   revalidatePath("/feed.xml");
 }
 
+function revalidatePagePaths(slug?: string | null) {
+  revalidatePath("/", "layout");
+  revalidatePath("/");
+  revalidatePath("/admin/cms");
+  revalidatePath("/sitemap.xml");
+
+  if (slug) {
+    revalidatePath(`/${slug}`);
+  }
+}
+
 function revalidateSiteChrome() {
   revalidatePath("/", "layout");
   revalidatePath("/");
@@ -279,6 +290,40 @@ export async function deleteCategoryAction(formData: FormData) {
   redirect("/admin/categories?deleted=1");
 }
 
+export async function upsertCategoryAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+  const name = stringValue(formData, "name") || "Нова категория";
+  const slug = stringValue(formData, "slug") || slugify(name);
+  const payload = {
+    name,
+    slug,
+    description: stringValue(formData, "description"),
+    seo_title: stringValue(formData, "seo_title"),
+    seo_description: stringValue(formData, "seo_description"),
+    canonical_url: stringValue(formData, "canonical_url"),
+    og_title: stringValue(formData, "og_title"),
+    og_description: stringValue(formData, "og_description"),
+    og_image_url: stringValue(formData, "og_image_url"),
+    robots_index: booleanValue(formData, "robots_index"),
+    robots_follow: booleanValue(formData, "robots_follow"),
+    schema_type: stringValue(formData, "schema_type") || "CollectionPage"
+  };
+
+  const { error } = id
+    ? await supabase.from("categories").update(payload).eq("id", id)
+    : await supabase.from("categories").insert(payload);
+
+  if (error) {
+    redirect(`/admin/categories?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidateEditorialPaths();
+  revalidatePath("/admin/categories");
+  revalidatePath(`/${slug}`);
+  redirect("/admin/categories?saved=1");
+}
+
 export async function deleteMediaAction(formData: FormData) {
   const { supabase } = await requireAdmin();
   const id = uuidValue(formData, "id");
@@ -484,4 +529,97 @@ export async function saveSocialLinksAction(formData: FormData) {
   }
 
   revalidateSiteChrome();
+}
+
+export async function upsertEditablePageAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+  const title = stringValue(formData, "title") || "Нова страница";
+  const slug = stringValue(formData, "slug") || slugify(title);
+  const status: "draft" | "published" = stringValue(formData, "status") === "draft" ? "draft" : "published";
+  const payload = {
+    title,
+    slug,
+    eyebrow: stringValue(formData, "eyebrow"),
+    excerpt: stringValue(formData, "excerpt"),
+    content: rawStringValue(formData, "content"),
+    hero_image_url: stringValue(formData, "hero_image_url"),
+    hero_image_alt: stringValue(formData, "hero_image_alt"),
+    cta_label: stringValue(formData, "cta_label"),
+    cta_url: stringValue(formData, "cta_url"),
+    status,
+    seo_title: stringValue(formData, "seo_title"),
+    seo_description: stringValue(formData, "seo_description"),
+    canonical_url: stringValue(formData, "canonical_url"),
+    og_title: stringValue(formData, "og_title"),
+    og_description: stringValue(formData, "og_description"),
+    og_image_url: stringValue(formData, "og_image_url"),
+    robots_index: booleanValue(formData, "robots_index"),
+    robots_follow: booleanValue(formData, "robots_follow"),
+    schema_type: stringValue(formData, "schema_type") || "WebPage",
+    sort_order: integerValue(formData, "sort_order", 100)
+  };
+
+  const { error } = id
+    ? await supabase.from("editable_pages").update(payload).eq("id", id)
+    : await supabase.from("editable_pages").insert(payload);
+
+  if (error) {
+    redirect(`/admin/cms?error=${encodeURIComponent(error.message)}`);
+  }
+
+  revalidatePagePaths(slug);
+  redirect("/admin/cms?saved=1");
+}
+
+export async function upsertArtStudioServiceAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+  const title = stringValue(formData, "title") || "Нова услуга";
+  const slug = stringValue(formData, "slug") || slugify(title);
+  const payload = {
+    title,
+    slug,
+    description: stringValue(formData, "description"),
+    image_url: stringValue(formData, "image_url"),
+    image_alt: stringValue(formData, "image_alt"),
+    button_label: stringValue(formData, "button_label") || "Виж повече",
+    button_url: stringValue(formData, "button_url") || "/contact",
+    price_label: stringValue(formData, "price_label"),
+    features: jsonLines(formData, "features_input"),
+    is_premium: booleanValue(formData, "is_premium"),
+    is_active: booleanValue(formData, "is_active"),
+    sort_order: integerValue(formData, "sort_order", 100),
+    seo_title: stringValue(formData, "seo_title"),
+    seo_description: stringValue(formData, "seo_description")
+  };
+
+  const { error } = id
+    ? await supabase.from("art_studio_services").update(payload).eq("id", id)
+    : await supabase.from("art_studio_services").insert(payload);
+
+  if (error) {
+    redirect(`/admin/cms?error=${encodeURIComponent(error.message)}#art-studio-services`);
+  }
+
+  revalidatePagePaths("art-studio");
+  redirect("/admin/cms?saved=1#art-studio-services");
+}
+
+export async function deleteArtStudioServiceAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+
+  if (!id) {
+    redirect("/admin/cms?error=missing-id#art-studio-services");
+  }
+
+  const { error } = await supabase.from("art_studio_services").delete().eq("id", id);
+
+  if (error) {
+    redirect(`/admin/cms?error=${encodeURIComponent(error.message)}#art-studio-services`);
+  }
+
+  revalidatePagePaths("art-studio");
+  redirect("/admin/cms?deleted=1#art-studio-services");
 }

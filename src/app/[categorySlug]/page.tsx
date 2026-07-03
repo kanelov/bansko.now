@@ -26,12 +26,17 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     },
     description: category.seo_description || category.description || undefined,
     alternates: {
-      canonical: `/${category.slug}`
+      canonical: category.canonical_url || `/${category.slug}`
     },
     openGraph: {
-      title: category.seo_title || category.name,
-      description: category.seo_description || category.description || undefined,
+      title: category.og_title || category.seo_title || category.name,
+      description: category.og_description || category.seo_description || category.description || undefined,
+      images: category.og_image_url ? [category.og_image_url] : undefined,
       type: "website"
+    },
+    robots: {
+      index: category.robots_index ?? true,
+      follow: category.robots_follow ?? true
     }
   };
 }
@@ -54,6 +59,13 @@ export default async function CategoryPage({ params }: { params: Params }) {
     .filter((item) => item.slug !== category.slug)
     .filter((item) => ["events", "explore", "nature", "culture", "living", "food"].includes(item.slug))
     .slice(0, 3);
+  const schema = {
+    "@context": "https://schema.org",
+    "@type": category.schema_type || "CollectionPage",
+    name: category.name,
+    description: category.description,
+    url: `/${category.slug}`
+  };
 
   return (
     <div>
@@ -93,6 +105,7 @@ export default async function CategoryPage({ params }: { params: Params }) {
         <FacebookGroupCTA settings={settings} />
       </main>
       <SiteFooter settings={settings} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
     </div>
   );
 }

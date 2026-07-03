@@ -210,13 +210,45 @@ export async function updateBusinessAction(formData: FormData) {
     show_on_illustrated_map: booleanValue(formData, "show_on_illustrated_map"),
     admin_notes: stringValue(formData, "admin_notes"),
     seo_title: stringValue(formData, "seo_title"),
-    seo_description: stringValue(formData, "seo_description")
+    seo_description: stringValue(formData, "seo_description"),
+    canonical_url: stringValue(formData, "canonical_url"),
+    og_title: stringValue(formData, "og_title"),
+    og_description: stringValue(formData, "og_description"),
+    og_image_url: stringValue(formData, "og_image_url"),
+    robots_index: booleanValue(formData, "robots_index"),
+    robots_follow: booleanValue(formData, "robots_follow"),
+    schema_type: stringValue(formData, "schema_type") || "LocalBusiness"
   };
 
   const { error } = await supabase.from("businesses").update(payload).eq("id", id);
 
   if (error) {
     redirect(`/admin/businesses?error=${encodeURIComponent(error.message)}`);
+  }
+
+  const ownerName = stringValue(formData, "owner_name");
+  const ownerEmail = stringValue(formData, "owner_email");
+  const ownerPhone = stringValue(formData, "owner_phone");
+
+  if (ownerName && ownerEmail) {
+    const { data: existingContact } = await supabase
+      .from("business_contacts")
+      .select("id")
+      .eq("business_id", id)
+      .limit(1)
+      .maybeSingle();
+    const contactPayload = {
+      business_id: id,
+      owner_name: ownerName,
+      owner_email: ownerEmail,
+      owner_phone: ownerPhone
+    };
+
+    if (existingContact?.id) {
+      await supabase.from("business_contacts").update(contactPayload).eq("id", existingContact.id);
+    } else {
+      await supabase.from("business_contacts").insert(contactPayload);
+    }
   }
 
   revalidateBusinessPaths();

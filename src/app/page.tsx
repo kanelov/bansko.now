@@ -39,7 +39,7 @@ function HeroMedia({ settings }: { settings: SiteSettings }) {
         <iframe
           src={hostedVideoEmbedUrl}
           title="Bansko NOW hero video"
-          className="pointer-events-none absolute left-1/2 top-1/2 h-[125%] w-[220%] -translate-x-1/2 -translate-y-1/2 border-0 sm:w-[175%] md:h-full md:w-full md:scale-110"
+          className="hero-media-frame pointer-events-none border-0"
           allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
           allowFullScreen
         />
@@ -64,7 +64,7 @@ function HeroMedia({ settings }: { settings: SiteSettings }) {
       <iframe
         src={embedUrl}
         title="Bansko NOW hero video"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[125%] w-[220%] -translate-x-1/2 -translate-y-1/2 border-0 sm:w-[175%] md:h-full md:w-full md:scale-110"
+        className="hero-media-frame pointer-events-none border-0"
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
         allowFullScreen
       />
@@ -91,10 +91,10 @@ export default async function HomePage() {
     <div>
       <SiteHeader />
       <main>
-        <section className="relative min-h-[78vh] overflow-hidden">
+        <section className="relative min-h-[100svh] overflow-hidden">
           <HeroMedia settings={settings} />
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 via-black/20 to-black/55" />
-          <div className="relative mx-auto flex min-h-[78vh] max-w-7xl flex-col justify-end px-4 pb-16 pt-24 text-white sm:px-6 lg:px-8">
+          <div className="relative mx-auto flex min-h-[100svh] max-w-7xl flex-col justify-end px-4 pb-16 pt-24 text-white sm:px-6 lg:px-8">
             <p className="text-sm font-semibold uppercase">Bansko NOW</p>
             <h1 className="mt-4 max-w-4xl font-serif text-6xl font-semibold leading-none sm:text-7xl">
               Животът в Банско отблизо

@@ -6,7 +6,17 @@ import {
   fallbackSettings,
   fallbackSocialLinks
 } from "@/lib/defaults";
-import type { ArticleWithCategory, Category, MediaItem, NavigationItem, SiteSettings, SocialLink, Tag } from "@/lib/types";
+import type {
+  ArtStudioService,
+  ArticleWithCategory,
+  Category,
+  EditablePage,
+  MediaItem,
+  NavigationItem,
+  SiteSettings,
+  SocialLink,
+  Tag
+} from "@/lib/types";
 
 export { categoryDefinitions, fallbackHeroImage, fallbackNavigationItems, fallbackSettings, fallbackSocialLinks };
 
@@ -49,6 +59,147 @@ const sampleArticle: ArticleWithCategory = {
   show_bansko_collection_block: true,
   tags: []
 };
+
+const fallbackPages: EditablePage[] = [
+  {
+    id: "about",
+    title: "Bansko NOW",
+    slug: "about",
+    eyebrow: "За проекта",
+    excerpt: "Местна дигитална платформа за събития, култура, природа, хора и ежедневен живот в Банско.",
+    content:
+      "Bansko NOW е създаден като бързо, красиво и полезно място за откриване на Банско.\n\nПубликуваме статии, местни препоръки, визуални истории, бизнеси и сезонни идеи, които помагат на хората да преживяват града по-близо.",
+    hero_image_url: null,
+    hero_image_alt: "Bansko NOW",
+    cta_label: null,
+    cta_url: null,
+    status: "published",
+    seo_title: "За Bansko NOW",
+    seo_description: "Bansko NOW е локална lifestyle и културна платформа за Банско и Пирин.",
+    canonical_url: null,
+    og_title: null,
+    og_description: null,
+    og_image_url: null,
+    robots_index: true,
+    robots_follow: true,
+    schema_type: "AboutPage",
+    sort_order: 10,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "contact",
+    title: "Пиши на Bansko NOW",
+    slug: "contact",
+    eyebrow: "Контакт",
+    excerpt: "За събития, препоръки, Art Studio услуги, бизнеси и партньорства.",
+    content: "",
+    hero_image_url: null,
+    hero_image_alt: "Контакт с Bansko NOW",
+    cta_label: null,
+    cta_url: null,
+    status: "published",
+    seo_title: "Контакт | Bansko NOW",
+    seo_description: "Свържи се с Bansko NOW за събития, препоръки, визуални проекти и локални истории.",
+    canonical_url: null,
+    og_title: null,
+    og_description: null,
+    og_image_url: null,
+    robots_index: true,
+    robots_follow: true,
+    schema_type: "ContactPage",
+    sort_order: 20,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "art-studio",
+    title: "Art Studio към Bansko NOW",
+    slug: "art-studio",
+    eyebrow: "Визуални истории от Банско",
+    excerpt:
+      "Фотография, fine art печат, платна, визуални решения и авторски продукти, вдъхновени от Банско и Пирин.",
+    content:
+      "Красивите места, събития и лични спомени имат нужда от силно визуално присъствие. Art Studio към Bansko NOW създава арт печат, фотографии, платна и визуални решения с премиум усещане.",
+    hero_image_url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1600&q=80",
+    hero_image_alt: "Фотография и печат в Art Studio",
+    cta_label: "Свържи се за проект",
+    cta_url: "/contact",
+    status: "published",
+    seo_title: "Art Studio в Банско | Bansko NOW",
+    seo_description: "Fine art печат, фотографии, платна и визуални решения, вдъхновени от Банско и Пирин.",
+    canonical_url: null,
+    og_title: null,
+    og_description: null,
+    og_image_url: null,
+    robots_index: true,
+    robots_follow: true,
+    schema_type: "Service",
+    sort_order: 30,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
+
+const fallbackArtStudioServices: ArtStudioService[] = [
+  {
+    id: "fine-art-print",
+    title: "Fine Art печат",
+    slug: "fine-art-print",
+    description: "Премиум печат върху художествена хартия за фотографии, изложби и лични проекти.",
+    image_url: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80",
+    image_alt: "Fine art печат",
+    button_label: "Запитай за печат",
+    button_url: "/contact",
+    price_label: "по заявка",
+    features: ["Художествени хартии", "Цветова подготовка", "Музейно усещане"],
+    is_premium: true,
+    is_active: true,
+    sort_order: 10,
+    seo_title: null,
+    seo_description: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "canvas-print",
+    title: "Canvas печат",
+    slug: "canvas-print",
+    description: "Платна с визуален характер за дом, студио, хотел, ресторант или подарък от Банско.",
+    image_url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+    image_alt: "Canvas печат",
+    button_label: "Виж опции",
+    button_url: "/contact",
+    price_label: "размери по избор",
+    features: ["Платно", "Готово за окачване", "Снимки от Банско"],
+    is_premium: false,
+    is_active: true,
+    sort_order: 20,
+    seo_title: null,
+    seo_description: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  },
+  {
+    id: "visual-storytelling",
+    title: "Визуално представяне",
+    slug: "visual-storytelling",
+    description: "Фотография, дизайн подготовка и кратки визуални истории за събития, места и бизнеси.",
+    image_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80",
+    image_alt: "Визуално представяне",
+    button_label: "Обсъди проект",
+    button_url: "/contact",
+    price_label: "индивидуално",
+    features: ["Фото история", "Дизайн", "Локален контекст"],
+    is_premium: false,
+    is_active: true,
+    sort_order: 30,
+    seo_title: null,
+    seo_description: null,
+    created_at: new Date().toISOString(),
+    updated_at: new Date().toISOString()
+  }
+];
 
 function normalizeArticle(article: ArticleWithCategory): ArticleWithCategory {
   return {
@@ -320,4 +471,79 @@ export async function getMediaItems(limit = 24): Promise<MediaItem[]> {
     .limit(limit);
 
   return (data ?? []) as MediaItem[];
+}
+
+export async function getEditablePages(options?: { includeDrafts?: boolean }): Promise<EditablePage[]> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return options?.includeDrafts ? fallbackPages : fallbackPages.filter((page) => page.status === "published");
+  }
+
+  let query = supabase
+    .from("editable_pages")
+    .select("*")
+    .order("sort_order", { ascending: true })
+    .order("title", { ascending: true });
+
+  if (!options?.includeDrafts) {
+    query = query.eq("status", "published");
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    return options?.includeDrafts ? fallbackPages : fallbackPages.filter((page) => page.status === "published");
+  }
+
+  return (data ?? []) as EditablePage[];
+}
+
+export async function getEditablePageBySlug(slug: string, options?: { includeDrafts?: boolean }): Promise<EditablePage | null> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return fallbackPages.find((page) => page.slug === slug && (options?.includeDrafts || page.status === "published")) ?? null;
+  }
+
+  let query = supabase.from("editable_pages").select("*").eq("slug", slug);
+
+  if (!options?.includeDrafts) {
+    query = query.eq("status", "published");
+  }
+
+  const { data, error } = await query.maybeSingle();
+
+  if (error) {
+    return fallbackPages.find((page) => page.slug === slug && (options?.includeDrafts || page.status === "published")) ?? null;
+  }
+
+  return (data as EditablePage | null) ?? null;
+}
+
+export async function getArtStudioServices(options?: { includeInactive?: boolean }): Promise<ArtStudioService[]> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return options?.includeInactive ? fallbackArtStudioServices : fallbackArtStudioServices.filter((service) => service.is_active);
+  }
+
+  let query = supabase
+    .from("art_studio_services")
+    .select("*")
+    .order("is_premium", { ascending: false })
+    .order("sort_order", { ascending: true })
+    .order("title", { ascending: true });
+
+  if (!options?.includeInactive) {
+    query = query.eq("is_active", true);
+  }
+
+  const { data, error } = await query;
+
+  if (error) {
+    return options?.includeInactive ? fallbackArtStudioServices : fallbackArtStudioServices.filter((service) => service.is_active);
+  }
+
+  return (data ?? []) as ArtStudioService[];
 }

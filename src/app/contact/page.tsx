@@ -3,21 +3,37 @@ import { submitContactMessageAction } from "@/app/businesses/actions";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
-import { getBusinessDirectorySettings } from "@/lib/businesses";
-import { getSiteSettings } from "@/lib/content";
+import { getEditablePageBySlug, getSiteSettings } from "@/lib/content";
 
 type SearchParams = Promise<{ sent?: string; error?: string }>;
 
-export const metadata: Metadata = {
-  title: "Контакт",
-  description: "Свържи се с Bansko NOW за събития, препоръки, визуални проекти и локални истории."
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const page = await getEditablePageBySlug("contact");
+
+  return {
+    title: page?.seo_title || page?.title || "Контакт",
+    description:
+      page?.seo_description ||
+      page?.excerpt ||
+      "Свържи се с Bansko NOW за събития, препоръки, визуални проекти и локални истории.",
+    alternates: { canonical: page?.canonical_url || "/contact" },
+    openGraph: {
+      title: page?.og_title || page?.seo_title || page?.title || "Контакт",
+      description: page?.og_description || page?.seo_description || page?.excerpt || undefined,
+      images: page?.og_image_url || page?.hero_image_url ? [page.og_image_url || page.hero_image_url || ""] : undefined
+    },
+    robots: {
+      index: page?.robots_index ?? true,
+      follow: page?.robots_follow ?? true
+    }
+  };
+}
 
 export default async function ContactPage({ searchParams }: { searchParams: SearchParams }) {
-  const [params, settings, contactSettings] = await Promise.all([
+  const [params, settings, page] = await Promise.all([
     searchParams,
     getSiteSettings(),
-    getBusinessDirectorySettings()
+    getEditablePageBySlug("contact")
   ]);
 
   return (
@@ -25,12 +41,12 @@ export default async function ContactPage({ searchParams }: { searchParams: Sear
       <SiteHeader />
       <main className="mx-auto grid max-w-4xl gap-10 px-4 py-16 sm:px-6 lg:px-8">
         <header>
-          <p className="text-sm font-semibold uppercase text-moss">Контакт</p>
+          <p className="text-sm font-semibold uppercase text-moss">{page?.eyebrow || "Контакт"}</p>
           <h1 className="mt-3 font-serif text-5xl font-semibold text-stone-950">
-            {contactSettings.contact_title || "Пиши на Bansko NOW"}
+            {page?.title || "Пиши на Bansko NOW"}
           </h1>
           <p className="mt-6 text-xl leading-9 text-stone-650">
-            {contactSettings.contact_description ||
+            {page?.excerpt ||
               "За събития, снимки, препоръки, Art Studio услуги или Bansko Collection идеи."}
           </p>
         </header>
