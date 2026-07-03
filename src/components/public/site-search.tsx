@@ -68,12 +68,12 @@ export function SiteSearch({ compact = false }: { compact?: boolean }) {
         onClick={() => setOpen(true)}
         className={
           compact
-            ? "flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white"
-            : "inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/70 text-forest shadow-soft transition hover:border-forest hover:bg-forest hover:text-white"
+            ? "group flex w-full items-center gap-2 rounded-xl px-3 py-2.5 text-left text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white"
+            : "group inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/70 text-forest shadow-soft transition hover:border-forest hover:bg-forest hover:text-white"
         }
       >
-        <IconGlyph name="magnifying-glass" className="h-4 w-4" />
-        {compact ? <span>Търсене</span> : null}
+        <IconGlyph name="magnifying-glass" className="h-4 w-4 text-current transition group-hover:text-white" />
+        {compact ? <span className="transition group-hover:text-white">Търсене</span> : null}
       </button>
 
       {open ? (

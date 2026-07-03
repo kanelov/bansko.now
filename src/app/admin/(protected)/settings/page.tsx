@@ -184,6 +184,10 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
 
         <section className="grid gap-5 border-t border-white/10 pt-6">
           <h2 className="font-serif text-2xl font-semibold">Homepage hero media</h2>
+          <p className="text-sm leading-6 text-stone-300">
+            За най-чист hero без YouTube controls използвай Hosted video: качи кратък MP4/WebM файл в Media и постави публичния URL тук.
+            YouTube/Vimeo embed работи, но платформата може да покаже собствен loading/chrome за момент.
+          </p>
           <label className="grid gap-2 text-sm font-semibold">
             Hero media type
             <select name="hero_media_type" defaultValue={settings.hero_media_type || "image"} className={fieldClass()}>
