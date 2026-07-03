@@ -27,7 +27,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
 
       {params.uploaded ? (
         <div className="rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">
-          Изображението е качено и записано в media библиотеката.
+          Файлът е качен и записан в media библиотеката.
         </div>
       ) : null}
 
@@ -45,14 +45,15 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
 
       <form action={uploadMediaAction} className="grid gap-5 rounded-2xl bg-white p-5 text-stone-950">
         <div>
-          <h2 className="font-serif text-2xl font-semibold">Upload image</h2>
+          <h2 className="font-serif text-2xl font-semibold">Upload media</h2>
           <p className="mt-2 max-w-2xl text-sm leading-6 text-stone-600">
-            Качи снимка в Supabase Storage bucket `bansko-media`. Публичният URL се записва автоматично в `media`.
+            Качи снимка или кратко hero видео в Supabase Storage bucket `bansko-media`. За homepage hero използвай кратък MP4/WebM файл,
+            без звук, 8-15 секунди, оптимизиран до около 10-25 MB. След качване копирай публичния URL и го постави в Settings -&gt; Hosted video URL.
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-[1.2fr_1fr]">
           <label className="grid gap-2 text-sm font-semibold">
-            Image file
+            Image or short video file
             <input
               type="file"
               name="file"
@@ -80,7 +81,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
         </label>
         <div>
           <button type="submit" className="admin-button admin-button-forest px-6 py-3 text-sm font-semibold">
-            Качи изображение
+            Качи файл
           </button>
         </div>
       </form>
@@ -89,7 +90,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
             <p className="text-sm font-semibold uppercase text-stone-400">Library</p>
-            <h2 className="mt-2 font-serif text-3xl font-semibold">Последни изображения</h2>
+            <h2 className="mt-2 font-serif text-3xl font-semibold">Последни файлове</h2>
           </div>
           <p className="text-sm text-stone-400">{mediaItems.length} файла</p>
         </div>
@@ -137,7 +138,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
           </div>
         ) : (
           <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm leading-6 text-stone-300">
-            Все още няма качени изображения. Качи първата снимка и тя ще се появи тук, както и в article editor-а.
+            Все още няма качени файлове. Качи първата снимка или кратко видео и то ще се появи тук.
           </div>
         )}
       </section>

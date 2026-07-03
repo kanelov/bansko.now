@@ -23,8 +23,8 @@ export default async function SubmitBusinessPage({ searchParams }: { searchParam
   return (
     <div>
       <SiteHeader />
-      <main className="mx-auto grid max-w-5xl gap-10 px-4 py-16 sm:px-6 lg:px-8">
-        <header>
+      <main className="mx-auto grid w-full max-w-5xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <header className="mx-auto w-full max-w-4xl text-center sm:text-left">
           <p className="text-sm font-semibold uppercase text-moss">Добави бизнес</p>
           <h1 className="mt-3 max-w-3xl font-serif text-5xl font-semibold text-stone-950">
             Представи местен бизнес в Bansko NOW

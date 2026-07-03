@@ -99,6 +99,15 @@ a {
   margin-top: 0;
 }
 
+a:hover svg,
+button:hover svg,
+summary:hover svg,
+a:hover .text-forest,
+button:hover .text-forest,
+summary:hover .text-forest {
+  color: currentColor;
+}
+
 .admin-button {
   display: inline-flex;
   align-items: center;

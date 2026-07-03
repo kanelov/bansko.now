@@ -39,7 +39,7 @@ function HeroMedia({ settings }: { settings: SiteSettings }) {
         <iframe
           src={hostedVideoEmbedUrl}
           title="Bansko NOW hero video"
-          className="absolute inset-0 h-full w-full scale-110 border-0"
+          className="pointer-events-none absolute left-1/2 top-1/2 h-[125%] w-[220%] -translate-x-1/2 -translate-y-1/2 border-0 sm:w-[175%] md:h-full md:w-full md:scale-110"
           allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
           allowFullScreen
         />
@@ -64,7 +64,7 @@ function HeroMedia({ settings }: { settings: SiteSettings }) {
       <iframe
         src={embedUrl}
         title="Bansko NOW hero video"
-        className="absolute inset-0 h-full w-full scale-110 border-0"
+        className="pointer-events-none absolute left-1/2 top-1/2 h-[125%] w-[220%] -translate-x-1/2 -translate-y-1/2 border-0 sm:w-[175%] md:h-full md:w-full md:scale-110"
         allow="autoplay; encrypted-media; fullscreen; picture-in-picture"
         allowFullScreen
       />

@@ -17,8 +17,11 @@ export function BusinessSubmitForm({
   const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
 
   return (
-    <form action={submitBusinessAction} className="grid gap-8">
-      <section className="grid gap-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-soft">
+    <form
+      action={submitBusinessAction}
+      className="mx-auto grid w-full max-w-4xl gap-8 [&_input]:min-w-0 [&_input]:w-full [&_select]:min-w-0 [&_select]:w-full [&_textarea]:min-w-0 [&_textarea]:w-full"
+    >
+      <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">Основна информация</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">Представи бизнеса си</h2>
@@ -75,7 +78,7 @@ export function BusinessSubmitForm({
         </label>
       </section>
 
-      <section className="grid gap-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-soft">
+      <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">Визуално представяне</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">Снимки и характеристики</h2>
@@ -87,7 +90,7 @@ export function BusinessSubmitForm({
             type="file"
             accept="image/jpeg,image/png,image/webp"
             multiple
-            className="rounded-xl border border-stone-300 bg-paper px-4 py-3 file:mr-4 file:rounded-full file:border-0 file:bg-forest file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+            className="max-w-full rounded-xl border border-stone-300 bg-paper px-3 py-3 text-xs file:mr-3 file:rounded-full file:border-0 file:bg-forest file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white sm:px-4 sm:text-sm sm:file:px-4 sm:file:text-sm"
           />
         </label>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -100,7 +103,7 @@ export function BusinessSubmitForm({
         </div>
       </section>
 
-      <section className="grid gap-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-soft">
+      <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">FAQ</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">Въпроси и отговори</h2>
@@ -120,7 +123,7 @@ export function BusinessSubmitForm({
         </button>
       </section>
 
-      <section className="grid gap-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-soft">
+      <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">План за видимост</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">{settings.premium_offer_title}</h2>
@@ -170,7 +173,7 @@ export function BusinessSubmitForm({
         </div>
       </section>
 
-      <section className="grid gap-5 rounded-3xl border border-stone-200 bg-white p-6 shadow-soft">
+      <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">Контакт за администратора</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">Кой изпраща заявката?</h2>
@@ -191,7 +194,7 @@ export function BusinessSubmitForm({
         </div>
       </section>
 
-      <button type="submit" className="rounded-full bg-forest px-8 py-4 text-base font-semibold text-white shadow-soft transition hover:bg-moss">
+      <button type="submit" className="justify-self-center rounded-full bg-forest px-8 py-4 text-base font-semibold text-white shadow-soft transition hover:bg-moss">
         Изпрати за преглед
       </button>
     </form>
