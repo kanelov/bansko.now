@@ -110,12 +110,6 @@ a {
   transform: translate(-50%, -50%);
 }
 
-button,
-[role="button"],
-summary {
-  color: inherit;
-}
-
 :is(a, button, summary, [role="button"]) svg,
 :is(a, button, summary, [role="button"]) svg * {
   fill: currentColor;
@@ -156,9 +150,27 @@ summary {
     box-shadow 180ms ease;
 }
 
+.admin-button,
+.admin-button * {
+  color: inherit;
+}
+
 .admin-button:hover {
   transform: translateY(-2px);
   box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+}
+
+.admin-button:active {
+  transform: translateY(0);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+}
+
+.admin-button:disabled,
+.admin-button[aria-disabled="true"] {
+  cursor: not-allowed;
+  opacity: 0.55;
+  transform: none;
+  box-shadow: none;
 }
 
 .admin-button:focus-visible {
@@ -167,54 +179,83 @@ summary {
 }
 
 .admin-button-primary {
-  background: #fff;
-  color: var(--ink);
+  background: #fff !important;
+  color: var(--ink) !important;
 }
 
 .admin-button-primary:hover {
-  background: var(--sage);
-  color: var(--forest);
+  background: var(--sage) !important;
+  color: var(--forest) !important;
 }
 
 .admin-button-secondary {
   border: 1px solid rgba(255, 255, 255, 0.28);
-  background: transparent;
-  color: #fff;
+  background: transparent !important;
+  color: #fff !important;
 }
 
 .admin-button-secondary:hover {
-  background: #fff;
-  color: var(--ink);
+  background: #fff !important;
+  color: var(--ink) !important;
 }
 
 .admin-button-forest {
-  background: var(--forest);
-  color: #fff;
+  background: var(--forest) !important;
+  color: #fff !important;
 }
 
 .admin-button-forest:hover {
-  background: var(--moss);
-  color: #fff;
+  background: var(--moss) !important;
+  color: #fff !important;
 }
 
 .admin-button-sage {
-  background: var(--sage);
-  color: var(--forest);
+  background: var(--sage) !important;
+  color: var(--forest) !important;
 }
 
 .admin-button-sage:hover {
-  background: #fff;
-  color: var(--forest);
+  background: #fff !important;
+  color: var(--forest) !important;
 }
 
 .admin-button-danger {
   border: 1px solid rgba(252, 165, 165, 0.45);
-  background: #7f1d1d;
-  color: #fff;
+  background: #7f1d1d !important;
+  color: #fff !important;
 }
 
 .admin-button-danger:hover {
   border-color: rgba(254, 202, 202, 0.8);
-  background: #991b1b;
-  color: #fff;
+  background: #991b1b !important;
+  color: #fff !important;
+}
+
+.admin-tab {
+  border-radius: 9999px;
+  padding: 0.5rem 1rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  transition: background-color 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.admin-tab[aria-selected="true"] {
+  background: #fff !important;
+  color: var(--ink) !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+}
+
+.admin-tab[aria-selected="false"] {
+  background: rgba(255, 255, 255, 0.1) !important;
+  color: #fff !important;
+}
+
+.admin-tab[aria-selected="false"]:hover {
+  background: rgba(255, 255, 255, 0.2) !important;
+  color: #fff !important;
+}
+
+.admin-tab:focus-visible {
+  outline: 2px solid var(--sage);
+  outline-offset: 3px;
 }

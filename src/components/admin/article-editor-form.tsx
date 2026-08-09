@@ -244,10 +244,10 @@ export function ArticleEditorForm({
           <button
             key={tab.id}
             type="button"
+            role="tab"
+            aria-selected={activeTab === tab.id}
             onClick={() => setActiveTab(tab.id)}
-            className={`rounded-full px-4 py-2 text-sm font-semibold transition ${
-              activeTab === tab.id ? "bg-white text-stone-950 shadow-sm" : "bg-white/10 text-stone-100 hover:bg-white/15"
-            }`}
+            className="admin-tab"
           >
             {tab.label}
           </button>
