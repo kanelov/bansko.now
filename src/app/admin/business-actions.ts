@@ -121,7 +121,7 @@ export async function upsertBusinessPlanAction(formData: FormData) {
     name,
     slug: stringValue(formData, "slug") || `${slugify(name) || "plan"}-${randomUUID().slice(0, 6)}`,
     tier: businessTierValue(stringValue(formData, "tier")),
-    period_months: integerValue(formData, "period_months", 1),
+    period_months: 12,
     price: numberValue(formData, "price"),
     currency: stringValue(formData, "currency") || "BGN",
     stripe_payment_link: stringValue(formData, "stripe_payment_link"),

@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { submitBusinessAction } from "@/app/businesses/actions";
+import { annualPlanDescriptions, getBusinessTierLabel } from "@/lib/business-plan-labels";
 import { businessCategories, businessFeatures, businessServices } from "@/lib/business-public";
 import type { BusinessDirectorySettings, BusinessListingPlan } from "@/lib/types";
 
@@ -14,17 +15,19 @@ export function BusinessSubmitForm({
 }) {
   const [faqRows, setFaqRows] = useState([0]);
   const [selectedPlanId, setSelectedPlanId] = useState("");
-  const selectedPlan = plans.find((plan) => plan.id === selectedPlanId);
+  const [selectedImageCount, setSelectedImageCount] = useState(0);
+  const annualPlans = plans.filter((plan) => plan.period_months === 12 && plan.tier !== "free");
+  const selectedPlan = annualPlans.find((plan) => plan.id === selectedPlanId);
 
   return (
     <form
       action={submitBusinessAction}
-      className="mx-auto grid w-full max-w-4xl gap-8 [&_input]:min-w-0 [&_input]:w-full [&_select]:min-w-0 [&_select]:w-full [&_textarea]:min-w-0 [&_textarea]:w-full"
+      className="mx-auto grid w-full max-w-4xl gap-8 [&_input]:min-w-0 [&_select]:min-w-0 [&_select]:w-full [&_textarea]:min-w-0 [&_textarea]:w-full"
     >
       <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">Основна информация</p>
-          <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">Представи бизнеса си</h2>
+          <h2 className="mt-2 font-serif text-2xl font-semibold text-stone-950 sm:text-3xl">Представи бизнеса си</h2>
         </div>
         <div className="grid gap-4 md:grid-cols-2">
           <label className="grid gap-2 text-sm font-semibold">
@@ -81,42 +84,67 @@ export function BusinessSubmitForm({
       <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">Визуално представяне</p>
-          <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">Снимки и характеристики</h2>
+          <h2 className="mt-2 font-serif text-2xl font-semibold text-stone-950 sm:text-3xl">Снимки и характеристики</h2>
         </div>
-        <label className="grid gap-2 text-sm font-semibold">
-          Снимки, до 2MB всяка
+        <label className="grid cursor-pointer gap-2 text-sm font-semibold">
+          <span>Снимки, до 2MB всяка</span>
           <input
             name="business_images"
             type="file"
             accept="image/jpeg,image/png,image/webp"
             multiple
-            className="max-w-full rounded-xl border border-stone-300 bg-paper px-3 py-3 text-xs file:mr-3 file:rounded-full file:border-0 file:bg-forest file:px-3 file:py-2 file:text-xs file:font-semibold file:text-white sm:px-4 sm:text-sm sm:file:px-4 sm:file:text-sm"
+            onChange={(event) => setSelectedImageCount(event.target.files?.length ?? 0)}
+            className="sr-only"
           />
+          <span className="flex flex-wrap items-center gap-3 rounded-xl border border-stone-300 bg-paper p-3">
+            <span className="rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white">Избери снимки</span>
+            <span className="text-sm font-medium text-stone-600">
+              {selectedImageCount ? `${selectedImageCount} избрани` : "JPEG, PNG или WEBP"}
+            </span>
+          </span>
         </label>
-        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+        <fieldset>
+          <legend className="text-sm font-semibold text-stone-950">Удобства и характеристики</legend>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           {businessFeatures.map((feature) => (
-            <label key={feature} className="flex items-center gap-2 rounded-xl border border-stone-200 p-3 text-sm font-medium">
-              <input type="checkbox" name="features" value={feature} />
-              {feature}
+            <label
+              key={feature}
+              className="choice-row cursor-pointer rounded-xl border border-stone-200 bg-stone-50/70 p-3 text-sm font-medium text-stone-800 transition hover:border-forest/40 hover:bg-sage/30"
+            >
+              <input className="choice-control" type="checkbox" name="features" value={feature} />
+              <span className="leading-5">{feature}</span>
             </label>
           ))}
-        </div>
+          </div>
+        </fieldset>
       </section>
 
       <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">FAQ</p>
-          <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">Въпроси и отговори</h2>
+          <h2 className="mt-2 font-serif text-2xl font-semibold text-stone-950 sm:text-3xl">Въпроси и отговори</h2>
         </div>
-        {faqRows.map((row) => (
+        {faqRows.map((row, index) => (
           <div key={row} className="grid gap-3 rounded-2xl bg-stone-50 p-4">
+            <div className="flex items-center justify-between gap-3">
+              <p className="text-sm font-semibold text-stone-700">Въпрос {index + 1}</p>
+              {faqRows.length > 1 ? (
+                <button
+                  type="button"
+                  onClick={() => setFaqRows((rows) => rows.filter((item) => item !== row))}
+                  className="rounded-full px-3 py-1.5 text-xs font-semibold text-red-800 transition hover:bg-red-100"
+                >
+                  Премахни
+                </button>
+              ) : null}
+            </div>
             <input name="faq_question" placeholder="Въпрос" className="rounded-xl border border-stone-300 px-4 py-3" />
             <textarea name="faq_answer" rows={3} placeholder="Отговор" className="rounded-xl border border-stone-300 px-4 py-3" />
           </div>
         ))}
         <button
           type="button"
-          onClick={() => setFaqRows((rows) => [...rows, Date.now()])}
+          onClick={() => setFaqRows((rows) => [...rows, Math.max(...rows) + 1])}
           className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white"
         >
           Добави въпрос
@@ -126,57 +154,113 @@ export function BusinessSubmitForm({
       <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">План за видимост</p>
-          <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">{settings.premium_offer_title}</h2>
+          <h2 className="mt-2 font-serif text-2xl font-semibold text-stone-950 sm:text-3xl">{settings.premium_offer_title}</h2>
           <p className="mt-2 text-sm leading-6 text-stone-600">{settings.premium_offer_description}</p>
         </div>
-        <div className="grid gap-4 md:grid-cols-2">
-          <label className="grid gap-2 text-sm font-semibold">
-            Избран план
-            <select
-              name="requested_plan_id"
-              value={selectedPlanId}
-              onChange={(event) => setSelectedPlanId(event.target.value)}
-              className="rounded-xl border border-stone-300 px-4 py-3"
+        <fieldset>
+          <legend className="sr-only">Избери план за видимост</legend>
+          <div className="grid gap-3 md:grid-cols-2">
+            <label
+              className={`choice-row cursor-pointer rounded-2xl border p-4 transition ${
+                selectedPlanId === "" ? "border-forest bg-sage/40 shadow-sm" : "border-stone-200 bg-white hover:border-forest/40"
+              }`}
             >
-              <option value="">Free listing</option>
-              {plans
-                .filter((plan) => plan.tier !== "free")
-                .map((plan) => (
-                  <option key={plan.id} value={plan.id}>
-                    {plan.name} {plan.price ? `- ${plan.price} ${plan.currency}` : ""}
-                  </option>
-                ))}
-            </select>
-          </label>
-          {selectedPlan?.stripe_payment_link ? (
-            <a
-              href={selectedPlan.stripe_payment_link}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="self-end rounded-full bg-forest px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-moss"
-            >
-              Плати със Stripe
-            </a>
-          ) : (
-            <div className="self-end rounded-2xl bg-stone-50 p-4 text-sm leading-6 text-stone-600">
-              Ако избереш платен план без линк, ще се свържем с теб с оферта.
-            </div>
-          )}
-        </div>
-        <div className="grid gap-3 sm:grid-cols-2">
-          {businessServices.map((service) => (
-            <label key={service} className="flex items-center gap-2 rounded-xl border border-stone-200 p-3 text-sm font-medium">
-              <input type="checkbox" name="requested_services" value={service} />
-              {service}
+              <input
+                className="choice-control"
+                type="radio"
+                name="requested_plan_id"
+                value=""
+                checked={selectedPlanId === ""}
+                onChange={() => setSelectedPlanId("")}
+              />
+              <span>
+                <span className="flex flex-wrap items-center justify-between gap-2">
+                  <strong className="text-base text-stone-950">Безплатен</strong>
+                  <span className="rounded-full bg-white px-2.5 py-1 text-xs font-semibold text-forest">По подразбиране</span>
+                </span>
+                <span className="mt-2 block text-sm leading-6 text-stone-600">{annualPlanDescriptions.free}</span>
+              </span>
             </label>
-          ))}
-        </div>
+
+            {annualPlans.map((plan) => {
+              const selected = selectedPlanId === plan.id;
+
+              return (
+                <label
+                  key={plan.id}
+                  className={`choice-row cursor-pointer rounded-2xl border p-4 transition ${
+                    selected ? "border-forest bg-sage/40 shadow-sm" : "border-stone-200 bg-white hover:border-forest/40"
+                  }`}
+                >
+                  <input
+                    className="choice-control"
+                    type="radio"
+                    name="requested_plan_id"
+                    value={plan.id}
+                    checked={selected}
+                    onChange={() => setSelectedPlanId(plan.id)}
+                  />
+                  <span>
+                    <span className="flex flex-wrap items-center justify-between gap-2">
+                      <strong className="text-base text-stone-950">{getBusinessTierLabel(plan.tier)}</strong>
+                      <span className="rounded-full bg-forest px-2.5 py-1 text-xs font-semibold text-white">1 година</span>
+                    </span>
+                    <span className="mt-2 block text-sm leading-6 text-stone-600">
+                      {plan.description || annualPlanDescriptions[plan.tier]}
+                    </span>
+                    {plan.price ? (
+                      <span className="mt-3 block text-sm font-semibold text-forest">
+                        {plan.price} {plan.currency} / година
+                      </span>
+                    ) : null}
+                  </span>
+                </label>
+              );
+            })}
+          </div>
+        </fieldset>
+
+        {selectedPlan ? (
+          selectedPlan.stripe_payment_link ? (
+            <div className="flex flex-col gap-3 rounded-2xl bg-stone-50 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <p className="text-sm leading-6 text-stone-600">Плащането се отваря в защитена Stripe страница.</p>
+              <a
+                href={selectedPlan.stripe_payment_link}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="rounded-full bg-forest px-5 py-3 text-center text-sm font-semibold text-white transition hover:bg-moss"
+              >
+                Плати със Stripe
+              </a>
+            </div>
+          ) : (
+            <div className="rounded-2xl bg-stone-50 p-4 text-sm leading-6 text-stone-600">
+              За това ниво все още няма добавен Stripe линк. Изпрати заявката и ще се свържем с теб с оферта.
+            </div>
+          )
+        ) : null}
+
+        <fieldset>
+          <legend className="text-sm font-semibold text-stone-950">Допълнителни услуги по желание</legend>
+          <p className="mt-1 text-sm leading-6 text-stone-600">Изборът не е задължителен. Ще уточним цена и възможности отделно.</p>
+          <div className="mt-3 grid gap-3 sm:grid-cols-2">
+            {businessServices.map((service) => (
+              <label
+                key={service}
+                className="choice-row cursor-pointer rounded-xl border border-stone-200 bg-stone-50/70 p-3 text-sm font-medium text-stone-800 transition hover:border-forest/40 hover:bg-sage/30"
+              >
+                <input className="choice-control" type="checkbox" name="requested_services" value={service} />
+                <span className="leading-5">{service}</span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
       </section>
 
       <section className="grid w-full min-w-0 gap-5 rounded-3xl border border-stone-200 bg-white p-4 shadow-soft sm:p-6">
         <div>
           <p className="text-sm font-semibold uppercase text-moss">Контакт за администратора</p>
-          <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">Кой изпраща заявката?</h2>
+          <h2 className="mt-2 font-serif text-2xl font-semibold text-stone-950 sm:text-3xl">Кой изпраща заявката?</h2>
         </div>
         <div className="grid gap-4 md:grid-cols-3">
           <label className="grid gap-2 text-sm font-semibold">

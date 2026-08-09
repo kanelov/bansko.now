@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { BusinessMedia } from "@/components/public/business-media";
+import { getBusinessTierLabel } from "@/lib/business-plan-labels";
 import { getBusinessPath, getDirectionsUrl, getEffectiveBusinessTier } from "@/lib/business-public";
 import { getHomepageSpotlightBusiness } from "@/lib/businesses";
 
@@ -21,7 +22,7 @@ export async function BusinessSpotlightBlock() {
         <div className="mt-4 flex flex-wrap gap-2">
           <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{business.category}</span>
           <span className="rounded-full bg-forest px-3 py-1 text-xs font-semibold text-white">
-            {tier === "homepage" ? "Spotlight" : "Premium"}
+            {getBusinessTierLabel(tier)}
           </span>
         </div>
         <h2 className="mt-5 font-serif text-4xl font-semibold text-stone-950">{business.name}</h2>

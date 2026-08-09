@@ -3,13 +3,14 @@ import { signOutAction } from "@/app/admin/actions";
 import type { Route } from "next";
 
 const adminNav: { href: Route; label: string }[] = [
-  { href: "/admin", label: "Dashboard" },
-  { href: "/admin/articles", label: "Articles" },
+  { href: "/admin", label: "Табло" },
+  { href: "/admin/articles", label: "Статии" },
   { href: "/admin/cms", label: "Страници" },
-  { href: "/admin/businesses", label: "Businesses" },
-  { href: "/admin/categories", label: "Categories" },
-  { href: "/admin/media", label: "Media" },
-  { href: "/admin/settings", label: "Settings" }
+  { href: "/admin/businesses", label: "Бизнеси" },
+  { href: "/admin/categories", label: "Категории" },
+  { href: "/admin/media", label: "Медия" },
+  { href: "/admin/settings", label: "Настройки" },
+  { href: "/admin/guide", label: "Инструкции" }
 ];
 
 export function AdminShell({ children }: { children: React.ReactNode }) {
@@ -38,7 +39,7 @@ export function AdminShell({ children }: { children: React.ReactNode }) {
             Bansko NOW
           </Link>
           <Link href="/admin/articles/new" className="admin-button admin-button-primary px-5 py-2 text-sm font-semibold">
-            New Article
+            Нова статия
           </Link>
         </header>
         <main className="px-4 py-8 sm:px-6 lg:px-8">{children}</main>

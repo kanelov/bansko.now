@@ -11,6 +11,7 @@ import {
   getEffectiveBusinessTier,
   parseBusinessFaqs
 } from "@/lib/business-public";
+import { getBusinessTierLabel } from "@/lib/business-plan-labels";
 import type { BusinessDirectorySettings, BusinessWithRelations } from "@/lib/types";
 
 export function IllustratedBusinessMap({
@@ -100,7 +101,9 @@ export function IllustratedBusinessMap({
             <div className="mt-4 flex flex-wrap gap-2">
               <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{selected.category}</span>
               {getEffectiveBusinessTier(selected) !== "free" ? (
-                <span className="rounded-full bg-forest px-3 py-1 text-xs font-semibold text-white">Premium</span>
+                <span className="rounded-full bg-forest px-3 py-1 text-xs font-semibold text-white">
+                  {getBusinessTierLabel(getEffectiveBusinessTier(selected))}
+                </span>
               ) : null}
             </div>
             <h2 className="mt-4 font-serif text-3xl font-semibold text-stone-950">{selected.name}</h2>

@@ -3,7 +3,7 @@ create table if not exists public.business_listing_plans (
   name text not null,
   slug text not null unique,
   tier text not null default 'featured' check (tier in ('free', 'featured', 'premium', 'homepage')),
-  period_months integer not null default 1 check (period_months in (1, 6, 12)),
+  period_months integer not null default 12 check (period_months = 12),
   price numeric(10, 2) default 0,
   currency text not null default 'BGN',
   stripe_payment_link text,
@@ -64,8 +64,8 @@ create table if not exists public.business_directory_settings (
   id uuid primary key default gen_random_uuid(),
   intro_title text default 'Местни бизнеси в Банско',
   intro_description text default 'Открий места, услуги и локални партньори в Банско.',
-  premium_offer_title text default 'Искаш по-видимо представяне?',
-  premium_offer_description text default 'Избери Featured или Premium позиция и покажи бизнеса си по-силно в Bansko NOW.',
+  premium_offer_title text default 'Избери как да присъства бизнесът ти',
+  premium_offer_description text default 'Безплатното присъствие е по подразбиране. При желание избери годишно ниво за по-силна видимост в Bansko NOW.',
   map_image_url text,
   map_image_alt text default 'Илюстрирана карта на Банско',
   notification_email text,
@@ -93,6 +93,8 @@ create table if not exists public.contact_messages (
 
 create index if not exists businesses_status_category_idx on public.businesses(status, category);
 create index if not exists businesses_public_order_idx on public.businesses(status, listing_tier, paid_until, priority);
+create index if not exists businesses_requested_plan_id_idx on public.businesses(requested_plan_id);
+create index if not exists businesses_active_plan_id_idx on public.businesses(active_plan_id);
 create index if not exists business_contacts_business_id_idx on public.business_contacts(business_id);
 
 alter table public.business_listing_plans enable row level security;
@@ -224,14 +226,8 @@ where not exists (select 1 from public.business_directory_settings);
 insert into public.business_listing_plans
   (name, slug, tier, period_months, price, currency, description, benefits, sort_order)
 values
-  ('Free Listing', 'free-listing', 'free', 12, 0, 'BGN', 'Основно присъствие в каталога след одобрение.', array['Профил в каталога', 'Адрес и упътване', 'До 3 снимки'], 10),
-  ('Featured - 1 месец', 'featured-1-month', 'featured', 1, 0, 'BGN', 'По-видима позиция в категорията за 1 месец.', array['Featured позиция', 'По-силна карта', 'Видео линк'], 20),
-  ('Featured - 6 месеца', 'featured-6-months', 'featured', 6, 0, 'BGN', 'По-видима позиция в категорията за 6 месеца.', array['Featured позиция', 'По-силна карта', 'Видео линк'], 30),
-  ('Featured - 1 година', 'featured-12-months', 'featured', 12, 0, 'BGN', 'По-видима позиция в категорията за 1 година.', array['Featured позиция', 'По-силна карта', 'Видео линк'], 40),
-  ('Premium - 1 месец', 'premium-1-month', 'premium', 1, 0, 'BGN', 'Premium фокус в категорията за 1 месец.', array['Premium позиция', 'Голяма editorial карта', 'По-видим pin'], 50),
-  ('Premium - 6 месеца', 'premium-6-months', 'premium', 6, 0, 'BGN', 'Premium фокус в категорията за 6 месеца.', array['Premium позиция', 'Голяма editorial карта', 'По-видим pin'], 60),
-  ('Premium - 1 година', 'premium-12-months', 'premium', 12, 0, 'BGN', 'Premium фокус в категорията за 1 година.', array['Premium позиция', 'Голяма editorial карта', 'По-видим pin'], 70),
-  ('Homepage Spotlight - 1 месец', 'homepage-spotlight-1-month', 'homepage', 1, 0, 'BGN', 'Местен фокус на началната страница за 1 месец.', array['Homepage spotlight', 'Premium визуален блок'], 80),
-  ('Homepage Spotlight - 6 месеца', 'homepage-spotlight-6-months', 'homepage', 6, 0, 'BGN', 'Местен фокус на началната страница за 6 месеца.', array['Homepage spotlight', 'Premium визуален блок'], 90),
-  ('Homepage Spotlight - 1 година', 'homepage-spotlight-12-months', 'homepage', 12, 0, 'BGN', 'Местен фокус на началната страница за 1 година.', array['Homepage spotlight', 'Premium визуален блок'], 100)
+  ('Безплатно присъствие', 'free-listing', 'free', 12, 0, 'BGN', 'Основен профил в каталога след редакторско одобрение.', array['Профил в каталога', 'Адрес и упътване', 'До 3 снимки'], 10),
+  ('Препоръчан бизнес - 1 година', 'featured-12-months', 'featured', 12, 0, 'BGN', 'По-предна позиция и по-видимо представяне в избраната категория.', array['По-предна позиция', 'По-видима карта', 'Видео представяне'], 20),
+  ('Премиум бизнес - 1 година', 'premium-12-months', 'premium', 12, 0, 'BGN', 'Силен визуален акцент и приоритетно позициониране в каталога.', array['Приоритетна позиция', 'Премиум визуален акцент', 'По-видим pin на картата'], 30),
+  ('Фокус на началната страница - 1 година', 'homepage-spotlight-12-months', 'homepage', 12, 0, 'BGN', 'Премиум присъствие в каталога и възможност за фокус на началната страница.', array['Най-висока видимост', 'Фокус на началната страница', 'Премиум визуален блок'], 40)
 on conflict (slug) do nothing;

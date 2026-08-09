@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Route } from "next";
 import { BusinessMedia } from "@/components/public/business-media";
+import { getBusinessTierLabel } from "@/lib/business-plan-labels";
 import { getBusinessPath, getDirectionsUrl, getEffectiveBusinessTier } from "@/lib/business-public";
 import type { BusinessWithRelations } from "@/lib/types";
 
@@ -22,7 +23,7 @@ export function BusinessCard({ business, featured = false }: { business: Busines
           <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{business.category}</span>
           {tier !== "free" ? (
             <span className="rounded-full bg-forest px-3 py-1 text-xs font-semibold text-white">
-              {tier === "homepage" ? "Spotlight" : tier === "premium" ? "Premium" : "Featured"}
+              {getBusinessTierLabel(tier)}
             </span>
           ) : null}
         </div>

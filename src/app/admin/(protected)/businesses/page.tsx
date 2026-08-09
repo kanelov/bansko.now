@@ -15,6 +15,12 @@ import {
   getBusinessListingPlans,
   getContactMessages
 } from "@/lib/businesses";
+import {
+  businessPaymentStatusLabels,
+  businessStatusLabels,
+  businessTierLabels,
+  getBusinessTierLabel
+} from "@/lib/business-plan-labels";
 
 type SearchParams = Promise<{ saved?: string; approved?: string; deleted?: string; error?: string }>;
 
@@ -52,14 +58,15 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
     getBusinessDirectorySettings(),
     getContactMessages()
   ]);
+  const annualPlans = plans.filter((plan) => plan.period_months === 12);
 
   return (
     <div className="grid gap-10">
       <header>
-        <p className="text-sm font-semibold uppercase text-stone-400">Local Directory</p>
-        <h1 className="mt-2 font-serif text-4xl font-semibold">Business Directory</h1>
+        <p className="text-sm font-semibold uppercase text-stone-400">Местен каталог</p>
+        <h1 className="mt-2 font-serif text-4xl font-semibold">Бизнес каталог</h1>
         <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-300">
-          Управлявай заявки, paid tiers, illustrated map pins, Stripe payment links и контакт съобщения.
+          Управлявай бизнес заявки, годишни нива за видимост, позиции на картата, Stripe линкове и контактни съобщения.
         </p>
       </header>
 
@@ -76,7 +83,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Submissions</p>
+          <p className="text-sm font-semibold uppercase text-stone-400">Заявки</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Бизнес заявки</h2>
         </div>
         {businesses.length ? (
@@ -86,13 +93,13 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                 <summary className="cursor-pointer list-none">
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <div>
-                      <p className="text-xs font-semibold uppercase text-stone-400">{business.category} / {business.status}</p>
+                      <p className="text-xs font-semibold uppercase text-stone-400">{business.category} / {businessStatusLabels[business.status]}</p>
                       <h3 className="mt-2 font-serif text-2xl font-semibold">{business.name}</h3>
                       <p className="mt-1 text-sm text-stone-300">{business.address}</p>
                     </div>
                     <div className="text-right text-sm text-stone-300">
-                      <p>{business.listing_tier} / {business.payment_status}</p>
-                      <p>Paid until: {formatDate(business.paid_until)}</p>
+                      <p>{businessTierLabels[business.listing_tier]} / {businessPaymentStatusLabels[business.payment_status]}</p>
+                      <p>Активен до: {formatDate(business.paid_until)}</p>
                     </div>
                   </div>
                 </summary>
@@ -102,7 +109,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                     <input type="hidden" name="id" value={business.id} />
                     <div className="grid gap-4 md:grid-cols-2">
                       <label className="grid gap-2 text-sm font-semibold">
-                        Name
+                        Име
                         <input name="name" defaultValue={business.name} className="rounded-xl border border-stone-300 px-4 py-3" />
                       </label>
                       <label className="grid gap-2 text-sm font-semibold">
@@ -112,7 +119,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                     </div>
                     <div className="grid gap-4 md:grid-cols-2">
                       <label className="grid gap-2 text-sm font-semibold">
-                        Category
+                        Категория
                         <select name="category" defaultValue={business.category} className="rounded-xl border border-stone-300 px-4 py-3">
                           {businessCategories.map((category) => (
                             <option key={category}>{category}</option>
@@ -120,20 +127,20 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                         </select>
                       </label>
                       <label className="grid gap-2 text-sm font-semibold">
-                        Status
+                        Статус
                         <select name="status" defaultValue={business.status} className="rounded-xl border border-stone-300 px-4 py-3">
-                          <option value="draft">draft</option>
-                          <option value="approved">approved</option>
-                          <option value="rejected">rejected</option>
+                          <option value="draft">Чернова</option>
+                          <option value="approved">Одобрен</option>
+                          <option value="rejected">Отхвърлен</option>
                         </select>
                       </label>
                     </div>
                     <label className="grid gap-2 text-sm font-semibold">
-                      Description
+                      Описание
                       <textarea name="description" defaultValue={business.description ?? ""} rows={4} className="rounded-xl border border-stone-300 px-4 py-3" />
                     </label>
                     <label className="grid gap-2 text-sm font-semibold">
-                      Address
+                      Адрес
                       <input name="address" defaultValue={business.address} className="rounded-xl border border-stone-300 px-4 py-3" />
                     </label>
                     <div className="grid gap-4 md:grid-cols-2">
@@ -147,15 +154,15 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                     </div>
                     <input name="facebook_url" defaultValue={business.facebook_url ?? ""} placeholder="Facebook" className="rounded-xl border border-stone-300 px-4 py-3" />
                     <div className="rounded-2xl bg-stone-50 p-4">
-                      <p className="text-sm font-semibold uppercase text-moss">Private contact</p>
+                      <p className="text-sm font-semibold uppercase text-moss">Контакт само за администратора</p>
                       <div className="mt-4 grid gap-4 md:grid-cols-3">
-                        <input name="owner_name" defaultValue={business.contact?.owner_name ?? ""} placeholder="Owner name" className="rounded-xl border border-stone-300 px-4 py-3" />
-                        <input name="owner_email" defaultValue={business.contact?.owner_email ?? ""} placeholder="Owner email" className="rounded-xl border border-stone-300 px-4 py-3" />
-                        <input name="owner_phone" defaultValue={business.contact?.owner_phone ?? ""} placeholder="Owner phone" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="owner_name" defaultValue={business.contact?.owner_name ?? ""} placeholder="Име" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="owner_email" defaultValue={business.contact?.owner_email ?? ""} placeholder="Имейл" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="owner_phone" defaultValue={business.contact?.owner_phone ?? ""} placeholder="Телефон" className="rounded-xl border border-stone-300 px-4 py-3" />
                       </div>
                     </div>
                     <label className="grid gap-2 text-sm font-semibold">
-                      Image URLs
+                      URL адреси на изображенията
                       <textarea
                         name="images_input"
                         defaultValue={textAreaValue(business.images)}
@@ -165,7 +172,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                       />
                     </label>
                     <label className="grid gap-2 text-sm font-semibold">
-                      FAQs
+                      Въпроси и отговори
                       <textarea
                         name="faqs_input"
                         defaultValue={faqTextAreaValue(business.faqs)}
@@ -180,45 +187,45 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                     </div>
                     <div className="grid gap-4 md:grid-cols-3">
                       <label className="grid gap-2 text-sm font-semibold">
-                        Tier
+                        Ниво на видимост
                         <select name="listing_tier" defaultValue={business.listing_tier} className="rounded-xl border border-stone-300 px-4 py-3">
-                          <option value="free">free</option>
-                          <option value="featured">featured</option>
-                          <option value="premium">premium</option>
-                          <option value="homepage">homepage</option>
+                          <option value="free">Безплатен</option>
+                          <option value="featured">Препоръчан</option>
+                          <option value="premium">Премиум</option>
+                          <option value="homepage">Фокус на началната</option>
                         </select>
                       </label>
                       <label className="grid gap-2 text-sm font-semibold">
-                        Payment
+                        Плащане
                         <select name="payment_status" defaultValue={business.payment_status} className="rounded-xl border border-stone-300 px-4 py-3">
-                          <option value="unpaid">unpaid</option>
-                          <option value="pending">pending</option>
-                          <option value="paid">paid</option>
-                          <option value="expired">expired</option>
+                          <option value="unpaid">Неплатено</option>
+                          <option value="pending">Очаква плащане</option>
+                          <option value="paid">Платено</option>
+                          <option value="expired">Изтекло</option>
                         </select>
                       </label>
                       <label className="grid gap-2 text-sm font-semibold">
-                        Active plan
+                        Активен годишен план
                         <select name="active_plan_id" defaultValue={business.active_plan_id ?? ""} className="rounded-xl border border-stone-300 px-4 py-3">
-                          <option value="">No plan</option>
-                          {plans.map((plan) => (
-                            <option key={plan.id} value={plan.id}>{plan.name}</option>
+                          <option value="">Без платен план</option>
+                          {annualPlans.map((plan) => (
+                            <option key={plan.id} value={plan.id}>{getBusinessTierLabel(plan.tier)}</option>
                           ))}
                         </select>
                       </label>
                     </div>
                     <div className="grid gap-4 md:grid-cols-3">
                       <label className="grid gap-2 text-sm font-semibold">
-                        Paid until
+                        Активен до
                         <input type="date" name="paid_until" defaultValue={business.paid_until?.slice(0, 10) ?? ""} className="rounded-xl border border-stone-300 px-4 py-3" />
                       </label>
                       <label className="grid gap-2 text-sm font-semibold">
-                        Priority
+                        Приоритет
                         <input name="priority" defaultValue={business.priority} className="rounded-xl border border-stone-300 px-4 py-3" />
                       </label>
-                      <label className="flex items-center gap-2 pt-8 text-sm font-semibold">
-                        <input type="checkbox" name="is_homepage_spotlight" defaultChecked={business.is_homepage_spotlight} />
-                        Homepage spotlight
+                      <label className="choice-row cursor-pointer self-end rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm font-semibold">
+                        <input className="choice-control" type="checkbox" name="is_homepage_spotlight" defaultChecked={business.is_homepage_spotlight} />
+                        <span>Фокус на началната страница</span>
                       </label>
                     </div>
                     <div className="grid gap-4 md:grid-cols-3">
@@ -226,9 +233,9 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                       <input name="map_pin_x" defaultValue={business.map_pin_x ?? ""} placeholder="Map pin X %" className="rounded-xl border border-stone-300 px-4 py-3" />
                       <input name="map_pin_y" defaultValue={business.map_pin_y ?? ""} placeholder="Map pin Y %" className="rounded-xl border border-stone-300 px-4 py-3" />
                     </div>
-                    <label className="flex items-center gap-2 text-sm font-semibold">
-                      <input type="checkbox" name="show_on_illustrated_map" defaultChecked={business.show_on_illustrated_map} />
-                      Show on illustrated map
+                    <label className="choice-row cursor-pointer rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm font-semibold">
+                      <input className="choice-control" type="checkbox" name="show_on_illustrated_map" defaultChecked={business.show_on_illustrated_map} />
+                      <span>Покажи на илюстрираната карта</span>
                     </label>
                     <textarea name="admin_notes" defaultValue={business.admin_notes ?? ""} rows={3} className="rounded-xl border border-stone-300 px-4 py-3" placeholder="Admin notes" />
                     <div className="rounded-2xl bg-stone-50 p-4">
@@ -242,23 +249,23 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                         <input name="og_description" defaultValue={business.og_description ?? ""} placeholder="OG description" className="rounded-xl border border-stone-300 px-4 py-3" />
                         <input name="schema_type" defaultValue={business.schema_type ?? "LocalBusiness"} placeholder="Schema type" className="rounded-xl border border-stone-300 px-4 py-3" />
                         <div className="flex flex-wrap items-center gap-4 text-sm font-semibold">
-                          <label className="flex items-center gap-2">
-                            <input type="checkbox" name="robots_index" defaultChecked={business.robots_index ?? true} />
-                            Index
+                          <label className="choice-row cursor-pointer rounded-xl border border-stone-200 bg-white p-3">
+                            <input className="choice-control" type="checkbox" name="robots_index" defaultChecked={business.robots_index ?? true} />
+                            <span>Позволи индексиране</span>
                           </label>
-                          <label className="flex items-center gap-2">
-                            <input type="checkbox" name="robots_follow" defaultChecked={business.robots_follow ?? true} />
-                            Follow
+                          <label className="choice-row cursor-pointer rounded-xl border border-stone-200 bg-white p-3">
+                            <input className="choice-control" type="checkbox" name="robots_follow" defaultChecked={business.robots_follow ?? true} />
+                            <span>Следвай линковете</span>
                           </label>
                         </div>
                       </div>
                     </div>
-                    <button className="admin-button admin-button-forest px-5 py-3 text-sm font-semibold">Save business</button>
+                    <button className="admin-button admin-button-forest px-5 py-3 text-sm font-semibold">Запази бизнеса</button>
                   </form>
 
                   <aside className="grid gap-4 content-start">
                     <div className="rounded-2xl bg-white p-5 text-stone-950">
-                      <p className="text-sm font-semibold uppercase text-moss">Private contact</p>
+                      <p className="text-sm font-semibold uppercase text-moss">Контакт за администратора</p>
                       <p className="mt-3 font-semibold">{business.contact?.owner_name || "—"}</p>
                       <p className="text-sm text-stone-600">{business.contact?.owner_email || "—"}</p>
                       <p className="text-sm text-stone-600">{business.contact?.owner_phone || "—"}</p>
@@ -272,14 +279,14 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                     ) : null}
                     <form action={approveBusinessAction}>
                       <input type="hidden" name="id" value={business.id} />
-                      <button className="admin-button admin-button-sage w-full px-5 py-3 text-sm font-semibold">Approve</button>
+                      <button className="admin-button admin-button-sage w-full px-5 py-3 text-sm font-semibold">Одобри</button>
                     </form>
                     <details>
-                      <summary className="admin-button admin-button-danger list-none px-5 py-3 text-sm font-semibold">Delete / Reject</summary>
+                      <summary className="admin-button admin-button-danger list-none px-5 py-3 text-sm font-semibold">Изтрий / отхвърли</summary>
                       <form action={deleteBusinessAction} className="mt-3 grid gap-3 rounded-2xl bg-red-950/30 p-4">
                         <input type="hidden" name="id" value={business.id} />
                         <p className="text-sm text-red-100">Изтрива бизнеса, private контакта и качените снимки.</p>
-                        <button className="admin-button admin-button-danger px-4 py-2 text-sm font-semibold">Confirm delete</button>
+                        <button className="admin-button admin-button-danger px-4 py-2 text-sm font-semibold">Потвърди изтриването</button>
                       </form>
                     </details>
                   </aside>
@@ -294,41 +301,41 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Plans</p>
-          <h2 className="mt-2 font-serif text-3xl font-semibold">Stripe Payment Links</h2>
+          <p className="text-sm font-semibold uppercase text-stone-400">План за видимост</p>
+          <h2 className="mt-2 font-serif text-3xl font-semibold">Годишни нива и Stripe линкове</h2>
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-300">
+            Безплатният план е по подразбиране. Всички платени нива са за една година, за да бъдат офертата и подновяването ясни.
+          </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {[...plans, null].map((plan, index) => (
+          {[...annualPlans, null].map((plan, index) => (
             <form key={plan?.id || "new"} action={upsertBusinessPlanAction} className="grid gap-3 rounded-2xl bg-white p-5 text-stone-950">
               {plan ? <input type="hidden" name="id" value={plan.id} /> : null}
-              <input name="name" defaultValue={plan?.name ?? ""} placeholder="Plan name" className="rounded-xl border border-stone-300 px-4 py-3" />
+              <input type="hidden" name="period_months" value="12" />
+              <input name="name" defaultValue={plan?.name ?? ""} placeholder="Име на плана" className="rounded-xl border border-stone-300 px-4 py-3" />
               <input name="slug" defaultValue={plan?.slug ?? ""} placeholder="slug" className="rounded-xl border border-stone-300 px-4 py-3" />
-              <div className="grid gap-3 md:grid-cols-2">
+              <div className="grid gap-3 md:grid-cols-[1fr_auto]">
                 <select name="tier" defaultValue={plan?.tier ?? "featured"} className="rounded-xl border border-stone-300 px-4 py-3">
-                  <option value="free">free</option>
-                  <option value="featured">featured</option>
-                  <option value="premium">premium</option>
-                  <option value="homepage">homepage</option>
+                  <option value="free">Безплатен</option>
+                  <option value="featured">Препоръчан</option>
+                  <option value="premium">Премиум</option>
+                  <option value="homepage">Фокус на началната</option>
                 </select>
-                <select name="period_months" defaultValue={plan?.period_months ?? 1} className="rounded-xl border border-stone-300 px-4 py-3">
-                  <option value="1">1 месец</option>
-                  <option value="6">6 месеца</option>
-                  <option value="12">1 година</option>
-                </select>
+                <span className="inline-flex items-center rounded-xl bg-sage px-4 py-3 text-sm font-semibold text-forest">1 година</span>
               </div>
               <div className="grid gap-3 md:grid-cols-3">
-                <input name="price" defaultValue={plan?.price ?? ""} placeholder="Price" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <input name="price" defaultValue={plan?.price ?? ""} placeholder="Цена" className="rounded-xl border border-stone-300 px-4 py-3" />
                 <input name="currency" defaultValue={plan?.currency ?? "BGN"} placeholder="BGN" className="rounded-xl border border-stone-300 px-4 py-3" />
-                <input name="sort_order" defaultValue={plan?.sort_order ?? index * 10} placeholder="Order" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <input name="sort_order" defaultValue={plan?.sort_order ?? index * 10} placeholder="Ред" className="rounded-xl border border-stone-300 px-4 py-3" />
               </div>
               <input name="stripe_payment_link" defaultValue={plan?.stripe_payment_link ?? ""} placeholder="Stripe Payment Link" className="rounded-xl border border-stone-300 px-4 py-3" />
-              <textarea name="description" defaultValue={plan?.description ?? ""} rows={2} placeholder="Description" className="rounded-xl border border-stone-300 px-4 py-3" />
-              <textarea name="benefits_input" defaultValue={textAreaValue(plan?.benefits)} rows={3} placeholder="Benefits, one per line" className="rounded-xl border border-stone-300 px-4 py-3" />
-              <label className="flex items-center gap-2 text-sm font-semibold">
-                <input type="checkbox" name="is_active" defaultChecked={plan?.is_active ?? true} />
-                Active
+              <textarea name="description" defaultValue={plan?.description ?? ""} rows={2} placeholder="Кратко описание" className="rounded-xl border border-stone-300 px-4 py-3" />
+              <textarea name="benefits_input" defaultValue={textAreaValue(plan?.benefits)} rows={3} placeholder="Предимства, по едно на ред" className="rounded-xl border border-stone-300 px-4 py-3" />
+              <label className="choice-row cursor-pointer rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm font-semibold">
+                <input className="choice-control" type="checkbox" name="is_active" defaultChecked={plan?.is_active ?? true} />
+                <span>Активен план</span>
               </label>
-              <button className="admin-button admin-button-forest px-4 py-2 text-sm font-semibold">{plan ? "Save plan" : "Create plan"}</button>
+              <button className="admin-button admin-button-forest px-4 py-2 text-sm font-semibold">{plan ? "Запази плана" : "Създай ниво"}</button>
             </form>
           ))}
         </div>

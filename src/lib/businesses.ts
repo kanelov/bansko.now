@@ -49,7 +49,7 @@ export const fallbackBusinessDirectorySettings: BusinessDirectorySettings = {
   intro_description: "Открий места, услуги и локални партньори в Банско.",
   premium_offer_title: "Искаш по-видимо представяне?",
   premium_offer_description:
-    "Избери Featured или Premium позиция и покажи бизнеса си по-силно в Bansko NOW.",
+    "Безплатното присъствие е по подразбиране. При желание избери годишно ниво за по-силна видимост в Bansko NOW.",
   map_image_url: null,
   map_image_alt: "Илюстрирана карта на Банско",
   notification_email: null,
