@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import { upsertArticleAction } from "@/app/admin/actions";
+import { useFormStatus } from "react-dom";
+import { publishArticleAction, upsertArticleAction } from "@/app/admin/actions";
 import { ArticleTableOfContents } from "@/components/public/article-table-of-contents";
 import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
@@ -164,6 +165,97 @@ const visualBlocks = [
   }
 ];
 
+const serializedDraftFields: (keyof Draft)[] = [
+  "title",
+  "slug",
+  "excerpt",
+  "content",
+  "category_id",
+  "tags_input",
+  "source_links_input",
+  "internal_link_suggestions_input",
+  "focus_keyword",
+  "seo_title",
+  "seo_description",
+  "canonical_url",
+  "og_title",
+  "og_description",
+  "og_image_url",
+  "featured_image_url",
+  "featured_image_alt",
+  "author_name",
+  "schema_type",
+  "status",
+  "published_at",
+  "scheduled_at",
+  "robots_index",
+  "robots_follow",
+  "is_featured",
+  "is_homepage_highlight",
+  "show_facebook_cta",
+  "show_art_studio_block",
+  "show_bansko_collection_block"
+];
+
+function ArticleFormActions({
+  isExisting,
+  isPublished,
+  hasUnsavedChanges
+}: {
+  isExisting: boolean;
+  isPublished: boolean;
+  hasUnsavedChanges: boolean;
+}) {
+  const { pending, data, action } = useFormStatus();
+  const pendingIntent = data?.get("intent");
+  const isPublishPending = pending && (action === publishArticleAction || pendingIntent === "publish");
+  const publishDisabled = isExisting && (isPublished || hasUnsavedChanges);
+  const publishTitle = hasUnsavedChanges
+    ? "Първо запази редакционните промени, след това публикувай."
+    : isPublished
+      ? "Статията вече е публикувана."
+      : "Публикувай запазената версия на статията.";
+
+  return (
+    <div className="flex flex-wrap items-center justify-end gap-3">
+      {isExisting && hasUnsavedChanges ? (
+        <p className="mr-auto text-sm font-medium text-amber-200">Има незапазени промени. Първо ги запази.</p>
+      ) : null}
+      <button
+        type="submit"
+        name="intent"
+        value="save"
+        disabled={pending}
+        className="admin-button admin-button-secondary px-6 py-3 text-sm font-semibold"
+      >
+        {pending && pendingIntent !== "publish" ? "Запазване..." : isExisting ? "Запази промените" : "Запази чернова"}
+      </button>
+      {isExisting ? (
+        <button
+          type="submit"
+          formAction={publishArticleAction}
+          disabled={pending || publishDisabled}
+          title={publishTitle}
+          className="admin-button admin-button-primary px-6 py-3 text-sm font-semibold"
+        >
+          {isPublishPending ? "Публикуване..." : isPublished ? "Публикувана" : "Публикувай"}
+        </button>
+      ) : (
+        <button
+          type="submit"
+          name="intent"
+          value="publish"
+          disabled={pending}
+          title="Създай и публикувай статията."
+          className="admin-button admin-button-primary px-6 py-3 text-sm font-semibold"
+        >
+          {isPublishPending ? "Публикуване..." : "Публикувай"}
+        </button>
+      )}
+    </div>
+  );
+}
+
 export function ArticleEditorForm({
   article,
   categories,
@@ -174,7 +266,8 @@ export function ArticleEditorForm({
   mediaItems?: MediaItem[];
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("content");
-  const [draft, setDraft] = useState<Draft>(() => initialDraft(article));
+  const originalDraft = useMemo(() => initialDraft(article), [article]);
+  const [draft, setDraft] = useState<Draft>(() => originalDraft);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const previewToc = useMemo(() => getArticleToc(draft.content || ""), [draft.content]);
   const seoArticle = useMemo<Partial<ArticleWithCategory>>(
@@ -235,10 +328,18 @@ export function ArticleEditorForm({
   }
 
   const score = getSeoScore(seoArticle);
+  const tagsDirty = draft.tags_input !== originalDraft.tags_input;
+  const hasUnsavedChanges = Boolean(article?.id) && JSON.stringify(draft) !== JSON.stringify(originalDraft);
+  const isPublished = article?.status === "published" && !hasUnsavedChanges;
 
   return (
     <form action={upsertArticleAction} className="grid gap-6">
       {article?.id ? <input type="hidden" name="id" value={article.id} /> : null}
+      <input type="hidden" name="editor_loaded" value="true" />
+      <input type="hidden" name="tags_dirty" value={tagsDirty ? "true" : "false"} />
+      {serializedDraftFields.map((field) => (
+        <input key={field} type="hidden" name={field} value={String(draft[field])} />
+      ))}
       <div className="flex flex-wrap gap-2">
         {tabs.map((tab) => (
           <button
@@ -642,24 +743,11 @@ export function ArticleEditorForm({
         </section>
       ) : null}
 
-      <div className="flex flex-wrap justify-end gap-3">
-        <button
-          type="submit"
-          name="intent"
-          value="draft"
-          className="admin-button admin-button-secondary px-6 py-3 text-sm font-semibold"
-        >
-          Запази чернова
-        </button>
-        <button
-          type="submit"
-          name="intent"
-          value="publish"
-          className="admin-button admin-button-primary px-6 py-3 text-sm font-semibold"
-        >
-          Публикувай
-        </button>
-      </div>
+      <ArticleFormActions
+        isExisting={Boolean(article?.id)}
+        isPublished={Boolean(isPublished)}
+        hasUnsavedChanges={hasUnsavedChanges}
+      />
     </form>
   );
 }

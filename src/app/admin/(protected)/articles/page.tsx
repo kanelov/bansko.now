@@ -4,7 +4,7 @@ import { deleteArticleAction, publishArticleAction } from "@/app/admin/actions";
 import { getAllAdminArticles, getArticleCategory, getArticlePath } from "@/lib/content";
 import { getSeoScore } from "@/lib/seo";
 
-type SearchParams = Promise<{ deleted?: string; error?: string }>;
+type SearchParams = Promise<{ deleted?: string; published?: string; error?: string }>;
 
 function formatDate(value: string | null) {
   if (!value) return "—";
@@ -33,6 +33,12 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
       {params.deleted ? (
         <div className="rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">
           Статията е изтрита.
+        </div>
+      ) : null}
+
+      {params.published ? (
+        <div className="rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">
+          Статията е публикувана успешно.
         </div>
       ) : null}
 
@@ -80,6 +86,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                         {article.status !== "published" ? (
                           <form action={publishArticleAction}>
                             <input type="hidden" name="id" value={article.id} />
+                            <input type="hidden" name="return_to" value="list" />
                             <button className="admin-button admin-button-sage px-3 py-1.5 text-xs font-semibold">
                               Publish
                             </button>

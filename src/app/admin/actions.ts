@@ -1,13 +1,14 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { estimateReadingTime } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
 import { hasAdminRole, requireAdmin } from "@/lib/supabase/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { SiteSettings } from "@/lib/types";
+import type { ArticleStatus, Database, SiteSettings } from "@/lib/types";
 
 const mediaBucket = "bansko-media";
 const maxUploadSize = 8 * 1024 * 1024;
@@ -76,6 +77,19 @@ function jsonLines(formData: FormData, key: string) {
 
 function normalizeDate(value: string | null) {
   return value ? new Date(value).toISOString() : null;
+}
+
+function articleStatusValue(value: string | null): ArticleStatus {
+  return value === "published" || value === "scheduled" ? value : "draft";
+}
+
+function errorMessage(error: unknown, fallback: string) {
+  return error instanceof Error && error.message ? error.message : fallback;
+}
+
+function articleEditorErrorPath(articleId: string | null, message: string) {
+  const path = articleId ? `/admin/articles/${articleId}/edit` : "/admin/articles/new";
+  return `${path}?error=${encodeURIComponent(message)}`;
 }
 
 function revalidateEditorialPaths() {
@@ -157,14 +171,17 @@ export async function signOutAction() {
   redirect("/admin/login");
 }
 
-async function syncTags(articleId: string, tagsInput: string | null) {
-  const { supabase } = await requireAdmin();
+async function syncTags(supabase: SupabaseClient<Database>, articleId: string, tagsInput: string | null) {
   const tags = (tagsInput || "")
     .split(",")
     .map((tag) => tag.trim())
     .filter(Boolean);
 
-  await supabase.from("article_tags").delete().eq("article_id", articleId);
+  const { error: deleteError } = await supabase.from("article_tags").delete().eq("article_id", articleId);
+
+  if (deleteError) {
+    throw new Error(deleteError.message);
+  }
 
   for (const tagName of tags) {
     const slug = slugify(tagName);
@@ -172,26 +189,83 @@ async function syncTags(articleId: string, tagsInput: string | null) {
       continue;
     }
 
-    const { data: tag } = await supabase
+    const { data: tag, error: tagError } = await supabase
       .from("tags")
       .upsert({ name: tagName, slug }, { onConflict: "slug" })
       .select("id")
       .single();
 
+    if (tagError) {
+      throw new Error(tagError.message);
+    }
+
     if (tag?.id) {
-      await supabase.from("article_tags").insert({ article_id: articleId, tag_id: tag.id });
+      const { error: linkError } = await supabase.from("article_tags").insert({ article_id: articleId, tag_id: tag.id });
+
+      if (linkError) {
+        throw new Error(linkError.message);
+      }
     }
   }
 }
 
+async function publishArticleRecord(supabase: SupabaseClient<Database>, articleId: string) {
+  const { data, error } = await supabase
+    .from("articles")
+    .update({
+      status: "published",
+      published_at: new Date().toISOString(),
+      scheduled_at: null
+    })
+    .eq("id", articleId)
+    .select("id, title, slug, status, published_at, scheduled_at")
+    .single();
+
+  if (error || !data) {
+    throw new Error(error?.message || "Статията не можа да бъде публикувана.");
+  }
+
+  return data;
+}
+
 export async function upsertArticleAction(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const id = stringValue(formData, "id");
-  const title = stringValue(formData, "title") || "Нова статия";
+  const id = uuidValue(formData, "id");
+  const title = stringValue(formData, "title");
   const content = rawStringValue(formData, "content");
   const intent = stringValue(formData, "intent");
-  const selectedStatus = (stringValue(formData, "status") || "draft") as "draft" | "published" | "scheduled";
-  const status = intent === "publish" ? "published" : selectedStatus;
+  const isNewPublish = intent === "publish" && !id;
+
+  if (rawStringValue(formData, "editor_loaded") !== "true" || !formData.has("title") || !formData.has("content")) {
+    redirect(articleEditorErrorPath(id, "Редакторът още не е зареден напълно. Обнови страницата и опитай отново."));
+  }
+
+  if (!title || !content.trim()) {
+    redirect(articleEditorErrorPath(id, "Заглавието и съдържанието са задължителни. Нищо не е презаписано."));
+  }
+
+  if (id) {
+    const { data: existing, error: existingError } = await supabase
+      .from("articles")
+      .select("title, content")
+      .eq("id", id)
+      .single();
+
+    if (existingError || !existing) {
+      redirect(articleEditorErrorPath(id, existingError?.message || "Статията не е намерена."));
+    }
+
+    if (title === "Нова статия" && existing.title !== "Нова статия") {
+      redirect(articleEditorErrorPath(id, "Записът е спрян, защото формата съдържа незаредено заглавие."));
+    }
+
+    if (!content.trim() && existing.content.trim()) {
+      redirect(articleEditorErrorPath(id, "Записът е спрян, защото зареденото съдържание е празно."));
+    }
+  }
+
+  const selectedStatus = articleStatusValue(stringValue(formData, "status"));
+  const status: ArticleStatus = isNewPublish ? "draft" : selectedStatus;
   const publishedAt =
     status === "published"
       ? normalizeDate(stringValue(formData, "published_at")) || new Date().toISOString()
@@ -234,30 +308,48 @@ export async function upsertArticleAction(formData: FormData) {
     : await supabase.from("articles").insert(payload).select("id").single();
 
   if (result.error || !result.data?.id) {
-    throw new Error(result.error?.message || "Article could not be saved.");
+    redirect(articleEditorErrorPath(id, result.error?.message || "Статията не можа да бъде запазена."));
   }
 
-  await syncTags(result.data.id, stringValue(formData, "tags_input"));
-  revalidateEditorialPaths();
+  try {
+    if (!id || booleanValue(formData, "tags_dirty")) {
+      await syncTags(supabase, result.data.id, stringValue(formData, "tags_input"));
+    }
 
-  redirect(`/admin/articles/${result.data.id}/edit?saved=1`);
+    if (isNewPublish) {
+      await publishArticleRecord(supabase, result.data.id);
+    }
+  } catch (error) {
+    redirect(articleEditorErrorPath(result.data.id, errorMessage(error, "Статията е запазена, но последващата операция е неуспешна.")));
+  }
+
+  revalidateEditorialPaths();
+  revalidatePath("/admin/articles");
+
+  redirect(`/admin/articles/${result.data.id}/edit?${isNewPublish ? "published" : "saved"}=1`);
 }
 
 export async function publishArticleAction(formData: FormData) {
   const { supabase } = await requireAdmin();
-  const id = stringValue(formData, "id");
+  const id = uuidValue(formData, "id");
+  const returnToList = stringValue(formData, "return_to") === "list";
 
   if (!id) {
-    return;
+    redirect(returnToList ? "/admin/articles?error=missing-id" : "/admin/articles/new?error=missing-id");
   }
 
-  await supabase
-    .from("articles")
-    .update({ status: "published", published_at: new Date().toISOString() })
-    .eq("id", id);
+  try {
+    await publishArticleRecord(supabase, id);
+  } catch (error) {
+    const message = encodeURIComponent(errorMessage(error, "Статията не можа да бъде публикувана."));
+    redirect(returnToList ? `/admin/articles?error=${message}` : `/admin/articles/${id}/edit?error=${message}`);
+  }
 
   revalidateEditorialPaths();
   revalidatePath("/admin/articles");
+  revalidatePath(`/admin/articles/${id}/edit`);
+
+  redirect(returnToList ? "/admin/articles?published=1" : `/admin/articles/${id}/edit?published=1`);
 }
 
 export async function deleteArticleAction(formData: FormData) {
