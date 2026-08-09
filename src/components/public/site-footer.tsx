@@ -31,6 +31,10 @@ export async function SiteFooter({ settings }: { settings: SiteSettings }) {
           <div className="mt-4 grid gap-2 text-sm text-stone-100">
             <Link href="/privacy">Privacy Policy</Link>
             <Link href="/terms">Terms</Link>
+            <Link href="/admin" className="group inline-flex w-fit items-center gap-2 text-stone-100 transition hover:text-white">
+              <IconGlyph name="user-shield" className="h-4 w-4 text-current" />
+              <span>Админ панел</span>
+            </Link>
           </div>
           {socialLinks.length ? (
             <div className="mt-5 flex flex-wrap gap-2">

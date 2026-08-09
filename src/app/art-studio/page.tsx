@@ -13,7 +13,7 @@ export async function generateMetadata(): Promise<Metadata> {
   const page = await getEditablePageBySlug("art-studio");
 
   return {
-    title: page?.seo_title || page?.title || "Art Studio | Bansko NOW",
+    title: { absolute: page?.seo_title || page?.title || "Art Studio | Bansko NOW" },
     description: page?.seo_description || page?.excerpt || "Art Studio услуги към Bansko NOW.",
     alternates: {
       canonical: page?.canonical_url || `${siteUrl}/art-studio`

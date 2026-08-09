@@ -6,6 +6,7 @@ import {
   faClock,
   faCompass,
   faGlobe,
+  faHeart,
   faHouse,
   faLink,
   faMagnifyingGlass,
@@ -17,7 +18,8 @@ import {
   faTree,
   faUserShield,
   faUsers,
-  faUtensils
+  faUtensils,
+  faXmark
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebookF,
@@ -51,7 +53,9 @@ const iconDefinitions: Record<string, FontAwesomeIconDefinition> = {
   "magnifying-glass": faMagnifyingGlass,
   link: faLink,
   globe: faGlobe,
+  heart: faHeart,
   "arrow-up": faArrowUp,
+  xmark: faXmark,
   facebook: faFacebookF,
   "facebook-f": faFacebookF,
   instagram: faInstagram,

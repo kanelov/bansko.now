@@ -8,7 +8,7 @@ import { getSiteSettings } from "@/lib/content";
 type SearchParams = Promise<{ submitted?: string; error?: string }>;
 
 export const metadata: Metadata = {
-  title: "Добави бизнес | Bansko NOW",
+  title: { absolute: "Добави бизнес | Bansko NOW" },
   description: "Изпрати местен бизнес за включване в Bansko NOW Business Directory."
 };
 

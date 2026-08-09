@@ -235,8 +235,7 @@ function compareBusinesses(a: BusinessWithRelations, b: BusinessWithRelations) {
   const weight: Record<BusinessTier, number> = {
     homepage: 0,
     premium: 1,
-    featured: 2,
-    free: 3
+    free: 2
   };
   const tierA = getEffectiveBusinessTier(a);
   const tierB = getEffectiveBusinessTier(b);

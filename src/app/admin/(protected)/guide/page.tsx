@@ -1,45 +1,101 @@
 import Link from "next/link";
+import type { ReactNode } from "react";
 
-const markdownExample = `## Основно подзаглавие
-
-Текст с **удебелен акцент** и [вътрешен линк](/events).
-
-### По-малка секция
-
-- Първа точка
-- Втора точка
-
-> Цитат или важен редакторски акцент.`;
-
-const galleryExample = `:::gallery
+const markdownHelpRows = [
+  {
+    title: "Основно подзаглавие (H2)",
+    explanation: "Използвай го за всяка голяма секция в статията. Заглавието на самата статия вече е H1.",
+    example: "## Какво да видим в Банско"
+  },
+  {
+    title: "По-малко подзаглавие (H3)",
+    explanation: "Разделя по-дълга H2 секция на по-малки и лесни за четене части.",
+    example: "### Подходящо време за посещение"
+  },
+  {
+    title: "Обикновен абзац",
+    explanation: "Напиши текста на собствен ред и остави един празен ред преди следващия абзац.",
+    example: "Банско е жив град през всеки сезон."
+  },
+  {
+    title: "Удебелен текст",
+    explanation: "Постави две звездички преди и след думите, които искаш да изпъкнат.",
+    example: "Това е **важна информация** за посетителите."
+  },
+  {
+    title: "Списък с точки",
+    explanation: "Започни всеки ред с тире. Подходящо е за идеи, удобства или кратки съвети.",
+    example: `- Първа идея
+- Втора идея`
+  },
+  {
+    title: "Номериран списък",
+    explanation: "Започни всеки ред с номер, когато последователността е важна.",
+    example: `1. Първа стъпка
+2. Втора стъпка`
+  },
+  {
+    title: "Линк",
+    explanation: "Текстът е в квадратни скоби, а адресът веднага след него е в кръгли скоби.",
+    example: "[Виж събитията в Банско](/events)"
+  },
+  {
+    title: "Единична снимка",
+    explanation: "Текстът в квадратните скоби е alt описание за Google и за хора, които не виждат изображението.",
+    example: "![Пирин над Банско през зимата](https://.../pirin.webp)"
+  },
+  {
+    title: "Цитат",
+    explanation: "Започни реда със знак >, за да покажеш цитат или кратък редакторски акцент.",
+    example: "> Банско е най-красиво, когато го откриваш бавно."
+  },
+  {
+    title: "Галерия с lightbox",
+    explanation: "Добави по една снимка на ред. При отваряне читателят може да преминава между всички снимки.",
+    example: `:::gallery
 ![Смислен alt текст на първата снимка](https://.../image-1.webp)
 ![Смислен alt текст на втората снимка](https://.../image-2.webp)
-:::`;
-
-const buttonExample = `:::button
+:::`
+  },
+  {
+    title: "Бутон с линк",
+    explanation: "Промени текста и адреса. Използвай primary за основен и secondary за по-лек бутон.",
+    example: `:::button
 text: Виж програмата
 url: /events
 style: primary
-:::`;
-
-const visualBlocksExample = `:::callout
+:::`
+  },
+  {
+    title: "Информационен акцент",
+    explanation: "Използвай го за важна практична информация, която трябва да се забележи лесно.",
+    example: `:::callout
 color: forest
 
 Важна практична информация за читателя.
-:::
-
-:::text
+:::`
+  },
+  {
+    title: "Текст с избран цвят",
+    explanation: "Цветът може да бъде stone, forest, moss, clay, ink или white.",
+    example: `:::text
 color: clay
 
 Редакторски текст с цветен акцент.
-:::
-
-:::video
+:::`
+  },
+  {
+    title: "Видео",
+    explanation: "На първия ред постави публичния адрес на видеото, а на втория - кратко описание.",
+    example: `:::video
 https://.../short-video.mp4
 Кратко описание на видеото.
-:::`;
-
-const faqExample = `:::faq
+:::`
+  },
+  {
+    title: "Въпроси и отговори (FAQ)",
+    explanation: "Всеки въпрос е H3. Блокът се показва като акордеон и добавя FAQ структурирани данни за SEO.",
+    example: `:::faq
 color: stone
 
 ### Кога е най-подходящо да посетя Банско?
@@ -47,7 +103,9 @@ color: stone
 
 ### Нужно ли е предварително записване?
 Втори ясен отговор.
-:::`;
+:::`
+  }
+];
 
 function CodeBlock({ children }: { children: string }) {
   return (
@@ -65,7 +123,7 @@ function GuideSection({
 }: {
   number: string;
   title: string;
-  children: React.ReactNode;
+  children: ReactNode;
   open?: boolean;
 }) {
   return (
@@ -79,6 +137,18 @@ function GuideSection({
       </summary>
       <div className="pb-7 pl-0 text-sm leading-7 text-stone-700 sm:pl-12">{children}</div>
     </details>
+  );
+}
+
+function MarkdownGuideRow({ title, explanation, example }: (typeof markdownHelpRows)[number]) {
+  return (
+    <div className="grid gap-2 border-t border-stone-200 py-5 first:border-t-0 lg:grid-cols-[0.8fr_1.2fr] lg:gap-8">
+      <div>
+        <h3 className="font-semibold text-stone-950">{title}</h3>
+        <p className="mt-2 leading-6 text-stone-600">{explanation}</p>
+      </div>
+      <CodeBlock>{example}</CodeBlock>
+    </div>
   );
 }
 
@@ -119,25 +189,14 @@ export default function AdminGuidePage() {
           <p>
             Редакторът има раздели Content, SEO, Images, Settings и Preview. Основният текст се пази като Markdown, което го прави лек, стабилен и подходящ за SEO.
           </p>
-          <h3 className="mt-5 font-semibold text-stone-950">Основен Markdown</h3>
-          <CodeBlock>{markdownExample}</CodeBlock>
-          <p className="mt-4">В статията не добавяй второ H1. Заглавието на страницата вече е H1; в текста използвай H2 и H3.</p>
-
-          <h3 className="mt-6 font-semibold text-stone-950">Галерия с lightbox</h3>
-          <CodeBlock>{galleryExample}</CodeBlock>
-          <p className="mt-3">Текстът в квадратните скоби е alt текст и трябва да описва реалното съдържание на снимката.</p>
-
-          <h3 className="mt-6 font-semibold text-stone-950">Бутон в статия</h3>
-          <CodeBlock>{buttonExample}</CodeBlock>
-          <p className="mt-3">Допустими стилове: <code>primary</code> и <code>secondary</code>. За вътрешна страница използвай кратък адрес като <code>/events</code>.</p>
-
-          <h3 className="mt-6 font-semibold text-stone-950">Акцент, цветен текст и видео</h3>
-          <CodeBlock>{visualBlocksExample}</CodeBlock>
-          <p className="mt-3">Цветове: <code>stone</code>, <code>forest</code>, <code>moss</code>, <code>clay</code>, <code>ink</code> и <code>white</code>.</p>
-
-          <h3 className="mt-6 font-semibold text-stone-950">FAQ блок</h3>
-          <CodeBlock>{faqExample}</CodeBlock>
-          <p className="mt-3">FAQ блокът се показва като отварящи се въпроси и се включва в структурните SEO данни на статията.</p>
+          <p className="mt-4 rounded-xl bg-sage/40 p-4 text-forest">
+            Не добавяй H1 в основния текст. Заглавието на статията вече е единственият H1 на страницата.
+          </p>
+          <div className="mt-5">
+            {markdownHelpRows.map((row) => (
+              <MarkdownGuideRow key={row.title} {...row} />
+            ))}
+          </div>
         </GuideSection>
 
         <GuideSection number="03" title="SEO на статия">
@@ -167,9 +226,8 @@ export default function AdminGuidePage() {
           <h3 className="mt-6 font-semibold text-stone-950">Годишни нива за видимост</h3>
           <ul className="mt-3 grid list-disc gap-2 pl-5">
             <li><strong>Безплатен:</strong> стандартна карта в каталога; избран е по подразбиране.</li>
-            <li><strong>Препоръчан:</strong> по-предна позиция и по-видима карта в категорията.</li>
-            <li><strong>Премиум:</strong> приоритетно представяне и по-силен визуален акцент.</li>
-            <li><strong>Фокус на началната:</strong> най-висока видимост и възможност за блок на началната страница.</li>
+            <li><strong>Премиум:</strong> широка карта, приоритетно представяне и по-силен визуален акцент.</li>
+            <li><strong>На фокус:</strong> широка карта, най-висока видимост и възможност за блок на началната страница.</li>
           </ul>
           <p className="mt-4 rounded-xl bg-stone-100 p-4">
             Всички платени нива са за 1 година. Stripe линкът и цената се добавят от секцията „Годишни нива и Stripe линкове“. Без статус „Платено“ и бъдеща дата „Активен до“ бизнесът се показва като безплатен.
@@ -199,6 +257,8 @@ export default function AdminGuidePage() {
         <GuideSection number="07" title="Настройки, меню и контакти">
           <ul className="grid list-disc gap-2 pl-5">
             <li>В „Настройки“ се управляват hero медията, навигацията, Facebook групата и социалните линкове.</li>
+            <li>В секцията „Подкрепи Bansko NOW“ се редактират текстът, снимката и Stripe/PayPal линковете на картата за доброволна подкрепа.</li>
+            <li>За произволна сума Stripe Payment Link трябва да е създаден с „customer chooses what to pay“, а PayPal/PayPal.Me линкът да няма предварително зададена сума.</li>
             <li>Социална икона се показва само когато има валиден добавен URL.</li>
             <li>Менюто може да съдържа вътрешни и външни линкове и икони от поддържания Font Awesome списък.</li>
             <li>Контактните форми и бизнес заявките изпращат известие към зададения административен имейл.</li>

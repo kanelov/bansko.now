@@ -183,6 +183,49 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
         </section>
 
         <section className="grid gap-5 border-t border-white/10 pt-6">
+          <div>
+            <h2 className="font-serif text-2xl font-semibold">Подкрепи Bansko NOW</h2>
+            <p className="mt-2 text-sm leading-6 text-stone-300">
+              Бутонът се показва в основното меню и отваря кратка карта за доброволна подкрепа. Добави Stripe Payment Link с включена опция клиентът сам да избере сумата или PayPal/PayPal.Me линк без фиксирана сума.
+            </p>
+          </div>
+          <label className="choice-row cursor-pointer rounded-xl border border-white/10 bg-white/5 p-4 text-sm font-semibold">
+            <input className="choice-control" type="checkbox" name="support_enabled" defaultChecked={settings.support_enabled ?? true} />
+            <span>Показвай бутона „Подкрепи ни“</span>
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Кратък текст на бутона
+            <input name="support_button_label" defaultValue={settings.support_button_label || "Подкрепи ни"} className={fieldClass()} maxLength={24} />
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Заглавие на картата
+            <input name="support_title" defaultValue={settings.support_title || "Подкрепи Bansko NOW"} className={fieldClass()} />
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Текст на картата
+            <textarea name="support_description" defaultValue={settings.support_description || ""} className={fieldClass()} rows={4} />
+          </label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="grid gap-2 text-sm font-semibold">
+              Снимка URL
+              <input name="support_image_url" defaultValue={settings.support_image_url || ""} className={fieldClass()} placeholder="https://..." />
+            </label>
+            <label className="grid gap-2 text-sm font-semibold">
+              Alt текст на снимката
+              <input name="support_image_alt" defaultValue={settings.support_image_alt || ""} className={fieldClass()} />
+            </label>
+          </div>
+          <label className="grid gap-2 text-sm font-semibold">
+            Stripe Payment Link
+            <input type="url" name="support_stripe_url" defaultValue={settings.support_stripe_url || ""} className={fieldClass()} placeholder="https://buy.stripe.com/..." />
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            PayPal / PayPal.Me линк
+            <input type="url" name="support_paypal_url" defaultValue={settings.support_paypal_url || ""} className={fieldClass()} placeholder="https://paypal.me/..." />
+          </label>
+        </section>
+
+        <section className="grid gap-5 border-t border-white/10 pt-6">
           <h2 className="font-serif text-2xl font-semibold">Homepage hero media</h2>
           <p className="text-sm leading-6 text-stone-300">
             За най-чист hero без YouTube controls използвай Hosted video: качи кратък MP4/WebM файл в Media и постави публичния URL тук.

@@ -46,6 +46,21 @@ function looksExternalUrl(value: string) {
   return /^(https?:|mailto:|tel:)/i.test(value);
 }
 
+function webUrlValue(formData: FormData, key: string) {
+  const value = stringValue(formData, key);
+
+  if (!value) {
+    return null;
+  }
+
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" || url.protocol === "http:" ? url.toString() : null;
+  } catch {
+    return null;
+  }
+}
+
 function jsonLines(formData: FormData, key: string) {
   const value = stringValue(formData, key);
 
@@ -426,6 +441,14 @@ export async function saveSettingsAction(formData: FormData) {
     hero_video_url: stringValue(formData, "hero_video_url"),
     hero_video_poster_url: stringValue(formData, "hero_video_poster_url"),
     hero_embed_url: stringValue(formData, "hero_embed_url"),
+    support_enabled: booleanValue(formData, "support_enabled"),
+    support_button_label: stringValue(formData, "support_button_label") || "Подкрепи ни",
+    support_title: stringValue(formData, "support_title") || "Подкрепи Bansko NOW",
+    support_description: stringValue(formData, "support_description"),
+    support_image_url: stringValue(formData, "support_image_url"),
+    support_image_alt: stringValue(formData, "support_image_alt"),
+    support_stripe_url: webUrlValue(formData, "support_stripe_url"),
+    support_paypal_url: webUrlValue(formData, "support_paypal_url"),
     default_author_name: stringValue(formData, "default_author_name") || "Любо Канелов"
   };
 
@@ -437,8 +460,7 @@ export async function saveSettingsAction(formData: FormData) {
     redirect(`/admin/settings?error=${encodeURIComponent(error.message)}`);
   }
 
-  revalidatePath("/");
-  revalidatePath("/admin/settings");
+  revalidateSiteChrome();
   redirect("/admin/settings?saved=1");
 }
 

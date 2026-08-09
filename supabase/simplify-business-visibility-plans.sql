@@ -15,18 +15,6 @@ values
     10
   ),
   (
-    'Препоръчан бизнес - 1 година',
-    'featured-12-months',
-    'featured',
-    12,
-    0,
-    'BGN',
-    'По-предна позиция и по-видимо представяне в избраната категория.',
-    array['По-предна позиция', 'По-видима карта', 'Видео представяне'],
-    true,
-    20
-  ),
-  (
     'Премиум бизнес - 1 година',
     'premium-12-months',
     'premium',
@@ -39,14 +27,14 @@ values
     30
   ),
   (
-    'Фокус на началната страница - 1 година',
+    'На фокус - 1 година',
     'homepage-spotlight-12-months',
     'homepage',
     12,
     0,
     'BGN',
-    'Премиум присъствие в каталога и възможност за фокус на началната страница.',
-    array['Най-висока видимост', 'Фокус на началната страница', 'Премиум визуален блок'],
+    'Най-висока видимост в каталога и възможност за представяне на началната страница.',
+    array['Най-висока видимост', 'На фокус на началната страница', 'Премиум визуален блок'],
     true,
     40
   )
@@ -67,7 +55,7 @@ from public.business_listing_plans as current_plan
 join public.business_listing_plans as replacement
   on replacement.slug = case current_plan.tier
     when 'free' then 'free-listing'
-    when 'featured' then 'featured-12-months'
+    when 'featured' then 'premium-12-months'
     when 'premium' then 'premium-12-months'
     when 'homepage' then 'homepage-spotlight-12-months'
   end
@@ -80,7 +68,7 @@ from public.business_listing_plans as current_plan
 join public.business_listing_plans as replacement
   on replacement.slug = case current_plan.tier
     when 'free' then 'free-listing'
-    when 'featured' then 'featured-12-months'
+    when 'featured' then 'premium-12-months'
     when 'premium' then 'premium-12-months'
     when 'homepage' then 'homepage-spotlight-12-months'
   end

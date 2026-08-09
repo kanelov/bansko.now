@@ -190,9 +190,8 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                         Ниво на видимост
                         <select name="listing_tier" defaultValue={business.listing_tier} className="rounded-xl border border-stone-300 px-4 py-3">
                           <option value="free">Безплатен</option>
-                          <option value="featured">Препоръчан</option>
                           <option value="premium">Премиум</option>
-                          <option value="homepage">Фокус на началната</option>
+                          <option value="homepage">На фокус</option>
                         </select>
                       </label>
                       <label className="grid gap-2 text-sm font-semibold">
@@ -225,7 +224,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                       </label>
                       <label className="choice-row cursor-pointer self-end rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm font-semibold">
                         <input className="choice-control" type="checkbox" name="is_homepage_spotlight" defaultChecked={business.is_homepage_spotlight} />
-                        <span>Фокус на началната страница</span>
+                        <span>На фокус на началната страница</span>
                       </label>
                     </div>
                     <div className="grid gap-4 md:grid-cols-3">
@@ -308,34 +307,33 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
           </p>
         </div>
         <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-          {[...annualPlans, null].map((plan, index) => (
-            <form key={plan?.id || "new"} action={upsertBusinessPlanAction} className="grid gap-3 rounded-2xl bg-white p-5 text-stone-950">
-              {plan ? <input type="hidden" name="id" value={plan.id} /> : null}
+          {annualPlans.map((plan, index) => (
+            <form key={plan.id} action={upsertBusinessPlanAction} className="grid gap-3 rounded-2xl bg-white p-5 text-stone-950">
+              <input type="hidden" name="id" value={plan.id} />
               <input type="hidden" name="period_months" value="12" />
-              <input name="name" defaultValue={plan?.name ?? ""} placeholder="Име на плана" className="rounded-xl border border-stone-300 px-4 py-3" />
-              <input name="slug" defaultValue={plan?.slug ?? ""} placeholder="slug" className="rounded-xl border border-stone-300 px-4 py-3" />
+              <input name="name" defaultValue={plan.name} placeholder="Име на плана" className="rounded-xl border border-stone-300 px-4 py-3" />
+              <input name="slug" defaultValue={plan.slug} placeholder="slug" className="rounded-xl border border-stone-300 px-4 py-3" />
               <div className="grid gap-3 md:grid-cols-[1fr_auto]">
-                <select name="tier" defaultValue={plan?.tier ?? "featured"} className="rounded-xl border border-stone-300 px-4 py-3">
+                <select name="tier" defaultValue={plan.tier} className="rounded-xl border border-stone-300 px-4 py-3">
                   <option value="free">Безплатен</option>
-                  <option value="featured">Препоръчан</option>
                   <option value="premium">Премиум</option>
-                  <option value="homepage">Фокус на началната</option>
+                  <option value="homepage">На фокус</option>
                 </select>
                 <span className="inline-flex items-center rounded-xl bg-sage px-4 py-3 text-sm font-semibold text-forest">1 година</span>
               </div>
               <div className="grid gap-3 md:grid-cols-3">
-                <input name="price" defaultValue={plan?.price ?? ""} placeholder="Цена" className="rounded-xl border border-stone-300 px-4 py-3" />
-                <input name="currency" defaultValue={plan?.currency ?? "BGN"} placeholder="BGN" className="rounded-xl border border-stone-300 px-4 py-3" />
-                <input name="sort_order" defaultValue={plan?.sort_order ?? index * 10} placeholder="Ред" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <input name="price" defaultValue={plan.price ?? ""} placeholder="Цена" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <input name="currency" defaultValue={plan.currency} placeholder="BGN" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <input name="sort_order" defaultValue={plan.sort_order ?? index * 10} placeholder="Ред" className="rounded-xl border border-stone-300 px-4 py-3" />
               </div>
-              <input name="stripe_payment_link" defaultValue={plan?.stripe_payment_link ?? ""} placeholder="Stripe Payment Link" className="rounded-xl border border-stone-300 px-4 py-3" />
-              <textarea name="description" defaultValue={plan?.description ?? ""} rows={2} placeholder="Кратко описание" className="rounded-xl border border-stone-300 px-4 py-3" />
-              <textarea name="benefits_input" defaultValue={textAreaValue(plan?.benefits)} rows={3} placeholder="Предимства, по едно на ред" className="rounded-xl border border-stone-300 px-4 py-3" />
+              <input name="stripe_payment_link" defaultValue={plan.stripe_payment_link ?? ""} placeholder="Stripe Payment Link" className="rounded-xl border border-stone-300 px-4 py-3" />
+              <textarea name="description" defaultValue={plan.description ?? ""} rows={2} placeholder="Кратко описание" className="rounded-xl border border-stone-300 px-4 py-3" />
+              <textarea name="benefits_input" defaultValue={textAreaValue(plan.benefits)} rows={3} placeholder="Предимства, по едно на ред" className="rounded-xl border border-stone-300 px-4 py-3" />
               <label className="choice-row cursor-pointer rounded-xl border border-stone-200 bg-stone-50 p-3 text-sm font-semibold">
-                <input className="choice-control" type="checkbox" name="is_active" defaultChecked={plan?.is_active ?? true} />
+                <input className="choice-control" type="checkbox" name="is_active" defaultChecked={plan.is_active} />
                 <span>Активен план</span>
               </label>
-              <button className="admin-button admin-button-forest px-4 py-2 text-sm font-semibold">{plan ? "Запази плана" : "Създай ниво"}</button>
+              <button className="admin-button admin-button-forest px-4 py-2 text-sm font-semibold">Запази плана</button>
             </form>
           ))}
         </div>

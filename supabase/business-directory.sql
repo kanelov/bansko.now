@@ -2,7 +2,7 @@ create table if not exists public.business_listing_plans (
   id uuid primary key default gen_random_uuid(),
   name text not null,
   slug text not null unique,
-  tier text not null default 'featured' check (tier in ('free', 'featured', 'premium', 'homepage')),
+  tier text not null default 'free' check (tier in ('free', 'premium', 'homepage')),
   period_months integer not null default 12 check (period_months = 12),
   price numeric(10, 2) default 0,
   currency text not null default 'BGN',
@@ -32,7 +32,7 @@ create table if not exists public.businesses (
   faqs jsonb default '[]'::jsonb,
   features text[] default '{}'::text[],
   status text not null default 'draft' check (status in ('draft', 'approved', 'rejected')),
-  listing_tier text not null default 'free' check (listing_tier in ('free', 'featured', 'premium', 'homepage')),
+  listing_tier text not null default 'free' check (listing_tier in ('free', 'premium', 'homepage')),
   requested_plan_id uuid references public.business_listing_plans(id) on delete set null,
   active_plan_id uuid references public.business_listing_plans(id) on delete set null,
   payment_status text not null default 'unpaid' check (payment_status in ('unpaid', 'pending', 'paid', 'expired')),
@@ -227,7 +227,6 @@ insert into public.business_listing_plans
   (name, slug, tier, period_months, price, currency, description, benefits, sort_order)
 values
   ('Безплатно присъствие', 'free-listing', 'free', 12, 0, 'BGN', 'Основен профил в каталога след редакторско одобрение.', array['Профил в каталога', 'Адрес и упътване', 'До 3 снимки'], 10),
-  ('Препоръчан бизнес - 1 година', 'featured-12-months', 'featured', 12, 0, 'BGN', 'По-предна позиция и по-видимо представяне в избраната категория.', array['По-предна позиция', 'По-видима карта', 'Видео представяне'], 20),
   ('Премиум бизнес - 1 година', 'premium-12-months', 'premium', 12, 0, 'BGN', 'Силен визуален акцент и приоритетно позициониране в каталога.', array['Приоритетна позиция', 'Премиум визуален акцент', 'По-видим pin на картата'], 30),
-  ('Фокус на началната страница - 1 година', 'homepage-spotlight-12-months', 'homepage', 12, 0, 'BGN', 'Премиум присъствие в каталога и възможност за фокус на началната страница.', array['Най-висока видимост', 'Фокус на началната страница', 'Премиум визуален блок'], 40)
+  ('На фокус - 1 година', 'homepage-spotlight-12-months', 'homepage', 12, 0, 'BGN', 'Най-висока видимост в каталога и възможност за представяне на началната страница.', array['Най-висока видимост', 'На фокус на началната страница', 'Премиум визуален блок'], 40)
 on conflict (slug) do nothing;

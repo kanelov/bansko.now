@@ -88,6 +88,14 @@ export type SiteSettings = {
   hero_video_url: string | null;
   hero_video_poster_url: string | null;
   hero_embed_url: string | null;
+  support_enabled: boolean;
+  support_button_label: string | null;
+  support_title: string | null;
+  support_description: string | null;
+  support_image_url: string | null;
+  support_image_alt: string | null;
+  support_stripe_url: string | null;
+  support_paypal_url: string | null;
   default_author_name: string | null;
   created_at?: string;
   updated_at?: string;
@@ -175,7 +183,7 @@ export type ArtStudioService = {
 };
 
 export type BusinessStatus = "draft" | "approved" | "rejected";
-export type BusinessTier = "free" | "featured" | "premium" | "homepage";
+export type BusinessTier = "free" | "premium" | "homepage";
 export type BusinessPaymentStatus = "unpaid" | "pending" | "paid" | "expired";
 
 export type BusinessFaq = {

@@ -20,7 +20,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   }
 
   return {
-    title: business.seo_title || `${business.name} в Банско | Bansko NOW`,
+    title: { absolute: business.seo_title || `${business.name} в Банско | Bansko NOW` },
     description: business.seo_description || business.description || `${business.name} - ${business.category} в Банско.`,
     alternates: { canonical: business.canonical_url || `${siteUrl}/businesses/${business.slug}` },
     openGraph: {

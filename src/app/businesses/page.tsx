@@ -7,7 +7,7 @@ import { getApprovedBusinesses, getBusinessDirectorySettings } from "@/lib/busin
 import { getSiteSettings } from "@/lib/content";
 
 export const metadata: Metadata = {
-  title: "Местни бизнеси в Банско | Bansko NOW",
+  title: { absolute: "Местни бизнеси в Банско | Bansko NOW" },
   description: "Каталог с местни бизнеси, услуги, места и партньори в Банско."
 };
 

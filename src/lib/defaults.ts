@@ -100,6 +100,15 @@ export const fallbackSettings: SiteSettings = {
   hero_video_url: null,
   hero_video_poster_url: fallbackHeroImage,
   hero_embed_url: null,
+  support_enabled: true,
+  support_button_label: "Подкрепи ни",
+  support_title: "Подкрепи Bansko NOW",
+  support_description:
+    "Ако Bansko NOW ти е полезен, можеш да подкрепиш независимите местни истории, снимки и идеи с избрана от теб сума.",
+  support_image_url: fallbackHeroImage,
+  support_image_alt: "Банско и Пирин - вдъхновение за Bansko NOW",
+  support_stripe_url: null,
+  support_paypal_url: null,
   default_author_name: "Любо Канелов"
 };
 

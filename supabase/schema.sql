@@ -81,6 +81,14 @@ create table if not exists public.site_settings (
   hero_video_url text,
   hero_video_poster_url text,
   hero_embed_url text,
+  support_enabled boolean not null default true,
+  support_button_label text default 'Подкрепи ни',
+  support_title text default 'Подкрепи Bansko NOW',
+  support_description text default 'Ако Bansko NOW ти е полезен, можеш да подкрепиш независимите местни истории, снимки и идеи с избрана от теб сума.',
+  support_image_url text,
+  support_image_alt text default 'Банско и Пирин - вдъхновение за Bansko NOW',
+  support_stripe_url text,
+  support_paypal_url text,
   default_author_name text default 'Любо Канелов',
   created_at timestamptz default now(),
   updated_at timestamptz default now()
@@ -124,7 +132,15 @@ alter table public.site_settings
   add column if not exists hero_image_alt text,
   add column if not exists hero_video_url text,
   add column if not exists hero_video_poster_url text,
-  add column if not exists hero_embed_url text;
+  add column if not exists hero_embed_url text,
+  add column if not exists support_enabled boolean not null default true,
+  add column if not exists support_button_label text default 'Подкрепи ни',
+  add column if not exists support_title text default 'Подкрепи Bansko NOW',
+  add column if not exists support_description text default 'Ако Bansko NOW ти е полезен, можеш да подкрепиш независимите местни истории, снимки и идеи с избрана от теб сума.',
+  add column if not exists support_image_url text,
+  add column if not exists support_image_alt text default 'Банско и Пирин - вдъхновение за Bansko NOW',
+  add column if not exists support_stripe_url text,
+  add column if not exists support_paypal_url text;
 
 create or replace function public.set_updated_at()
 returns trigger
@@ -507,6 +523,11 @@ insert into public.site_settings (
   hero_image_url,
   hero_image_alt,
   hero_video_poster_url,
+  support_enabled,
+  support_button_label,
+  support_title,
+  support_description,
+  support_image_alt,
   default_author_name
 )
 values (
@@ -518,6 +539,11 @@ values (
   'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=1800&q=80',
   'Банско и Пирин',
   'https://images.unsplash.com/photo-1483728642387-6c3bdd6c93e5?auto=format&fit=crop&w=1800&q=80',
+  true,
+  'Подкрепи ни',
+  'Подкрепи Bansko NOW',
+  'Ако Bansko NOW ти е полезен, можеш да подкрепиш независимите местни истории, снимки и идеи с избрана от теб сума.',
+  'Банско и Пирин - вдъхновение за Bansko NOW',
   'Любо Канелов'
 )
 on conflict do nothing;

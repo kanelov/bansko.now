@@ -18,11 +18,6 @@ export function BusinessDirectoryView({ businesses }: { businesses: BusinessWith
       }),
     [businesses, category, feature]
   );
-  const spotlightIndex = filtered.findIndex((business) => {
-    const tier = getEffectiveBusinessTier(business);
-    return tier === "homepage";
-  });
-
   return (
     <section className="grid gap-8">
       <div className="flex flex-wrap gap-3">
@@ -49,12 +44,17 @@ export function BusinessDirectoryView({ businesses }: { businesses: BusinessWith
       </div>
 
       {filtered.length ? (
-        <div className="grid gap-5 md:grid-cols-2">
-          {filtered.map((business, index) => (
-            <div key={business.id} className={index === spotlightIndex ? "md:col-span-2" : ""}>
-              <BusinessCard business={business} featured={index === spotlightIndex} />
-            </div>
-          ))}
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {filtered.map((business) => {
+            const tier = getEffectiveBusinessTier(business);
+            const isWide = tier === "premium" || tier === "homepage";
+
+            return (
+              <div key={business.id} className={isWide ? "sm:col-span-2 lg:col-span-3" : ""}>
+                <BusinessCard business={business} wide={isWide} />
+              </div>
+            );
+          })}
         </div>
       ) : (
         <div className="rounded-2xl border border-stone-200 bg-white p-8 text-stone-650 shadow-soft">

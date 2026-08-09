@@ -4,6 +4,7 @@ import { getNavigationItems, getSiteSettings, getSocialLinks } from "@/lib/conte
 import type { NavigationItem, SocialLink } from "@/lib/types";
 import { IconGlyph } from "./icon-glyph";
 import { SiteSearch } from "./site-search";
+import { SupportProjectButton } from "./support-project-button";
 
 function isExternalUrl(href: string) {
   return /^(https?:|mailto:|tel:)/i.test(href);
@@ -82,24 +83,6 @@ function SocialIconLink({ link }: { link: SocialLink }) {
   );
 }
 
-function AdminLink({ showLabel = false }: { showLabel?: boolean }) {
-  return (
-    <Link
-      href="/admin"
-      aria-label="Админ панел"
-      title="Админ панел"
-      className={
-        showLabel
-          ? "group inline-flex h-9 items-center gap-2 rounded-full border border-stone-300 bg-white/60 px-3 text-sm font-medium text-forest transition hover:border-forest hover:bg-forest hover:text-white"
-          : "group inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 text-forest transition hover:border-forest hover:bg-forest hover:text-white"
-      }
-    >
-      <IconGlyph name="user-shield" className="h-4 w-4 text-current transition group-hover:text-white" />
-      {showLabel ? <span className="transition group-hover:text-white">Админ</span> : null}
-    </Link>
-  );
-}
-
 export async function SiteHeader() {
   const [settings, navItems] = await Promise.all([getSiteSettings(), getNavigationItems()]);
   const socialLinks = await getSocialLinks(settings);
@@ -128,7 +111,7 @@ export async function SiteHeader() {
           {socialLinks.map((link) => (
             <SocialIconLink key={link.id} link={link} />
           ))}
-          <AdminLink showLabel />
+          <SupportProjectButton settings={settings} />
         </div>
 
         <details className="group relative lg:hidden">
@@ -150,7 +133,7 @@ export async function SiteHeader() {
               {socialLinks.map((link) => (
                 <SocialIconLink key={link.id} link={link} />
               ))}
-              <AdminLink showLabel />
+              <SupportProjectButton settings={settings} />
             </div>
           </div>
         </details>

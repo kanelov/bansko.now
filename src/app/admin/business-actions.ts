@@ -72,7 +72,7 @@ function normalizeDate(value: string | null) {
 }
 
 function businessTierValue(value: string | null): BusinessTier {
-  return value === "featured" || value === "premium" || value === "homepage" ? value : "free";
+  return value === "premium" || value === "homepage" ? value : "free";
 }
 
 function businessStatusValue(value: string | null): BusinessStatus {
