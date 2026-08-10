@@ -1,4 +1,6 @@
 import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createPublicSupabaseClient } from "@/lib/supabase/public";
+import { localePath } from "@/lib/i18n";
 import {
   categoryDefinitions,
   fallbackHeroImage,
@@ -8,12 +10,17 @@ import {
 } from "@/lib/defaults";
 import type {
   ArtStudioService,
+  ArtStudioServiceTranslation,
   ArticleWithCategory,
   Category,
+  CategoryTranslation,
   EditablePage,
+  Locale,
   MediaItem,
   NavigationItem,
+  NavigationItemTranslation,
   SiteSettings,
+  SiteSettingsTranslation,
   SocialLink,
   Tag
 } from "@/lib/types";
@@ -57,6 +64,8 @@ const sampleArticle: ArticleWithCategory = {
   show_facebook_cta: true,
   show_art_studio_block: true,
   show_bansko_collection_block: true,
+  locale: "bg",
+  translation_group_id: "sample-bg",
   tags: []
 };
 
@@ -86,6 +95,8 @@ const fallbackPages: EditablePage[] = [
     sort_order: 10,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
+    ,locale: "bg",
+    translation_group_id: "about-bg"
   },
   {
     id: "contact",
@@ -111,6 +122,8 @@ const fallbackPages: EditablePage[] = [
     sort_order: 20,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
+    ,locale: "bg",
+    translation_group_id: "contact-bg"
   },
   {
     id: "art-studio",
@@ -138,6 +151,8 @@ const fallbackPages: EditablePage[] = [
     sort_order: 30,
     created_at: new Date().toISOString(),
     updated_at: new Date().toISOString()
+    ,locale: "bg",
+    translation_group_id: "art-studio-bg"
   }
 ];
 
@@ -201,6 +216,116 @@ const fallbackArtStudioServices: ArtStudioService[] = [
   }
 ];
 
+const englishCategoryFallbacks: Record<string, Partial<Category>> = {
+  now: { name: "Now", description: "What is happening in Bansko today." },
+  events: { name: "Events", description: "Festivals, concerts, exhibitions and local initiatives in Bansko." },
+  explore: { name: "Explore Bansko", description: "Places, routes and practical ideas for discovering Bansko." },
+  nature: { name: "Nature and Pirin", description: "Pirin Mountain, trails, seasons and responsible time outdoors." },
+  culture: { name: "Culture", description: "Traditions, art, music and cultural life in Bansko." },
+  living: { name: "Living in Bansko", description: "Everyday life, people and practical stories from Bansko." },
+  food: { name: "Food and Places", description: "Local food, restaurants and places worth discovering." },
+  "art-studio": { name: "Art Studio", description: "Photography, fine art printing and visual services." },
+  "bansko-collection": { name: "Bansko Collection", description: "Artistic products inspired by Bansko and Pirin." },
+  stories: { name: "Stories", description: "People, places and visual stories from Bansko." }
+};
+
+const englishPages: Record<string, Partial<EditablePage>> = {
+  about: {
+    title: "Bansko NOW",
+    eyebrow: "About the project",
+    excerpt: "A local digital platform for events, culture, nature, people and everyday life in Bansko.",
+    content:
+      "Bansko NOW is a fast, beautiful and useful place for discovering Bansko.\n\nWe publish articles, local recommendations, visual stories, businesses and seasonal ideas that bring people closer to the town.",
+    seo_title: "About Bansko NOW",
+    seo_description: "Learn about Bansko NOW, a local lifestyle, culture and nature platform for Bansko and Pirin."
+  },
+  contact: {
+    title: "Contact Bansko NOW",
+    eyebrow: "Contact",
+    excerpt: "Contact us about events, recommendations, Art Studio services, businesses and partnerships.",
+    content: "",
+    seo_title: "Contact Bansko NOW",
+    seo_description: "Contact Bansko NOW about events, local stories, visual projects and partnerships."
+  },
+  "art-studio": {
+    title: "Bansko NOW Art Studio",
+    eyebrow: "Visual stories from Bansko",
+    excerpt: "Photography, fine art printing, canvas and visual solutions inspired by Bansko and Pirin.",
+    content:
+      "Beautiful places, events and personal memories deserve a strong visual presence. Bansko NOW Art Studio creates fine art prints, photography, canvas and visual solutions with a premium finish.",
+    hero_image_alt: "Photography and printing at Bansko NOW Art Studio",
+    cta_label: "Discuss a project",
+    seo_title: "Art Studio in Bansko",
+    seo_description: "Fine art printing, photography, canvas and visual solutions inspired by Bansko and Pirin."
+  }
+};
+
+function localizeCategory(category: Category, translation?: CategoryTranslation | null): Category {
+  return translation
+    ? {
+        ...category,
+        name: translation.name,
+        description: translation.description,
+        seo_title: translation.seo_title,
+        seo_description: translation.seo_description,
+        canonical_url: translation.canonical_url,
+        og_title: translation.og_title,
+        og_description: translation.og_description,
+        og_image_url: translation.og_image_url,
+        robots_index: translation.robots_index,
+        robots_follow: translation.robots_follow,
+        schema_type: translation.schema_type
+      }
+    : category;
+}
+
+function localizeNavigationItem(item: NavigationItem, translation?: NavigationItemTranslation | null): NavigationItem {
+  return translation ? { ...item, label: translation.label, aria_label: translation.aria_label } : item;
+}
+
+function localizeSettings(settings: SiteSettings, translation?: SiteSettingsTranslation | null): SiteSettings {
+  return translation
+    ? {
+        ...settings,
+        site_description: translation.site_description,
+        hero_image_alt: translation.hero_image_alt,
+        support_button_label: translation.support_button_label,
+        support_title: translation.support_title,
+        support_description: translation.support_description,
+        support_image_alt: translation.support_image_alt,
+        facebook_cta_eyebrow: translation.facebook_cta_eyebrow,
+        facebook_cta_title: translation.facebook_cta_title,
+        facebook_cta_text: translation.facebook_cta_text,
+        facebook_cta_button_label: translation.facebook_cta_button_label,
+        art_studio_block_eyebrow: translation.art_studio_block_eyebrow,
+        art_studio_block_title: translation.art_studio_block_title,
+        art_studio_block_text: translation.art_studio_block_text,
+        art_studio_block_button_label: translation.art_studio_block_button_label,
+        collection_block_eyebrow: translation.collection_block_eyebrow,
+        collection_block_title: translation.collection_block_title,
+        collection_block_text: translation.collection_block_text,
+        collection_block_button_label: translation.collection_block_button_label,
+        collection_items: translation.collection_items
+      }
+    : settings;
+}
+
+function localizeService(service: ArtStudioService, translation?: ArtStudioServiceTranslation | null): ArtStudioService {
+  return translation
+    ? {
+        ...service,
+        title: translation.title,
+        description: translation.description,
+        image_alt: translation.image_alt,
+        button_label: translation.button_label,
+        price_label: translation.price_label,
+        features: translation.features,
+        seo_title: translation.seo_title,
+        seo_description: translation.seo_description
+      }
+    : service;
+}
+
 function normalizeArticle(article: ArticleWithCategory): ArticleWithCategory {
   return {
     ...article,
@@ -215,22 +340,34 @@ export function getArticleCategory(article: ArticleWithCategory) {
 
 export function getArticlePath(article: ArticleWithCategory) {
   const category = getArticleCategory(article);
-  return `/${category?.slug || "articles"}/${article.slug}`;
+  return localePath(article.locale, `/${category?.slug || "articles"}/${article.slug}`);
 }
 
-export async function getSiteSettings(): Promise<SiteSettings> {
-  const supabase = await createSupabaseServerClient();
+export async function getSiteSettings(locale: Locale = "bg"): Promise<SiteSettings> {
+  const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
     return fallbackSettings;
   }
 
   const { data } = await supabase.from("site_settings").select("*").limit(1).maybeSingle();
-  return data ?? fallbackSettings;
+
+  if (!data) {
+    return fallbackSettings;
+  }
+
+  const { data: translation } = await supabase
+    .from("site_settings_translations")
+    .select("*")
+    .eq("site_settings_id", data.id)
+    .eq("locale", locale)
+    .maybeSingle();
+
+  return localizeSettings(data, translation);
 }
 
-export async function getNavigationItems(): Promise<NavigationItem[]> {
-  const supabase = await createSupabaseServerClient();
+export async function getNavigationItems(locale: Locale = "bg"): Promise<NavigationItem[]> {
+  const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
     return fallbackNavigationItems;
@@ -247,10 +384,18 @@ export async function getNavigationItems(): Promise<NavigationItem[]> {
     return fallbackNavigationItems;
   }
 
-  return data as NavigationItem[];
+  const ids = data.map((item) => item.id);
+  const { data: translations } = await supabase
+    .from("navigation_item_translations")
+    .select("*")
+    .eq("locale", locale)
+    .in("navigation_item_id", ids);
+  const byId = new Map((translations ?? []).map((translation) => [translation.navigation_item_id, translation]));
+
+  return data.map((item) => localizeNavigationItem(item, byId.get(item.id)));
 }
 
-export async function getAllNavigationItems(): Promise<NavigationItem[]> {
+export async function getAllNavigationItems(locale: Locale = "bg"): Promise<NavigationItem[]> {
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
@@ -267,12 +412,20 @@ export async function getAllNavigationItems(): Promise<NavigationItem[]> {
     return fallbackNavigationItems;
   }
 
-  return data as NavigationItem[];
+  const items = data as NavigationItem[];
+  const { data: translations } = await supabase
+    .from("navigation_item_translations")
+    .select("*")
+    .eq("locale", locale)
+    .in("navigation_item_id", items.map((item) => item.id));
+  const byId = new Map((translations ?? []).map((translation) => [translation.navigation_item_id, translation]));
+
+  return items.map((item) => localizeNavigationItem(item, byId.get(item.id)));
 }
 
 export async function getSocialLinks(settings?: SiteSettings): Promise<SocialLink[]> {
   const resolvedSettings = settings ?? (await getSiteSettings());
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
     return fallbackSocialLinks(resolvedSettings);
@@ -313,47 +466,70 @@ export async function getAllSocialLinks(settings?: SiteSettings): Promise<Social
   return data as SocialLink[];
 }
 
-export async function getCategories(): Promise<Category[]> {
-  const supabase = await createSupabaseServerClient();
+export async function getCategories(locale: Locale = "bg"): Promise<Category[]> {
+  const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
-    return categoryDefinitions;
+    return locale === "en"
+      ? categoryDefinitions.map((category) => ({ ...category, ...englishCategoryFallbacks[category.slug] }))
+      : categoryDefinitions;
   }
 
   const { data, error } = await supabase.from("categories").select("*").order("created_at");
 
   if (error) {
-    return categoryDefinitions;
+    return locale === "en"
+      ? categoryDefinitions.map((category) => ({ ...category, ...englishCategoryFallbacks[category.slug] }))
+      : categoryDefinitions;
   }
 
-  return (data ?? []) as Category[];
+  const categories = (data ?? []) as Category[];
+  const { data: translations } = await supabase.from("category_translations").select("*").eq("locale", locale);
+  const byId = new Map((translations ?? []).map((translation) => [translation.category_id, translation]));
+
+  return categories.map((category) => localizeCategory(category, byId.get(category.id)));
 }
 
-export async function getCategoryBySlug(slug: string): Promise<Category | null> {
-  const supabase = await createSupabaseServerClient();
+export async function getCategoryBySlug(slug: string, locale: Locale = "bg"): Promise<Category | null> {
+  const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
-    return categoryDefinitions.find((category) => category.slug === slug) ?? null;
+    const category = categoryDefinitions.find((item) => item.slug === slug) ?? null;
+    return category && locale === "en" ? { ...category, ...englishCategoryFallbacks[category.slug] } : category;
   }
 
   const { data, error } = await supabase.from("categories").select("*").eq("slug", slug).maybeSingle();
 
   if (error) {
-    return categoryDefinitions.find((category) => category.slug === slug) ?? null;
+    const category = categoryDefinitions.find((item) => item.slug === slug) ?? null;
+    return category && locale === "en" ? { ...category, ...englishCategoryFallbacks[category.slug] } : category;
   }
 
-  return data ?? null;
+  if (!data) {
+    return null;
+  }
+
+  const { data: translation } = await supabase
+    .from("category_translations")
+    .select("*")
+    .eq("category_id", data.id)
+    .eq("locale", locale)
+    .maybeSingle();
+
+  return localizeCategory(data, translation);
 }
 
 export async function getPublishedArticles(options?: {
   limit?: number;
   categorySlug?: string;
   featured?: boolean;
+  locale?: Locale;
 }): Promise<ArticleWithCategory[]> {
-  const supabase = await createSupabaseServerClient();
+  const locale = options?.locale ?? "bg";
+  const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
-    if (options?.categorySlug && options.categorySlug !== getArticleCategory(sampleArticle)?.slug) {
+    if (locale === "en" || (options?.categorySlug && options.categorySlug !== getArticleCategory(sampleArticle)?.slug)) {
       return [];
     }
 
@@ -363,6 +539,7 @@ export async function getPublishedArticles(options?: {
   let query = supabase
     .from("articles")
     .select("*, category:categories(*)")
+    .eq("locale", locale)
     .eq("status", "published")
     .or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`)
     .order("published_at", { ascending: false, nullsFirst: false });
@@ -377,6 +554,15 @@ export async function getPublishedArticles(options?: {
 
   const { data } = await query;
   let articles = ((data ?? []) as unknown as ArticleWithCategory[]).map(normalizeArticle);
+
+  if (articles.length) {
+    const localizedCategories = await getCategories(locale);
+    const categoriesById = new Map(localizedCategories.map((category) => [category.id, category]));
+    articles = articles.map((article) => {
+      const category = article.category_id ? categoriesById.get(article.category_id) ?? getArticleCategory(article) : null;
+      return { ...article, category, categories: category };
+    });
+  }
 
   if (options?.categorySlug) {
     articles = articles.filter((article) => getArticleCategory(article)?.slug === options.categorySlug);
@@ -416,32 +602,84 @@ export async function getAdminArticleById(id: string): Promise<ArticleWithCatego
   return data ? normalizeArticle(data as unknown as ArticleWithCategory) : null;
 }
 
-export async function getArticleBySlug(slug: string): Promise<ArticleWithCategory | null> {
+export async function getAdminArticleTranslations(translationGroupId: string): Promise<ArticleWithCategory[]> {
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {
-    return slug === sampleArticle.slug ? sampleArticle : null;
+    return [];
+  }
+
+  const { data } = await supabase
+    .from("articles")
+    .select("*, category:categories(*)")
+    .eq("translation_group_id", translationGroupId)
+    .order("locale");
+
+  return ((data ?? []) as unknown as ArticleWithCategory[]).map(normalizeArticle);
+}
+
+export async function getArticleBySlug(slug: string, locale: Locale = "bg"): Promise<ArticleWithCategory | null> {
+  const supabase = createPublicSupabaseClient();
+
+  if (!supabase) {
+    return locale === "bg" && slug === sampleArticle.slug ? sampleArticle : null;
   }
 
   const { data } = await supabase
     .from("articles")
     .select("*, category:categories(*)")
     .eq("slug", slug)
+    .eq("locale", locale)
     .eq("status", "published")
     .or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`)
     .maybeSingle();
 
-  return data ? normalizeArticle(data as unknown as ArticleWithCategory) : null;
+  if (!data) {
+    return null;
+  }
+
+  const article = normalizeArticle(data as unknown as ArticleWithCategory);
+  const category = article.category_id ? await getCategoryBySlug(getArticleCategory(article)?.slug || "", locale) : null;
+  return { ...article, category, categories: category };
+}
+
+export async function getPublishedArticleTranslation(
+  translationGroupId: string,
+  locale: Locale
+): Promise<ArticleWithCategory | null> {
+  const supabase = createPublicSupabaseClient();
+
+  if (!supabase) {
+    return null;
+  }
+
+  const { data } = await supabase
+    .from("articles")
+    .select("*, category:categories(*)")
+    .eq("translation_group_id", translationGroupId)
+    .eq("locale", locale)
+    .eq("status", "published")
+    .or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`)
+    .maybeSingle();
+
+  if (!data) {
+    return null;
+  }
+
+  const article = normalizeArticle(data as unknown as ArticleWithCategory);
+  const categorySlug = getArticleCategory(article)?.slug;
+  const category = categorySlug ? await getCategoryBySlug(categorySlug, locale) : null;
+  return { ...article, category, categories: category };
 }
 
 export async function getRelatedArticles(article: ArticleWithCategory, limit = 3) {
   const category = getArticleCategory(article);
-  const articles = await getPublishedArticles({ categorySlug: category?.slug, limit: limit + 1 });
+  const articles = await getPublishedArticles({ categorySlug: category?.slug, limit: limit + 1, locale: article.locale });
   return articles.filter((item) => item.id !== article.id).slice(0, limit);
 }
 
 export async function getTagsForArticle(articleId: string): Promise<Tag[]> {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
     return [];
@@ -473,16 +711,23 @@ export async function getMediaItems(limit = 24): Promise<MediaItem[]> {
   return (data ?? []) as MediaItem[];
 }
 
-export async function getEditablePages(options?: { includeDrafts?: boolean }): Promise<EditablePage[]> {
-  const supabase = await createSupabaseServerClient();
+export async function getEditablePages(options?: { includeDrafts?: boolean; locale?: Locale }): Promise<EditablePage[]> {
+  const locale = options?.locale ?? "bg";
+  const supabase = options?.includeDrafts ? await createSupabaseServerClient() : createPublicSupabaseClient();
 
   if (!supabase) {
-    return options?.includeDrafts ? fallbackPages : fallbackPages.filter((page) => page.status === "published");
+    const pages = fallbackPages.map((page) =>
+      locale === "en"
+        ? { ...page, ...englishPages[page.slug], id: `${page.id}-en`, locale, translation_group_id: page.translation_group_id }
+        : page
+    );
+    return options?.includeDrafts ? pages : pages.filter((page) => page.status === "published");
   }
 
   let query = supabase
     .from("editable_pages")
     .select("*")
+    .eq("locale", locale)
     .order("sort_order", { ascending: true })
     .order("title", { ascending: true });
 
@@ -493,20 +738,34 @@ export async function getEditablePages(options?: { includeDrafts?: boolean }): P
   const { data, error } = await query;
 
   if (error) {
-    return options?.includeDrafts ? fallbackPages : fallbackPages.filter((page) => page.status === "published");
+    const pages = fallbackPages.map((page) =>
+      locale === "en"
+        ? { ...page, ...englishPages[page.slug], id: `${page.id}-en`, locale, translation_group_id: page.translation_group_id }
+        : page
+    );
+    return options?.includeDrafts ? pages : pages.filter((page) => page.status === "published");
   }
 
   return (data ?? []) as EditablePage[];
 }
 
-export async function getEditablePageBySlug(slug: string, options?: { includeDrafts?: boolean }): Promise<EditablePage | null> {
-  const supabase = await createSupabaseServerClient();
+export async function getEditablePageBySlug(
+  slug: string,
+  options?: { includeDrafts?: boolean; locale?: Locale }
+): Promise<EditablePage | null> {
+  const locale = options?.locale ?? "bg";
+  const supabase = options?.includeDrafts ? await createSupabaseServerClient() : createPublicSupabaseClient();
 
   if (!supabase) {
-    return fallbackPages.find((page) => page.slug === slug && (options?.includeDrafts || page.status === "published")) ?? null;
+    const page = fallbackPages.find((item) => item.slug === slug) ?? null;
+    const localizedPage =
+      page && locale === "en"
+        ? { ...page, ...englishPages[page.slug], id: `${page.id}-en`, locale, translation_group_id: page.translation_group_id }
+        : page;
+    return localizedPage && (options?.includeDrafts || localizedPage.status === "published") ? localizedPage : null;
   }
 
-  let query = supabase.from("editable_pages").select("*").eq("slug", slug);
+  let query = supabase.from("editable_pages").select("*").eq("slug", slug).eq("locale", locale);
 
   if (!options?.includeDrafts) {
     query = query.eq("status", "published");
@@ -515,14 +774,20 @@ export async function getEditablePageBySlug(slug: string, options?: { includeDra
   const { data, error } = await query.maybeSingle();
 
   if (error) {
-    return fallbackPages.find((page) => page.slug === slug && (options?.includeDrafts || page.status === "published")) ?? null;
+    const page = fallbackPages.find((item) => item.slug === slug) ?? null;
+    const localizedPage =
+      page && locale === "en"
+        ? { ...page, ...englishPages[page.slug], id: `${page.id}-en`, locale, translation_group_id: page.translation_group_id }
+        : page;
+    return localizedPage && (options?.includeDrafts || localizedPage.status === "published") ? localizedPage : null;
   }
 
   return (data as EditablePage | null) ?? null;
 }
 
-export async function getArtStudioServices(options?: { includeInactive?: boolean }): Promise<ArtStudioService[]> {
-  const supabase = await createSupabaseServerClient();
+export async function getArtStudioServices(options?: { includeInactive?: boolean; locale?: Locale }): Promise<ArtStudioService[]> {
+  const locale = options?.locale ?? "bg";
+  const supabase = options?.includeInactive ? await createSupabaseServerClient() : createPublicSupabaseClient();
 
   if (!supabase) {
     return options?.includeInactive ? fallbackArtStudioServices : fallbackArtStudioServices.filter((service) => service.is_active);
@@ -545,5 +810,13 @@ export async function getArtStudioServices(options?: { includeInactive?: boolean
     return options?.includeInactive ? fallbackArtStudioServices : fallbackArtStudioServices.filter((service) => service.is_active);
   }
 
-  return (data ?? []) as ArtStudioService[];
+  const services = (data ?? []) as ArtStudioService[];
+  const { data: translations } = await supabase
+    .from("art_studio_service_translations")
+    .select("*")
+    .eq("locale", locale)
+    .in("service_id", services.map((service) => service.id));
+  const byId = new Map((translations ?? []).map((translation) => [translation.service_id, translation]));
+
+  return services.map((service) => localizeService(service, byId.get(service.id)));
 }

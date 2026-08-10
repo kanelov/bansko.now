@@ -2,8 +2,11 @@
 
 import { useCallback, useEffect, useId, useState } from "react";
 import type { GalleryImage } from "@/lib/markdown-blocks";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
-export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
+export function GalleryLightbox({ images, locale = "bg" }: { images: GalleryImage[]; locale?: Locale }) {
+  const dictionary = getDictionary(locale);
   const galleryId = useId();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
   const activeImage = activeIndex === null ? null : images[activeIndex];
@@ -67,7 +70,7 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
               <button
                 type="button"
                 onClick={() => setActiveIndex(index)}
-                aria-label={image.alt ? `Отвори снимка: ${image.alt}` : "Отвори снимка"}
+                aria-label={image.alt ? `${locale === "en" ? "Open image" : "Отвори снимка"}: ${image.alt}` : locale === "en" ? "Open image" : "Отвори снимка"}
                 aria-describedby={captionId}
                 className="group block w-full rounded-[1.35rem] bg-stone-100 text-left text-stone-950 transition duration-200 hover:-translate-y-0.5 hover:shadow-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest"
               >
@@ -91,13 +94,13 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
       </div>
 
       {activeImage ? (
-        <div className="fixed inset-0 z-50 grid place-items-center bg-black/85 p-4" role="dialog" aria-modal="true" aria-label="Галерия">
+        <div className="fixed inset-0 z-50 grid place-items-center bg-black/85 p-4" role="dialog" aria-modal="true" aria-label={locale === "en" ? "Gallery" : "Галерия"}>
           <button
             type="button"
             onClick={() => setActiveIndex(null)}
             className="absolute right-4 top-4 rounded-full bg-white px-4 py-2 text-sm font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100"
           >
-            Затвори
+            {dictionary.close}
           </button>
           {hasMultipleImages ? (
             <>
@@ -105,7 +108,7 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
                 type="button"
                 onClick={showPrevious}
                 className="absolute left-4 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-3xl leading-none text-stone-950 shadow-sm transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                aria-label="Предишна снимка"
+                aria-label={dictionary.previousImage}
               >
                 <span aria-hidden="true">‹</span>
               </button>
@@ -113,7 +116,7 @@ export function GalleryLightbox({ images }: { images: GalleryImage[] }) {
                 type="button"
                 onClick={showNext}
                 className="absolute right-4 top-1/2 grid h-12 w-12 -translate-y-1/2 place-items-center rounded-full bg-white/95 text-3xl leading-none text-stone-950 shadow-sm transition hover:bg-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-white"
-                aria-label="Следваща снимка"
+                aria-label={dictionary.nextImage}
               >
                 <span aria-hidden="true">›</span>
               </button>

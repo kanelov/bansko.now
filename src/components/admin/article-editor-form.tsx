@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
 import { useFormStatus } from "react-dom";
 import { publishArticleAction, upsertArticleAction } from "@/app/admin/actions";
@@ -12,11 +13,13 @@ import { fallbackSettings } from "@/lib/defaults";
 import { getArticleToc } from "@/lib/markdown-blocks";
 import { getSeoScore } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
-import type { ArticleStatus, ArticleWithCategory, Category, MediaItem } from "@/lib/types";
+import type { ArticleStatus, ArticleWithCategory, Category, Locale, MediaItem, SiteSettings } from "@/lib/types";
 
 type Tab = "content" | "seo" | "images" | "settings" | "preview";
 
 type Draft = {
+  locale: Locale;
+  translation_group_id: string;
   title: string;
   slug: string;
   excerpt: string;
@@ -60,16 +63,20 @@ function lines(value: unknown) {
   return Array.isArray(value) ? value.filter(Boolean).join("\n") : "";
 }
 
-function ArtStudioPreviewBlock() {
+function ArtStudioPreviewBlock({ locale, settings }: { locale: Locale; settings: SiteSettings }) {
+  const services = locale === "en"
+    ? ["Fine Art printing", "Canvas printing", "Visual storytelling"]
+    : ["Fine Art печат", "Canvas печат", "Визуално представяне"];
+
   return (
     <section className="rounded-3xl border border-stone-200 bg-[#f7f2e8] p-6 shadow-soft">
-      <p className="text-sm font-semibold uppercase text-moss">Art Studio към Bansko NOW</p>
-      <h2 className="mt-3 font-serif text-3xl font-semibold text-stone-950">Визуални услуги с характер</h2>
+      <p className="text-sm font-semibold uppercase text-moss">{settings.art_studio_block_eyebrow}</p>
+      <h2 className="mt-3 font-serif text-3xl font-semibold text-stone-950">{settings.art_studio_block_title}</h2>
       <p className="mt-4 text-base leading-7 text-stone-650">
-        Preview блокът показва как ще стои Art Studio CTA в статията. Реалните услуги се управляват от CMS секцията в админа.
+        {settings.art_studio_block_text}
       </p>
       <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        {["Fine Art печат", "Canvas печат", "Визуално представяне"].map((service) => (
+        {services.map((service) => (
           <div key={service} className="rounded-2xl bg-white p-4 text-sm font-semibold text-stone-800 shadow-soft">
             {service}
           </div>
@@ -79,8 +86,10 @@ function ArtStudioPreviewBlock() {
   );
 }
 
-function initialDraft(article?: ArticleWithCategory | null): Draft {
+function initialDraft(article?: ArticleWithCategory | null, locale: Locale = "bg", translationGroupId = ""): Draft {
   return {
+    locale: article?.locale || locale,
+    translation_group_id: article?.translation_group_id || translationGroupId,
     title: article?.title || "",
     slug: article?.slug || "",
     excerpt: article?.excerpt || "",
@@ -166,6 +175,8 @@ const visualBlocks = [
 ];
 
 const serializedDraftFields: (keyof Draft)[] = [
+  "locale",
+  "translation_group_id",
   "title",
   "slug",
   "excerpt",
@@ -259,14 +270,20 @@ function ArticleFormActions({
 export function ArticleEditorForm({
   article,
   categories,
-  mediaItems = []
+  mediaItems = [],
+  locale = article?.locale || "bg",
+  translationGroupId = article?.translation_group_id || "",
+  settings = fallbackSettings
 }: {
   article?: ArticleWithCategory | null;
   categories: Category[];
   mediaItems?: MediaItem[];
+  locale?: Locale;
+  translationGroupId?: string;
+  settings?: SiteSettings;
 }) {
   const [activeTab, setActiveTab] = useState<Tab>("content");
-  const originalDraft = useMemo(() => initialDraft(article), [article]);
+  const originalDraft = useMemo(() => initialDraft(article, locale, translationGroupId), [article, locale, translationGroupId]);
   const [draft, setDraft] = useState<Draft>(() => originalDraft);
   const contentRef = useRef<HTMLTextAreaElement>(null);
   const previewToc = useMemo(() => getArticleToc(draft.content || ""), [draft.content]);
@@ -341,6 +358,9 @@ export function ArticleEditorForm({
         <input key={field} type="hidden" name={field} value={String(draft[field])} />
       ))}
       <div className="flex flex-wrap gap-2">
+        <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white">
+          {draft.locale === "en" ? "English" : "Български"}
+        </span>
         {tabs.map((tab) => (
           <button
             key={tab.id}
@@ -453,9 +473,9 @@ export function ArticleEditorForm({
             <div className="grid gap-3 rounded-2xl bg-stone-50 p-4">
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <h3 className="font-serif text-2xl font-semibold">Insert media in article</h3>
-                <a href="/admin/media" className="text-sm font-semibold text-forest underline underline-offset-4">
+                <Link href="/admin/media" className="text-sm font-semibold text-forest underline underline-offset-4">
                   Media library
-                </a>
+                </Link>
               </div>
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 {mediaItems.slice(0, 8).map((item) => (
@@ -582,9 +602,9 @@ export function ArticleEditorForm({
               </label>
               <div className="rounded-2xl bg-stone-50 p-4 text-sm leading-6 text-stone-600">
                 Качи нови изображения от{" "}
-                <a href="/admin/media" className="font-semibold text-forest underline underline-offset-4">
+                <Link href="/admin/media" className="font-semibold text-forest underline underline-offset-4">
                   Media
-                </a>
+                </Link>
                 . Последните качени файлове са достъпни тук за бърз избор.
               </div>
             </div>
@@ -610,9 +630,9 @@ export function ArticleEditorForm({
           <div className="grid gap-3 rounded-2xl bg-stone-50 p-4">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <h3 className="font-serif text-2xl font-semibold">Media library</h3>
-              <a href="/admin/media" className="text-sm font-semibold text-forest underline underline-offset-4">
+              <Link href="/admin/media" className="text-sm font-semibold text-forest underline underline-offset-4">
                 Качи изображение
-              </a>
+              </Link>
             </div>
             {mediaItems.length ? (
               <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
@@ -732,14 +752,17 @@ export function ArticleEditorForm({
               />
             ) : null}
             <div className="mt-10">
-              <ArticleTableOfContents items={previewToc} />
-              <MarkdownRenderer content={draft.content || "## Подзаглавие\n\nТекстът на статията ще се покаже тук."} />
+              <ArticleTableOfContents items={previewToc} locale={draft.locale} />
+              <MarkdownRenderer
+                content={draft.content || (draft.locale === "en" ? "## Subheading\n\nThe article content will appear here." : "## Подзаглавие\n\nТекстът на статията ще се покаже тук.")}
+                locale={draft.locale}
+              />
             </div>
           </article>
           <SEOChecklist article={seoArticle} />
-          {draft.show_art_studio_block ? <ArtStudioPreviewBlock /> : null}
-          {draft.show_bansko_collection_block ? <BanskoCollectionBlock /> : null}
-          {draft.show_facebook_cta ? <FacebookGroupCTA settings={fallbackSettings} /> : null}
+          {draft.show_art_studio_block ? <ArtStudioPreviewBlock locale={draft.locale} settings={settings} /> : null}
+          {draft.show_bansko_collection_block ? <BanskoCollectionBlock locale={draft.locale} settings={settings} /> : null}
+          {draft.show_facebook_cta ? <FacebookGroupCTA settings={settings} locale={draft.locale} /> : null}
         </section>
       ) : null}
 

@@ -11,11 +11,15 @@ function compactFieldClass() {
   return "w-full rounded-lg border border-white/10 bg-white px-3 py-2 text-sm text-stone-950";
 }
 
+function textAreaValue(value: string[] | null | undefined) {
+  return (value ?? []).join("\n");
+}
+
 function isUuid(value: string) {
   return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
 }
 
-function MenuRow({ item, rowKey }: { item?: NavigationItem; rowKey: string }) {
+function MenuRow({ item, englishItem, rowKey }: { item?: NavigationItem; englishItem?: NavigationItem; rowKey: string }) {
   return (
     <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
       <input type="hidden" name="navigation_row_key" value={rowKey} />
@@ -51,6 +55,16 @@ function MenuRow({ item, rowKey }: { item?: NavigationItem; rowKey: string }) {
         Aria label
         <input name={`navigation_aria_label_${rowKey}`} defaultValue={item?.aria_label || ""} className={compactFieldClass()} placeholder="Optional SEO/accessibility label" />
       </label>
+      <div className="grid gap-3 rounded-xl border border-white/10 bg-black/10 p-3 md:grid-cols-2">
+        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
+          English label
+          <input name={`navigation_label_en_${rowKey}`} defaultValue={englishItem?.label || ""} className={compactFieldClass()} placeholder="Events" />
+        </label>
+        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
+          English aria label
+          <input name={`navigation_aria_label_en_${rowKey}`} defaultValue={englishItem?.aria_label || ""} className={compactFieldClass()} />
+        </label>
+      </div>
       <div className="flex flex-wrap gap-4 text-sm text-stone-100">
         <label className="inline-flex items-center gap-2">
           <input type="checkbox" name={`navigation_is_active_${rowKey}`} defaultChecked={item?.is_active ?? true} />
@@ -131,8 +145,13 @@ type SearchParams = Promise<{ saved?: string; error?: string }>;
 
 export default async function AdminSettingsPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
-  const settings = await getSiteSettings();
-  const [navigationItems, socialLinks] = await Promise.all([getAllNavigationItems(), getAllSocialLinks(settings)]);
+  const [settings, englishSettings] = await Promise.all([getSiteSettings("bg"), getSiteSettings("en")]);
+  const [navigationItems, englishNavigationItems, socialLinks] = await Promise.all([
+    getAllNavigationItems("bg"),
+    getAllNavigationItems("en"),
+    getAllSocialLinks(settings)
+  ]);
+  const englishNavigationById = new Map(englishNavigationItems.map((item) => [item.id, item]));
 
   return (
     <div className="grid gap-8">
@@ -184,6 +203,47 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
 
         <section className="grid gap-5 border-t border-white/10 pt-6">
           <div>
+            <h2 className="font-serif text-2xl font-semibold">Блокове под статията</h2>
+            <p className="mt-2 text-sm leading-6 text-stone-300">
+              Тук редактираш общите български текстове. Във всяка статия от Settings избираш кои блокове да се покажат.
+              Картите с конкретните Art Studio услуги се управляват от „Страници“ → „Art Studio“.
+            </p>
+          </div>
+          <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
+            <p className="text-sm font-semibold uppercase text-stone-300">Facebook общност</p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <input name="facebook_cta_eyebrow" defaultValue={settings.facebook_cta_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
+              <input name="facebook_cta_title" defaultValue={settings.facebook_cta_title || ""} className={fieldClass()} placeholder="Заглавие" />
+            </div>
+            <textarea name="facebook_cta_text" defaultValue={settings.facebook_cta_text || ""} className={fieldClass()} rows={3} placeholder="Текст" />
+            <input name="facebook_cta_button_label" defaultValue={settings.facebook_cta_button_label || ""} className={fieldClass()} placeholder="Текст на бутона" />
+          </div>
+          <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
+            <p className="text-sm font-semibold uppercase text-stone-300">Art Studio</p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <input name="art_studio_block_eyebrow" defaultValue={settings.art_studio_block_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
+              <input name="art_studio_block_title" defaultValue={settings.art_studio_block_title || ""} className={fieldClass()} placeholder="Заглавие" />
+            </div>
+            <textarea name="art_studio_block_text" defaultValue={settings.art_studio_block_text || ""} className={fieldClass()} rows={3} placeholder="Текст" />
+            <input name="art_studio_block_button_label" defaultValue={settings.art_studio_block_button_label || ""} className={fieldClass()} placeholder="Текст на бутона" />
+          </div>
+          <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
+            <p className="text-sm font-semibold uppercase text-stone-300">Bansko Collection</p>
+            <div className="grid gap-4 md:grid-cols-2">
+              <input name="collection_block_eyebrow" defaultValue={settings.collection_block_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
+              <input name="collection_block_title" defaultValue={settings.collection_block_title || ""} className={fieldClass()} placeholder="Заглавие" />
+            </div>
+            <textarea name="collection_block_text" defaultValue={settings.collection_block_text || ""} className={fieldClass()} rows={3} placeholder="Текст" />
+            <input name="collection_block_button_label" defaultValue={settings.collection_block_button_label || ""} className={fieldClass()} placeholder="Текст на бутона" />
+            <label className="grid gap-2 text-sm font-semibold">
+              Продуктови етикети, по един на ред
+              <textarea name="collection_items" defaultValue={textAreaValue(settings.collection_items)} className={fieldClass()} rows={4} />
+            </label>
+          </div>
+        </section>
+
+        <section className="grid gap-5 border-t border-white/10 pt-6">
+          <div>
             <h2 className="font-serif text-2xl font-semibold">Подкрепи Bansko NOW</h2>
             <p className="mt-2 text-sm leading-6 text-stone-300">
               Бутонът се показва в основното меню и отваря кратка карта за доброволна подкрепа. Добави Stripe Payment Link с включена опция клиентът сам да избере сумата или PayPal/PayPal.Me линк без фиксирана сума.
@@ -223,6 +283,49 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
             PayPal / PayPal.Me линк
             <input type="url" name="support_paypal_url" defaultValue={settings.support_paypal_url || ""} className={fieldClass()} placeholder="https://paypal.me/..." />
           </label>
+        </section>
+
+        <section className="grid gap-5 border-t border-white/10 pt-6">
+          <div>
+            <p className="text-sm font-semibold uppercase text-stone-400">English</p>
+            <h2 className="mt-2 font-serif text-2xl font-semibold">English public texts</h2>
+          </div>
+          <label className="grid gap-2 text-sm font-semibold">
+            Site description
+            <textarea name="site_description_en" defaultValue={englishSettings.site_description || ""} className={fieldClass()} rows={3} />
+          </label>
+          <label className="grid gap-2 text-sm font-semibold">
+            Hero image alt
+            <input name="hero_image_alt_en" defaultValue={englishSettings.hero_image_alt || ""} className={fieldClass()} />
+          </label>
+          <div className="grid gap-4 md:grid-cols-2">
+            <input name="support_button_label_en" defaultValue={englishSettings.support_button_label || ""} className={fieldClass()} placeholder="Support us" />
+            <input name="support_title_en" defaultValue={englishSettings.support_title || ""} className={fieldClass()} placeholder="Support Bansko NOW" />
+          </div>
+          <textarea name="support_description_en" defaultValue={englishSettings.support_description || ""} className={fieldClass()} rows={3} placeholder="Support message" />
+          <input name="support_image_alt_en" defaultValue={englishSettings.support_image_alt || ""} className={fieldClass()} placeholder="Support image alt" />
+          <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
+            <p className="text-sm font-semibold uppercase text-stone-300">Article blocks</p>
+            <div className="grid gap-3 md:grid-cols-2">
+              <input name="facebook_cta_eyebrow_en" defaultValue={englishSettings.facebook_cta_eyebrow || ""} className={fieldClass()} placeholder="Community eyebrow" />
+              <input name="facebook_cta_title_en" defaultValue={englishSettings.facebook_cta_title || ""} className={fieldClass()} placeholder="Community title" />
+            </div>
+            <textarea name="facebook_cta_text_en" defaultValue={englishSettings.facebook_cta_text || ""} className={fieldClass()} rows={3} placeholder="Community text" />
+            <input name="facebook_cta_button_label_en" defaultValue={englishSettings.facebook_cta_button_label || ""} className={fieldClass()} placeholder="Community button" />
+            <div className="grid gap-3 md:grid-cols-2">
+              <input name="art_studio_block_eyebrow_en" defaultValue={englishSettings.art_studio_block_eyebrow || ""} className={fieldClass()} placeholder="Art Studio eyebrow" />
+              <input name="art_studio_block_title_en" defaultValue={englishSettings.art_studio_block_title || ""} className={fieldClass()} placeholder="Art Studio title" />
+            </div>
+            <textarea name="art_studio_block_text_en" defaultValue={englishSettings.art_studio_block_text || ""} className={fieldClass()} rows={3} placeholder="Art Studio text" />
+            <input name="art_studio_block_button_label_en" defaultValue={englishSettings.art_studio_block_button_label || ""} className={fieldClass()} placeholder="Art Studio button" />
+            <div className="grid gap-3 md:grid-cols-2">
+              <input name="collection_block_eyebrow_en" defaultValue={englishSettings.collection_block_eyebrow || ""} className={fieldClass()} placeholder="Collection eyebrow" />
+              <input name="collection_block_title_en" defaultValue={englishSettings.collection_block_title || ""} className={fieldClass()} placeholder="Collection title" />
+            </div>
+            <textarea name="collection_block_text_en" defaultValue={englishSettings.collection_block_text || ""} className={fieldClass()} rows={3} placeholder="Collection text" />
+            <input name="collection_block_button_label_en" defaultValue={englishSettings.collection_block_button_label || ""} className={fieldClass()} placeholder="Collection button" />
+            <textarea name="collection_items_en" defaultValue={textAreaValue(englishSettings.collection_items)} className={fieldClass()} rows={4} placeholder="Collection items, one per line" />
+          </div>
         </section>
 
         <section className="grid gap-5 border-t border-white/10 pt-6">
@@ -296,7 +399,7 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
         </div>
         <div className="grid gap-4">
           {navigationItems.map((item, index) => (
-            <MenuRow key={item.id} item={item} rowKey={`existing-${index}`} />
+            <MenuRow key={item.id} item={item} englishItem={englishNavigationById.get(item.id)} rowKey={`existing-${index}`} />
           ))}
           <MenuRow rowKey="new-1" />
           <MenuRow rowKey="new-2" />

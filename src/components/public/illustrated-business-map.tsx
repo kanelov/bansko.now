@@ -5,23 +5,28 @@ import Link from "next/link";
 import type { Route } from "next";
 import { BusinessMedia } from "@/components/public/business-media";
 import {
-  businessCategories,
   getBusinessPath,
   getDirectionsUrl,
   getEffectiveBusinessTier,
   parseBusinessFaqs
 } from "@/lib/business-public";
 import { getBusinessTierLabel } from "@/lib/business-plan-labels";
-import type { BusinessDirectorySettings, BusinessWithRelations } from "@/lib/types";
+import type { BusinessDirectorySettings, BusinessWithRelations, Locale } from "@/lib/types";
+import { getDictionary } from "@/lib/i18n";
 
 export function IllustratedBusinessMap({
   businesses,
-  settings
+  settings,
+  locale = "bg"
 }: {
   businesses: BusinessWithRelations[];
   settings: BusinessDirectorySettings;
+  locale?: Locale;
 }) {
-  const [category, setCategory] = useState("Всички");
+  const all = "__all__";
+  const dictionary = getDictionary(locale);
+  const [category, setCategory] = useState(all);
+  const categories = useMemo(() => Array.from(new Set(businesses.map((business) => business.category))).sort(), [businesses]);
   const [selectedId, setSelectedId] = useState<string | null>(businesses[0]?.id ?? null);
   const mapBusinesses = useMemo(
     () =>
@@ -30,7 +35,7 @@ export function IllustratedBusinessMap({
           business.show_on_illustrated_map &&
           typeof business.map_pin_x === "number" &&
           typeof business.map_pin_y === "number" &&
-          (category === "Всички" || business.category === category)
+          (category === all || business.category === category)
       ),
     [businesses, category]
   );
@@ -40,7 +45,7 @@ export function IllustratedBusinessMap({
     <section className="grid gap-6 lg:grid-cols-[1.4fr_0.6fr]">
       <div className="rounded-3xl border border-stone-200 bg-white p-3 shadow-soft">
         <div className="mb-3 flex flex-wrap items-center justify-between gap-3 px-2 pt-2">
-          <p className="text-sm font-semibold uppercase text-moss">Илюстрирана карта</p>
+          <p className="text-sm font-semibold uppercase text-moss">{locale === "en" ? "Illustrated map" : "Илюстрирана карта"}</p>
           <select
             value={category}
             onChange={(event) => {
@@ -49,8 +54,8 @@ export function IllustratedBusinessMap({
             }}
             className="rounded-full border border-stone-300 bg-paper px-4 py-2 text-sm font-semibold"
           >
-            <option>Всички</option>
-            {businessCategories.map((item) => (
+            <option value={all}>{dictionary.allCategories}</option>
+            {categories.map((item) => (
               <option key={item}>{item}</option>
             ))}
           </select>
@@ -67,7 +72,7 @@ export function IllustratedBusinessMap({
               <div>
                 <p className="font-serif text-4xl font-semibold text-forest">Bansko NOW Map</p>
                 <p className="mt-3 max-w-md text-sm leading-6 text-moss">
-                  Качи илюстрирана карта от admin, после pin-вай бизнесите с X/Y проценти.
+                  {locale === "en" ? "Upload an illustrated map in admin, then place businesses with X/Y percentages." : "Качи илюстрирана карта от admin, после pin-вай бизнесите с X/Y проценти."}
                 </p>
               </div>
             </div>
@@ -102,7 +107,7 @@ export function IllustratedBusinessMap({
               <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{selected.category}</span>
               {getEffectiveBusinessTier(selected) !== "free" ? (
                 <span className="rounded-full bg-forest px-3 py-1 text-xs font-semibold text-white">
-                  {getBusinessTierLabel(getEffectiveBusinessTier(selected))}
+                  {getBusinessTierLabel(getEffectiveBusinessTier(selected), locale)}
                 </span>
               ) : null}
             </div>
@@ -124,8 +129,8 @@ export function IllustratedBusinessMap({
               </details>
             ))}
             <div className="mt-6 flex flex-wrap gap-2">
-              <Link href={getBusinessPath(selected) as Route} className="rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white transition hover:bg-moss">
-                Виж профила
+              <Link href={getBusinessPath(selected, locale) as Route} className="rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
+                {dictionary.viewBusiness}
               </Link>
               <a
                 href={getDirectionsUrl(selected)}
@@ -133,12 +138,12 @@ export function IllustratedBusinessMap({
                 rel="noopener noreferrer"
                 className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white"
               >
-                Упътване
+                {dictionary.directions}
               </a>
             </div>
           </div>
         ) : (
-          <p className="text-sm leading-6 text-stone-650">Когато добавиш pin позиции, бизнесите ще се появят върху картата.</p>
+          <p className="text-sm leading-6 text-stone-650">{locale === "en" ? "Businesses will appear on the map after pin positions are added." : "Когато добавиш pin позиции, бизнесите ще се появят върху картата."}</p>
         )}
       </aside>
     </section>

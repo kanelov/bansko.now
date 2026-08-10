@@ -1,4 +1,5 @@
-import type { Business, BusinessFaq, BusinessTier } from "@/lib/types";
+import { localePath } from "@/lib/i18n";
+import type { Business, BusinessFaq, BusinessTier, Locale } from "@/lib/types";
 
 export const businessCategories = [
   "Ресторанти",
@@ -47,8 +48,8 @@ export function getEffectiveBusinessTier(business: Pick<Business, "listing_tier"
   return isPaidTierActive(business) ? business.listing_tier : "free";
 }
 
-export function getBusinessPath(business: Pick<Business, "slug">) {
-  return `/businesses/${business.slug}`;
+export function getBusinessPath(business: Pick<Business, "slug">, locale: Locale = "bg") {
+  return localePath(locale, `/businesses/${business.slug}`);
 }
 
 export function getDirectionsUrl(business: Pick<Business, "latitude" | "longitude" | "address" | "name">) {

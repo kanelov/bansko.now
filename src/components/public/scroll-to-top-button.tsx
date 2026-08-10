@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
-export function ScrollToTopButton() {
+export function ScrollToTopButton({ locale = "bg" }: { locale?: Locale }) {
+  const dictionary = getDictionary(locale);
   const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
@@ -29,7 +32,7 @@ export function ScrollToTopButton() {
   return (
     <button
       type="button"
-      aria-label="Към началото на статията"
+      aria-label={dictionary.backToTop}
       onClick={() => window.scrollTo({ top: 0, behavior: "smooth" })}
       className={`fixed bottom-5 right-5 z-50 inline-flex h-11 w-11 items-center justify-center rounded-full border border-stone-300 bg-white/90 text-forest shadow-soft backdrop-blur transition duration-200 hover:border-forest hover:bg-forest hover:text-white ${
         isVisible ? "translate-y-0 opacity-100" : "pointer-events-none translate-y-3 opacity-0"

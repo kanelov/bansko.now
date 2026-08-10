@@ -1,17 +1,21 @@
 import Link from "next/link";
 import type { Route } from "next";
 import type { ArtStudioService } from "@/lib/types";
+import { localePath } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
 const fallbackServiceImage = "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80";
 
 export function ArtStudioServiceCard({
   service,
-  featured = false
+  featured = false,
+  locale = "bg"
 }: {
   service: ArtStudioService;
   featured?: boolean;
+  locale?: Locale;
 }) {
-  const href = service.button_url || "/contact";
+  const href = service.button_url || localePath(locale, "/contact");
   const isExternal = /^https?:\/\//i.test(href);
   const image = service.image_url || fallbackServiceImage;
 
@@ -66,10 +70,10 @@ export function ArtStudioServiceCard({
           </a>
         ) : (
           <Link
-            href={href as Route}
+            href={localePath(locale, href) as Route}
             className="mt-6 inline-flex w-fit rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss"
           >
-            {service.button_label || "Виж повече"}
+            {service.button_label || (locale === "en" ? "Learn more" : "Виж повече")}
           </Link>
         )}
       </div>

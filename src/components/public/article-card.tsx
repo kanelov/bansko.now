@@ -2,8 +2,10 @@ import Link from "next/link";
 import { fallbackHeroImage, getArticleCategory, getArticlePath } from "@/lib/content";
 import type { Route } from "next";
 import type { ArticleWithCategory } from "@/lib/types";
+import { localePath } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
-export function ArticleCard({ article, priority = false }: { article: ArticleWithCategory; priority?: boolean }) {
+export function ArticleCard({ article, priority = false, locale = article.locale }: { article: ArticleWithCategory; priority?: boolean; locale?: Locale }) {
   const category = getArticleCategory(article);
   const image = article.featured_image_url || fallbackHeroImage;
   const articlePath = getArticlePath(article) as Route;
@@ -22,7 +24,7 @@ export function ArticleCard({ article, priority = false }: { article: ArticleWit
       </Link>
       <div className="grid gap-3 p-5">
         {category ? (
-          <Link href={`/${category.slug}` as Route} className="text-xs font-semibold uppercase text-moss">
+          <Link href={localePath(locale, `/${category.slug}`) as Route} className="text-xs font-semibold uppercase text-moss">
             {category.name}
           </Link>
         ) : null}
@@ -34,7 +36,7 @@ export function ArticleCard({ article, priority = false }: { article: ArticleWit
         {article.excerpt ? <p className="line-clamp-3 text-sm leading-6 text-stone-600">{article.excerpt}</p> : null}
         <div className="flex items-center justify-between text-xs text-stone-500">
           <span>{article.author_name || "Любо Канелов"}</span>
-          <span>{article.reading_time || 1} мин.</span>
+          <span>{article.reading_time || 1} {locale === "en" ? "min" : "мин."}</span>
         </div>
       </div>
     </article>

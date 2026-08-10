@@ -109,6 +109,19 @@ export const fallbackSettings: SiteSettings = {
   support_image_alt: "Банско и Пирин - вдъхновение за Bansko NOW",
   support_stripe_url: null,
   support_paypal_url: null,
+  facebook_cta_eyebrow: "Общност",
+  facebook_cta_title: "Присъедини се към общността",
+  facebook_cta_text: "Имаш събитие, снимка, препоръка или въпрос за Банско? Сподели го в Bansko NOW | Живот в Банско.",
+  facebook_cta_button_label: "Към Facebook групата",
+  art_studio_block_eyebrow: "Art Studio към Bansko NOW",
+  art_studio_block_title: "Визуални услуги с характер",
+  art_studio_block_text: "Фотография, арт печат, платна и визуални решения, вдъхновени от Банско и Пирин.",
+  art_studio_block_button_label: "Виж Art Studio",
+  collection_block_eyebrow: "Вдъхновено от Банско",
+  collection_block_title: "Bansko Collection",
+  collection_block_text: "Авторски продукти за хората, които искат да отнесат част от Банско със себе си.",
+  collection_block_button_label: "Разгледай колекцията",
+  collection_items: ["Тениски", "Чаши", "Постери", "Фото принтове"],
   default_author_name: "Любо Канелов"
 };
 

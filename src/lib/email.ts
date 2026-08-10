@@ -4,6 +4,7 @@ type NotificationEmail = {
   to?: string | null;
   subject: string;
   title: string;
+  replyTo?: string | null;
   intro?: string;
   rows?: { label: string; value: string | null | undefined }[];
   actionUrl?: string | null;
@@ -57,12 +58,12 @@ export async function sendNotificationEmail(message: NotificationEmail) {
   const to = message.to || adminNotificationEmail;
 
   if (!resendApiKey || !to) {
-    console.info("[email skipped]", message.subject);
-    return;
+    console.warn("[email skipped] Missing RESEND_API_KEY or notification recipient", { subject: message.subject });
+    return false;
   }
 
   try {
-    await fetch("https://api.resend.com/emails", {
+    const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${resendApiKey}`,
@@ -71,11 +72,21 @@ export async function sendNotificationEmail(message: NotificationEmail) {
       body: JSON.stringify({
         from: emailFrom,
         to,
+        reply_to: message.replyTo || undefined,
         subject: message.subject,
         html: notificationHtml(message)
       })
     });
+
+    if (!response.ok) {
+      const details = await response.text();
+      console.error("[email rejected]", { status: response.status, subject: message.subject, details });
+      return false;
+    }
+
+    return true;
   } catch (error) {
     console.error("[email failed]", error);
+    return false;
   }
 }

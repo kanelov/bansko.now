@@ -1,22 +1,37 @@
+import Link from "next/link";
 import {
   deleteArtStudioServiceAction,
   upsertArtStudioServiceAction,
   upsertEditablePageAction
 } from "@/app/admin/actions";
 import { getArtStudioServices, getEditablePages } from "@/lib/content";
+import { isLocale } from "@/lib/i18n";
 
-type SearchParams = Promise<{ saved?: string; deleted?: string; error?: string }>;
+type SearchParams = Promise<{
+  saved?: string;
+  deleted?: string;
+  error?: string;
+  locale?: string;
+  translation_group_id?: string;
+}>;
 
 function textAreaValue(value: string[] | null | undefined) {
   return (value ?? []).join("\n");
 }
 
 export default async function AdminPagesPage({ searchParams }: { searchParams: SearchParams }) {
-  const [params, pages, services] = await Promise.all([
+  const [params, bgPages, enPages, services, englishServices] = await Promise.all([
     searchParams,
-    getEditablePages({ includeDrafts: true }),
-    getArtStudioServices({ includeInactive: true })
+    getEditablePages({ includeDrafts: true, locale: "bg" }),
+    getEditablePages({ includeDrafts: true, locale: "en" }),
+    getArtStudioServices({ includeInactive: true, locale: "bg" }),
+    getArtStudioServices({ includeInactive: true, locale: "en" })
   ]);
+  const pages = [...bgPages, ...enPages].sort((a, b) => a.slug.localeCompare(b.slug) || a.locale.localeCompare(b.locale));
+  const pagesByTranslation = new Map(pages.map((page) => [`${page.translation_group_id}:${page.locale}`, page]));
+  const englishServicesById = new Map(englishServices.map((service) => [service.id, service]));
+  const newPageLocale = params.locale && isLocale(params.locale) ? params.locale : "bg";
+  const newPageTranslationGroup = params.translation_group_id || "";
 
   return (
     <div className="grid gap-10">
@@ -46,13 +61,24 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
         </div>
 
         <div className="grid gap-4">
-          {[...pages, null].map((page, index) => (
-            <details key={page?.id || "new-page"} className="rounded-2xl border border-white/10 bg-white/5 p-5" open={!page}>
+          {[...pages, null].map((page, index) => {
+            const alternateLocale = page?.locale === "bg" ? "en" : "bg";
+            const counterpart = page
+              ? pagesByTranslation.get(`${page.translation_group_id}:${alternateLocale}`)
+              : null;
+
+            return (
+            <details
+              id={page ? `page-${page.id}` : "new-page"}
+              key={page?.id || "new-page"}
+              className="rounded-2xl border border-white/10 bg-white/5 p-5"
+              open={!page}
+            >
               <summary className="cursor-pointer list-none">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
                     <p className="text-xs font-semibold uppercase text-stone-400">
-                      {page ? `/${page.slug} / ${page.status}` : "Нова страница"}
+                      {page ? `${page.locale.toUpperCase()} / ${page.locale === "en" ? "/en" : ""}/${page.slug} / ${page.status}` : "Нова страница"}
                     </p>
                     <h3 className="mt-2 font-serif text-2xl font-semibold">{page?.title || "Добави страница"}</h3>
                   </div>
@@ -64,7 +90,33 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
 
               <form action={upsertEditablePageAction} className="mt-6 grid gap-4 rounded-2xl bg-white p-5 text-stone-950">
                 {page ? <input type="hidden" name="id" value={page.id} /> : null}
-                <div className="grid gap-4 md:grid-cols-3">
+                {page ? <input type="hidden" name="locale" value={page.locale} /> : null}
+                {page ? <input type="hidden" name="translation_group_id" value={page.translation_group_id} /> : null}
+                {!page && newPageTranslationGroup ? (
+                  <input type="hidden" name="translation_group_id" value={newPageTranslationGroup} />
+                ) : null}
+                {page ? (
+                  <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-stone-100 p-3 text-sm">
+                    <span className="font-semibold">Език: {page.locale === "bg" ? "Български" : "English"}</span>
+                    {counterpart ? (
+                      <Link href={`/admin/cms#page-${counterpart.id}`} className="admin-button admin-button-secondary px-4 py-2 text-xs font-semibold">
+                        Отвори {alternateLocale.toUpperCase()} версията
+                      </Link>
+                    ) : (
+                      <Link
+                        href={`/admin/cms?locale=${alternateLocale}&translation_group_id=${page.translation_group_id}#new-page`}
+                        className="admin-button admin-button-forest px-4 py-2 text-xs font-semibold"
+                      >
+                        + {alternateLocale === "en" ? "English" : "Български"} версия
+                      </Link>
+                    )}
+                  </div>
+                ) : newPageTranslationGroup ? (
+                  <p className="rounded-xl bg-sage/40 p-3 text-sm font-semibold text-forest">
+                    Създаваш {newPageLocale.toUpperCase()} версия, свързана с другия език.
+                  </p>
+                ) : null}
+                <div className="grid gap-4 md:grid-cols-4">
                   <label className="grid gap-2 text-sm font-semibold">
                     Title
                     <input name="title" defaultValue={page?.title ?? ""} className="rounded-xl border border-stone-300 px-4 py-3" />
@@ -73,11 +125,20 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
                     Slug
                     <input name="slug" defaultValue={page?.slug ?? ""} placeholder="art-studio" className="rounded-xl border border-stone-300 px-4 py-3" />
                   </label>
+                  {!page ? (
+                    <label className="grid gap-2 text-sm font-semibold">
+                      Language
+                      <select name="locale" defaultValue={newPageLocale} className="rounded-xl border border-stone-300 px-4 py-3">
+                        <option value="bg">Български</option>
+                        <option value="en">English</option>
+                      </select>
+                    </label>
+                  ) : null}
                   <label className="grid gap-2 text-sm font-semibold">
                     Status
-                    <select name="status" defaultValue={page?.status ?? "published"} className="rounded-xl border border-stone-300 px-4 py-3">
-                      <option value="published">published</option>
+                    <select name="status" defaultValue={page?.status ?? "draft"} className="rounded-xl border border-stone-300 px-4 py-3">
                       <option value="draft">draft</option>
+                      <option value="published">published</option>
                     </select>
                   </label>
                 </div>
@@ -126,7 +187,8 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
                 <button className="admin-button admin-button-forest w-fit px-5 py-3 text-sm font-semibold">Save page</button>
               </form>
             </details>
-          ))}
+            );
+          })}
         </div>
       </section>
 
@@ -174,6 +236,21 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
                   <input type="checkbox" name="is_active" defaultChecked={service?.is_active ?? true} />
                   Active
                 </label>
+              </div>
+              <div className="mt-2 grid gap-3 rounded-2xl border border-stone-200 bg-stone-50 p-4">
+                <p className="text-xs font-semibold uppercase text-moss">English version</p>
+                <input name="title_en" defaultValue={service ? englishServicesById.get(service.id)?.title || "" : ""} placeholder="English title" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <textarea name="description_en" defaultValue={service ? englishServicesById.get(service.id)?.description || "" : ""} rows={3} placeholder="English description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <input name="image_alt_en" defaultValue={service ? englishServicesById.get(service.id)?.image_alt || "" : ""} placeholder="English image alt" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <div className="grid gap-3 md:grid-cols-2">
+                  <input name="button_label_en" defaultValue={service ? englishServicesById.get(service.id)?.button_label || "" : ""} placeholder="Button label" className="rounded-xl border border-stone-300 px-4 py-3" />
+                  <input name="price_label_en" defaultValue={service ? englishServicesById.get(service.id)?.price_label || "" : ""} placeholder="Price label" className="rounded-xl border border-stone-300 px-4 py-3" />
+                </div>
+                <textarea name="features_input_en" defaultValue={service ? textAreaValue(englishServicesById.get(service.id)?.features) : ""} rows={3} placeholder="English features, one per line" className="rounded-xl border border-stone-300 px-4 py-3" />
+                <div className="grid gap-3 md:grid-cols-2">
+                  <input name="seo_title_en" defaultValue={service ? englishServicesById.get(service.id)?.seo_title || "" : ""} placeholder="English SEO title" className="rounded-xl border border-stone-300 px-4 py-3" />
+                  <input name="seo_description_en" defaultValue={service ? englishServicesById.get(service.id)?.seo_description || "" : ""} placeholder="English SEO description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                </div>
               </div>
               <button className="admin-button admin-button-forest px-4 py-2 text-sm font-semibold">{service ? "Save service" : "Create service"}</button>
               {service ? (

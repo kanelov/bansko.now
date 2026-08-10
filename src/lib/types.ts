@@ -6,6 +6,8 @@ export type Json =
   | { [key: string]: Json | undefined }
   | Json[];
 
+export type Locale = "bg" | "en";
+
 export type Category = {
   id: string;
   name: string;
@@ -24,10 +26,29 @@ export type Category = {
   updated_at?: string;
 };
 
+export type CategoryTranslation = {
+  category_id: string;
+  locale: Locale;
+  name: string;
+  description: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  canonical_url: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image_url: string | null;
+  robots_index: boolean;
+  robots_follow: boolean;
+  schema_type: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
 export type Tag = {
   id: string;
   name: string;
   slug: string;
+  locale: Locale;
   created_at?: string;
 };
 
@@ -66,6 +87,17 @@ export type Article = {
   show_facebook_cta: boolean;
   show_art_studio_block: boolean;
   show_bansko_collection_block: boolean;
+  locale: Locale;
+  translation_group_id: string;
+  source_drive_id?: string | null;
+  source_email_id?: string | null;
+  automation_source?: string | null;
+  article_type?: string | null;
+  location?: string | null;
+  observed_at?: string | null;
+  image_caption?: string | null;
+  photo_credit?: string | null;
+  automation_last_imported_at?: string | null;
 };
 
 export type ArticleWithCategory = Article & {
@@ -96,7 +128,46 @@ export type SiteSettings = {
   support_image_alt: string | null;
   support_stripe_url: string | null;
   support_paypal_url: string | null;
+  facebook_cta_eyebrow: string | null;
+  facebook_cta_title: string | null;
+  facebook_cta_text: string | null;
+  facebook_cta_button_label: string | null;
+  art_studio_block_eyebrow: string | null;
+  art_studio_block_title: string | null;
+  art_studio_block_text: string | null;
+  art_studio_block_button_label: string | null;
+  collection_block_eyebrow: string | null;
+  collection_block_title: string | null;
+  collection_block_text: string | null;
+  collection_block_button_label: string | null;
+  collection_items: string[] | null;
   default_author_name: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type SiteSettingsTranslation = {
+  site_settings_id: string;
+  locale: Locale;
+  site_description: string | null;
+  hero_image_alt: string | null;
+  support_button_label: string | null;
+  support_title: string | null;
+  support_description: string | null;
+  support_image_alt: string | null;
+  facebook_cta_eyebrow: string | null;
+  facebook_cta_title: string | null;
+  facebook_cta_text: string | null;
+  facebook_cta_button_label: string | null;
+  art_studio_block_eyebrow: string | null;
+  art_studio_block_title: string | null;
+  art_studio_block_text: string | null;
+  art_studio_block_button_label: string | null;
+  collection_block_eyebrow: string | null;
+  collection_block_title: string | null;
+  collection_block_text: string | null;
+  collection_block_button_label: string | null;
+  collection_items: string[] | null;
   created_at?: string;
   updated_at?: string;
 };
@@ -110,6 +181,15 @@ export type NavigationItem = {
   is_external: boolean;
   open_in_new_tab: boolean;
   is_active: boolean;
+  aria_label: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type NavigationItemTranslation = {
+  navigation_item_id: string;
+  locale: Locale;
+  label: string;
   aria_label: string | null;
   created_at?: string;
   updated_at?: string;
@@ -136,6 +216,15 @@ export type MediaItem = {
   created_at: string;
 };
 
+export type MediaTranslation = {
+  media_id: string;
+  locale: Locale;
+  alt_text: string | null;
+  caption: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
 export type EditablePage = {
   id: string;
   title: string;
@@ -160,6 +249,8 @@ export type EditablePage = {
   sort_order: number;
   created_at: string;
   updated_at: string;
+  locale: Locale;
+  translation_group_id: string;
 };
 
 export type ArtStudioService = {
@@ -180,6 +271,21 @@ export type ArtStudioService = {
   seo_description: string | null;
   created_at: string;
   updated_at: string;
+};
+
+export type ArtStudioServiceTranslation = {
+  service_id: string;
+  locale: Locale;
+  title: string;
+  description: string | null;
+  image_alt: string | null;
+  button_label: string | null;
+  price_label: string | null;
+  features: string[];
+  seo_title: string | null;
+  seo_description: string | null;
+  created_at?: string;
+  updated_at?: string;
 };
 
 export type BusinessStatus = "draft" | "approved" | "rejected";
@@ -251,6 +357,30 @@ export type Business = {
   updated_at: string;
 };
 
+export type BusinessTranslation = {
+  business_id: string;
+  locale: Locale;
+  slug: string;
+  name: string;
+  category: string;
+  description: string | null;
+  address: string;
+  image_alt: string | null;
+  faqs: Json;
+  features: string[];
+  seo_title: string | null;
+  seo_description: string | null;
+  canonical_url: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image_url: string | null;
+  robots_index: boolean;
+  robots_follow: boolean;
+  schema_type: string | null;
+  created_at?: string;
+  updated_at?: string;
+};
+
 export type BusinessContact = {
   id: string;
   business_id: string;
@@ -313,6 +443,12 @@ export type Database = {
         Update: Partial<Category>;
         Relationships: [];
       };
+      category_translations: {
+        Row: CategoryTranslation;
+        Insert: Partial<CategoryTranslation> & Pick<CategoryTranslation, "category_id" | "locale" | "name">;
+        Update: Partial<CategoryTranslation>;
+        Relationships: [];
+      };
       tags: {
         Row: Tag;
         Insert: Partial<Tag> & Pick<Tag, "name" | "slug">;
@@ -331,10 +467,22 @@ export type Database = {
         Update: Partial<SiteSettings>;
         Relationships: [];
       };
+      site_settings_translations: {
+        Row: SiteSettingsTranslation;
+        Insert: Partial<SiteSettingsTranslation> & Pick<SiteSettingsTranslation, "site_settings_id" | "locale">;
+        Update: Partial<SiteSettingsTranslation>;
+        Relationships: [];
+      };
       navigation_items: {
         Row: NavigationItem;
         Insert: Partial<NavigationItem> & Pick<NavigationItem, "label" | "href">;
         Update: Partial<NavigationItem>;
+        Relationships: [];
+      };
+      navigation_item_translations: {
+        Row: NavigationItemTranslation;
+        Insert: Partial<NavigationItemTranslation> & Pick<NavigationItemTranslation, "navigation_item_id" | "locale" | "label">;
+        Update: Partial<NavigationItemTranslation>;
         Relationships: [];
       };
       social_links: {
@@ -359,6 +507,12 @@ export type Database = {
         }>;
         Relationships: [];
       };
+      media_translations: {
+        Row: MediaTranslation;
+        Insert: Partial<MediaTranslation> & Pick<MediaTranslation, "media_id" | "locale">;
+        Update: Partial<MediaTranslation>;
+        Relationships: [];
+      };
       editable_pages: {
         Row: EditablePage;
         Insert: Partial<EditablePage> & Pick<EditablePage, "title" | "slug">;
@@ -371,6 +525,12 @@ export type Database = {
         Update: Partial<ArtStudioService>;
         Relationships: [];
       };
+      art_studio_service_translations: {
+        Row: ArtStudioServiceTranslation;
+        Insert: Partial<ArtStudioServiceTranslation> & Pick<ArtStudioServiceTranslation, "service_id" | "locale" | "title">;
+        Update: Partial<ArtStudioServiceTranslation>;
+        Relationships: [];
+      };
       business_listing_plans: {
         Row: BusinessListingPlan;
         Insert: Partial<BusinessListingPlan> & Pick<BusinessListingPlan, "name" | "slug">;
@@ -381,6 +541,12 @@ export type Database = {
         Row: Business;
         Insert: Partial<Business> & Pick<Business, "name" | "slug" | "category" | "address">;
         Update: Partial<Business>;
+        Relationships: [];
+      };
+      business_translations: {
+        Row: BusinessTranslation;
+        Insert: Partial<BusinessTranslation> & Pick<BusinessTranslation, "business_id" | "locale" | "slug" | "name" | "category" | "address">;
+        Update: Partial<BusinessTranslation>;
         Relationships: [];
       };
       business_contacts: {

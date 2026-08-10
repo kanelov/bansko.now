@@ -2,8 +2,10 @@ import Link from "next/link";
 import { fallbackHeroImage, getArticleCategory, getArticlePath } from "@/lib/content";
 import type { Route } from "next";
 import type { ArticleWithCategory } from "@/lib/types";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
-export function FeaturedArticle({ article }: { article: ArticleWithCategory | null }) {
+export function FeaturedArticle({ article, locale = "bg" }: { article: ArticleWithCategory | null; locale?: Locale }) {
   if (!article) {
     return null;
   }
@@ -11,6 +13,7 @@ export function FeaturedArticle({ article }: { article: ArticleWithCategory | nu
   const category = getArticleCategory(article);
   const image = article.featured_image_url || fallbackHeroImage;
   const articlePath = getArticlePath(article) as Route;
+  const dictionary = getDictionary(locale);
 
   return (
     <section className="grid overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-soft lg:grid-cols-[1.08fr_0.92fr]">
@@ -18,7 +21,7 @@ export function FeaturedArticle({ article }: { article: ArticleWithCategory | nu
         <img src={image} alt={article.featured_image_alt || article.title} className="h-full w-full object-cover" />
       </Link>
       <div className="flex flex-col justify-center p-8 sm:p-10">
-        <p className="text-sm font-semibold uppercase text-moss">Препоръчано</p>
+        <p className="text-sm font-semibold uppercase text-moss">{dictionary.featured}</p>
         {category ? <p className="mt-4 text-sm text-stone-500">{category.name}</p> : null}
         <Link href={articlePath}>
           <h2 className="mt-3 font-serif text-4xl font-semibold leading-tight text-stone-950">{article.title}</h2>
@@ -28,7 +31,7 @@ export function FeaturedArticle({ article }: { article: ArticleWithCategory | nu
           href={articlePath}
           className="mt-8 inline-flex w-fit rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white transition hover:bg-moss"
         >
-          Прочети статията
+          {dictionary.readMore}
         </Link>
       </div>
     </section>

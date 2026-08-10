@@ -54,6 +54,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
             <thead className="bg-white/10 text-stone-300">
               <tr>
                 <th className="px-4 py-3">Title</th>
+                <th className="px-4 py-3">Language</th>
                 <th className="px-4 py-3">Category</th>
                 <th className="px-4 py-3">Status</th>
                 <th className="px-4 py-3">Published</th>
@@ -67,6 +68,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                 return (
                   <tr key={article.id}>
                     <td className="px-4 py-4 font-semibold">{article.title}</td>
+                    <td className="px-4 py-4"><span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{article.locale === "en" ? "EN" : "BG"}</span></td>
                     <td className="px-4 py-4 text-stone-300">{category?.name || "—"}</td>
                     <td className="px-4 py-4">
                       <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{article.status}</span>

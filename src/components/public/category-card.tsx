@@ -1,10 +1,14 @@
 import Link from "next/link";
 import type { Category } from "@/lib/types";
+import { getDictionary, localePath } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
+import type { Route } from "next";
 
-export function CategoryCard({ category }: { category: Category }) {
+export function CategoryCard({ category, locale = "bg" }: { category: Category; locale?: Locale }) {
+  const dictionary = getDictionary(locale);
   return (
     <Link
-      href={`/${category.slug}`}
+      href={localePath(locale, `/${category.slug}`) as Route}
       className="group rounded-2xl border border-stone-200 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-xl"
     >
       <p className="text-xs font-semibold uppercase text-moss">Bansko NOW</p>
@@ -13,7 +17,7 @@ export function CategoryCard({ category }: { category: Category }) {
         <p className="mt-3 text-sm leading-6 text-stone-600">{category.description}</p>
       ) : null}
       <span className="mt-5 inline-block text-sm font-semibold text-forest group-hover:text-clay">
-        Виж повече
+        {dictionary.readMore}
       </span>
     </Link>
   );

@@ -4,32 +4,35 @@ import { BusinessMedia } from "@/components/public/business-media";
 import { getBusinessTierLabel } from "@/lib/business-plan-labels";
 import { getBusinessPath, getDirectionsUrl, getEffectiveBusinessTier } from "@/lib/business-public";
 import { getHomepageSpotlightBusiness } from "@/lib/businesses";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
-export async function BusinessSpotlightBlock() {
-  const business = await getHomepageSpotlightBusiness();
+export async function BusinessSpotlightBlock({ locale = "bg" }: { locale?: Locale }) {
+  const business = await getHomepageSpotlightBusiness(locale);
 
   if (!business) {
     return null;
   }
 
   const tier = getEffectiveBusinessTier(business);
+  const dictionary = getDictionary(locale);
 
   return (
     <section className="overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-soft md:grid md:grid-cols-[0.95fr_1.05fr]">
       <BusinessMedia business={business} className="aspect-[4/3] h-full overflow-hidden bg-sage" preferVideo />
       <div className="p-8 sm:p-10">
-        <p className="text-sm font-semibold uppercase text-moss">Местен фокус</p>
+        <p className="text-sm font-semibold uppercase text-moss">{locale === "en" ? "Local spotlight" : "Местен фокус"}</p>
         <div className="mt-4 flex flex-wrap gap-2">
           <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{business.category}</span>
           <span className="rounded-full bg-forest px-3 py-1 text-xs font-semibold text-white">
-            {getBusinessTierLabel(tier)}
+            {getBusinessTierLabel(tier, locale)}
           </span>
         </div>
         <h2 className="mt-5 font-serif text-4xl font-semibold text-stone-950">{business.name}</h2>
         <p className="mt-4 text-base leading-7 text-stone-650">{business.description || business.address}</p>
         <div className="mt-7 flex flex-wrap gap-3">
-          <Link href={getBusinessPath(business) as Route} className="rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss">
-            Виж профила
+          <Link href={getBusinessPath(business, locale) as Route} className="rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
+            {dictionary.viewBusiness}
           </Link>
           <a
             href={getDirectionsUrl(business)}
@@ -37,7 +40,7 @@ export async function BusinessSpotlightBlock() {
             rel="noopener noreferrer"
             className="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white"
           >
-            Упътване
+            {dictionary.directions}
           </a>
         </div>
       </div>

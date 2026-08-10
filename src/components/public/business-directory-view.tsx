@@ -2,18 +2,24 @@
 
 import { useMemo, useState } from "react";
 import { BusinessCard } from "@/components/public/business-card";
-import { businessCategories, businessFeatures, getEffectiveBusinessTier } from "@/lib/business-public";
+import { getEffectiveBusinessTier } from "@/lib/business-public";
 import type { BusinessWithRelations } from "@/lib/types";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
-export function BusinessDirectoryView({ businesses }: { businesses: BusinessWithRelations[] }) {
-  const [category, setCategory] = useState("Всички");
-  const [feature, setFeature] = useState("Всички");
+export function BusinessDirectoryView({ businesses, locale = "bg" }: { businesses: BusinessWithRelations[]; locale?: Locale }) {
+  const all = "__all__";
+  const dictionary = getDictionary(locale);
+  const [category, setCategory] = useState(all);
+  const [feature, setFeature] = useState(all);
+  const categories = useMemo(() => Array.from(new Set(businesses.map((business) => business.category))).sort(), [businesses]);
+  const features = useMemo(() => Array.from(new Set(businesses.flatMap((business) => business.features ?? []))).sort(), [businesses]);
 
   const filtered = useMemo(
     () =>
       businesses.filter((business) => {
-        const matchesCategory = category === "Всички" || business.category === category;
-        const matchesFeature = feature === "Всички" || business.features?.includes(feature);
+        const matchesCategory = category === all || business.category === category;
+        const matchesFeature = feature === all || business.features?.includes(feature);
         return matchesCategory && matchesFeature;
       }),
     [businesses, category, feature]
@@ -26,8 +32,8 @@ export function BusinessDirectoryView({ businesses }: { businesses: BusinessWith
           onChange={(event) => setCategory(event.target.value)}
           className="rounded-full border border-stone-300 bg-white px-4 py-3 text-sm font-semibold text-stone-800"
         >
-          <option>Всички</option>
-          {businessCategories.map((item) => (
+          <option value={all}>{dictionary.allCategories}</option>
+          {categories.map((item) => (
             <option key={item}>{item}</option>
           ))}
         </select>
@@ -36,8 +42,8 @@ export function BusinessDirectoryView({ businesses }: { businesses: BusinessWith
           onChange={(event) => setFeature(event.target.value)}
           className="rounded-full border border-stone-300 bg-white px-4 py-3 text-sm font-semibold text-stone-800"
         >
-          <option>Всички</option>
-          {businessFeatures.map((item) => (
+          <option value={all}>{locale === "en" ? "All features" : "Всички характеристики"}</option>
+          {features.map((item) => (
             <option key={item}>{item}</option>
           ))}
         </select>
@@ -51,14 +57,14 @@ export function BusinessDirectoryView({ businesses }: { businesses: BusinessWith
 
             return (
               <div key={business.id} className={isWide ? "sm:col-span-2 lg:col-span-3" : ""}>
-                <BusinessCard business={business} wide={isWide} />
+                <BusinessCard business={business} wide={isWide} locale={locale} />
               </div>
             );
           })}
         </div>
       ) : (
         <div className="rounded-2xl border border-stone-200 bg-white p-8 text-stone-650 shadow-soft">
-          Няма бизнеси за тези филтри. Опитай с друга категория или характеристика.
+          {locale === "en" ? "No businesses match these filters. Try another category or feature." : "Няма бизнеси за тези филтри. Опитай с друга категория или характеристика."}
         </div>
       )}
     </section>

@@ -4,6 +4,31 @@ import { getSupabaseConfig } from "@/lib/env";
 import type { Database } from "@/lib/types";
 
 export async function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (pathname === "/bg" || pathname.startsWith("/bg/")) {
+    const url = request.nextUrl.clone();
+    url.pathname = pathname.replace(/^\/bg(?=\/|$)/, "") || "/";
+    return NextResponse.redirect(url, 308);
+  }
+
+  if (!pathname.startsWith("/admin")) {
+    if (
+      pathname === "/en" ||
+      pathname.startsWith("/en/") ||
+      pathname.startsWith("/api") ||
+      pathname === "/sitemap.xml" ||
+      pathname === "/robots.txt" ||
+      pathname === "/icon.svg"
+    ) {
+      return NextResponse.next({ request });
+    }
+
+    const url = request.nextUrl.clone();
+    url.pathname = `/bg${pathname === "/" ? "" : pathname}`;
+    return NextResponse.rewrite(url);
+  }
+
   const config = getSupabaseConfig();
 
   if (!config) {

@@ -4,7 +4,12 @@ import { getCategories } from "@/lib/content";
 type SearchParams = Promise<{ saved?: string; deleted?: string; error?: string }>;
 
 export default async function AdminCategoriesPage({ searchParams }: { searchParams: SearchParams }) {
-  const [params, categories] = await Promise.all([searchParams, getCategories()]);
+  const [params, bgCategories, enCategories] = await Promise.all([searchParams, getCategories("bg"), getCategories("en")]);
+  const enById = new Map(enCategories.map((category) => [category.id, category]));
+  const categoryRows = bgCategories.flatMap((category) => [
+    { category, locale: "bg" as const },
+    { category: enById.get(category.id) || category, locale: "en" as const }
+  ]);
 
   return (
     <div className="grid gap-8">
@@ -26,13 +31,13 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
       ) : null}
 
       <div className="grid gap-4">
-        {[...categories, null].map((category, index) => (
-          <details key={category?.slug || "new-category"} className="rounded-2xl border border-white/10 bg-white/5 p-5" open={!category}>
+        {[...categoryRows, { category: null, locale: "bg" as const }].map(({ category, locale }, index) => (
+          <details key={category ? `${category.id}-${locale}` : "new-category"} className="rounded-2xl border border-white/10 bg-white/5 p-5" open={!category}>
             <summary className="cursor-pointer list-none">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
                   <p className="text-xs font-semibold uppercase text-stone-400">
-                    {category ? `/${category.slug}` : "Нова категория"}
+                    {category ? `${locale.toUpperCase()} / ${locale === "en" ? "/en" : ""}/${category.slug}` : "Нова категория"}
                   </p>
                   <h2 className="mt-3 font-serif text-2xl font-semibold">{category?.name || "Добави категория"}</h2>
                   {category?.description ? <p className="mt-2 text-sm leading-6 text-stone-300">{category.description}</p> : null}
@@ -43,6 +48,7 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
 
             <form action={upsertCategoryAction} className="mt-6 grid gap-4 rounded-2xl bg-white p-5 text-stone-950">
               {category ? <input type="hidden" name="id" value={category.id} /> : null}
+              <input type="hidden" name="locale" value={locale} />
               <div className="grid gap-4 md:grid-cols-2">
                 <label className="grid gap-2 text-sm font-semibold">
                   Name
@@ -50,7 +56,7 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
                 </label>
                 <label className="grid gap-2 text-sm font-semibold">
                   Slug
-                  <input name="slug" defaultValue={category?.slug ?? ""} placeholder={`category-${index}`} className="rounded-xl border border-stone-300 px-4 py-3" />
+                  <input name="slug" defaultValue={category?.slug ?? ""} placeholder={`category-${index}`} readOnly={locale === "en"} className="rounded-xl border border-stone-300 px-4 py-3 read-only:bg-stone-100" />
                 </label>
               </div>
               <textarea name="description" defaultValue={category?.description ?? ""} rows={3} placeholder="Category description" className="rounded-xl border border-stone-300 px-4 py-3" />
@@ -78,7 +84,7 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
               </button>
             </form>
 
-            {category ? (
+            {category && locale === "bg" ? (
               <details className="mt-5">
               <summary className="admin-button admin-button-danger list-none px-4 py-2 text-xs font-semibold">
                 Delete category

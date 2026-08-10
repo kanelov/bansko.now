@@ -4,6 +4,8 @@ import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import type { Route } from "next";
 import { IconGlyph } from "@/components/public/icon-glyph";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
 type SearchResult = {
   id: string;
@@ -13,7 +15,8 @@ type SearchResult = {
   href: string;
 };
 
-export function SiteSearch({ compact = false }: { compact?: boolean }) {
+export function SiteSearch({ compact = false, locale = "bg" }: { compact?: boolean; locale?: Locale }) {
+  const dictionary = getDictionary(locale);
   const [open, setOpen] = useState(false);
   const [query, setQuery] = useState("");
   const [results, setResults] = useState<SearchResult[]>([]);
@@ -28,7 +31,6 @@ export function SiteSearch({ compact = false }: { compact?: boolean }) {
 
   useEffect(() => {
     if (!open || query.trim().length < 2) {
-      setResults([]);
       return;
     }
 
@@ -37,7 +39,7 @@ export function SiteSearch({ compact = false }: { compact?: boolean }) {
       setLoading(true);
 
       try {
-        const response = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}`, {
+        const response = await fetch(`/api/search?q=${encodeURIComponent(query.trim())}&locale=${locale}`, {
           signal: controller.signal
         });
         const data = (await response.json()) as { results?: SearchResult[] };
@@ -57,13 +59,13 @@ export function SiteSearch({ compact = false }: { compact?: boolean }) {
       controller.abort();
       window.clearTimeout(timer);
     };
-  }, [open, query]);
+  }, [locale, open, query]);
 
   return (
     <>
       <button
         type="button"
-        aria-label="Търсене"
+        aria-label={dictionary.search}
         aria-expanded={open}
         onClick={() => setOpen(true)}
         className={
@@ -73,40 +75,50 @@ export function SiteSearch({ compact = false }: { compact?: boolean }) {
         }
       >
         <IconGlyph name="magnifying-glass" className="h-4 w-4 text-current transition group-hover:text-white" />
-        {compact ? <span className="transition group-hover:text-white">Търсене</span> : null}
+        {compact ? <span className="transition group-hover:text-white">{dictionary.search}</span> : null}
       </button>
 
       {open ? (
-        <div className="fixed inset-0 z-[80] bg-stone-950/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label="Търсене в сайта">
+        <div className="fixed inset-0 z-[80] bg-stone-950/35 p-4 backdrop-blur-sm" role="dialog" aria-modal="true" aria-label={dictionary.search}>
           <div className="mx-auto mt-20 max-w-2xl overflow-hidden rounded-3xl border border-stone-200 bg-paper shadow-[0_30px_80px_rgba(0,0,0,0.25)]">
             <div className="flex items-center gap-3 border-b border-stone-200 bg-white px-4 py-3">
               <IconGlyph name="magnifying-glass" className="h-4 w-4 shrink-0 text-forest" />
               <input
                 ref={inputRef}
                 value={query}
-                onChange={(event) => setQuery(event.target.value)}
+                onChange={(event) => {
+                  const nextQuery = event.target.value;
+                  setQuery(nextQuery);
+
+                  if (nextQuery.trim().length < 2) {
+                    setResults([]);
+                    setLoading(false);
+                  }
+                }}
                 onKeyDown={(event) => {
                   if (event.key === "Escape") {
                     setOpen(false);
                   }
                 }}
                 className="min-w-0 flex-1 bg-transparent py-2 text-base font-semibold text-stone-950 outline-none placeholder:text-stone-400"
-                placeholder="Търси статии, бизнеси, категории..."
+                placeholder={locale === "en" ? "Search articles, businesses, categories..." : "Търси статии, бизнеси, категории..."}
               />
               <button
                 type="button"
                 onClick={() => setOpen(false)}
                 className="rounded-full bg-stone-100 px-4 py-2 text-sm font-semibold text-stone-700 transition hover:bg-forest hover:text-white"
               >
-                Затвори
+                {dictionary.close}
               </button>
             </div>
 
             <div className="max-h-[60vh] overflow-y-auto p-3">
               {query.trim().length < 2 ? (
-                <p className="rounded-2xl bg-white p-5 text-sm leading-6 text-stone-650">Въведи поне 2 символа, за да потърсиш в сайта.</p>
+                <p className="rounded-2xl bg-white p-5 text-sm leading-6 text-stone-650">
+                  {locale === "en" ? "Enter at least 2 characters to search the site." : "Въведи поне 2 символа, за да потърсиш в сайта."}
+                </p>
               ) : loading ? (
-                <p className="rounded-2xl bg-white p-5 text-sm font-semibold text-stone-650">Търсене...</p>
+                <p className="rounded-2xl bg-white p-5 text-sm font-semibold text-stone-650">{locale === "en" ? "Searching..." : "Търсене..."}</p>
               ) : results.length ? (
                 <div className="grid gap-2">
                   {results.map((result) => (
@@ -123,7 +135,7 @@ export function SiteSearch({ compact = false }: { compact?: boolean }) {
                   ))}
                 </div>
               ) : (
-                <p className="rounded-2xl bg-white p-5 text-sm leading-6 text-stone-650">Няма резултати за това търсене.</p>
+                <p className="rounded-2xl bg-white p-5 text-sm leading-6 text-stone-650">{dictionary.noResults}</p>
               )}
             </div>
           </div>

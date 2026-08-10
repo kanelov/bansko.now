@@ -1,4 +1,4 @@
-import type { BusinessPaymentStatus, BusinessStatus, BusinessTier } from "@/lib/types";
+import type { BusinessPaymentStatus, BusinessStatus, BusinessTier, Locale } from "@/lib/types";
 
 export const businessTierLabels: Record<BusinessTier, string> = {
   free: "Безплатен",
@@ -25,6 +25,10 @@ export const annualPlanDescriptions: Record<BusinessTier, string> = {
   homepage: "Най-висока видимост в каталога и възможност за представяне на началната страница."
 };
 
-export function getBusinessTierLabel(tier: BusinessTier) {
+export function getBusinessTierLabel(tier: BusinessTier, locale: Locale = "bg") {
+  if (locale === "en") {
+    return { free: "Free", premium: "Premium", homepage: "Spotlight" }[tier];
+  }
+
   return businessTierLabels[tier];
 }

@@ -1,22 +1,25 @@
 import { getBanskoWeather } from "@/lib/weather";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
 function value(number: number | null, suffix: string) {
   return typeof number === "number" ? `${Math.round(number)}${suffix}` : "—";
 }
 
-export async function WeatherWidget() {
-  const weather = await getBanskoWeather();
+export async function WeatherWidget({ locale = "bg" }: { locale?: Locale }) {
+  const weather = await getBanskoWeather(locale);
+  const dictionary = getDictionary(locale);
 
   return (
     <section className="rounded-2xl border border-stone-200 bg-[#f5efe3] p-5 shadow-soft">
       <div className="flex items-start justify-between gap-4">
         <div>
-          <p className="text-xs font-semibold uppercase text-moss">Времето в Банско</p>
+          <p className="text-xs font-semibold uppercase text-moss">{dictionary.weatherTitle}</p>
           <p className="mt-2 text-4xl font-semibold text-stone-950">{value(weather.temperature, "°")}</p>
           <p className="mt-1 text-sm text-stone-600">{weather.condition}</p>
         </div>
         <div className="rounded-full bg-sage px-3 py-2 text-sm font-semibold text-forest">
-          усеща се {value(weather.apparentTemperature, "°")}
+          {dictionary.feelsLike} {value(weather.apparentTemperature, "°")}
         </div>
       </div>
       <div className="mt-6 grid grid-cols-3 gap-3">
@@ -32,11 +35,11 @@ export async function WeatherWidget() {
               </p>
               <dl className="mt-2 grid gap-1 text-[11px] leading-4 text-stone-600">
                 <div className="flex items-center justify-between gap-2">
-                  <dt>Вятър</dt>
+                  <dt>{dictionary.wind}</dt>
                   <dd className="font-semibold text-stone-900">{value(day.windSpeed, " km/h")}</dd>
                 </div>
                 <div className="flex items-center justify-between gap-2">
-                  <dt>Валеж</dt>
+                  <dt>{dictionary.precipitation}</dt>
                   <dd className="font-semibold text-stone-900">{value(day.precipitationProbability, "%")}</dd>
                 </div>
               </dl>

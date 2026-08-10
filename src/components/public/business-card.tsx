@@ -4,9 +4,12 @@ import { BusinessMedia } from "@/components/public/business-media";
 import { getBusinessTierLabel } from "@/lib/business-plan-labels";
 import { getBusinessPath, getDirectionsUrl, getEffectiveBusinessTier } from "@/lib/business-public";
 import type { BusinessWithRelations } from "@/lib/types";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
-export function BusinessCard({ business, wide = false }: { business: BusinessWithRelations; wide?: boolean }) {
+export function BusinessCard({ business, wide = false, locale = "bg" }: { business: BusinessWithRelations; wide?: boolean; locale?: Locale }) {
   const tier = getEffectiveBusinessTier(business);
+  const dictionary = getDictionary(locale);
 
   return (
     <article
@@ -21,7 +24,7 @@ export function BusinessCard({ business, wide = false }: { business: BusinessWit
           <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{business.category}</span>
           {tier !== "free" ? (
             <span className="rounded-full bg-forest px-3 py-1 text-xs font-semibold text-white">
-              {getBusinessTierLabel(tier)}
+              {getBusinessTierLabel(tier, locale)}
             </span>
           ) : null}
         </div>
@@ -40,8 +43,8 @@ export function BusinessCard({ business, wide = false }: { business: BusinessWit
           </div>
         ) : null}
         <div className="mt-6 flex flex-wrap gap-2">
-          <Link href={getBusinessPath(business) as Route} className="rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white transition hover:bg-moss">
-            Виж профила
+          <Link href={getBusinessPath(business, locale) as Route} className="rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
+            {dictionary.viewBusiness}
           </Link>
           <a
             href={getDirectionsUrl(business)}
@@ -49,7 +52,7 @@ export function BusinessCard({ business, wide = false }: { business: BusinessWit
             rel="noopener noreferrer"
             className="rounded-full border border-stone-300 px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white"
           >
-            Упътване
+            {dictionary.directions}
           </a>
         </div>
       </div>

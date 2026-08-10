@@ -5,6 +5,8 @@ import type { NavigationItem, SocialLink } from "@/lib/types";
 import { IconGlyph } from "./icon-glyph";
 import { SiteSearch } from "./site-search";
 import { SupportProjectButton } from "./support-project-button";
+import { getDictionary, getSocialLabel, localePath } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
 function isExternalUrl(href: string) {
   return /^(https?:|mailto:|tel:)/i.test(href);
@@ -19,7 +21,7 @@ function linkProps(href: string, openInNewTab?: boolean) {
   };
 }
 
-function DesktopMenuItem({ item }: { item: NavigationItem }) {
+function DesktopMenuItem({ item, locale }: { item: NavigationItem; locale: Locale }) {
   const className =
     "inline-flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white";
   const label = (
@@ -38,13 +40,13 @@ function DesktopMenuItem({ item }: { item: NavigationItem }) {
   }
 
   return (
-    <Link href={item.href as Route} aria-label={item.aria_label || item.label} className={className}>
+    <Link href={localePath(locale, item.href) as Route} aria-label={item.aria_label || item.label} className={className}>
       {label}
     </Link>
   );
 }
 
-function MobileMenuItem({ item }: { item: NavigationItem }) {
+function MobileMenuItem({ item, locale }: { item: NavigationItem; locale: Locale }) {
   const className = "group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white";
   const label = (
     <>
@@ -62,18 +64,20 @@ function MobileMenuItem({ item }: { item: NavigationItem }) {
   }
 
   return (
-    <Link href={item.href as Route} aria-label={item.aria_label || item.label} className={className}>
+    <Link href={localePath(locale, item.href) as Route} aria-label={item.aria_label || item.label} className={className}>
       {label}
     </Link>
   );
 }
 
-function SocialIconLink({ link }: { link: SocialLink }) {
+function SocialIconLink({ link, locale }: { link: SocialLink; locale: Locale }) {
+  const label = getSocialLabel(link.platform, link.label, locale);
+
   return (
     <a
       href={link.url}
-      aria-label={link.label}
-      title={link.label}
+      aria-label={label}
+      title={label}
       className="group inline-flex h-9 w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 text-forest transition hover:border-forest hover:bg-forest hover:text-white"
       target="_blank"
       rel="noopener noreferrer"
@@ -83,57 +87,75 @@ function SocialIconLink({ link }: { link: SocialLink }) {
   );
 }
 
-export async function SiteHeader() {
-  const [settings, navItems] = await Promise.all([getSiteSettings(), getNavigationItems()]);
+export async function SiteHeader({ locale = "bg", alternateHref }: { locale?: Locale; alternateHref?: string | null }) {
+  const dictionary = getDictionary(locale);
+  const [settings, navItems] = await Promise.all([getSiteSettings(locale), getNavigationItems(locale)]);
   const socialLinks = await getSocialLinks(settings);
+  const languageHref = alternateHref === undefined ? localePath(locale === "bg" ? "en" : "bg", "/") : alternateHref;
 
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200 bg-[rgba(250,248,242,0.9)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <Link href="/" className="shrink-0 font-serif text-2xl font-semibold text-forest" aria-label="Bansko NOW начало">
+        <Link href={localePath(locale, "/") as Route} className="shrink-0 font-serif text-2xl font-semibold text-forest" aria-label={`Bansko NOW ${dictionary.home}`}>
           Bansko NOW
         </Link>
 
-        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex" aria-label="Основна навигация">
+        <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex" aria-label={dictionary.navigation}>
           {navItems.map((item) => (
-            <DesktopMenuItem key={item.id} item={item} />
+            <DesktopMenuItem key={item.id} item={item} locale={locale} />
           ))}
         </nav>
 
         <div className="hidden shrink-0 items-center gap-2 lg:flex">
           <Link
-            href="/articles"
+            href={localePath(locale, "/articles") as Route}
             className="rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-700 transition hover:border-forest hover:bg-forest hover:text-white"
           >
-            Всички статии
+            {dictionary.allArticles}
           </Link>
-          <SiteSearch />
+          <SiteSearch locale={locale} />
           {socialLinks.map((link) => (
-            <SocialIconLink key={link.id} link={link} />
+            <SocialIconLink key={link.id} link={link} locale={locale} />
           ))}
-          <SupportProjectButton settings={settings} />
+          {languageHref ? (
+            <Link
+              href={languageHref as Route}
+              hrefLang={locale === "bg" ? "en" : "bg"}
+              className="inline-flex h-9 min-w-9 items-center justify-center rounded-full border border-stone-300 bg-white/60 px-3 text-xs font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white"
+              aria-label={dictionary.otherLocaleName}
+            >
+              {locale === "bg" ? "EN" : "BG"}
+            </Link>
+          ) : null}
+          <SupportProjectButton settings={settings} locale={locale} />
         </div>
 
         <details className="group relative lg:hidden">
           <summary className="list-none rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-800">
-            Меню
+            {dictionary.menu}
           </summary>
           <div className="absolute right-0 mt-3 w-80 max-w-[calc(100vw-2rem)] rounded-2xl border border-stone-200 bg-paper p-3 shadow-xl">
-            <nav className="grid gap-1" aria-label="Мобилна навигация">
+            <nav className="grid gap-1" aria-label={dictionary.mobileNavigation}>
               {navItems.map((item) => (
-                <MobileMenuItem key={item.id} item={item} />
+                <MobileMenuItem key={item.id} item={item} locale={locale} />
               ))}
-              <SiteSearch compact />
-              <Link href="/articles" className="group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white">
+              <SiteSearch compact locale={locale} />
+              <Link href={localePath(locale, "/articles") as Route} className="group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white">
                 <IconGlyph name="newspaper" className="h-4 w-4 text-forest transition group-hover:text-white" />
-                Всички статии
+                {dictionary.allArticles}
               </Link>
+              {languageHref ? (
+                <Link href={languageHref as Route} hrefLang={locale === "bg" ? "en" : "bg"} className="group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white">
+                  <IconGlyph name="globe" className="h-4 w-4 text-forest transition group-hover:text-white" />
+                  {dictionary.otherLocaleName}
+                </Link>
+              ) : null}
             </nav>
             <div className="mt-3 flex items-center gap-2 border-t border-stone-200 pt-3">
               {socialLinks.map((link) => (
-                <SocialIconLink key={link.id} link={link} />
+                <SocialIconLink key={link.id} link={link} locale={locale} />
               ))}
-              <SupportProjectButton settings={settings} />
+              <SupportProjectButton settings={settings} locale={locale} />
             </div>
           </div>
         </details>

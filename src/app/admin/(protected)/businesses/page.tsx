@@ -11,6 +11,7 @@ import {
   businessFeatures,
   businessServices,
   getAdminBusinesses,
+  getAdminBusinessTranslations,
   getBusinessDirectorySettings,
   getBusinessListingPlans,
   getContactMessages
@@ -21,6 +22,7 @@ import {
   businessTierLabels,
   getBusinessTierLabel
 } from "@/lib/business-plan-labels";
+import { emailFrom, resendApiKey } from "@/lib/env";
 
 type SearchParams = Promise<{ saved?: string; approved?: string; deleted?: string; error?: string }>;
 
@@ -51,13 +53,15 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminBusinessesPage({ searchParams }: { searchParams: SearchParams }) {
-  const [params, businesses, plans, settings, messages] = await Promise.all([
+  const [params, businesses, translations, plans, settings, messages] = await Promise.all([
     searchParams,
     getAdminBusinesses(),
+    getAdminBusinessTranslations(),
     getBusinessListingPlans({ includeInactive: true }),
     getBusinessDirectorySettings(),
     getContactMessages()
   ]);
+  const englishTranslationsByBusinessId = new Map(translations.filter((item) => item.locale === "en").map((item) => [item.business_id, item]));
   const annualPlans = plans.filter((plan) => plan.period_months === 12);
 
   return (
@@ -259,6 +263,29 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                         </div>
                       </div>
                     </div>
+                    <div className="grid gap-4 rounded-2xl border border-stone-200 bg-stone-50 p-4">
+                      <div>
+                        <p className="text-sm font-semibold uppercase text-moss">English version</p>
+                        <p className="mt-1 text-xs leading-5 text-stone-600">Английските публични текстове за този бизнес.</p>
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <input name="slug_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.slug ?? ""} placeholder="English slug" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="name_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.name ?? ""} placeholder="English business name" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="category_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.category ?? ""} placeholder="English category" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="address_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.address ?? ""} placeholder="English address" className="rounded-xl border border-stone-300 px-4 py-3" />
+                      </div>
+                      <textarea name="description_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.description ?? ""} rows={4} placeholder="English description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <textarea name="features_input_en" defaultValue={textAreaValue(englishTranslationsByBusinessId.get(business.id)?.features)} rows={4} placeholder="English features, one per line" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <textarea name="faqs_input_en" defaultValue={faqTextAreaValue(englishTranslationsByBusinessId.get(business.id)?.faqs)} rows={4} placeholder="Question | Answer" className="rounded-xl border border-stone-300 px-4 py-3" />
+                      </div>
+                      <div className="grid gap-4 md:grid-cols-2">
+                        <input name="seo_title_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.seo_title ?? ""} placeholder="English SEO title" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="seo_description_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.seo_description ?? ""} placeholder="English SEO description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="og_title_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.og_title ?? ""} placeholder="English OG title" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="og_description_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.og_description ?? ""} placeholder="English OG description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                      </div>
+                    </div>
                     <button className="admin-button admin-button-forest px-5 py-3 text-sm font-semibold">Запази бизнеса</button>
                   </form>
 
@@ -349,6 +376,13 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
           <div className="grid gap-4 md:grid-cols-2">
             <input name="intro_title" defaultValue={settings.intro_title ?? ""} placeholder="Directory title" className="rounded-xl border border-stone-300 px-4 py-3" />
             <input name="notification_email" defaultValue={settings.notification_email ?? ""} placeholder="Notification email" className="rounded-xl border border-stone-300 px-4 py-3" />
+          </div>
+          <div className={`rounded-xl border p-4 text-sm leading-6 ${resendApiKey ? "border-emerald-200 bg-emerald-50 text-emerald-950" : "border-amber-200 bg-amber-50 text-amber-950"}`}>
+            {resendApiKey ? (
+              <p><strong>Email известията са активни.</strong> Изпращач: {emailFrom}</p>
+            ) : (
+              <p><strong>Email известията още не се изпращат.</strong> Съобщенията се пазят в Supabase, но във Vercel липсва <code>RESEND_API_KEY</code>.</p>
+            )}
           </div>
           <textarea name="intro_description" defaultValue={settings.intro_description ?? ""} rows={2} placeholder="Directory description" className="rounded-xl border border-stone-300 px-4 py-3" />
           <div className="grid gap-4 md:grid-cols-2">

@@ -12,6 +12,7 @@ import {
   splitMarkdownBlocks,
   type MarkdownTextColor
 } from "@/lib/markdown-blocks";
+import type { Locale } from "@/lib/types";
 
 const textColorClasses: Record<MarkdownTextColor, string> = {
   stone: "text-stone-700",
@@ -117,7 +118,7 @@ function MarkdownBlock({ content, textColor = "stone" }: { content: string; text
   );
 }
 
-export function MarkdownRenderer({ content }: { content: string }) {
+export function MarkdownRenderer({ content, locale = "bg" }: { content: string; locale?: Locale }) {
   const blocks = splitMarkdownBlocks(content);
 
   return (
@@ -134,7 +135,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
         }
 
         if (block.type === "gallery") {
-          return <GalleryLightbox key={`gallery-${index}`} images={parseGalleryImages(block.content)} />;
+          return <GalleryLightbox key={`gallery-${index}`} images={parseGalleryImages(block.content)} locale={locale} />;
         }
 
         if (block.type === "callout") {
@@ -153,7 +154,7 @@ export function MarkdownRenderer({ content }: { content: string }) {
 
           return (
             <section key={`faq-${index}`} className="not-prose mt-12 rounded-3xl border border-stone-200 bg-white p-6 shadow-soft">
-              <h2 className={`font-serif text-3xl font-semibold ${headingColorClasses[faq.color]}`}>Често задавани въпроси</h2>
+              <h2 className={`font-serif text-3xl font-semibold ${headingColorClasses[faq.color]}`}>{locale === "en" ? "Frequently asked questions" : "Често задавани въпроси"}</h2>
               <div className="mt-5 grid gap-3">
                 {items.map((item) => (
                   <details key={item.question} className="rounded-2xl bg-paper p-4">

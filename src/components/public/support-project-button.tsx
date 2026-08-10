@@ -4,6 +4,8 @@ import { useEffect, useId, useState } from "react";
 import { createPortal } from "react-dom";
 import type { SiteSettings } from "@/lib/types";
 import { IconGlyph } from "./icon-glyph";
+import { getDictionary } from "@/lib/i18n";
+import type { Locale } from "@/lib/types";
 
 function safePaymentUrl(value: string | null) {
   if (!value) {
@@ -18,7 +20,8 @@ function safePaymentUrl(value: string | null) {
   }
 }
 
-export function SupportProjectButton({ settings }: { settings: SiteSettings }) {
+export function SupportProjectButton({ settings, locale = "bg" }: { settings: SiteSettings; locale?: Locale }) {
+  const dictionary = getDictionary(locale);
   const [isOpen, setIsOpen] = useState(false);
   const titleId = useId();
   const descriptionId = useId();
@@ -71,7 +74,7 @@ export function SupportProjectButton({ settings }: { settings: SiteSettings }) {
         <button
           type="button"
           onClick={() => setIsOpen(false)}
-          aria-label="Затвори"
+          aria-label={dictionary.close}
           className="absolute right-4 top-4 z-10 inline-flex h-10 w-10 items-center justify-center rounded-full bg-white text-stone-950 shadow-md transition hover:bg-forest hover:text-white"
         >
           <IconGlyph name="xmark" className="h-4 w-4 text-current" />
@@ -81,7 +84,7 @@ export function SupportProjectButton({ settings }: { settings: SiteSettings }) {
           <div className="aspect-[16/9] min-h-52 overflow-hidden bg-sage md:aspect-auto md:min-h-full">
             <img
               src={imageUrl}
-              alt={settings.support_image_alt || "Подкрепи Bansko NOW"}
+              alt={settings.support_image_alt || (locale === "en" ? "Support Bansko NOW" : "Подкрепи Bansko NOW")}
               className="h-full w-full object-cover"
               loading="lazy"
             />
@@ -93,11 +96,13 @@ export function SupportProjectButton({ settings }: { settings: SiteSettings }) {
             <IconGlyph name="heart" className="h-5 w-5" />
           </span>
           <h2 id={titleId} className="mt-5 font-serif text-3xl font-semibold text-stone-950">
-            {settings.support_title || "Подкрепи Bansko NOW"}
+            {settings.support_title || (locale === "en" ? "Support Bansko NOW" : "Подкрепи Bansko NOW")}
           </h2>
           <p id={descriptionId} className="mt-4 text-sm leading-7 text-stone-650">
             {settings.support_description ||
-              "Ако Bansko NOW ти е полезен, можеш да подкрепиш независимите местни истории, снимки и идеи с избрана от теб сума."}
+              (locale === "en"
+                ? "If Bansko NOW is useful to you, support independent local stories, photography and ideas with an amount of your choice."
+                : "Ако Bansko NOW ти е полезен, можеш да подкрепиш независимите местни истории, снимки и идеи с избрана от теб сума.")}
           </p>
 
           {stripeUrl || paypalUrl ? (
@@ -111,7 +116,7 @@ export function SupportProjectButton({ settings }: { settings: SiteSettings }) {
                     className="inline-flex items-center justify-center gap-2 rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss hover:text-white"
                   >
                     <IconGlyph name="heart" className="h-4 w-4" />
-                    Подкрепи със Stripe
+                    {locale === "en" ? "Support with Stripe" : "Подкрепи със Stripe"}
                   </a>
                 ) : null}
                 {paypalUrl ? (
@@ -121,15 +126,17 @@ export function SupportProjectButton({ settings }: { settings: SiteSettings }) {
                     rel="noopener noreferrer"
                     className="inline-flex items-center justify-center rounded-full border border-stone-300 bg-white px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white"
                   >
-                    Подкрепи с PayPal
+                    {locale === "en" ? "Support with PayPal" : "Подкрепи с PayPal"}
                   </a>
                 ) : null}
               </div>
-              <p className="mt-3 text-center text-xs leading-5 text-stone-500">Избираш сумата в защитената страница за плащане.</p>
+              <p className="mt-3 text-center text-xs leading-5 text-stone-500">
+                {locale === "en" ? "Choose the amount on the secure payment page." : "Избираш сумата в защитената страница за плащане."}
+              </p>
             </>
           ) : (
             <p className="mt-6 rounded-xl bg-sage/50 p-4 text-sm font-medium text-forest">
-              Възможността за онлайн подкрепа ще бъде активна скоро.
+              {locale === "en" ? "Online support will be available soon." : "Възможността за онлайн подкрепа ще бъде активна скоро."}
             </p>
           )}
         </div>
@@ -147,7 +154,7 @@ export function SupportProjectButton({ settings }: { settings: SiteSettings }) {
         className="group inline-flex h-9 items-center gap-2 rounded-full bg-forest px-3 text-sm font-semibold text-white transition hover:bg-moss hover:text-white"
       >
         <IconGlyph name="heart" className="h-4 w-4 text-current" />
-        <span>{settings.support_button_label || "Подкрепи ни"}</span>
+        <span>{settings.support_button_label || dictionary.support}</span>
       </button>
       {modal ? createPortal(modal, document.body) : null}
     </>

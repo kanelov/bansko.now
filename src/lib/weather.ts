@@ -1,4 +1,5 @@
 import { openMeteoBaseUrl } from "@/lib/env";
+import type { Locale } from "@/lib/types";
 
 export type BanskoWeather = {
   temperature: number | null;
@@ -42,18 +43,42 @@ const weatherCodes: Record<number, string> = {
   82: "Силен валеж",
   95: "Буря"
 };
+const englishWeatherCodes: Record<number, string> = {
+  0: "Clear",
+  1: "Mainly clear",
+  2: "Partly cloudy",
+  3: "Overcast",
+  45: "Fog",
+  48: "Rime fog",
+  51: "Light drizzle",
+  53: "Drizzle",
+  55: "Heavy drizzle",
+  61: "Light rain",
+  63: "Rain",
+  65: "Heavy rain",
+  71: "Light snow",
+  73: "Snow",
+  75: "Heavy snow",
+  80: "Rain showers",
+  81: "Rain showers",
+  82: "Heavy showers",
+  95: "Thunderstorm"
+};
 
-const forecastLabels = ["Днес", "Утре", "+2 дни"];
-
-function conditionFromCode(code: number | null | undefined) {
-  return typeof code === "number" ? weatherCodes[code] || "Променливо" : "Променливо";
+function forecastLabels(locale: Locale) {
+  return locale === "en" ? ["Today", "Tomorrow", "+2 days"] : ["Днес", "Утре", "+2 дни"];
 }
 
-function fallbackForecast(): BanskoWeatherDay[] {
-  return forecastLabels.map((label) => ({
+function conditionFromCode(code: number | null | undefined, locale: Locale) {
+  const codes = locale === "en" ? englishWeatherCodes : weatherCodes;
+  return typeof code === "number" ? codes[code] || (locale === "en" ? "Variable" : "Променливо") : locale === "en" ? "Variable" : "Променливо";
+}
+
+function fallbackForecast(locale: Locale): BanskoWeatherDay[] {
+  return forecastLabels(locale).map((label) => ({
     date: null,
     label,
-    condition: "Очаква данни",
+    condition: locale === "en" ? "Awaiting data" : "Очаква данни",
     min: null,
     max: null,
     windSpeed: null,
@@ -61,7 +86,7 @@ function fallbackForecast(): BanskoWeatherDay[] {
   }));
 }
 
-export async function getBanskoWeather(): Promise<BanskoWeather> {
+export async function getBanskoWeather(locale: Locale = "bg"): Promise<BanskoWeather> {
   const url = new URL(openMeteoBaseUrl);
   url.searchParams.set("latitude", "41.8383");
   url.searchParams.set("longitude", "23.4885");
@@ -101,10 +126,10 @@ export async function getBanskoWeather(): Promise<BanskoWeather> {
     };
 
     const code = data.current?.weather_code;
-    const forecast = forecastLabels.map((label, index) => ({
+    const forecast = forecastLabels(locale).map((label, index) => ({
       date: data.daily?.time?.[index] ?? null,
       label,
-      condition: conditionFromCode(data.daily?.weather_code?.[index]),
+      condition: conditionFromCode(data.daily?.weather_code?.[index], locale),
       min: data.daily?.temperature_2m_min?.[index] ?? null,
       max: data.daily?.temperature_2m_max?.[index] ?? null,
       windSpeed: data.daily?.wind_speed_10m_max?.[index] ?? null,
@@ -114,7 +139,7 @@ export async function getBanskoWeather(): Promise<BanskoWeather> {
     return {
       temperature: data.current?.temperature_2m ?? null,
       apparentTemperature: data.current?.apparent_temperature ?? null,
-      condition: conditionFromCode(code),
+      condition: conditionFromCode(code, locale),
       windSpeed: data.current?.wind_speed_10m ?? null,
       min: forecast[0]?.min ?? null,
       max: forecast[0]?.max ?? null,
@@ -125,12 +150,12 @@ export async function getBanskoWeather(): Promise<BanskoWeather> {
     return {
       temperature: null,
       apparentTemperature: null,
-      condition: "Очаква данни",
+      condition: locale === "en" ? "Awaiting data" : "Очаква данни",
       windSpeed: null,
       min: null,
       max: null,
       precipitationProbability: null,
-      forecast: fallbackForecast()
+      forecast: fallbackForecast(locale)
     };
   }
 }

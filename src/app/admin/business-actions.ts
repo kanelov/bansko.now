@@ -89,8 +89,11 @@ function contactMessageStatusValue(value: string | null): "new" | "read" | "arch
 
 function revalidateBusinessPaths() {
   revalidatePath("/");
+  revalidatePath("/en");
   revalidatePath("/businesses");
+  revalidatePath("/en/businesses");
   revalidatePath("/businesses/map");
+  revalidatePath("/en/businesses/map");
   revalidatePath("/sitemap.xml");
   revalidatePath("/admin/businesses");
 }
@@ -181,6 +184,11 @@ export async function updateBusinessAction(formData: FormData) {
 
   const name = stringValue(formData, "name") || "Business";
   const activePlanId = uuidValue(formData, "active_plan_id");
+  const { data: currentBusiness } = await supabase
+    .from("businesses")
+    .select("payment_status")
+    .eq("id", id)
+    .maybeSingle();
   const payload = {
     name,
     slug: stringValue(formData, "slug") || slugify(name),
@@ -226,6 +234,61 @@ export async function updateBusinessAction(formData: FormData) {
     redirect(`/admin/businesses?error=${encodeURIComponent(error.message)}`);
   }
 
+  const translationPayload = (locale: "bg" | "en", suffix = "") => ({
+    business_id: id,
+    locale,
+    slug: stringValue(formData, `slug${suffix}`) || payload.slug,
+    name: stringValue(formData, `name${suffix}`) || payload.name,
+    category: stringValue(formData, `category${suffix}`) || payload.category,
+    description: stringValue(formData, `description${suffix}`),
+    address: stringValue(formData, `address${suffix}`) || payload.address,
+    faqs: faqLinesValue(formData, `faqs_input${suffix}`),
+    features: linesValue(formData, `features_input${suffix}`),
+    seo_title: stringValue(formData, `seo_title${suffix}`),
+    seo_description: stringValue(formData, `seo_description${suffix}`),
+    canonical_url: suffix ? null : payload.canonical_url,
+    og_title: stringValue(formData, `og_title${suffix}`),
+    og_description: stringValue(formData, `og_description${suffix}`),
+    og_image_url: payload.og_image_url,
+    robots_index: payload.robots_index,
+    robots_follow: payload.robots_follow,
+    schema_type: payload.schema_type
+  });
+  const translations = [translationPayload("bg")];
+
+  if (stringValue(formData, "name_en")) {
+    translations.push(translationPayload("en", "_en"));
+  }
+
+  const { error: translationError } = await supabase
+    .from("business_translations")
+    .upsert(translations, { onConflict: "business_id,locale" });
+
+  if (translationError) {
+    redirect(`/admin/businesses?error=${encodeURIComponent(translationError.message)}`);
+  }
+
+  if (payload.payment_status === "paid" && currentBusiness?.payment_status !== "paid") {
+    const { data: notificationSettings } = await supabase
+      .from("business_directory_settings")
+      .select("notification_email")
+      .limit(1)
+      .maybeSingle();
+
+    await sendNotificationEmail({
+      to: notificationSettings?.notification_email,
+      subject: "Bansko NOW: бизнесът е маркиран като платен",
+      title: "Платен бизнес листинг",
+      rows: [
+        { label: "Бизнес", value: payload.name },
+        { label: "Ниво", value: payload.listing_tier },
+        { label: "Активен до", value: payload.paid_until }
+      ],
+      actionUrl: `${siteUrl}/admin/businesses`,
+      actionLabel: "Към admin"
+    });
+  }
+
   const ownerName = stringValue(formData, "owner_name");
   const ownerEmail = stringValue(formData, "owner_email");
   const ownerPhone = stringValue(formData, "owner_phone");
@@ -253,6 +316,9 @@ export async function updateBusinessAction(formData: FormData) {
 
   revalidateBusinessPaths();
   revalidatePath(`/businesses/${payload.slug}`);
+  if (stringValue(formData, "slug_en")) {
+    revalidatePath(`/en/businesses/${stringValue(formData, "slug_en")}`);
+  }
   redirect("/admin/businesses?saved=1");
 }
 
@@ -301,32 +367,4 @@ export async function markContactMessageAction(formData: FormData) {
 
   await supabase.from("contact_messages").update({ status }).eq("id", id);
   revalidatePath("/admin/businesses");
-}
-
-export async function sendBusinessPaidNotificationAction(formData: FormData) {
-  const { supabase } = await requireAdmin();
-  const id = uuidValue(formData, "id");
-
-  if (!id) {
-    redirect("/admin/businesses?error=missing-id");
-  }
-
-  const { data } = await supabase
-    .from("businesses")
-    .select("name, listing_tier, paid_until, business_contacts(owner_email, owner_name)")
-    .eq("id", id)
-    .maybeSingle();
-  const business = data as unknown as { name: string | null; listing_tier: string | null; paid_until: string | null } | null;
-
-  await sendNotificationEmail({
-    subject: "Bansko NOW: бизнесът е маркиран като платен",
-    title: "Платен бизнес листинг",
-    rows: [
-      { label: "Бизнес", value: business?.name },
-      { label: "Ниво", value: business?.listing_tier },
-      { label: "Активен до", value: business?.paid_until }
-    ],
-    actionUrl: `${siteUrl}/admin/businesses`,
-    actionLabel: "Към admin"
-  });
 }

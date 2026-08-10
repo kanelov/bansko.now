@@ -8,7 +8,8 @@ import { estimateReadingTime } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
 import { hasAdminRole, requireAdmin } from "@/lib/supabase/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
-import type { ArticleStatus, Database, SiteSettings } from "@/lib/types";
+import type { ArticleStatus, Database, Locale, SiteSettings } from "@/lib/types";
+import { isLocale } from "@/lib/i18n";
 
 const mediaBucket = "bansko-media";
 const maxUploadSize = 8 * 1024 * 1024;
@@ -94,9 +95,12 @@ function articleEditorErrorPath(articleId: string | null, message: string) {
 
 function revalidateEditorialPaths() {
   revalidatePath("/");
+  revalidatePath("/en");
   revalidatePath("/articles");
+  revalidatePath("/en/articles");
   revalidatePath("/sitemap.xml");
   revalidatePath("/feed.xml");
+  revalidatePath("/en/feed.xml");
 }
 
 function revalidatePagePaths(slug?: string | null) {
@@ -107,6 +111,7 @@ function revalidatePagePaths(slug?: string | null) {
 
   if (slug) {
     revalidatePath(`/${slug}`);
+    revalidatePath(`/en/${slug}`);
   }
 }
 
@@ -114,6 +119,7 @@ function revalidateSiteChrome() {
   revalidatePath("/", "layout");
   revalidatePath("/");
   revalidatePath("/articles");
+  revalidatePath("/en/articles");
   revalidatePath("/admin/settings");
 }
 
@@ -171,7 +177,12 @@ export async function signOutAction() {
   redirect("/admin/login");
 }
 
-async function syncTags(supabase: SupabaseClient<Database>, articleId: string, tagsInput: string | null) {
+function localeValue(formData: FormData, key = "locale"): Locale {
+  const value = stringValue(formData, key);
+  return value && isLocale(value) ? value : "bg";
+}
+
+async function syncTags(supabase: SupabaseClient<Database>, articleId: string, tagsInput: string | null, locale: Locale) {
   const tags = (tagsInput || "")
     .split(",")
     .map((tag) => tag.trim())
@@ -191,7 +202,7 @@ async function syncTags(supabase: SupabaseClient<Database>, articleId: string, t
 
     const { data: tag, error: tagError } = await supabase
       .from("tags")
-      .upsert({ name: tagName, slug }, { onConflict: "slug" })
+      .upsert({ name: tagName, slug, locale }, { onConflict: "locale,slug" })
       .select("id")
       .single();
 
@@ -235,6 +246,8 @@ export async function upsertArticleAction(formData: FormData) {
   const content = rawStringValue(formData, "content");
   const intent = stringValue(formData, "intent");
   const isNewPublish = intent === "publish" && !id;
+  const locale = localeValue(formData);
+  const translationGroupId = uuidValue(formData, "translation_group_id");
 
   if (rawStringValue(formData, "editor_loaded") !== "true" || !formData.has("title") || !formData.has("content")) {
     redirect(articleEditorErrorPath(id, "Редакторът още не е зареден напълно. Обнови страницата и опитай отново."));
@@ -272,6 +285,8 @@ export async function upsertArticleAction(formData: FormData) {
       : normalizeDate(stringValue(formData, "published_at"));
 
   const payload = {
+    locale,
+    ...(translationGroupId ? { translation_group_id: translationGroupId } : {}),
     title,
     slug: stringValue(formData, "slug") || slugify(title),
     excerpt: stringValue(formData, "excerpt"),
@@ -313,7 +328,7 @@ export async function upsertArticleAction(formData: FormData) {
 
   try {
     if (!id || booleanValue(formData, "tags_dirty")) {
-      await syncTags(supabase, result.data.id, stringValue(formData, "tags_input"));
+      await syncTags(supabase, result.data.id, stringValue(formData, "tags_input"), locale);
     }
 
     if (isNewPublish) {
@@ -400,11 +415,11 @@ export async function deleteCategoryAction(formData: FormData) {
 export async function upsertCategoryAction(formData: FormData) {
   const { supabase } = await requireAdmin();
   const id = uuidValue(formData, "id");
+  const locale = localeValue(formData);
   const name = stringValue(formData, "name") || "Нова категория";
   const slug = stringValue(formData, "slug") || slugify(name);
-  const payload = {
+  const translationPayload = {
     name,
-    slug,
     description: stringValue(formData, "description"),
     seo_title: stringValue(formData, "seo_title"),
     seo_description: stringValue(formData, "seo_description"),
@@ -417,12 +432,35 @@ export async function upsertCategoryAction(formData: FormData) {
     schema_type: stringValue(formData, "schema_type") || "CollectionPage"
   };
 
-  const { error } = id
-    ? await supabase.from("categories").update(payload).eq("id", id)
-    : await supabase.from("categories").insert(payload);
+  if (locale === "en") {
+    if (!id) {
+      redirect("/admin/categories?error=missing-category-for-translation");
+    }
 
-  if (error) {
-    redirect(`/admin/categories?error=${encodeURIComponent(error.message)}`);
+    const { error } = await supabase
+      .from("category_translations")
+      .upsert({ category_id: id, locale, ...translationPayload }, { onConflict: "category_id,locale" });
+
+    if (error) {
+      redirect(`/admin/categories?error=${encodeURIComponent(error.message)}`);
+    }
+  } else {
+    const basePayload = { slug, ...translationPayload };
+    const result = id
+      ? await supabase.from("categories").update(basePayload).eq("id", id).select("id").single()
+      : await supabase.from("categories").insert(basePayload).select("id").single();
+
+    if (result.error || !result.data?.id) {
+      redirect(`/admin/categories?error=${encodeURIComponent(result.error?.message || "Категорията не можа да бъде запазена.")}`);
+    }
+
+    const { error: translationError } = await supabase
+      .from("category_translations")
+      .upsert({ category_id: result.data.id, locale, ...translationPayload }, { onConflict: "category_id,locale" });
+
+    if (translationError) {
+      redirect(`/admin/categories?error=${encodeURIComponent(translationError.message)}`);
+    }
   }
 
   revalidateEditorialPaths();
@@ -544,12 +582,44 @@ export async function saveSettingsAction(formData: FormData) {
     default_author_name: stringValue(formData, "default_author_name") || "Любо Канелов"
   };
 
-  const { error } = id
-    ? await supabase.from("site_settings").update(payload).eq("id", id)
-    : await supabase.from("site_settings").insert(payload);
+  const result = id
+    ? await supabase.from("site_settings").update(payload).eq("id", id).select("id").single()
+    : await supabase.from("site_settings").insert(payload).select("id").single();
 
-  if (error) {
-    redirect(`/admin/settings?error=${encodeURIComponent(error.message)}`);
+  if (result.error || !result.data?.id) {
+    redirect(`/admin/settings?error=${encodeURIComponent(result.error?.message || "Settings не можаха да бъдат запазени.")}`);
+  }
+
+  const localizedFields = (locale: Locale, suffix = "") => ({
+    site_settings_id: result.data.id,
+    locale,
+    site_description: stringValue(formData, `site_description${suffix}`),
+    hero_image_alt: stringValue(formData, `hero_image_alt${suffix}`),
+    support_button_label: stringValue(formData, `support_button_label${suffix}`),
+    support_title: stringValue(formData, `support_title${suffix}`),
+    support_description: stringValue(formData, `support_description${suffix}`),
+    support_image_alt: stringValue(formData, `support_image_alt${suffix}`),
+    facebook_cta_eyebrow: stringValue(formData, `facebook_cta_eyebrow${suffix}`),
+    facebook_cta_title: stringValue(formData, `facebook_cta_title${suffix}`),
+    facebook_cta_text: stringValue(formData, `facebook_cta_text${suffix}`),
+    facebook_cta_button_label: stringValue(formData, `facebook_cta_button_label${suffix}`),
+    art_studio_block_eyebrow: stringValue(formData, `art_studio_block_eyebrow${suffix}`),
+    art_studio_block_title: stringValue(formData, `art_studio_block_title${suffix}`),
+    art_studio_block_text: stringValue(formData, `art_studio_block_text${suffix}`),
+    art_studio_block_button_label: stringValue(formData, `art_studio_block_button_label${suffix}`),
+    collection_block_eyebrow: stringValue(formData, `collection_block_eyebrow${suffix}`),
+    collection_block_title: stringValue(formData, `collection_block_title${suffix}`),
+    collection_block_text: stringValue(formData, `collection_block_text${suffix}`),
+    collection_block_button_label: stringValue(formData, `collection_block_button_label${suffix}`),
+    collection_items: jsonLines(formData, `collection_items${suffix}`)
+  });
+
+  const { error: translationError } = await supabase
+    .from("site_settings_translations")
+    .upsert([localizedFields("bg"), localizedFields("en", "_en")], { onConflict: "site_settings_id,locale" });
+
+  if (translationError) {
+    redirect(`/admin/settings?error=${encodeURIComponent(translationError.message)}`);
   }
 
   revalidateSiteChrome();
@@ -567,6 +637,7 @@ export async function saveNavigationAction(formData: FormData) {
     const id = uuidValue(formData, `navigation_id_${rowKey}`);
     const label = stringValue(formData, `navigation_label_${rowKey}`);
     const href = stringValue(formData, `navigation_href_${rowKey}`);
+    const englishLabel = stringValue(formData, `navigation_label_en_${rowKey}`);
     const shouldDelete = booleanValue(formData, `navigation_delete_${rowKey}`);
 
     if (shouldDelete) {
@@ -591,10 +662,34 @@ export async function saveNavigationAction(formData: FormData) {
       aria_label: stringValue(formData, `navigation_aria_label_${rowKey}`)
     };
 
-    if (id) {
-      await supabase.from("navigation_items").update(payload).eq("id", id);
-    } else {
-      await supabase.from("navigation_items").upsert(payload, { onConflict: "href" });
+    const result = id
+      ? await supabase.from("navigation_items").update(payload).eq("id", id).select("id").single()
+      : await supabase.from("navigation_items").upsert(payload, { onConflict: "href" }).select("id").single();
+
+    if (result.error || !result.data?.id) {
+      continue;
+    }
+
+    await supabase.from("navigation_item_translations").upsert(
+      {
+        navigation_item_id: result.data.id,
+        locale: "bg",
+        label,
+        aria_label: stringValue(formData, `navigation_aria_label_${rowKey}`)
+      },
+      { onConflict: "navigation_item_id,locale" }
+    );
+
+    if (englishLabel) {
+      await supabase.from("navigation_item_translations").upsert(
+        {
+          navigation_item_id: result.data.id,
+          locale: "en",
+          label: englishLabel,
+          aria_label: stringValue(formData, `navigation_aria_label_en_${rowKey}`)
+        },
+        { onConflict: "navigation_item_id,locale" }
+      );
     }
   }
 
@@ -651,7 +746,11 @@ export async function upsertEditablePageAction(formData: FormData) {
   const title = stringValue(formData, "title") || "Нова страница";
   const slug = stringValue(formData, "slug") || slugify(title);
   const status: "draft" | "published" = stringValue(formData, "status") === "draft" ? "draft" : "published";
+  const locale = localeValue(formData);
+  const translationGroupId = uuidValue(formData, "translation_group_id");
   const payload = {
+    locale,
+    ...(translationGroupId ? { translation_group_id: translationGroupId } : {}),
     title,
     slug,
     eyebrow: stringValue(formData, "eyebrow"),
@@ -683,6 +782,7 @@ export async function upsertEditablePageAction(formData: FormData) {
   }
 
   revalidatePagePaths(slug);
+  revalidatePath(`/en/${slug}`);
   redirect("/admin/cms?saved=1");
 }
 
@@ -708,12 +808,38 @@ export async function upsertArtStudioServiceAction(formData: FormData) {
     seo_description: stringValue(formData, "seo_description")
   };
 
-  const { error } = id
-    ? await supabase.from("art_studio_services").update(payload).eq("id", id)
-    : await supabase.from("art_studio_services").insert(payload);
+  const result = id
+    ? await supabase.from("art_studio_services").update(payload).eq("id", id).select("id").single()
+    : await supabase.from("art_studio_services").insert(payload).select("id").single();
 
-  if (error) {
-    redirect(`/admin/cms?error=${encodeURIComponent(error.message)}#art-studio-services`);
+  if (result.error || !result.data?.id) {
+    redirect(`/admin/cms?error=${encodeURIComponent(result.error?.message || "Услугата не можа да бъде запазена.")}#art-studio-services`);
+  }
+
+  const translation = (locale: Locale, suffix = "") => ({
+    service_id: result.data.id,
+    locale,
+    title: stringValue(formData, `title${suffix}`) || title,
+    description: stringValue(formData, `description${suffix}`),
+    image_alt: stringValue(formData, `image_alt${suffix}`),
+    button_label: stringValue(formData, `button_label${suffix}`),
+    price_label: stringValue(formData, `price_label${suffix}`),
+    features: jsonLines(formData, `features_input${suffix}`),
+    seo_title: stringValue(formData, `seo_title${suffix}`),
+    seo_description: stringValue(formData, `seo_description${suffix}`)
+  });
+
+  const translations = [translation("bg")];
+  if (stringValue(formData, "title_en")) {
+    translations.push(translation("en", "_en"));
+  }
+
+  const { error: translationError } = await supabase
+    .from("art_studio_service_translations")
+    .upsert(translations, { onConflict: "service_id,locale" });
+
+  if (translationError) {
+    redirect(`/admin/cms?error=${encodeURIComponent(translationError.message)}#art-studio-services`);
   }
 
   revalidatePagePaths("art-studio");
