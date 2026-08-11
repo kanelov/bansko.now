@@ -68,6 +68,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       lastModified: new Date(article.updated_at || article.published_at || article.created_at),
       changeFrequency: "monthly" as const,
       priority: 0.7,
+      images: article.featured_image_url ? [article.featured_image_url] : undefined,
       alternates
     }));
   });

@@ -13,7 +13,6 @@ import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { SourceLinks } from "@/components/public/source-links";
 import {
-  fallbackHeroImage,
   getArticleBySlug,
   getArticleCategory,
   getArticlePath,
@@ -40,8 +39,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
   const title = article.seo_title || article.title;
   const description = article.seo_description || article.excerpt || undefined;
-  const image = article.og_image_url || article.featured_image_url || fallbackHeroImage;
-  const canonical = article.canonical_url || `${siteUrl}${getArticlePath(article)}`;
+  const image = article.og_image_url || article.featured_image_url || undefined;
+  const canonical = `${siteUrl}${getArticlePath(article)}`;
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
   const translation = await getPublishedArticleTranslation(article.translation_group_id, alternateLocale);
   const languages: Record<string, string> = {
@@ -76,7 +75,9 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       publishedTime: article.published_at || undefined,
       modifiedTime: article.updated_at || undefined,
       authors: [article.author_name || "Любо Канелов"],
-      images: image ? [{ url: image, alt: article.featured_image_alt || article.title }] : undefined
+      images: image
+        ? [{ url: image, ...(article.featured_image_alt ? { alt: article.featured_image_alt } : {}) }]
+        : undefined
     },
     twitter: {
       card: "summary_large_image",
@@ -141,7 +142,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
     getTagsForArticle(article.id),
     getPublishedArticleTranslation(article.translation_group_id, alternateLocale)
   ]);
-  const image = article.featured_image_url || fallbackHeroImage;
+  const image = article.featured_image_url;
   const articleUrl = `${siteUrl}${getArticlePath(article)}`;
   const publishedDate = formatDate(article.published_at, locale);
   const updatedDate = formatDate(article.updated_at, locale);
@@ -154,15 +155,26 @@ export default async function ArticlePage({ params }: { params: Params }) {
     url: articleUrl,
     headline: article.title,
     description: article.seo_description || article.excerpt,
-    image: [
-      {
-        "@type": "ImageObject",
-        url: image,
-        caption: article.featured_image_alt || article.title,
-        representativeOfPage: true
-      }
-    ],
-    thumbnailUrl: image,
+    image: image
+      ? [
+          {
+            "@type": "ImageObject",
+            "@id": `${articleUrl}#primaryimage`,
+            url: image,
+            contentUrl: image,
+            caption: article.image_caption || undefined,
+            creditText: article.photo_credit || undefined,
+            creator: article.photo_credit
+              ? {
+                  "@type": "Person",
+                  name: article.photo_credit
+                }
+              : undefined,
+            representativeOfPage: true
+          }
+        ]
+      : undefined,
+    thumbnailUrl: image || undefined,
     datePublished: article.published_at,
     dateModified: article.updated_at,
     inLanguage: locale === "en" ? "en" : "bg",
@@ -242,17 +254,23 @@ export default async function ArticlePage({ params }: { params: Params }) {
             <ArticleShareActions title={article.title} url={articleUrl} locale={locale} />
           </header>
 
-          <figure className="mt-10">
-            <img
-              src={image}
-              alt={article.featured_image_alt || article.title}
-              className="aspect-[16/10] w-full rounded-3xl object-cover"
-              decoding="async"
-            />
-            {article.featured_image_alt ? (
-              <figcaption className="mt-3 text-sm text-stone-500">{article.featured_image_alt}</figcaption>
-            ) : null}
-          </figure>
+          {image ? (
+            <figure className="mt-10">
+              <img
+                src={image}
+                alt={article.featured_image_alt || ""}
+                width={1600}
+                height={1000}
+                className="aspect-[16/10] w-full rounded-3xl object-cover"
+                decoding="async"
+              />
+              {article.image_caption || article.photo_credit ? (
+                <figcaption className="mt-3 text-sm text-stone-500">
+                  {[article.image_caption, article.photo_credit].filter(Boolean).join(" · ")}
+                </figcaption>
+              ) : null}
+            </figure>
+          ) : null}
 
           <div className="mt-12">
             <ArticleTableOfContents items={tocItems} locale={locale} />
