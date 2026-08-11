@@ -290,6 +290,199 @@ export type ArtStudioServiceTranslation = {
   updated_at?: string;
 };
 
+export type ArtStudioProductType = {
+  id: string;
+  internal_name: string;
+  icon_name: string | null;
+  image_url: string | null;
+  is_featured: boolean;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArtStudioProductTypeTranslation = {
+  product_type_id: string;
+  locale: Locale;
+  title: string;
+  slug: string;
+  description: string | null;
+  image_alt: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image_url: string | null;
+  robots_index: boolean;
+  robots_follow: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type LocalizedArtStudioProductType = ArtStudioProductType & ArtStudioProductTypeTranslation & {
+  alternate_slug: string | null;
+};
+
+export type ArtStudioCategory = {
+  id: string;
+  product_type_id: string;
+  internal_name: string;
+  icon_name: string | null;
+  image_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArtStudioCategoryTranslation = {
+  category_id: string;
+  locale: Locale;
+  title: string;
+  slug: string;
+  description: string | null;
+  image_alt: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  robots_index: boolean;
+  robots_follow: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type LocalizedArtStudioCategory = ArtStudioCategory & ArtStudioCategoryTranslation;
+
+export type ArtStudioProduct = {
+  id: string;
+  product_type_id: string;
+  category_id: string | null;
+  sku: string | null;
+  image_url: string | null;
+  gallery_urls: string[];
+  personalization_text_enabled: boolean;
+  idea_note_enabled: boolean;
+  is_featured: boolean;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArtStudioProductTranslation = {
+  product_id: string;
+  locale: Locale;
+  title: string;
+  slug: string;
+  short_description: string | null;
+  description: string | null;
+  image_alt: string | null;
+  seo_title: string | null;
+  seo_description: string | null;
+  og_title: string | null;
+  og_description: string | null;
+  og_image_url: string | null;
+  robots_index: boolean;
+  robots_follow: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArtStudioOptionValue = {
+  value: string;
+  label_bg: string;
+  label_en: string | null;
+  hex_color: string | null;
+};
+
+export type ArtStudioProductOption = {
+  id: string;
+  product_id: string;
+  option_key: string;
+  label_bg: string;
+  label_en: string | null;
+  input_type: "select" | "radio" | "swatch";
+  is_required: boolean;
+  values: ArtStudioOptionValue[];
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArtStudioProductOffer = {
+  id: string;
+  product_id: string;
+  label_bg: string;
+  label_en: string | null;
+  price: number;
+  currency: string;
+  payment_link_url: string | null;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type LocalizedArtStudioProduct = ArtStudioProduct & ArtStudioProductTranslation & {
+  alternate_slug: string | null;
+  product_type: LocalizedArtStudioProductType;
+  category: LocalizedArtStudioCategory | null;
+  options: ArtStudioProductOption[];
+  offers: ArtStudioProductOffer[];
+};
+
+export type ArtStudioPublicSettings = {
+  id: string;
+  pickup_name_bg: string | null;
+  pickup_name_en: string | null;
+  pickup_address_bg: string | null;
+  pickup_address_en: string | null;
+  pickup_phone: string | null;
+  pickup_instructions_bg: string | null;
+  pickup_instructions_en: string | null;
+  econt_instructions_bg: string | null;
+  econt_instructions_en: string | null;
+  orders_enabled: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArtStudioPaymentStatus = "pending" | "paid" | "failed" | "expired" | "refunded";
+export type ArtStudioProductionStatus = "new" | "in_production" | "ready_for_pickup" | "shipped" | "completed" | "cancelled";
+
+export type ArtStudioOrder = {
+  id: string;
+  order_number: string;
+  product_id: string | null;
+  offer_id: string | null;
+  product_snapshot: Json;
+  locale: Locale;
+  customer_first_name: string;
+  customer_last_name: string;
+  customer_email: string;
+  customer_phone: string;
+  personalization_text: string | null;
+  idea_note: string | null;
+  quantity: number;
+  selected_options: Json;
+  delivery_method: "econt_office" | "gallery_pickup";
+  delivery_city: string | null;
+  delivery_office: string | null;
+  delivery_notes: string | null;
+  unit_price: number;
+  delivery_price: number;
+  total: number;
+  currency: string;
+  payment_status: ArtStudioPaymentStatus;
+  production_status: ArtStudioProductionStatus;
+  payment_link_url: string | null;
+  stripe_checkout_session_id: string | null;
+  stripe_payment_link_id: string | null;
+  paid_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type BusinessStatus = "draft" | "approved" | "rejected";
 export type BusinessTier = "free" | "premium" | "homepage";
 export type BusinessPaymentStatus = "unpaid" | "pending" | "paid" | "expired";
@@ -531,6 +724,66 @@ export type Database = {
         Row: ArtStudioServiceTranslation;
         Insert: Partial<ArtStudioServiceTranslation> & Pick<ArtStudioServiceTranslation, "service_id" | "locale" | "title">;
         Update: Partial<ArtStudioServiceTranslation>;
+        Relationships: [];
+      };
+      art_studio_product_types: {
+        Row: ArtStudioProductType;
+        Insert: Partial<ArtStudioProductType> & Pick<ArtStudioProductType, "internal_name">;
+        Update: Partial<ArtStudioProductType>;
+        Relationships: [];
+      };
+      art_studio_product_type_translations: {
+        Row: ArtStudioProductTypeTranslation;
+        Insert: Partial<ArtStudioProductTypeTranslation> & Pick<ArtStudioProductTypeTranslation, "product_type_id" | "locale" | "title" | "slug">;
+        Update: Partial<ArtStudioProductTypeTranslation>;
+        Relationships: [];
+      };
+      art_studio_categories: {
+        Row: ArtStudioCategory;
+        Insert: Partial<ArtStudioCategory> & Pick<ArtStudioCategory, "product_type_id" | "internal_name">;
+        Update: Partial<ArtStudioCategory>;
+        Relationships: [];
+      };
+      art_studio_category_translations: {
+        Row: ArtStudioCategoryTranslation;
+        Insert: Partial<ArtStudioCategoryTranslation> & Pick<ArtStudioCategoryTranslation, "category_id" | "locale" | "title" | "slug">;
+        Update: Partial<ArtStudioCategoryTranslation>;
+        Relationships: [];
+      };
+      art_studio_products: {
+        Row: ArtStudioProduct;
+        Insert: Partial<ArtStudioProduct> & Pick<ArtStudioProduct, "product_type_id">;
+        Update: Partial<ArtStudioProduct>;
+        Relationships: [];
+      };
+      art_studio_product_translations: {
+        Row: ArtStudioProductTranslation;
+        Insert: Partial<ArtStudioProductTranslation> & Pick<ArtStudioProductTranslation, "product_id" | "locale" | "title" | "slug">;
+        Update: Partial<ArtStudioProductTranslation>;
+        Relationships: [];
+      };
+      art_studio_product_options: {
+        Row: ArtStudioProductOption;
+        Insert: Partial<ArtStudioProductOption> & Pick<ArtStudioProductOption, "product_id" | "option_key" | "label_bg">;
+        Update: Partial<ArtStudioProductOption>;
+        Relationships: [];
+      };
+      art_studio_product_offers: {
+        Row: ArtStudioProductOffer;
+        Insert: Partial<ArtStudioProductOffer> & Pick<ArtStudioProductOffer, "product_id" | "label_bg" | "price">;
+        Update: Partial<ArtStudioProductOffer>;
+        Relationships: [];
+      };
+      art_studio_public_settings: {
+        Row: ArtStudioPublicSettings;
+        Insert: Partial<ArtStudioPublicSettings>;
+        Update: Partial<ArtStudioPublicSettings>;
+        Relationships: [];
+      };
+      art_studio_orders: {
+        Row: ArtStudioOrder;
+        Insert: Partial<ArtStudioOrder> & Pick<ArtStudioOrder, "order_number" | "product_snapshot" | "customer_first_name" | "customer_last_name" | "customer_email" | "customer_phone" | "delivery_method" | "unit_price" | "total">;
+        Update: Partial<ArtStudioOrder>;
         Relationships: [];
       };
       business_listing_plans: {

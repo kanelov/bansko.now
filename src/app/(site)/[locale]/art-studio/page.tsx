@@ -2,10 +2,12 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import type { Route } from "next";
 import { ArtStudioServiceCard } from "@/components/public/art-studio-service-card";
+import { ArtStudioProductTypeCard } from "@/components/public/art-studio-product-type-card";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
+import { getArtStudioProductTypes } from "@/lib/art-studio";
 import { getArtStudioServices, getEditablePageBySlug, getSiteSettings } from "@/lib/content";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import { notFound } from "next/navigation";
@@ -40,10 +42,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function ArtStudioPage({ params }: { params: Params }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const [settings, page, services] = await Promise.all([
+  const [settings, page, services, productTypes] = await Promise.all([
     getSiteSettings(locale),
     getEditablePageBySlug("art-studio", { locale }),
-    getArtStudioServices({ locale })
+    getArtStudioServices({ locale }),
+    getArtStudioProductTypes({ locale })
   ]);
   const premium = services.find((service) => service.is_premium) ?? services[0] ?? null;
   const regularServices = services.filter((service) => service.id !== premium?.id);
@@ -113,6 +116,22 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
           {page?.content ? (
             <section className="mx-auto max-w-4xl">
               <MarkdownRenderer content={page.content} locale={locale} />
+            </section>
+          ) : null}
+
+          {productTypes.length ? (
+            <section aria-labelledby="art-studio-products-heading">
+              <div className="mb-8 max-w-3xl">
+                <p className="text-sm font-semibold uppercase text-moss">{locale === "en" ? "Art products" : "Арт продукти"}</p>
+                <h2 id="art-studio-products-heading" className="mt-3 font-serif text-4xl font-semibold text-stone-950">
+                  {locale === "en" ? "Choose what you want to create" : "Избери какво искаш да създадем"}
+                </h2>
+              </div>
+              <div className="grid gap-6 lg:grid-cols-2">
+                {productTypes.map((productType) => (
+                  <ArtStudioProductTypeCard key={productType.id} productType={productType} locale={locale} />
+                ))}
+              </div>
             </section>
           ) : null}
 

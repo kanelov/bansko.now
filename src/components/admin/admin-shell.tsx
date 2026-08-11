@@ -6,6 +6,7 @@ const adminNav: { href: Route; label: string }[] = [
   { href: "/admin", label: "Табло" },
   { href: "/admin/articles", label: "Статии" },
   { href: "/admin/cms", label: "Страници" },
+  { href: "/admin/art-studio", label: "Art Studio" },
   { href: "/admin/businesses", label: "Бизнеси" },
   { href: "/admin/categories", label: "Категории" },
   { href: "/admin/media", label: "Медия" },

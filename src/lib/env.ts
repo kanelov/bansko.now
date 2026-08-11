@@ -21,3 +21,6 @@ export const openMeteoBaseUrl =
 export const resendApiKey = process.env.RESEND_API_KEY || null;
 export const adminNotificationEmail = process.env.ADMIN_NOTIFICATION_EMAIL || null;
 export const emailFrom = process.env.EMAIL_FROM || "Bansko NOW <onboarding@resend.dev>";
+export const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || null;
+export const stripeSecretKey = process.env.STRIPE_SECRET_KEY || null;
+export const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET || null;

@@ -161,12 +161,13 @@ export default function AdminGuidePage() {
         <p className="mt-4 max-w-3xl text-sm leading-7 text-stone-300">
           Практично описание на функциите в сайта. Документът е част от проекта и трябва да се допълва при всяка нова възможност или промяна в работния процес.
         </p>
-        <p className="mt-3 text-xs font-semibold uppercase text-stone-500">Актуализирано: 10 август 2026</p>
+        <p className="mt-3 text-xs font-semibold uppercase text-stone-500">Актуализирано: 11 август 2026</p>
       </header>
 
       <nav aria-label="Бързи действия" className="flex flex-wrap gap-3">
         <Link href="/admin/articles/new" className="admin-button admin-button-primary px-5 py-2.5 text-sm font-semibold">Нова статия</Link>
         <Link href="/admin/businesses" className="admin-button admin-button-secondary px-5 py-2.5 text-sm font-semibold">Бизнеси</Link>
+        <Link href="/admin/art-studio" className="admin-button admin-button-secondary px-5 py-2.5 text-sm font-semibold">Art Studio</Link>
         <Link href="/admin/media" className="admin-button admin-button-secondary px-5 py-2.5 text-sm font-semibold">Медия</Link>
       </nav>
 
@@ -323,6 +324,33 @@ status: draft`}</CodeBlock>
             <li>Всяка езикова страница има собствен canonical, metadata, OpenGraph и schema език.</li>
             <li>Ако английската версия липсва или е чернова, тя не се показва публично и няма подвеждащ езиков линк.</li>
           </ul>
+        </GuideSection>
+
+        <GuideSection number="10" title="Art Studio каталог и поръчки">
+          <p>
+            Новият продуктов каталог е в „Art Studio“. Той е част от сайта, а не отделен магазин. Публичният път е: Art Studio → продуктов тип → продукт → поръчка → сигурно плащане в Stripe.
+          </p>
+          <ol className="mt-4 grid list-decimal gap-2 pl-5">
+            <li>В „Каталог“ създай продуктов тип, например тениски, арт принтове, чаши или икони. Попълни BG/EN заглавия, slug, снимка и SEO.</li>
+            <li>По желание добави категории към конкретния продуктов тип, например Ski, Bansko или Kids.</li>
+            <li>Създай продукт с основна снимка, галерия, BG/EN описание, SKU и SEO полета.</li>
+            <li>Добави прости опции като модел, размер и цвят. Те описват избора, но не променят цената.</li>
+            <li>Добави един ценови вариант за всяка различна крайна цена и постави съответния Stripe Payment Link.</li>
+            <li>Включи „Поле за име/текст“ или „Поле за бележка“, когато клиентът може да поиска кратка персонализация.</li>
+            <li>Публикувай продукта с отметката „Публикуван“. Архивирането го скрива, без да изтрива старите поръчки.</li>
+          </ol>
+          <h3 className="mt-6 font-semibold text-stone-950">Stripe Payment Link</h3>
+          <ul className="mt-3 grid list-disc gap-2 pl-5">
+            <li>Създай отделен Payment Link в Stripe за всяка цена и постави адреса <code>https://buy.stripe.com/...</code> в продукта.</li>
+            <li>Цената и валутата в админа трябва да са същите като в Stripe. Не включвай регулируемо количество за този MVP.</li>
+            <li>В Stripe задай след плащане пренасочване към <code>https://bansko.now/art-studio/order/success</code>.</li>
+            <li>Webhook адресът е <code>https://bansko.now/api/stripe/art-studio</code>. Слушай събитията <code>checkout.session.completed</code>, <code>checkout.session.async_payment_succeeded</code>, <code>checkout.session.async_payment_failed</code> и <code>checkout.session.expired</code>.</li>
+            <li>Във Vercel трябва да има само сървърни променливи <code>STRIPE_SECRET_KEY</code> и <code>STRIPE_WEBHOOK_SECRET</code>. Никога не добавяй <code>NEXT_PUBLIC_</code> към тях.</li>
+          </ul>
+          <h3 className="mt-6 font-semibold text-stone-950">Получаване и известия</h3>
+          <p className="mt-3">
+            Продуктът се предплаща изцяло. Клиентът избира офис на Еконт или взимане от галерията. Данните за галерията и инструкциите се редактират в „Доставка“. Платените поръчки се виждат в „Поръчки“, а известия се изпращат към <code>ADMIN_NOTIFICATION_EMAIL</code> и към клиента чрез Resend.
+          </p>
         </GuideSection>
       </div>
     </div>

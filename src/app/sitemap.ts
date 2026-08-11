@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getArticlePath, getCategories, getPublishedArticles } from "@/lib/content";
 import { localeUrl } from "@/lib/i18n";
@@ -27,19 +28,25 @@ function localizedStaticEntry(locale: Locale, path: string, now: Date): SitemapE
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses] = await Promise.all([
+  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts] = await Promise.all([
     getCategories("bg"),
     getCategories("en"),
     getPublishedArticles({ limit: 500, locale: "bg" }),
     getPublishedArticles({ limit: 500, locale: "en" }),
     getApprovedBusinesses("bg"),
-    getApprovedBusinesses("en")
+    getApprovedBusinesses("en"),
+    getArtStudioProductTypes({ locale: "bg" }),
+    getArtStudioProductTypes({ locale: "en" }),
+    getArtStudioProducts({ locale: "bg" }),
+    getArtStudioProducts({ locale: "en" })
   ]);
   const now = new Date();
   const staticRoutes = ["/", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/art-studio", "/about", "/contact", "/privacy", "/terms"];
   const enCategoryById = new Map(enCategories.map((category) => [category.id, category]));
   const articleByGroup = new Map<string, { bg?: (typeof bgArticles)[number]; en?: (typeof enArticles)[number] }>();
   const enBusinessById = new Map(enBusinesses.map((business) => [business.id, business]));
+  const enProductTypeById = new Map(enProductTypes.map((productType) => [productType.id, productType]));
+  const enProductById = new Map(enProducts.map((product) => [product.id, product]));
 
   for (const article of [...bgArticles, ...enArticles]) {
     const group = articleByGroup.get(article.translation_group_id) ?? {};
@@ -87,6 +94,39 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
     return entries;
   });
+  const artStudioTypeEntries = bgProductTypes.flatMap((productType) => {
+    const english = enProductTypeById.get(productType.id);
+    const bgPath = `/art-studio/${productType.slug}`;
+    const enPath = english ? `/art-studio/${english.slug}` : bgPath;
+    const alternates = english ? languageAlternates(bgPath, enPath) : undefined;
+    const entries: SitemapEntry[] = [{
+      url: localeUrl("bg", bgPath),
+      lastModified: new Date(productType.updated_at),
+      changeFrequency: "weekly",
+      priority: 0.7,
+      images: productType.image_url ? [productType.image_url] : undefined,
+      alternates
+    }];
+    if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
+    return entries;
+  });
+  const artStudioProductEntries = bgProducts.flatMap((product) => {
+    const english = enProductById.get(product.id);
+    const bgPath = `/art-studio/${product.product_type.slug}/${product.slug}`;
+    const enPath = english ? `/art-studio/${english.product_type.slug}/${english.slug}` : bgPath;
+    const alternates = english ? languageAlternates(bgPath, enPath) : undefined;
+    const images = [product.image_url, ...(product.gallery_urls || [])].filter((image): image is string => Boolean(image));
+    const entries: SitemapEntry[] = [{
+      url: localeUrl("bg", bgPath),
+      lastModified: new Date(product.updated_at),
+      changeFrequency: "weekly",
+      priority: 0.75,
+      images: images.length ? images : undefined,
+      alternates
+    }];
+    if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
+    return entries;
+  });
 
-  return [...staticEntries, ...categoryEntries, ...articleEntries, ...businessEntries];
+  return [...staticEntries, ...categoryEntries, ...articleEntries, ...businessEntries, ...artStudioTypeEntries, ...artStudioProductEntries];
 }
