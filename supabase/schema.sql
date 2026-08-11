@@ -70,6 +70,8 @@ create table if not exists public.media (
 create table if not exists public.site_settings (
   id uuid primary key default gen_random_uuid(),
   site_name text default 'Bansko NOW',
+  logo_image_url text,
+  logo_image_alt text default 'Bansko NOW',
   site_description text,
   facebook_group_url text,
   instagram_url text,
@@ -127,6 +129,8 @@ create unique index if not exists social_links_platform_unique_idx
 on public.social_links (platform);
 
 alter table public.site_settings
+  add column if not exists logo_image_url text,
+  add column if not exists logo_image_alt text default 'Bansko NOW',
   add column if not exists hero_media_type text default 'image' check (hero_media_type in ('image', 'video', 'embed')),
   add column if not exists hero_image_url text,
   add column if not exists hero_image_alt text,

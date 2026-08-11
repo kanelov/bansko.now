@@ -1,144 +1,12 @@
-import { saveNavigationAction, saveSettingsAction, saveSocialLinksAction } from "@/app/admin/actions";
-import { IconGlyph, menuIconOptions, socialIconOptions } from "@/components/public/icon-glyph";
-import { getAllNavigationItems, getAllSocialLinks, getSiteSettings } from "@/lib/content";
-import type { NavigationItem, SocialLink } from "@/lib/types";
+import { saveSettingsAction } from "@/app/admin/actions";
+import { getSiteSettings } from "@/lib/content";
 
 function fieldClass() {
   return "w-full rounded-xl border border-white/10 bg-white px-4 py-3 text-sm text-stone-950";
 }
 
-function compactFieldClass() {
-  return "w-full rounded-lg border border-white/10 bg-white px-3 py-2 text-sm text-stone-950";
-}
-
 function textAreaValue(value: string[] | null | undefined) {
   return (value ?? []).join("\n");
-}
-
-function isUuid(value: string) {
-  return /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(value);
-}
-
-function MenuRow({ item, englishItem, rowKey }: { item?: NavigationItem; englishItem?: NavigationItem; rowKey: string }) {
-  return (
-    <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
-      <input type="hidden" name="navigation_row_key" value={rowKey} />
-      {item?.id && isUuid(item.id) ? <input type="hidden" name={`navigation_id_${rowKey}`} value={item.id} /> : null}
-      <div className="grid gap-3 lg:grid-cols-[1.1fr_1.4fr_0.85fr_0.55fr]">
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          Label
-          <input name={`navigation_label_${rowKey}`} defaultValue={item?.label || ""} className={compactFieldClass()} placeholder="Събития" />
-        </label>
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          Link
-          <input name={`navigation_href_${rowKey}`} defaultValue={item?.href || ""} className={compactFieldClass()} placeholder="/events или https://..." />
-        </label>
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          Icon
-          <div className="flex items-center gap-2">
-            <IconGlyph name={item?.icon_name} className="h-5 w-5 shrink-0 text-white" />
-            <input
-              name={`navigation_icon_name_${rowKey}`}
-              defaultValue={item?.icon_name || ""}
-              className={compactFieldClass()}
-              list="menu-icon-options"
-              placeholder="calendar-days"
-            />
-          </div>
-        </label>
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          Order
-          <input name={`navigation_sort_order_${rowKey}`} type="number" defaultValue={item?.sort_order ?? 100} className={compactFieldClass()} />
-        </label>
-      </div>
-      <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-        Aria label
-        <input name={`navigation_aria_label_${rowKey}`} defaultValue={item?.aria_label || ""} className={compactFieldClass()} placeholder="Optional SEO/accessibility label" />
-      </label>
-      <div className="grid gap-3 rounded-xl border border-white/10 bg-black/10 p-3 md:grid-cols-2">
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          English label
-          <input name={`navigation_label_en_${rowKey}`} defaultValue={englishItem?.label || ""} className={compactFieldClass()} placeholder="Events" />
-        </label>
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          English aria label
-          <input name={`navigation_aria_label_en_${rowKey}`} defaultValue={englishItem?.aria_label || ""} className={compactFieldClass()} />
-        </label>
-      </div>
-      <div className="flex flex-wrap gap-4 text-sm text-stone-100">
-        <label className="inline-flex items-center gap-2">
-          <input type="checkbox" name={`navigation_is_active_${rowKey}`} defaultChecked={item?.is_active ?? true} />
-          Active
-        </label>
-        <label className="inline-flex items-center gap-2">
-          <input type="checkbox" name={`navigation_is_external_${rowKey}`} defaultChecked={item?.is_external ?? false} />
-          External
-        </label>
-        <label className="inline-flex items-center gap-2">
-          <input type="checkbox" name={`navigation_open_in_new_tab_${rowKey}`} defaultChecked={item?.open_in_new_tab ?? false} />
-          New tab
-        </label>
-        {item?.id && isUuid(item.id) ? (
-          <label className="inline-flex items-center gap-2 text-red-200">
-            <input type="checkbox" name={`navigation_delete_${rowKey}`} />
-            Remove
-          </label>
-        ) : null}
-      </div>
-    </div>
-  );
-}
-
-function SocialRow({ item, rowKey }: { item?: SocialLink; rowKey: string }) {
-  return (
-    <div className="grid gap-3 rounded-2xl border border-white/10 bg-white/5 p-4">
-      <input type="hidden" name="social_row_key" value={rowKey} />
-      {item?.id && isUuid(item.id) ? <input type="hidden" name={`social_id_${rowKey}`} value={item.id} /> : null}
-      <div className="grid gap-3 lg:grid-cols-[0.9fr_1fr_1.6fr_0.85fr_0.55fr]">
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          Platform
-          <input name={`social_platform_${rowKey}`} defaultValue={item?.platform || ""} className={compactFieldClass()} placeholder="instagram" />
-        </label>
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          Label
-          <input name={`social_label_${rowKey}`} defaultValue={item?.label || ""} className={compactFieldClass()} placeholder="Instagram" />
-        </label>
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          URL
-          <input name={`social_url_${rowKey}`} defaultValue={item?.url || ""} className={compactFieldClass()} placeholder="https://..." />
-        </label>
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          Icon
-          <div className="flex items-center gap-2">
-            <IconGlyph name={item?.icon_name || item?.platform} className="h-5 w-5 shrink-0 text-white" />
-            <input
-              name={`social_icon_name_${rowKey}`}
-              defaultValue={item?.icon_name || item?.platform || ""}
-              className={compactFieldClass()}
-              list="social-icon-options"
-              placeholder="instagram"
-            />
-          </div>
-        </label>
-        <label className="grid gap-1 text-xs font-semibold uppercase text-stone-400">
-          Order
-          <input name={`social_sort_order_${rowKey}`} type="number" defaultValue={item?.sort_order ?? 100} className={compactFieldClass()} />
-        </label>
-      </div>
-      <div className="flex flex-wrap gap-4 text-sm text-stone-100">
-        <label className="inline-flex items-center gap-2">
-          <input type="checkbox" name={`social_is_active_${rowKey}`} defaultChecked={item?.is_active ?? true} />
-          Active
-        </label>
-        {item?.id && isUuid(item.id) ? (
-          <label className="inline-flex items-center gap-2 text-red-200">
-            <input type="checkbox" name={`social_delete_${rowKey}`} />
-            Remove
-          </label>
-        ) : null}
-      </div>
-    </div>
-  );
 }
 
 type SearchParams = Promise<{ saved?: string; error?: string }>;
@@ -146,25 +14,9 @@ type SearchParams = Promise<{ saved?: string; error?: string }>;
 export default async function AdminSettingsPage({ searchParams }: { searchParams: SearchParams }) {
   const params = await searchParams;
   const [settings, englishSettings] = await Promise.all([getSiteSettings("bg"), getSiteSettings("en")]);
-  const [navigationItems, englishNavigationItems, socialLinks] = await Promise.all([
-    getAllNavigationItems("bg"),
-    getAllNavigationItems("en"),
-    getAllSocialLinks(settings)
-  ]);
-  const englishNavigationById = new Map(englishNavigationItems.map((item) => [item.id, item]));
 
   return (
     <div className="grid gap-8">
-      <datalist id="menu-icon-options">
-        {menuIconOptions.map((icon) => (
-          <option key={icon} value={icon} />
-        ))}
-      </datalist>
-      <datalist id="social-icon-options">
-        {socialIconOptions.map((icon) => (
-          <option key={icon} value={icon} />
-        ))}
-      </datalist>
       <div>
         <p className="text-sm font-semibold uppercase text-stone-400">Configuration</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Settings</h1>
@@ -183,10 +35,6 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
         {settings.id !== "fallback" ? <input type="hidden" name="id" value={settings.id} /> : null}
         <section className="grid gap-5">
           <h2 className="font-serif text-2xl font-semibold">General</h2>
-          <label className="grid gap-2 text-sm font-semibold">
-            Site name
-            <input name="site_name" defaultValue={settings.site_name || "Bansko NOW"} className={fieldClass()} />
-          </label>
           <label className="grid gap-2 text-sm font-semibold">
             Site description
             <textarea name="site_description" defaultValue={settings.site_description || ""} className={fieldClass()} rows={3} />
@@ -244,49 +92,6 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
 
         <section className="grid gap-5 border-t border-white/10 pt-6">
           <div>
-            <h2 className="font-serif text-2xl font-semibold">Подкрепи Bansko NOW</h2>
-            <p className="mt-2 text-sm leading-6 text-stone-300">
-              Бутонът се показва в основното меню и отваря кратка карта за доброволна подкрепа. Добави Stripe Payment Link с включена опция клиентът сам да избере сумата или PayPal/PayPal.Me линк без фиксирана сума.
-            </p>
-          </div>
-          <label className="choice-row cursor-pointer rounded-xl border border-white/10 bg-white/5 p-4 text-sm font-semibold">
-            <input className="choice-control" type="checkbox" name="support_enabled" defaultChecked={settings.support_enabled ?? true} />
-            <span>Показвай бутона „Подкрепи ни“</span>
-          </label>
-          <label className="grid gap-2 text-sm font-semibold">
-            Кратък текст на бутона
-            <input name="support_button_label" defaultValue={settings.support_button_label || "Подкрепи ни"} className={fieldClass()} maxLength={24} />
-          </label>
-          <label className="grid gap-2 text-sm font-semibold">
-            Заглавие на картата
-            <input name="support_title" defaultValue={settings.support_title || "Подкрепи Bansko NOW"} className={fieldClass()} />
-          </label>
-          <label className="grid gap-2 text-sm font-semibold">
-            Текст на картата
-            <textarea name="support_description" defaultValue={settings.support_description || ""} className={fieldClass()} rows={4} />
-          </label>
-          <div className="grid gap-4 md:grid-cols-2">
-            <label className="grid gap-2 text-sm font-semibold">
-              Снимка URL
-              <input name="support_image_url" defaultValue={settings.support_image_url || ""} className={fieldClass()} placeholder="https://..." />
-            </label>
-            <label className="grid gap-2 text-sm font-semibold">
-              Alt текст на снимката
-              <input name="support_image_alt" defaultValue={settings.support_image_alt || ""} className={fieldClass()} />
-            </label>
-          </div>
-          <label className="grid gap-2 text-sm font-semibold">
-            Stripe Payment Link
-            <input type="url" name="support_stripe_url" defaultValue={settings.support_stripe_url || ""} className={fieldClass()} placeholder="https://buy.stripe.com/..." />
-          </label>
-          <label className="grid gap-2 text-sm font-semibold">
-            PayPal / PayPal.Me линк
-            <input type="url" name="support_paypal_url" defaultValue={settings.support_paypal_url || ""} className={fieldClass()} placeholder="https://paypal.me/..." />
-          </label>
-        </section>
-
-        <section className="grid gap-5 border-t border-white/10 pt-6">
-          <div>
             <p className="text-sm font-semibold uppercase text-stone-400">English</p>
             <h2 className="mt-2 font-serif text-2xl font-semibold">English public texts</h2>
           </div>
@@ -298,12 +103,6 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
             Hero image alt
             <input name="hero_image_alt_en" defaultValue={englishSettings.hero_image_alt || ""} className={fieldClass()} />
           </label>
-          <div className="grid gap-4 md:grid-cols-2">
-            <input name="support_button_label_en" defaultValue={englishSettings.support_button_label || ""} className={fieldClass()} placeholder="Support us" />
-            <input name="support_title_en" defaultValue={englishSettings.support_title || ""} className={fieldClass()} placeholder="Support Bansko NOW" />
-          </div>
-          <textarea name="support_description_en" defaultValue={englishSettings.support_description || ""} className={fieldClass()} rows={3} placeholder="Support message" />
-          <input name="support_image_alt_en" defaultValue={englishSettings.support_image_alt || ""} className={fieldClass()} placeholder="Support image alt" />
           <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
             <p className="text-sm font-semibold uppercase text-stone-300">Article blocks</p>
             <div className="grid gap-3 md:grid-cols-2">
@@ -368,65 +167,11 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
           </label>
         </section>
 
-        <section className="grid gap-5 border-t border-white/10 pt-6">
-          <h2 className="font-serif text-2xl font-semibold">Social links</h2>
-          <label className="grid gap-2 text-sm font-semibold">
-            Facebook group URL
-            <input name="facebook_group_url" defaultValue={settings.facebook_group_url || ""} className={fieldClass()} />
-          </label>
-          <label className="grid gap-2 text-sm font-semibold">
-            Instagram URL
-            <input name="instagram_url" defaultValue={settings.instagram_url || ""} className={fieldClass()} />
-          </label>
-          <label className="grid gap-2 text-sm font-semibold">
-            YouTube URL
-            <input name="youtube_url" defaultValue={settings.youtube_url || ""} className={fieldClass()} />
-          </label>
-        </section>
-
         <button className="admin-button admin-button-primary w-fit px-6 py-3 text-sm font-semibold">
           Save settings
         </button>
       </form>
 
-      <form action={saveNavigationAction} className="grid max-w-5xl gap-5 rounded-2xl border border-white/10 bg-white/5 p-6">
-        <div>
-          <h2 className="font-serif text-2xl font-semibold">Main menu</h2>
-          <p className="mt-2 text-sm text-stone-400">
-            Use Font Awesome style names like <span className="text-stone-200">calendar-days</span>, <span className="text-stone-200">mountain</span> or{" "}
-            <span className="text-stone-200">fa-palette</span>.
-          </p>
-        </div>
-        <div className="grid gap-4">
-          {navigationItems.map((item, index) => (
-            <MenuRow key={item.id} item={item} englishItem={englishNavigationById.get(item.id)} rowKey={`existing-${index}`} />
-          ))}
-          <MenuRow rowKey="new-1" />
-          <MenuRow rowKey="new-2" />
-        </div>
-        <button className="admin-button admin-button-primary w-fit px-6 py-3 text-sm font-semibold">
-          Save menu
-        </button>
-      </form>
-
-      <form action={saveSocialLinksAction} className="grid max-w-5xl gap-5 rounded-2xl border border-white/10 bg-white/5 p-6">
-        <div>
-          <h2 className="font-serif text-2xl font-semibold">Social links</h2>
-          <p className="mt-2 text-sm text-stone-400">
-            Icons appear in the public header/footer only when the link is active and has a URL.
-          </p>
-        </div>
-        <div className="grid gap-4">
-          {socialLinks.map((item, index) => (
-            <SocialRow key={item.id} item={item} rowKey={`existing-${index}`} />
-          ))}
-          <SocialRow rowKey="new-1" />
-          <SocialRow rowKey="new-2" />
-        </div>
-        <button className="admin-button admin-button-primary w-fit px-6 py-3 text-sm font-semibold">
-          Save social links
-        </button>
-      </form>
     </div>
   );
 }

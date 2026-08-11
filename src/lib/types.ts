@@ -109,6 +109,8 @@ export type ArticleWithCategory = Article & {
 export type SiteSettings = {
   id: string;
   site_name: string | null;
+  logo_image_url: string | null;
+  logo_image_alt: string | null;
   site_description: string | null;
   facebook_group_url: string | null;
   instagram_url: string | null;

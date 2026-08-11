@@ -30,7 +30,7 @@ export async function SiteFooter({ settings, locale = "bg" }: { settings: SiteSe
     <footer className="border-t border-stone-200 bg-forest text-white">
       <div className="mx-auto grid max-w-7xl gap-10 px-4 py-12 sm:px-6 lg:grid-cols-[1.5fr_1fr_1fr] lg:px-8">
         <div>
-          <p className="font-serif text-3xl font-semibold">Bansko NOW</p>
+          <p className="font-serif text-3xl font-semibold">{settings.site_name || "Bansko NOW"}</p>
           <p className="mt-4 max-w-md text-sm leading-6 text-stone-200">
             {settings.site_description ||
               dictionary.heroText}

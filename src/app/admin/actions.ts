@@ -120,6 +120,7 @@ function revalidateSiteChrome() {
   revalidatePath("/");
   revalidatePath("/articles");
   revalidatePath("/en/articles");
+  revalidatePath("/admin/navigation");
   revalidatePath("/admin/settings");
 }
 
@@ -559,11 +560,7 @@ export async function saveSettingsAction(formData: FormData) {
   const heroMediaType: SiteSettings["hero_media_type"] =
     requestedHeroMediaType === "video" || requestedHeroMediaType === "embed" ? requestedHeroMediaType : "image";
   const payload = {
-    site_name: stringValue(formData, "site_name") || "Bansko NOW",
     site_description: stringValue(formData, "site_description"),
-    facebook_group_url: stringValue(formData, "facebook_group_url"),
-    instagram_url: stringValue(formData, "instagram_url"),
-    youtube_url: stringValue(formData, "youtube_url"),
     default_og_image: stringValue(formData, "default_og_image"),
     hero_media_type: heroMediaType,
     hero_image_url: stringValue(formData, "hero_image_url"),
@@ -571,14 +568,6 @@ export async function saveSettingsAction(formData: FormData) {
     hero_video_url: stringValue(formData, "hero_video_url"),
     hero_video_poster_url: stringValue(formData, "hero_video_poster_url"),
     hero_embed_url: stringValue(formData, "hero_embed_url"),
-    support_enabled: booleanValue(formData, "support_enabled"),
-    support_button_label: stringValue(formData, "support_button_label") || "Подкрепи ни",
-    support_title: stringValue(formData, "support_title") || "Подкрепи Bansko NOW",
-    support_description: stringValue(formData, "support_description"),
-    support_image_url: stringValue(formData, "support_image_url"),
-    support_image_alt: stringValue(formData, "support_image_alt"),
-    support_stripe_url: webUrlValue(formData, "support_stripe_url"),
-    support_paypal_url: webUrlValue(formData, "support_paypal_url"),
     default_author_name: stringValue(formData, "default_author_name") || "Любо Канелов"
   };
 
@@ -595,10 +584,6 @@ export async function saveSettingsAction(formData: FormData) {
     locale,
     site_description: stringValue(formData, `site_description${suffix}`),
     hero_image_alt: stringValue(formData, `hero_image_alt${suffix}`),
-    support_button_label: stringValue(formData, `support_button_label${suffix}`),
-    support_title: stringValue(formData, `support_title${suffix}`),
-    support_description: stringValue(formData, `support_description${suffix}`),
-    support_image_alt: stringValue(formData, `support_image_alt${suffix}`),
     facebook_cta_eyebrow: stringValue(formData, `facebook_cta_eyebrow${suffix}`),
     facebook_cta_title: stringValue(formData, `facebook_cta_title${suffix}`),
     facebook_cta_text: stringValue(formData, `facebook_cta_text${suffix}`),
@@ -626,8 +611,55 @@ export async function saveSettingsAction(formData: FormData) {
   redirect("/admin/settings?saved=1");
 }
 
+export async function saveHeaderSettingsAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = stringValue(formData, "id");
+  const payload = {
+    site_name: stringValue(formData, "site_name") || "Bansko NOW",
+    logo_image_url: webUrlValue(formData, "logo_image_url"),
+    logo_image_alt: stringValue(formData, "logo_image_alt") || stringValue(formData, "site_name") || "Bansko NOW",
+    facebook_group_url: webUrlValue(formData, "facebook_group_url"),
+    support_enabled: booleanValue(formData, "support_enabled"),
+    support_button_label: stringValue(formData, "support_button_label") || "Подкрепи ни",
+    support_title: stringValue(formData, "support_title") || "Подкрепи Bansko NOW",
+    support_description: stringValue(formData, "support_description"),
+    support_image_url: webUrlValue(formData, "support_image_url"),
+    support_image_alt: stringValue(formData, "support_image_alt"),
+    support_stripe_url: webUrlValue(formData, "support_stripe_url"),
+    support_paypal_url: webUrlValue(formData, "support_paypal_url")
+  };
+
+  const result = id
+    ? await supabase.from("site_settings").update(payload).eq("id", id).select("id").single()
+    : await supabase.from("site_settings").insert(payload).select("id").single();
+
+  if (result.error || !result.data?.id) {
+    redirect(`/admin/navigation?error=${encodeURIComponent(result.error?.message || "Настройките на хедъра не можаха да бъдат запазени.")}`);
+  }
+
+  const localizedSupport = (locale: Locale, suffix = "") => ({
+    site_settings_id: result.data.id,
+    locale,
+    support_button_label: stringValue(formData, `support_button_label${suffix}`),
+    support_title: stringValue(formData, `support_title${suffix}`),
+    support_description: stringValue(formData, `support_description${suffix}`),
+    support_image_alt: stringValue(formData, `support_image_alt${suffix}`)
+  });
+  const { error: translationError } = await supabase
+    .from("site_settings_translations")
+    .upsert([localizedSupport("bg"), localizedSupport("en", "_en")], { onConflict: "site_settings_id,locale" });
+
+  if (translationError) {
+    redirect(`/admin/navigation?error=${encodeURIComponent(translationError.message)}`);
+  }
+
+  revalidateSiteChrome();
+  redirect("/admin/navigation?saved=header");
+}
+
 export async function saveNavigationAction(formData: FormData) {
   const { supabase } = await requireAdmin();
+  let saveError: string | null = null;
   const rowKeys = formData
     .getAll("navigation_row_key")
     .map((value) => (typeof value === "string" ? value : null))
@@ -642,7 +674,8 @@ export async function saveNavigationAction(formData: FormData) {
 
     if (shouldDelete) {
       if (id) {
-        await supabase.from("navigation_items").delete().eq("id", id);
+        const { error } = await supabase.from("navigation_items").delete().eq("id", id);
+        saveError ||= error?.message || null;
       }
       continue;
     }
@@ -667,10 +700,11 @@ export async function saveNavigationAction(formData: FormData) {
       : await supabase.from("navigation_items").upsert(payload, { onConflict: "href" }).select("id").single();
 
     if (result.error || !result.data?.id) {
+      saveError ||= result.error?.message || "Елемент от менюто не можа да бъде запазен.";
       continue;
     }
 
-    await supabase.from("navigation_item_translations").upsert(
+    const { error: bgTranslationError } = await supabase.from("navigation_item_translations").upsert(
       {
         navigation_item_id: result.data.id,
         locale: "bg",
@@ -679,9 +713,10 @@ export async function saveNavigationAction(formData: FormData) {
       },
       { onConflict: "navigation_item_id,locale" }
     );
+    saveError ||= bgTranslationError?.message || null;
 
     if (englishLabel) {
-      await supabase.from("navigation_item_translations").upsert(
+      const { error: enTranslationError } = await supabase.from("navigation_item_translations").upsert(
         {
           navigation_item_id: result.data.id,
           locale: "en",
@@ -690,14 +725,21 @@ export async function saveNavigationAction(formData: FormData) {
         },
         { onConflict: "navigation_item_id,locale" }
       );
+      saveError ||= enTranslationError?.message || null;
     }
   }
 
+  if (saveError) {
+    redirect(`/admin/navigation?error=${encodeURIComponent(saveError)}`);
+  }
+
   revalidateSiteChrome();
+  redirect("/admin/navigation?saved=menu");
 }
 
 export async function saveSocialLinksAction(formData: FormData) {
   const { supabase } = await requireAdmin();
+  let saveError: string | null = null;
   const rowKeys = formData
     .getAll("social_row_key")
     .map((value) => (typeof value === "string" ? value : null))
@@ -712,7 +754,8 @@ export async function saveSocialLinksAction(formData: FormData) {
 
     if (shouldDelete) {
       if (id) {
-        await supabase.from("social_links").delete().eq("id", id);
+        const { error } = await supabase.from("social_links").delete().eq("id", id);
+        saveError ||= error?.message || null;
       }
       continue;
     }
@@ -731,13 +774,20 @@ export async function saveSocialLinksAction(formData: FormData) {
     };
 
     if (id) {
-      await supabase.from("social_links").update(payload).eq("id", id);
+      const { error } = await supabase.from("social_links").update(payload).eq("id", id);
+      saveError ||= error?.message || null;
     } else {
-      await supabase.from("social_links").upsert(payload, { onConflict: "platform" });
+      const { error } = await supabase.from("social_links").upsert(payload, { onConflict: "platform" });
+      saveError ||= error?.message || null;
     }
   }
 
+  if (saveError) {
+    redirect(`/admin/navigation?error=${encodeURIComponent(saveError)}`);
+  }
+
   revalidateSiteChrome();
+  redirect("/admin/navigation?saved=social");
 }
 
 export async function upsertEditablePageAction(formData: FormData) {

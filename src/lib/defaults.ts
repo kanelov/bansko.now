@@ -89,6 +89,8 @@ export const categoryDefinitions: Category[] = [
 export const fallbackSettings: SiteSettings = {
   id: "fallback",
   site_name: "Bansko NOW",
+  logo_image_url: null,
+  logo_image_alt: "Bansko NOW",
   site_description: "Събития, култура, природа, хора и истории от Банско и Пирин.",
   facebook_group_url: "https://www.facebook.com/groups/banskonow",
   instagram_url: null,

@@ -92,12 +92,23 @@ export async function SiteHeader({ locale = "bg", alternateHref }: { locale?: Lo
   const [settings, navItems] = await Promise.all([getSiteSettings(locale), getNavigationItems(locale)]);
   const socialLinks = await getSocialLinks(settings);
   const languageHref = alternateHref === undefined ? localePath(locale === "bg" ? "en" : "bg", "/") : alternateHref;
+  const siteName = settings.site_name || "Bansko NOW";
 
   return (
     <header className="sticky top-0 z-40 border-b border-stone-200 bg-[rgba(250,248,242,0.9)] backdrop-blur-xl">
       <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 px-4 py-4 sm:px-6 lg:px-8">
-        <Link href={localePath(locale, "/") as Route} className="shrink-0 font-serif text-2xl font-semibold text-forest" aria-label={`Bansko NOW ${dictionary.home}`}>
-          Bansko NOW
+        <Link href={localePath(locale, "/") as Route} className="shrink-0 font-serif text-2xl font-semibold text-forest" aria-label={`${siteName} ${dictionary.home}`}>
+          {settings.logo_image_url ? (
+            <img
+              src={settings.logo_image_url}
+              alt={settings.logo_image_alt || siteName}
+              width={180}
+              height={48}
+              className="h-10 w-auto max-w-44 object-contain"
+            />
+          ) : (
+            siteName
+          )}
         </Link>
 
         <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex" aria-label={dictionary.navigation}>
