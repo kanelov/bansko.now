@@ -4,7 +4,9 @@ import {
   upsertArtStudioServiceAction,
   upsertEditablePageAction
 } from "@/app/admin/actions";
+import { ContentDocumentTools } from "@/components/admin/content-document-tools";
 import { getArtStudioServices, getEditablePages } from "@/lib/content";
+import { editablePageDocumentFields } from "@/lib/content-transfer";
 import { isLocale } from "@/lib/i18n";
 
 type SearchParams = Promise<{
@@ -91,15 +93,12 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
               <form action={upsertEditablePageAction} className="mt-6 grid gap-4 rounded-2xl bg-white p-5 text-stone-950">
                 {page ? <input type="hidden" name="id" value={page.id} /> : null}
                 {page ? <input type="hidden" name="locale" value={page.locale} /> : null}
-                {page ? <input type="hidden" name="translation_group_id" value={page.translation_group_id} /> : null}
-                {!page && newPageTranslationGroup ? (
-                  <input type="hidden" name="translation_group_id" value={newPageTranslationGroup} />
-                ) : null}
+                <input type="hidden" name="translation_group_id" defaultValue={page?.translation_group_id || newPageTranslationGroup} />
                 {page ? (
                   <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl bg-stone-100 p-3 text-sm">
                     <span className="font-semibold">Език: {page.locale === "bg" ? "Български" : "English"}</span>
                     {counterpart ? (
-                      <Link href={`/admin/cms#page-${counterpart.id}`} className="admin-button admin-button-secondary px-4 py-2 text-xs font-semibold">
+                      <Link href={`/admin/cms#page-${counterpart.id}`} className="admin-button admin-button-sage px-4 py-2 text-xs font-semibold">
                         Отвори {alternateLocale.toUpperCase()} версията
                       </Link>
                     ) : (
@@ -116,6 +115,14 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
                     Създаваш {newPageLocale.toUpperCase()} версия, свързана с другия език.
                   </p>
                 ) : null}
+                <ContentDocumentTools
+                  documentType="page"
+                  currentLocale={page?.locale || newPageLocale}
+                  translationGroupId={page?.translation_group_id || newPageTranslationGroup}
+                  recordId={page?.id}
+                  slug={page?.slug || "new-page"}
+                  fieldNames={editablePageDocumentFields}
+                />
                 <div className="grid gap-4 md:grid-cols-4">
                   <label className="grid gap-2 text-sm font-semibold">
                     Title

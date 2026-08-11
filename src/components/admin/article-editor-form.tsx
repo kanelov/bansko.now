@@ -9,7 +9,9 @@ import { BanskoCollectionBlock } from "@/components/public/bansko-collection-blo
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SEOChecklist } from "@/components/admin/seo-checklist";
+import { ContentDocumentTools } from "@/components/admin/content-document-tools";
 import { fallbackSettings } from "@/lib/defaults";
+import { articleDocumentFields, type ContentDocumentMetadata, type ContentDocumentValue } from "@/lib/content-transfer";
 import { getArticleToc } from "@/lib/markdown-blocks";
 import { getSeoScore } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
@@ -174,39 +176,53 @@ const visualBlocks = [
   }
 ];
 
-const serializedDraftFields: (keyof Draft)[] = [
-  "locale",
-  "translation_group_id",
-  "title",
-  "slug",
-  "excerpt",
-  "content",
-  "category_id",
-  "tags_input",
-  "source_links_input",
-  "internal_link_suggestions_input",
-  "focus_keyword",
-  "seo_title",
-  "seo_description",
-  "canonical_url",
-  "og_title",
-  "og_description",
-  "og_image_url",
-  "featured_image_url",
-  "featured_image_alt",
-  "author_name",
-  "schema_type",
-  "status",
-  "published_at",
-  "scheduled_at",
-  "robots_index",
-  "robots_follow",
-  "is_featured",
-  "is_homepage_highlight",
-  "show_facebook_cta",
-  "show_art_studio_block",
-  "show_bansko_collection_block"
-];
+const serializedDraftFields: readonly (keyof Draft)[] = articleDocumentFields;
+
+function importedBoolean(value: string | undefined, fallback: boolean) {
+  if (value === undefined) {
+    return fallback;
+  }
+
+  return value.trim().toLowerCase() === "true";
+}
+
+function importDraft(current: Draft, fields: Record<string, string>, metadata: ContentDocumentMetadata): Draft {
+  const importedStatus = fields.status === "published" || fields.status === "scheduled" || fields.status === "draft" ? fields.status : current.status;
+
+  return {
+    locale: current.locale,
+    translation_group_id: current.translation_group_id || metadata.translationGroupId || fields.translation_group_id || "",
+    title: fields.title ?? current.title,
+    slug: fields.slug ? slugify(fields.slug) : current.slug,
+    excerpt: fields.excerpt ?? current.excerpt,
+    content: fields.content ?? current.content,
+    category_id: fields.category_id ?? current.category_id,
+    tags_input: fields.tags_input ?? current.tags_input,
+    source_links_input: fields.source_links_input ?? current.source_links_input,
+    internal_link_suggestions_input: fields.internal_link_suggestions_input ?? current.internal_link_suggestions_input,
+    focus_keyword: fields.focus_keyword ?? current.focus_keyword,
+    seo_title: fields.seo_title ?? current.seo_title,
+    seo_description: fields.seo_description ?? current.seo_description,
+    canonical_url: fields.canonical_url ?? current.canonical_url,
+    og_title: fields.og_title ?? current.og_title,
+    og_description: fields.og_description ?? current.og_description,
+    og_image_url: fields.og_image_url ?? current.og_image_url,
+    featured_image_url: fields.featured_image_url ?? current.featured_image_url,
+    featured_image_alt: fields.featured_image_alt ?? current.featured_image_alt,
+    author_name: fields.author_name ?? current.author_name,
+    schema_type: fields.schema_type ?? current.schema_type,
+    status: importedStatus,
+    published_at: fields.published_at ?? current.published_at,
+    scheduled_at: fields.scheduled_at ?? current.scheduled_at,
+    robots_index: importedBoolean(fields.robots_index, current.robots_index),
+    robots_follow: importedBoolean(fields.robots_follow, current.robots_follow),
+    is_featured: importedBoolean(fields.is_featured, current.is_featured),
+    is_homepage_highlight: importedBoolean(fields.is_homepage_highlight, current.is_homepage_highlight),
+    show_facebook_cta: importedBoolean(fields.show_facebook_cta, current.show_facebook_cta),
+    show_art_studio_block: importedBoolean(fields.show_art_studio_block, current.show_art_studio_block),
+    show_bansko_collection_block: importedBoolean(fields.show_bansko_collection_block, current.show_bansko_collection_block)
+  };
+}
 
 function ArticleFormActions({
   isExisting,
@@ -298,6 +314,10 @@ export function ArticleEditorForm({
     }),
     [article, draft]
   );
+  const documentValues = useMemo<Record<string, ContentDocumentValue>>(
+    () => Object.fromEntries(serializedDraftFields.map((field) => [field, draft[field]])),
+    [draft]
+  );
 
   function update<K extends keyof Draft>(key: K, value: Draft[K]) {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -375,6 +395,20 @@ export function ArticleEditorForm({
         ))}
         <span className="ml-auto rounded-full bg-sage px-4 py-2 text-sm font-semibold text-forest">SEO {score}/100</span>
       </div>
+
+      <ContentDocumentTools
+        documentType="article"
+        currentLocale={draft.locale}
+        translationGroupId={draft.translation_group_id}
+        recordId={article?.id}
+        slug={draft.slug || draft.title}
+        fieldNames={serializedDraftFields}
+        values={documentValues}
+        onImport={(fields, metadata) => {
+          setDraft((current) => importDraft(current, fields, metadata));
+          setActiveTab("content");
+        }}
+      />
 
       {activeTab === "content" ? (
         <section className="grid gap-5 rounded-2xl bg-white p-5 text-stone-950">
