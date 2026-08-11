@@ -74,7 +74,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       url: canonical,
       publishedTime: article.published_at || undefined,
       modifiedTime: article.updated_at || undefined,
-      authors: [article.author_name || "Любо Канелов"],
+      authors: article.author_name ? [article.author_name] : undefined,
       images: image
         ? [{ url: image, ...(article.featured_image_alt ? { alt: article.featured_image_alt } : {}) }]
         : undefined
@@ -148,6 +148,25 @@ export default async function ArticlePage({ params }: { params: Params }) {
   const updatedDate = formatDate(article.updated_at, locale);
   const tocItems = getArticleToc(article.content);
   const articleWordCount = wordCount(article.content);
+  const authorName = article.author_name || settings.default_author_name || undefined;
+  const primaryImage = image
+    ? {
+        "@type": "ImageObject",
+        "@id": `${articleUrl}#primaryimage`,
+        url: image,
+        contentUrl: image,
+        caption: article.image_caption || undefined,
+        creditText: article.photo_credit || undefined,
+        copyrightNotice: article.photo_credit || undefined,
+        creator: authorName
+          ? {
+              "@type": "Person",
+              name: authorName
+            }
+          : undefined,
+        representativeOfPage: true
+      }
+    : undefined;
 
   const articleSchema = {
     "@context": "https://schema.org",
@@ -155,35 +174,19 @@ export default async function ArticlePage({ params }: { params: Params }) {
     url: articleUrl,
     headline: article.title,
     description: article.seo_description || article.excerpt,
-    image: image
-      ? [
-          {
-            "@type": "ImageObject",
-            "@id": `${articleUrl}#primaryimage`,
-            url: image,
-            contentUrl: image,
-            caption: article.image_caption || undefined,
-            creditText: article.photo_credit || undefined,
-            creator: article.photo_credit
-              ? {
-                  "@type": "Person",
-                  name: article.photo_credit
-                }
-              : undefined,
-            representativeOfPage: true
-          }
-        ]
-      : undefined,
+    image: image ? [image] : undefined,
     thumbnailUrl: image || undefined,
     datePublished: article.published_at,
     dateModified: article.updated_at,
     inLanguage: locale === "en" ? "en" : "bg",
     isAccessibleForFree: true,
     wordCount: articleWordCount || undefined,
-    author: {
-      "@type": "Person",
-      name: article.author_name || settings.default_author_name || "Любо Канелов"
-    },
+    author: authorName
+      ? {
+          "@type": "Person",
+          name: authorName
+        }
+      : undefined,
     publisher: {
       "@type": "Organization",
       name: "Bansko NOW",
@@ -197,7 +200,8 @@ export default async function ArticlePage({ params }: { params: Params }) {
     keywords: tags.map((tag) => tag.name).join(", "),
     mainEntityOfPage: {
       "@type": "WebPage",
-      "@id": articleUrl
+      "@id": articleUrl,
+      primaryImageOfPage: primaryImage
     }
   };
   const faqItems = getFaqItemsFromMarkdown(article.content);
