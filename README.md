@@ -23,3 +23,15 @@ pnpm dev
 ```
 
 The app has graceful fallback content when Supabase env vars are missing, so the public MVP can build before the production project is connected.
+
+## ART GALLERY APP integration
+
+The Art Studio gallery reads published products from the protected ART GALLERY APP API. Add these server-only variables to Bansko NOW:
+
+```text
+ART_GALLERY_CATALOG_API_URL=https://app.kanelov.com/api/public-catalog
+ART_GALLERY_RESERVATION_API_URL=https://app.kanelov.com/api/reservations
+ART_GALLERY_INTEGRATION_SECRET=the-same-long-random-secret-as-the-source-app
+```
+
+The secret must never use a `NEXT_PUBLIC_` prefix. Catalog responses are cached by Next.js for five minutes. Pickup requests are written to the source system, receive a `BN-YYYY-######` reference, and do not use online payment.

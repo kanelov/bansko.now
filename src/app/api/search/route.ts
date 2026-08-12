@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getBusinessPath } from "@/lib/business-public";
 import { getArticlePath, getCategories, getEditablePages, getPublishedArticles } from "@/lib/content";
+import { getLocalizedGalleryCatalog } from "@/lib/gallery-catalog";
 import { isLocale, localePath } from "@/lib/i18n";
 
 export const dynamic = "force-dynamic";
@@ -20,15 +21,16 @@ export async function GET(request: Request) {
     return NextResponse.json({ results: [] });
   }
 
-  const [articles, businesses, categories, pages] = await Promise.all([
+  const [articles, businesses, categories, pages, gallery] = await Promise.all([
     getPublishedArticles({ limit: 100, locale }),
     getApprovedBusinesses(locale),
     getCategories(locale),
-    getEditablePages({ locale })
+    getEditablePages({ locale }),
+    getLocalizedGalleryCatalog(locale)
   ]);
   const labels = locale === "en"
-    ? { article: "Article", business: "Business", category: "Category", page: "Page" }
-    : { article: "Статия", business: "Бизнес", category: "Категория", page: "Страница" };
+    ? { article: "Article", business: "Business", category: "Category", page: "Page", product: "Gallery product" }
+    : { article: "Статия", business: "Бизнес", category: "Категория", page: "Страница", product: "Продукт от галерията" };
 
   const articleResults = articles
     .filter((article) => includesQuery([article.title, article.excerpt, article.content], query))
@@ -70,9 +72,26 @@ export async function GET(request: Request) {
       description: page.excerpt,
       href: localePath(locale, `/${page.slug}`)
     }));
+  const galleryResults = gallery.products
+    .filter((product) => includesQuery([
+      product.title,
+      product.short_description,
+      product.description,
+      product.sku,
+      product.material,
+      ...product.localized_categories.map((category) => category.name)
+    ], query))
+    .slice(0, 5)
+    .map((product) => ({
+      id: `gallery-${product.id}`,
+      type: labels.product,
+      title: product.title,
+      description: product.short_description,
+      href: localePath(locale, `/art-studio/gallery/${product.slug}`)
+    }));
 
   return NextResponse.json(
-    { results: [...articleResults, ...businessResults, ...categoryResults, ...pageResults] },
+    { results: [...articleResults, ...businessResults, ...galleryResults, ...categoryResults, ...pageResults] },
     { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
   );
 }

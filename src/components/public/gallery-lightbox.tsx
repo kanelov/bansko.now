@@ -5,7 +5,7 @@ import type { GalleryImage } from "@/lib/markdown-blocks";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
-export function GalleryLightbox({ images, locale = "bg" }: { images: GalleryImage[]; locale?: Locale }) {
+export function GalleryLightbox({ images, locale = "bg", priorityFirst = false }: { images: GalleryImage[]; locale?: Locale; priorityFirst?: boolean }) {
   const dictionary = getDictionary(locale);
   const galleryId = useId();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -77,8 +77,11 @@ export function GalleryLightbox({ images, locale = "bg" }: { images: GalleryImag
                 <img
                   src={image.src}
                   alt={image.alt}
+                  width={1200}
+                  height={900}
                   className="aspect-[4/3] w-full rounded-[1.35rem] object-cover transition duration-300 group-hover:scale-[1.015]"
-                  loading="lazy"
+                  loading={priorityFirst && index === 0 ? "eager" : "lazy"}
+                  fetchPriority={priorityFirst && index === 0 ? "high" : "auto"}
                   decoding="async"
                   itemProp="contentUrl"
                 />
@@ -123,7 +126,7 @@ export function GalleryLightbox({ images, locale = "bg" }: { images: GalleryImag
             </>
           ) : null}
           <figure className="grid max-h-[90vh] max-w-6xl gap-3" itemScope itemType="https://schema.org/ImageObject">
-            <img src={activeImage.src} alt={activeImage.alt} className="max-h-[82vh] w-full rounded-2xl object-contain" itemProp="contentUrl" />
+            <img src={activeImage.src} alt={activeImage.alt} width={1600} height={1200} className="max-h-[82vh] w-full rounded-2xl object-contain" itemProp="contentUrl" />
             <figcaption className="text-center text-sm text-stone-100">
               {activeImage.alt ? <span>{activeImage.alt}</span> : null}
               {hasMultipleImages ? (

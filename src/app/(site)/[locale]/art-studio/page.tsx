@@ -119,6 +119,23 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
             </section>
           ) : null}
 
+          <section className="grid items-center gap-6 border-y border-stone-200 py-9 md:grid-cols-[1fr_auto]" aria-labelledby="art-gallery-heading">
+            <div className="max-w-3xl">
+              <p className="text-sm font-semibold uppercase text-moss">Art Gallery Bansko</p>
+              <h2 id="art-gallery-heading" className="mt-2 font-serif text-4xl font-semibold text-stone-950">
+                {locale === "en" ? "Works and products from the gallery" : "Произведения и продукти от галерията"}
+              </h2>
+              <p className="mt-3 text-base leading-7 text-stone-650">
+                {locale === "en"
+                  ? "Explore the current collection, reserve a product for pickup in Bansko or continue to the online shop when available."
+                  : "Разгледай актуалната колекция, заяви продукт за взимане в Банско или продължи към онлайн магазина, когато е наличен."}
+              </p>
+            </div>
+            <Link href={localePath(locale, "/art-studio/gallery") as Route} className="inline-flex rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
+              {locale === "en" ? "Open the gallery" : "Отвори галерията"}
+            </Link>
+          </section>
+
           {productTypes.length ? (
             <section aria-labelledby="art-studio-products-heading">
               <div className="mb-8 max-w-3xl">

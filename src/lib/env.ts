@@ -24,3 +24,6 @@ export const emailFrom = process.env.EMAIL_FROM || "Bansko NOW <onboarding@resen
 export const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || null;
 export const stripeSecretKey = process.env.STRIPE_SECRET_KEY || null;
 export const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET || null;
+export const artGalleryCatalogApiUrl = process.env.ART_GALLERY_CATALOG_API_URL || null;
+export const artGalleryReservationApiUrl = process.env.ART_GALLERY_RESERVATION_API_URL || null;
+export const artGalleryIntegrationSecret = process.env.ART_GALLERY_INTEGRATION_SECRET || null;
