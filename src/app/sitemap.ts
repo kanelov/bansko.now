@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getArticlePath, getCategories, getPublishedArticles } from "@/lib/content";
-import { getLocalizedGalleryCatalog } from "@/lib/gallery-catalog";
+import { getAllLocalizedGalleryProducts } from "@/lib/gallery-catalog";
 import { localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
@@ -40,8 +40,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getArtStudioProductTypes({ locale: "en" }),
     getArtStudioProducts({ locale: "bg" }),
     getArtStudioProducts({ locale: "en" }),
-    getLocalizedGalleryCatalog("bg"),
-    getLocalizedGalleryCatalog("en")
+    getAllLocalizedGalleryProducts("bg"),
+    getAllLocalizedGalleryProducts("en")
   ]);
   const now = new Date();
   const staticRoutes = ["/", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/art-studio", "/art-studio/gallery", "/about", "/contact", "/privacy", "/terms"];
@@ -50,7 +50,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const enBusinessById = new Map(enBusinesses.map((business) => [business.id, business]));
   const enProductTypeById = new Map(enProductTypes.map((productType) => [productType.id, productType]));
   const enProductById = new Map(enProducts.map((product) => [product.id, product]));
-  const enGalleryProductById = new Map(enGallery.products.map((product) => [product.id, product]));
+  const enGalleryProductById = new Map(enGallery.map((product) => [product.id, product]));
 
   for (const article of [...bgArticles, ...enArticles]) {
     const group = articleByGroup.get(article.translation_group_id) ?? {};
@@ -131,7 +131,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
     return entries;
   });
-  const galleryProductEntries = bgGallery.products.flatMap((product) => {
+  const galleryProductEntries = bgGallery.flatMap((product) => {
     const english = enGalleryProductById.get(product.id);
     const bgPath = `/art-studio/gallery/${product.slug}`;
     const enPath = english ? `/art-studio/gallery/${english.slug}` : bgPath;

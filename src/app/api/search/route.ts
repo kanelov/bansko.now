@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     getApprovedBusinesses(locale),
     getCategories(locale),
     getEditablePages({ locale }),
-    getLocalizedGalleryCatalog(locale)
+    getLocalizedGalleryCatalog(locale, { query, pageSize: 5 })
   ]);
   const labels = locale === "en"
     ? { article: "Article", business: "Business", category: "Category", page: "Page", product: "Gallery product" }

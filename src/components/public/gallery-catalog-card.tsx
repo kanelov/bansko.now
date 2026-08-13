@@ -15,6 +15,7 @@ function availabilityLabel(product: LocalizedGalleryProduct, locale: Locale) {
   if (product.availability === "out_of_stock") return locale === "en" ? "Out of stock" : "Изчерпан";
   if (product.availability === "preorder") return locale === "en" ? "Pre-order" : "Предварителна заявка";
   if (product.availability === "in_gallery_only") return locale === "en" ? "In the gallery" : "В галерията";
+  if (product.availability === "catalog_only") return locale === "en" ? "Kiosk catalogue" : "Киоск каталог";
   return locale === "en" ? "Available" : "В наличност";
 }
 

@@ -9,27 +9,41 @@ import { getLocalizedGalleryCatalog } from "@/lib/gallery-catalog";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 
 type Params = Promise<{ locale: string }>;
-type SearchParams = Promise<{ category?: string }>;
+type SearchParams = Promise<{ category?: string; page?: string }>;
 
-export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
-  const { locale } = await params;
+function positiveInteger(value: string | undefined) {
+  const parsed = Number.parseInt(value || "", 10);
+  return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
+}
+
+function galleryQuery(category: string | undefined, page: number) {
+  const query = new URLSearchParams();
+  if (category) query.set("category", category);
+  if (page > 1) query.set("page", String(page));
+  const value = query.toString();
+  return value ? `?${value}` : "";
+}
+
+function paginationItems(current: number, total: number) {
+  const pages = new Set([1, total, current - 1, current, current + 1]);
+  return [...pages].filter((page) => page >= 1 && page <= total).sort((a, b) => a - b);
+}
+
+export async function generateMetadata({ params, searchParams }: { params: Params; searchParams: SearchParams }): Promise<Metadata> {
+  const [{ locale }, query] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) return {};
-  const canonical = localeUrl(locale, "/art-studio/gallery");
-  const title = locale === "en" ? "Art Gallery Bansko | Bansko NOW" : "Арт галерия Банско | Bansko NOW";
+  const page = positiveInteger(query.page);
+  const suffix = galleryQuery(query.category, page);
+  const canonical = `${localeUrl(locale, "/art-studio/gallery")}${suffix}`;
+  const baseTitle = locale === "en" ? "T-shirt catalogue Bansko" : "Каталог тениски Банско";
+  const title = `${baseTitle}${page > 1 ? ` · ${locale === "en" ? "Page" : "Страница"} ${page}` : ""} | Bansko NOW`;
   const description = locale === "en"
-    ? "Original art products inspired by Bansko and Pirin, available to reserve for pickup from our gallery."
-    : "Авторски арт продукти, вдъхновени от Банско и Пирин, с възможност за заявка и взимане от галерията.";
+    ? "Browse the T-shirt designs from the Art Studio kiosk catalogue and reserve available products for gallery pickup in Bansko."
+    : "Разгледай моделите тениски от киоск каталога на Art Studio и заяви наличните продукти за взимане от галерията в Банско.";
   return {
     title: { absolute: title },
     description,
-    alternates: {
-      canonical,
-      languages: {
-        bg: localeUrl("bg", "/art-studio/gallery"),
-        en: localeUrl("en", "/art-studio/gallery"),
-        "x-default": localeUrl("bg", "/art-studio/gallery")
-      }
-    },
+    alternates: { canonical },
     openGraph: { type: "website", url: canonical, title, description },
     twitter: { card: "summary_large_image", title, description }
   };
@@ -38,32 +52,36 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function ArtStudioGalleryPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   const [{ locale }, query] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
-  const [{ categories, products }, settings] = await Promise.all([
-    getLocalizedGalleryCatalog(locale),
+  const requestedPage = positiveInteger(query.page);
+  const [{ categories, products, page, pageCount, totalCount }, settings] = await Promise.all([
+    getLocalizedGalleryCatalog(locale, {
+      page: requestedPage,
+      pageSize: 24,
+      categorySlug: query.category
+    }),
     getSiteSettings(locale)
   ]);
   const activeCategory = categories.find((category) => category.slug === query.category) ?? null;
-  const filteredProducts = activeCategory
-    ? products.filter((product) => product.categories.some((category) => category.id === activeCategory.id))
-    : products;
-  const featured = !activeCategory ? filteredProducts.find((product) => product.is_featured) ?? null : null;
-  const regularProducts = filteredProducts.filter((product) => product.id !== featured?.id);
+  const featured = !activeCategory && page === 1 ? products.find((product) => product.is_featured) ?? null : null;
+  const regularProducts = products.filter((product) => product.id !== featured?.id);
   const isEnglish = locale === "en";
+  const pageNumbers = paginationItems(page, pageCount);
+  const pageHref = (targetPage: number) => `${localePath(locale, "/art-studio/gallery")}${galleryQuery(query.category, targetPage)}` as Route;
   const collectionSchema = {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
-    name: isEnglish ? "Art Gallery Bansko" : "Арт галерия Банско",
+    name: isEnglish ? "T-shirt catalogue Bansko" : "Каталог тениски Банско",
     description: isEnglish
-      ? "Original art products inspired by Bansko and Pirin."
-      : "Авторски арт продукти, вдъхновени от Банско и Пирин.",
-    url: localeUrl(locale, "/art-studio/gallery"),
+      ? "T-shirt designs from the Art Studio kiosk catalogue."
+      : "Модели тениски от киоск каталога на Art Studio.",
+    url: `${localeUrl(locale, "/art-studio/gallery")}${galleryQuery(query.category, page)}`,
     inLanguage: locale,
     mainEntity: {
       "@type": "ItemList",
-      numberOfItems: filteredProducts.length,
-      itemListElement: filteredProducts.map((product, index) => ({
+      numberOfItems: totalCount,
+      itemListElement: products.map((product, index) => ({
         "@type": "ListItem",
-        position: index + 1,
+        position: (page - 1) * 24 + index + 1,
         name: product.title,
         url: localeUrl(locale, `/art-studio/gallery/${product.slug}`)
       }))
@@ -78,12 +96,12 @@ export default async function ArtStudioGalleryPage({ params, searchParams }: { p
           <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <p className="text-sm font-semibold uppercase text-moss">Art Studio · Bansko NOW</p>
             <h1 className="mt-4 max-w-4xl font-serif text-5xl font-semibold leading-tight text-stone-950 sm:text-7xl">
-              {isEnglish ? "Art Gallery Bansko" : "Арт галерия Банско"}
+              {isEnglish ? "T-shirt catalogue" : "Каталог тениски"}
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-stone-650">
               {isEnglish
-                ? "Original prints, canvases and objects inspired by Bansko and Pirin. Reserve online, collect and pay at the gallery."
-                : "Авторски принтове, платна и предмети, вдъхновени от Банско и Пирин. Заяви онлайн, вземи и плати в галерията."}
+                ? "Browse the same designs shown in the gallery kiosk. Products currently in stock can be reserved for pickup in Bansko."
+                : "Разгледай същите модели, които се показват в киоска на галерията. Наличните продукти могат да бъдат заявени за взимане в Банско."}
             </p>
           </div>
         </section>
@@ -110,15 +128,33 @@ export default async function ArtStudioGalleryPage({ params, searchParams }: { p
             </header>
           ) : null}
 
-          {filteredProducts.length ? (
-            <section aria-label={isEnglish ? "Gallery products" : "Продукти в галерията"} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-              {featured ? <GalleryCatalogCard product={featured} locale={locale} featured /> : null}
-              {regularProducts.map((product) => <GalleryCatalogCard key={product.id} product={product} locale={locale} />)}
-            </section>
+          {products.length ? (
+            <>
+              <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-600">
+                <p>{isEnglish ? `${totalCount} products from the kiosk catalogue` : `${totalCount} продукта от киоск каталога`}</p>
+                <p>{isEnglish ? `Page ${page} of ${pageCount}` : `Страница ${page} от ${pageCount}`}</p>
+              </div>
+              <section aria-label={isEnglish ? "Gallery products" : "Продукти в галерията"} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {featured ? <GalleryCatalogCard product={featured} locale={locale} featured /> : null}
+                {regularProducts.map((product) => <GalleryCatalogCard key={product.id} product={product} locale={locale} />)}
+              </section>
+              {pageCount > 1 ? (
+                <nav className="mt-12 flex flex-wrap items-center justify-center gap-2 border-t border-stone-200 pt-8" aria-label={isEnglish ? "Catalogue pages" : "Страници на каталога"}>
+                  {page > 1 ? <Link href={pageHref(page - 1)} rel="prev" className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">{isEnglish ? "Previous" : "Назад"}</Link> : null}
+                  {pageNumbers.map((pageNumber, index) => (
+                    <span key={pageNumber} className="contents">
+                      {index > 0 && pageNumber - pageNumbers[index - 1] > 1 ? <span className="px-1 text-stone-400" aria-hidden="true">…</span> : null}
+                      <Link href={pageHref(pageNumber)} aria-current={pageNumber === page ? "page" : undefined} className={`grid h-10 min-w-10 place-items-center rounded-full border px-3 text-sm font-semibold transition ${pageNumber === page ? "border-forest bg-forest text-white" : "border-stone-300 bg-white text-forest hover:border-forest hover:bg-forest hover:text-white"}`}>{pageNumber}</Link>
+                    </span>
+                  ))}
+                  {page < pageCount ? <Link href={pageHref(page + 1)} rel="next" className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">{isEnglish ? "Next" : "Напред"}</Link> : null}
+                </nav>
+              ) : null}
+            </>
           ) : (
             <section className="border-y border-stone-200 py-16 text-center">
-              <h2 className="font-serif text-3xl font-semibold text-stone-950">{isEnglish ? "The online gallery is being curated" : "Онлайн галерията се подготвя"}</h2>
-              <p className="mx-auto mt-3 max-w-xl text-stone-650">{isEnglish ? "New works will appear here as soon as they are published from the gallery catalog." : "Новите произведения ще се появяват тук веднага след публикуване от каталога на галерията."}</p>
+              <h2 className="font-serif text-3xl font-semibold text-stone-950">{isEnglish ? "No products found" : "Няма намерени продукти"}</h2>
+              <p className="mx-auto mt-3 max-w-xl text-stone-650">{isEnglish ? "Try another category or return to the full catalogue." : "Избери друга категория или се върни към целия каталог."}</p>
             </section>
           )}
         </div>

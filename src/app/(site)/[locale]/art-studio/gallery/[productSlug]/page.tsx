@@ -16,7 +16,7 @@ type SearchParams = Promise<{ reservation?: string; reservation_error?: string }
 
 async function getAlternateProduct(id: string, locale: Locale) {
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
-  const catalog = await getGalleryCatalog();
+  const catalog = await getGalleryCatalog({ locale, catalogId: id, pageSize: 1 });
   const product = catalog.products.find((item) => item.id === id);
   const translation = product?.translations.find((item) => item.locale === alternateLocale && item.title && item.slug);
   return translation ? { locale: alternateLocale, translation } : null;

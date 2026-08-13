@@ -61,7 +61,7 @@ export type GalleryCatalogProduct = {
   image_urls: string[];
   price: number | null;
   currency: "BGN" | "EUR";
-  availability: "in_stock" | "out_of_stock" | "preorder" | "in_gallery_only";
+  availability: "in_stock" | "out_of_stock" | "preorder" | "in_gallery_only" | "catalog_only";
   brand: string;
   item_condition: "new" | "used" | "refurbished";
   is_featured: boolean;
@@ -77,6 +77,10 @@ export type GalleryCatalogProduct = {
 
 export type GalleryCatalog = {
   generated_at: string;
+  page: number;
+  page_size: number;
+  total_count: number;
+  page_count: number;
   categories: GalleryCatalogCategory[];
   products: GalleryCatalogProduct[];
 };
@@ -89,8 +93,22 @@ export type LocalizedGalleryProduct = GalleryCatalogProduct & GalleryCatalogTran
 
 const emptyCatalog: GalleryCatalog = {
   generated_at: new Date(0).toISOString(),
+  page: 1,
+  page_size: 24,
+  total_count: 0,
+  page_count: 0,
   categories: [],
   products: []
+};
+
+export type GalleryCatalogQuery = {
+  locale?: Locale;
+  page?: number;
+  pageSize?: number;
+  categorySlug?: string | null;
+  productSlug?: string | null;
+  catalogId?: string | null;
+  query?: string | null;
 };
 
 type NextFetchInit = RequestInit & {
@@ -98,29 +116,49 @@ type NextFetchInit = RequestInit & {
 };
 
 async function integrationFetch(url: string, init?: NextFetchInit) {
-  if (!artGalleryIntegrationSecret) return null;
+  const headers = new Headers(init?.headers);
+  headers.set("Content-Type", "application/json");
+  if (artGalleryIntegrationSecret) {
+    headers.set("Authorization", `Bearer ${artGalleryIntegrationSecret}`);
+  }
   return fetch(url, {
     ...init,
-    headers: {
-      Authorization: `Bearer ${artGalleryIntegrationSecret}`,
-      "Content-Type": "application/json",
-      ...init?.headers
-    }
+    headers
   });
 }
 
-export async function getGalleryCatalog(): Promise<GalleryCatalog> {
-  if (!artGalleryCatalogApiUrl || !artGalleryIntegrationSecret) return emptyCatalog;
+function catalogRequestUrl(query: GalleryCatalogQuery) {
+  if (!artGalleryCatalogApiUrl) return null;
+  const url = new URL(artGalleryCatalogApiUrl);
+  url.searchParams.set("locale", query.locale === "en" ? "en" : "bg");
+  if (query.page && query.page > 1) url.searchParams.set("page", String(query.page));
+  if (query.pageSize) url.searchParams.set("page_size", String(query.pageSize));
+  if (query.categorySlug) url.searchParams.set("category", query.categorySlug);
+  if (query.productSlug) url.searchParams.set("slug", query.productSlug);
+  if (query.catalogId) url.searchParams.set("id", query.catalogId);
+  if (query.query) url.searchParams.set("q", query.query);
+  return url.toString();
+}
+
+export async function getGalleryCatalog(query: GalleryCatalogQuery = {}): Promise<GalleryCatalog> {
+  const url = catalogRequestUrl(query);
+  if (!url) return emptyCatalog;
 
   try {
-    const response = await integrationFetch(artGalleryCatalogApiUrl, {
+    const response = await integrationFetch(url, {
       next: { revalidate: 300, tags: ["art-gallery-catalog"] }
     });
     if (!response?.ok) return emptyCatalog;
     const catalog = (await response.json()) as GalleryCatalog;
-    return Array.isArray(catalog.products) && Array.isArray(catalog.categories)
-      ? catalog
-      : emptyCatalog;
+    if (!Array.isArray(catalog.products) || !Array.isArray(catalog.categories)) return emptyCatalog;
+    return {
+      ...emptyCatalog,
+      ...catalog,
+      page: Number(catalog.page) || 1,
+      page_size: Number(catalog.page_size) || query.pageSize || 24,
+      total_count: Number(catalog.total_count) || 0,
+      page_count: Number(catalog.page_count) || 0
+    };
   } catch (error) {
     console.error("[gallery catalog unavailable]", error);
     return emptyCatalog;
@@ -133,8 +171,11 @@ function localizeCategory(category: GalleryCatalogCategory, locale: Locale) {
   return { ...category, ...translation } satisfies LocalizedGalleryCategory;
 }
 
-export async function getLocalizedGalleryCatalog(locale: Locale) {
-  const catalog = await getGalleryCatalog();
+export async function getLocalizedGalleryCatalog(
+  locale: Locale,
+  query: Omit<GalleryCatalogQuery, "locale"> = {}
+) {
+  const catalog = await getGalleryCatalog({ ...query, locale });
   const categories = catalog.categories
     .map((category) => localizeCategory(category, locale))
     .filter((category): category is LocalizedGalleryCategory => Boolean(category))
@@ -154,17 +195,36 @@ export async function getLocalizedGalleryCatalog(locale: Locale) {
     } satisfies LocalizedGalleryProduct];
   });
 
-  return { generatedAt: catalog.generated_at, categories, products };
+  return {
+    generatedAt: catalog.generated_at,
+    page: catalog.page,
+    pageSize: catalog.page_size,
+    totalCount: catalog.total_count,
+    pageCount: catalog.page_count,
+    categories,
+    products
+  };
 }
 
 export async function getGalleryProductBySlug(slug: string, locale: Locale) {
-  const { products } = await getLocalizedGalleryCatalog(locale);
+  const { products } = await getLocalizedGalleryCatalog(locale, { productSlug: slug, pageSize: 1 });
   return products.find((product) => product.slug === slug) ?? null;
 }
 
 export async function getGalleryProductById(id: string, locale: Locale) {
-  const { products } = await getLocalizedGalleryCatalog(locale);
+  const { products } = await getLocalizedGalleryCatalog(locale, { catalogId: id, pageSize: 1 });
   return products.find((product) => product.id === id) ?? null;
+}
+
+export async function getAllLocalizedGalleryProducts(locale: Locale) {
+  const first = await getLocalizedGalleryCatalog(locale, { page: 1, pageSize: 100 });
+  if (first.pageCount <= 1) return first.products;
+  const remaining = await Promise.all(
+    Array.from({ length: first.pageCount - 1 }, (_, index) =>
+      getLocalizedGalleryCatalog(locale, { page: index + 2, pageSize: 100 })
+    )
+  );
+  return [first.products, ...remaining.map((page) => page.products)].flat();
 }
 
 export type GalleryReservationInput = {
