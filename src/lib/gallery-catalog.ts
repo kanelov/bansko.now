@@ -129,7 +129,7 @@ export async function getGalleryCatalog(): Promise<GalleryCatalog> {
 
 function localizeCategory(category: GalleryCatalogCategory, locale: Locale) {
   const translation = category.translations.find((item) => item.locale === locale);
-  if (!translation?.name) return null;
+  if (!translation?.name || !translation.slug) return null;
   return { ...category, ...translation } satisfies LocalizedGalleryCategory;
 }
 
