@@ -22,11 +22,13 @@ function availabilityLabel(product: LocalizedGalleryProduct, locale: Locale) {
 export function GalleryCatalogCard({
   product,
   locale,
-  featured = false
+  featured = false,
+  priority = false
 }: {
   product: LocalizedGalleryProduct;
   locale: Locale;
   featured?: boolean;
+  priority?: boolean;
 }) {
   const href = localePath(locale, `/art-studio/gallery/${product.slug}`) as Route;
   const image = product.image_urls[0] || "";
@@ -40,8 +42,8 @@ export function GalleryCatalogCard({
             alt={product.image_alt || product.title}
             width={1200}
             height={900}
-            loading={featured ? "eager" : "lazy"}
-            fetchPriority={featured ? "high" : "auto"}
+            loading={priority ? "eager" : "lazy"}
+            fetchPriority={priority ? "high" : "low"}
             decoding="async"
             className={`w-full object-cover transition duration-300 group-hover:scale-[1.015] ${featured ? "h-full min-h-72" : "aspect-[4/3]"}`}
           />

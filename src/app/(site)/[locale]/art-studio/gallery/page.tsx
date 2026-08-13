@@ -135,8 +135,15 @@ export default async function ArtStudioGalleryPage({ params, searchParams }: { p
                 <p>{isEnglish ? `Page ${page} of ${pageCount}` : `Страница ${page} от ${pageCount}`}</p>
               </div>
               <section aria-label={isEnglish ? "Gallery products" : "Продукти в галерията"} className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {featured ? <GalleryCatalogCard product={featured} locale={locale} featured /> : null}
-                {regularProducts.map((product) => <GalleryCatalogCard key={product.id} product={product} locale={locale} />)}
+                {featured ? <GalleryCatalogCard product={featured} locale={locale} featured priority /> : null}
+                {regularProducts.map((product, index) => (
+                  <GalleryCatalogCard
+                    key={product.id}
+                    product={product}
+                    locale={locale}
+                    priority={!featured && index === 0}
+                  />
+                ))}
               </section>
               {pageCount > 1 ? (
                 <nav className="mt-12 flex flex-wrap items-center justify-center gap-2 border-t border-stone-200 pt-8" aria-label={isEnglish ? "Catalogue pages" : "Страници на каталога"}>
