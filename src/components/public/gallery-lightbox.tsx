@@ -5,7 +5,17 @@ import type { GalleryImage } from "@/lib/markdown-blocks";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
-export function GalleryLightbox({ images, locale = "bg", priorityFirst = false }: { images: GalleryImage[]; locale?: Locale; priorityFirst?: boolean }) {
+export function GalleryLightbox({
+  images,
+  locale = "bg",
+  priorityFirst = false,
+  square = false
+}: {
+  images: GalleryImage[];
+  locale?: Locale;
+  priorityFirst?: boolean;
+  square?: boolean;
+}) {
   const dictionary = getDictionary(locale);
   const galleryId = useId();
   const [activeIndex, setActiveIndex] = useState<number | null>(null);
@@ -61,7 +71,7 @@ export function GalleryLightbox({ images, locale = "bg", priorityFirst = false }
 
   return (
     <>
-      <div className="not-prose mt-10 grid gap-6 sm:grid-cols-2">
+      <div className={`not-prose mt-10 grid gap-6 ${images.length > 1 ? "sm:grid-cols-2" : "grid-cols-1"}`}>
         {images.map((image, index) => {
           const captionId = image.alt ? `${galleryId}-${index}-caption` : undefined;
 
@@ -72,14 +82,14 @@ export function GalleryLightbox({ images, locale = "bg", priorityFirst = false }
                 onClick={() => setActiveIndex(index)}
                 aria-label={image.alt ? `${locale === "en" ? "Open image" : "Отвори снимка"}: ${image.alt}` : locale === "en" ? "Open image" : "Отвори снимка"}
                 aria-describedby={captionId}
-                className="group block w-full rounded-[1.35rem] bg-stone-100 text-left text-stone-950 transition duration-200 hover:-translate-y-0.5 hover:shadow-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest"
+                className="group block w-full overflow-hidden rounded-[1.35rem] bg-stone-100 text-left text-stone-950 transition duration-200 hover:-translate-y-0.5 hover:shadow-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest"
               >
                 <img
                   src={image.src}
                   alt={image.alt}
                   width={1200}
-                  height={900}
-                  className="aspect-[4/3] w-full rounded-[1.35rem] object-cover transition duration-300 group-hover:scale-[1.015]"
+                  height={square ? 1200 : 900}
+                  className={`${square ? "aspect-square object-contain" : "aspect-[4/3] object-cover"} w-full rounded-[1.35rem] bg-stone-100 transition duration-300 group-hover:scale-[1.015]`}
                   loading={priorityFirst && index === 0 ? "eager" : "lazy"}
                   fetchPriority={priorityFirst && index === 0 ? "high" : "auto"}
                   decoding="async"

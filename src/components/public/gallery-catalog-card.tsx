@@ -41,14 +41,14 @@ export function GalleryCatalogCard({
             src={image}
             alt={product.image_alt || product.title}
             width={1200}
-            height={900}
+            height={1200}
             loading={priority ? "eager" : "lazy"}
             fetchPriority={priority ? "high" : "low"}
             decoding="async"
-            className={`w-full object-cover transition duration-300 group-hover:scale-[1.015] ${featured ? "h-full min-h-72" : "aspect-[4/3]"}`}
+            className="aspect-square w-full object-contain transition duration-300 group-hover:scale-[1.015]"
           />
         ) : (
-          <div className="aspect-[4/3] bg-sage" aria-hidden="true" />
+          <div className="aspect-square bg-sage" aria-hidden="true" />
         )}
       </Link>
       <div className={`flex flex-col p-5 ${featured ? "justify-center sm:p-8" : ""}`}>

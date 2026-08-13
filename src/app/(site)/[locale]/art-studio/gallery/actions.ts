@@ -19,6 +19,16 @@ function productPath(locale: Locale, slug: string, query = "") {
   return `${localePath(locale, `/art-studio/gallery/${slug}`)}${query}`;
 }
 
+const englishProductTypes: Record<string, string> = {
+  "Дамски тениски": "Women's T-shirts",
+  "Унисекс тениски": "Unisex T-shirts",
+  "Детски тениски": "Kids' T-shirts",
+  "Бебешки бодита": "Baby bodysuits",
+  "Принтове": "Prints",
+  "Платна": "Canvas prints",
+  "Аксесоари": "Accessories"
+};
+
 export async function createGalleryReservationAction(formData: FormData) {
   const locale: Locale = stringValue(formData, "locale") === "en" ? "en" : "bg";
   const productId = stringValue(formData, "product_id", 40);
@@ -49,7 +59,7 @@ export async function createGalleryReservationAction(formData: FormData) {
     || !emailLooksValid
     || !Number.isInteger(quantity)
     || quantity < 1
-    || quantity > Math.min(20, variant.quantity_available)
+    || quantity > 20
     || formData.get("accept_terms") !== "on"
   ) {
     redirect(productPath(locale, product.slug, "?reservation_error=required#reserve"));
@@ -73,7 +83,11 @@ export async function createGalleryReservationAction(formData: FormData) {
     redirect(productPath(locale, product.slug, "?reservation_error=save#reserve"));
   }
 
-  const variantLabel = [variant.product_type?.name, variant.label].filter(Boolean).join(" · ");
+  const productTypeName = locale === "en" && variant.product_type
+    ? englishProductTypes[variant.product_type.name] || variant.product_type.name
+    : variant.product_type?.name;
+  const variantLabel = [productTypeName, variant.label].filter(Boolean).join(" · ");
+  const isStockReservation = variant.quantity_available >= quantity;
   await Promise.allSettled([
     sendNotificationEmail({
       to: customerEmail,
@@ -82,12 +96,13 @@ export async function createGalleryReservationAction(formData: FormData) {
         : `Заявка за галерията ${reservation.reservation_code}`,
       title: locale === "en" ? "Your request was received" : "Заявката ти е получена",
       intro: locale === "en"
-        ? "We will confirm availability before pickup. Payment is made at the gallery."
-        : "Ще потвърдим наличността преди взимане. Плащането е на място в галерията.",
+        ? "We will confirm the stock or preparation time before pickup. Payment is made at the gallery."
+        : "Ще потвърдим наличността или срока за подготовка преди взимане. Плащането е на място в галерията.",
       rows: [
         { label: locale === "en" ? "Number" : "Номер", value: reservation.reservation_code },
         { label: locale === "en" ? "Product" : "Продукт", value: product.title },
         { label: locale === "en" ? "Variant" : "Вариант", value: variantLabel },
+        { label: locale === "en" ? "Request" : "Тип заявка", value: isStockReservation ? (locale === "en" ? "Available stock" : "От наличност") : (locale === "en" ? "Made to request" : "По заявка") },
         { label: locale === "en" ? "Quantity" : "Количество", value: String(quantity) }
       ]
     }),
@@ -100,6 +115,7 @@ export async function createGalleryReservationAction(formData: FormData) {
         { label: "Продукт", value: product.title },
         { label: "SKU", value: product.sku },
         { label: "Вариант", value: variantLabel },
+        { label: "Тип заявка", value: isStockReservation ? "От наличност" : "По заявка" },
         { label: "Количество", value: String(quantity) },
         { label: "Клиент", value: customerName },
         { label: "Телефон", value: customerPhone },

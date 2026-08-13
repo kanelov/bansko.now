@@ -75,6 +75,19 @@ export type GalleryCatalogProduct = {
   translations: GalleryCatalogTranslation[];
 };
 
+export type GalleryProductLink = {
+  id: string;
+  title: string;
+  slug: string;
+};
+
+type GalleryProductContext = {
+  can_request: boolean;
+  previous_product: GalleryProductLink | null;
+  next_product: GalleryProductLink | null;
+  variants: GalleryCatalogVariant[];
+};
+
 export type GalleryCatalog = {
   generated_at: string;
   page: number;
@@ -89,6 +102,8 @@ export type LocalizedGalleryCategory = GalleryCatalogCategory & GalleryCategoryT
 export type LocalizedGalleryProduct = GalleryCatalogProduct & GalleryCatalogTranslation & {
   alternate_slug: string | null;
   localized_categories: LocalizedGalleryCategory[];
+  previous_product: GalleryProductLink | null;
+  next_product: GalleryProductLink | null;
 };
 
 const emptyCatalog: GalleryCatalog = {
@@ -125,6 +140,10 @@ async function integrationFetch(url: string, init?: NextFetchInit) {
     ...init,
     headers
   });
+}
+
+function reservationIntegrationAvailable() {
+  return Boolean(artGalleryReservationApiUrl && artGalleryIntegrationSecret);
 }
 
 function catalogRequestUrl(query: GalleryCatalogQuery) {
@@ -188,10 +207,10 @@ export async function getLocalizedGalleryCatalog(
     return [{
       ...product,
       ...translation,
-      can_reserve: product.can_reserve && Boolean(
-        artGalleryReservationApiUrl && artGalleryIntegrationSecret
-      ),
+      can_reserve: product.can_reserve && reservationIntegrationAvailable(),
       alternate_slug: alternate?.slug ?? null,
+      previous_product: null,
+      next_product: null,
       localized_categories: product.categories
         .map((item) => categoryById.get(item.id))
         .filter((category): category is LocalizedGalleryCategory => Boolean(category))
@@ -209,14 +228,46 @@ export async function getLocalizedGalleryCatalog(
   };
 }
 
+async function getGalleryProductContext(id: string, locale: Locale): Promise<GalleryProductContext | null> {
+  if (!artGalleryCatalogApiUrl) return null;
+  const url = new URL(artGalleryCatalogApiUrl);
+  url.searchParams.set("locale", locale);
+  url.searchParams.set("context_for", id);
+
+  try {
+    const response = await integrationFetch(url.toString(), {
+      next: { revalidate: 300, tags: ["art-gallery-catalog"] }
+    });
+    if (!response.ok) return null;
+    const context = (await response.json()) as GalleryProductContext;
+    return Array.isArray(context.variants) ? context : null;
+  } catch (error) {
+    console.error("[gallery product context unavailable]", error);
+    return null;
+  }
+}
+
+async function withProductContext(product: LocalizedGalleryProduct | null, locale: Locale) {
+  if (!product) return null;
+  const context = await getGalleryProductContext(product.id, locale);
+  if (!context) return product;
+  return {
+    ...product,
+    variants: context.variants,
+    can_reserve: context.can_request && reservationIntegrationAvailable(),
+    previous_product: context.previous_product,
+    next_product: context.next_product
+  } satisfies LocalizedGalleryProduct;
+}
+
 export async function getGalleryProductBySlug(slug: string, locale: Locale) {
   const { products } = await getLocalizedGalleryCatalog(locale, { productSlug: slug, pageSize: 1 });
-  return products.find((product) => product.slug === slug) ?? null;
+  return withProductContext(products.find((product) => product.slug === slug) ?? null, locale);
 }
 
 export async function getGalleryProductById(id: string, locale: Locale) {
   const { products } = await getLocalizedGalleryCatalog(locale, { catalogId: id, pageSize: 1 });
-  return products.find((product) => product.id === id) ?? null;
+  return withProductContext(products.find((product) => product.id === id) ?? null, locale);
 }
 
 export async function getAllLocalizedGalleryProducts(locale: Locale) {

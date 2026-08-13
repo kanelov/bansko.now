@@ -132,12 +132,29 @@ export default async function GalleryProductPage({ params, searchParams }: { par
           <span>{product.title}</span>
         </nav>
 
+        {(product.previous_product || product.next_product) ? (
+          <nav className="mt-6 grid grid-cols-2 gap-3 border-y border-stone-200 py-4" aria-label={isEnglish ? "Product navigation" : "Навигация между продуктите"}>
+            {product.previous_product ? (
+              <Link href={localePath(locale, `/art-studio/gallery/${product.previous_product.slug}`)} rel="prev" className="group flex min-w-0 items-center gap-3 rounded-lg px-3 py-2 text-left text-stone-700 transition hover:bg-stone-100 hover:text-forest">
+                <span aria-hidden="true" className="text-xl">←</span>
+                <span className="min-w-0"><small className="block text-xs uppercase text-stone-500">{isEnglish ? "Previous" : "Предишен"}</small><strong className="block truncate text-sm">{product.previous_product.title}</strong></span>
+              </Link>
+            ) : <span />}
+            {product.next_product ? (
+              <Link href={localePath(locale, `/art-studio/gallery/${product.next_product.slug}`)} rel="next" className="group flex min-w-0 items-center justify-end gap-3 rounded-lg px-3 py-2 text-right text-stone-700 transition hover:bg-stone-100 hover:text-forest">
+                <span className="min-w-0"><small className="block text-xs uppercase text-stone-500">{isEnglish ? "Next" : "Следващ"}</small><strong className="block truncate text-sm">{product.next_product.title}</strong></span>
+                <span aria-hidden="true" className="text-xl">→</span>
+              </Link>
+            ) : null}
+          </nav>
+        ) : null}
+
         <div className="mt-10 grid items-start gap-10 lg:grid-cols-12">
           <article className="min-w-0 lg:col-span-7">
             <p className="text-sm font-semibold uppercase text-moss">{product.localized_categories[0]?.name || (isEnglish ? "Art product" : "Арт продукт")}</p>
             <h1 className="mt-3 font-serif text-5xl font-semibold leading-tight text-stone-950 sm:text-6xl">{product.title}</h1>
             {product.short_description ? <p className="mt-5 max-w-3xl text-lg leading-8 text-stone-650">{product.short_description}</p> : null}
-            {images.length ? <GalleryLightbox images={images} locale={locale} priorityFirst /> : <div className="mt-10 aspect-[4/3] rounded-lg bg-sage" />}
+            {images.length ? <GalleryLightbox images={images} locale={locale} priorityFirst square /> : <div className="mt-10 aspect-square rounded-lg bg-sage" />}
             {product.image_caption ? <p className="mt-3 text-sm leading-6 text-stone-500">{product.image_caption}</p> : null}
             {product.description ? (
               <section className="mt-12 border-t border-stone-200 pt-10">
@@ -166,7 +183,7 @@ export default async function GalleryProductPage({ params, searchParams }: { par
                 )}
               </div>
             </section>
-            <GalleryReservationForm product={product} locale={locale} reservationCode={query.reservation} reservationError={query.reservation_error} />
+            <GalleryReservationForm key={product.id} product={product} locale={locale} reservationCode={query.reservation} reservationError={query.reservation_error} />
           </aside>
         </div>
       </main>
