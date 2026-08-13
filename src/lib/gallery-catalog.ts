@@ -188,6 +188,9 @@ export async function getLocalizedGalleryCatalog(
     return [{
       ...product,
       ...translation,
+      can_reserve: product.can_reserve && Boolean(
+        artGalleryReservationApiUrl && artGalleryIntegrationSecret
+      ),
       alternate_slug: alternate?.slug ?? null,
       localized_categories: product.categories
         .map((item) => categoryById.get(item.id))

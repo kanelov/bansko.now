@@ -26,5 +26,6 @@ export const stripeSecretKey = process.env.STRIPE_SECRET_KEY || null;
 export const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET || null;
 export const artGalleryCatalogApiUrl = process.env.ART_GALLERY_CATALOG_API_URL
   || "https://app.kanelov.com/api/public-catalog";
-export const artGalleryReservationApiUrl = process.env.ART_GALLERY_RESERVATION_API_URL || null;
+export const artGalleryReservationApiUrl = process.env.ART_GALLERY_RESERVATION_API_URL
+  || "https://app.kanelov.com/api/reservations";
 export const artGalleryIntegrationSecret = process.env.ART_GALLERY_INTEGRATION_SECRET || null;
