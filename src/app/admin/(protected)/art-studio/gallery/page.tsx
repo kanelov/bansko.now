@@ -1,14 +1,17 @@
 import Link from "next/link";
 import { ArtStudioAdminNav } from "@/components/admin/art-studio-admin-nav";
-import { getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
+import { getLocalizedGalleryCatalog, getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
 
 const sourceAppUrl = "https://app.kanelov.com";
 
 export default async function AdminOnlineGalleryPage() {
-  const categories = await getLocalizedGalleryCategories("bg");
-  const roots = categories.filter((category) => !category.parent_id);
-  const productCount = roots.reduce((total, category) => total + category.product_count, 0);
-  const connected = categories.length > 0;
+  const [bgCategories, enCategories, bgCatalog, enCatalog] = await Promise.all([
+    getLocalizedGalleryCategories("bg"),
+    getLocalizedGalleryCategories("en"),
+    getLocalizedGalleryCatalog("bg", { pageSize: 1 }),
+    getLocalizedGalleryCatalog("en", { pageSize: 1 })
+  ]);
+  const connected = bgCategories.length > 0;
 
   return (
     <div className="grid gap-8">
@@ -23,7 +26,7 @@ export default async function AdminOnlineGalleryPage() {
         <ArtStudioAdminNav />
       </header>
 
-      <section className="grid gap-4 sm:grid-cols-3">
+      <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
           <p className="text-sm text-stone-400">Връзка</p>
           <p className={`mt-2 text-lg font-semibold ${connected ? "text-emerald-300" : "text-amber-300"}`}>
@@ -31,12 +34,17 @@ export default async function AdminOnlineGalleryPage() {
           </p>
         </article>
         <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <p className="text-sm text-stone-400">Категории</p>
-          <p className="mt-2 font-serif text-4xl font-semibold">{categories.length}</p>
+          <p className="text-sm text-stone-400">BG категории</p>
+          <p className="mt-2 font-serif text-4xl font-semibold">{bgCategories.length}</p>
         </article>
         <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <p className="text-sm text-stone-400">Публични продукти</p>
-          <p className="mt-2 font-serif text-4xl font-semibold">{productCount}</p>
+          <p className="text-sm text-stone-400">BG продукти</p>
+          <p className="mt-2 font-serif text-4xl font-semibold">{bgCatalog.totalCount}</p>
+        </article>
+        <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
+          <p className="text-sm text-stone-400">EN продукти</p>
+          <p className="mt-2 font-serif text-4xl font-semibold">{enCatalog.totalCount}</p>
+          <p className="mt-1 text-xs text-stone-400">{enCategories.length} категории</p>
         </article>
       </section>
 
@@ -48,7 +56,7 @@ export default async function AdminOnlineGalleryPage() {
         </p>
         <div className="mt-6 flex flex-wrap gap-3">
           <a href={sourceAppUrl} target="_blank" rel="noopener noreferrer" className="admin-button admin-button-forest px-5 py-3 text-sm font-semibold">
-            Отвори системата за заявки
+            Отвори Bansko NOW редактора
           </a>
           <Link href="/art-studio/gallery" target="_blank" className="admin-button admin-button-secondary px-5 py-3 text-sm font-semibold">
             Виж публичната галерия

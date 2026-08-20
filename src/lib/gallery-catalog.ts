@@ -10,6 +10,8 @@ import type { Locale } from "@/lib/types";
 export type GalleryCatalogTranslation = {
   catalog_id: string;
   locale: Locale;
+  publication_status?: "draft" | "published";
+  published_at?: string | null;
   title: string;
   slug: string;
   short_description: string;
@@ -30,6 +32,8 @@ export type GalleryCatalogTranslation = {
 export type GalleryCategoryTranslation = {
   category_id: string;
   locale: Locale;
+  publication_status?: "draft" | "published";
+  published_at?: string | null;
   name: string;
   slug: string;
   description: string;
@@ -135,6 +139,8 @@ export type GallerySitemapProduct = {
   image_url: string;
   translations: Array<{
     locale: Locale;
+    publication_status?: "draft" | "published";
+    published_at?: string | null;
     title: string;
     slug: string;
     image_alt: string;
@@ -146,6 +152,10 @@ export type GallerySitemapProduct = {
 type NextFetchInit = RequestInit & {
   next?: { revalidate?: number; tags?: string[] };
 };
+
+function isPublishedTranslation(translation: { publication_status?: "draft" | "published" }) {
+  return translation.publication_status !== "draft";
+}
 
 async function integrationFetch(url: string, init?: NextFetchInit) {
   const headers = new Headers(init?.headers);
@@ -196,7 +206,15 @@ export async function getGalleryCatalog(query: GalleryCatalogQuery = {}): Promis
       page: Number(catalog.page) || 1,
       page_size: Number(catalog.page_size) || query.pageSize || 24,
       total_count: Number(catalog.total_count) || 0,
-      page_count: Number(catalog.page_count) || 0
+      page_count: Number(catalog.page_count) || 0,
+      categories: catalog.categories.map((category) => ({
+        ...category,
+        translations: (category.translations || []).filter(isPublishedTranslation)
+      })),
+      products: catalog.products.map((product) => ({
+        ...product,
+        translations: (product.translations || []).filter(isPublishedTranslation)
+      }))
     };
   } catch (error) {
     console.error("[gallery catalog unavailable]", error);
@@ -214,7 +232,12 @@ export async function getGalleryCategories(locale: Locale) {
     });
     if (!response.ok) return [] as GalleryCatalogCategory[];
     const payload = await response.json() as { categories?: GalleryCatalogCategory[] };
-    return Array.isArray(payload.categories) ? payload.categories : [];
+    return Array.isArray(payload.categories)
+      ? payload.categories.map((category) => ({
+          ...category,
+          translations: (category.translations || []).filter(isPublishedTranslation)
+        }))
+      : [];
   } catch (error) {
     console.error("[gallery categories unavailable]", error);
     return [] as GalleryCatalogCategory[];
@@ -231,7 +254,12 @@ export async function getGallerySitemapProducts() {
     });
     if (!response.ok) return [] as GallerySitemapProduct[];
     const payload = await response.json() as { products?: GallerySitemapProduct[] };
-    return Array.isArray(payload.products) ? payload.products : [];
+    return Array.isArray(payload.products)
+      ? payload.products.map((product) => ({
+          ...product,
+          translations: (product.translations || []).filter(isPublishedTranslation)
+        }))
+      : [];
   } catch (error) {
     console.error("[gallery sitemap unavailable]", error);
     return [] as GallerySitemapProduct[];
@@ -239,7 +267,7 @@ export async function getGallerySitemapProducts() {
 }
 
 function localizeCategory(category: GalleryCatalogCategory, locale: Locale) {
-  const translation = category.translations.find((item) => item.locale === locale);
+  const translation = category.translations.find((item) => item.locale === locale && isPublishedTranslation(item));
   if (!translation?.name || !translation.slug) return null;
   return { ...category, ...translation } satisfies LocalizedGalleryCategory;
 }
@@ -262,12 +290,14 @@ export async function getLocalizedGalleryCatalog(
   ]);
   const categoryById = new Map(categories.map((category) => [category.id, category]));
   const products = catalog.products.flatMap((product) => {
-    const translation = product.translations.find((item) => item.locale === locale);
+    const translation = product.translations.find((item) => item.locale === locale && isPublishedTranslation(item));
     if (!translation?.title || !translation.slug) return [];
-    const alternate = product.translations.find((item) => item.locale !== locale && item.title && item.slug);
+    const alternate = product.translations.find((item) => item.locale !== locale && isPublishedTranslation(item) && item.title && item.slug);
     const normalizedTranslation: GalleryCatalogTranslation = {
       catalog_id: product.id,
       locale,
+      publication_status: "published",
+      published_at: translation.published_at || null,
       title: translation.title,
       slug: translation.slug,
       short_description: translation.short_description || "",
