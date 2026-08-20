@@ -19,7 +19,7 @@ type SearchParams = Promise<{
   from?: string;
 }>;
 
-const mostLikedCategoryPattern = /най[-\s]?продав|най[-\s]?харес|nay[-\s]?prodav|nai[-\s]?hares|best[-\s]?sell|most[-\s]?liked/i;
+const mostLikedCategoryPattern = /най[-\s]?харес|nay[-\s]?hares|бестсел|best[-\s]?sell|most[-\s]?liked/i;
 
 async function getAlternateProduct(id: string, locale: Locale) {
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
@@ -91,10 +91,20 @@ export default async function GalleryProductPage({ params, searchParams }: { par
     const path = localePath(locale, `/art-studio/gallery/${slug}`);
     return `${path}${fromCategory ? `?from=${encodeURIComponent(fromCategory.slug)}` : ""}`;
   };
-  const mostLikedCategory = categories.find((category) => mostLikedCategoryPattern.test(`${category.name} ${category.slug}`));
+  const mostLikedCategory = categories.find((category) => (
+    category.parent_id === null && mostLikedCategoryPattern.test(`${category.name} ${category.slug}`)
+  ));
   const mostLikedHref = mostLikedCategory
     ? localePath(locale, `/art-studio/gallery/category/${mostLikedCategory.slug}`)
     : null;
+  const mostLikedCategories = mostLikedCategory
+    ? categories
+        .filter((category) => category.parent_id === mostLikedCategory.id)
+        .map((category) => ({
+          href: localePath(locale, `/art-studio/gallery/category/${category.slug}`),
+          label: category.name
+        }))
+    : [];
   const productUrl = localeUrl(locale, `/art-studio/gallery/${product.slug}`);
   const images = product.image_urls.map((src, index) => ({
     src: product.updated_at
@@ -176,6 +186,7 @@ export default async function GalleryProductPage({ params, searchParams }: { par
           nextTitle={product.next_product?.title}
           homeHref={localePath(locale, "/art-studio/gallery")}
           mostLikedHref={mostLikedHref}
+          mostLikedCategories={mostLikedCategories}
         />
 
         <div className="mt-10 grid items-start gap-10 lg:grid-cols-12">

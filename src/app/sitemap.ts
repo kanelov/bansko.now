@@ -132,7 +132,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
     return entries;
   });
-  const galleryCategoryEntries = bgGalleryCategories.flatMap((category) => {
+  const galleryCategoryEntries = bgGalleryCategories.filter((category) => category.product_count > 0).flatMap((category) => {
     const english = enGalleryCategoryById.get(category.id);
     const bgPath = `/art-studio/gallery/category/${category.slug}`;
     const enPath = english ? `/art-studio/gallery/category/${english.slug}` : bgPath;
