@@ -12,7 +12,11 @@ import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
 type Params = Promise<{ locale: string; productSlug: string }>;
-type SearchParams = Promise<{ reservation?: string; reservation_error?: string }>;
+type SearchParams = Promise<{
+  reservation?: string;
+  reservation_error?: string;
+  from?: string;
+}>;
 
 async function getAlternateProduct(id: string, locale: Locale) {
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
@@ -66,16 +70,28 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function GalleryProductPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
   const [{ locale, productSlug }, query] = await Promise.all([params, searchParams]);
   if (!isLocale(locale)) notFound();
-  const product = await getGalleryProductBySlug(productSlug, locale);
+  const product = await getGalleryProductBySlug(productSlug, locale, query.from);
   if (!product) notFound();
   const [settings, alternate] = await Promise.all([
     getSiteSettings(locale),
     getAlternateProduct(product.id, locale)
   ]);
   const isEnglish = locale === "en";
+  const fromCategory = product.localized_categories.find((category) => category.slug === query.from)
+    ?? product.localized_categories[0]
+    ?? null;
+  const categoryHref = fromCategory
+    ? localePath(locale, `/art-studio/gallery/category/${fromCategory.slug}`)
+    : localePath(locale, "/art-studio/gallery");
+  const productHref = (slug: string) => {
+    const path = localePath(locale, `/art-studio/gallery/${slug}`);
+    return `${path}${fromCategory ? `?from=${encodeURIComponent(fromCategory.slug)}` : ""}`;
+  };
   const productUrl = localeUrl(locale, `/art-studio/gallery/${product.slug}`);
   const images = product.image_urls.map((src, index) => ({
-    src,
+    src: product.updated_at
+      ? `${src}${src.includes("?") ? "&" : "?"}v=${encodeURIComponent(product.updated_at)}`
+      : src,
     alt: index === 0
       ? product.image_alt || product.title
       : `${product.image_alt || product.title} ${index + 1}`
@@ -115,7 +131,18 @@ export default async function GalleryProductPage({ params, searchParams }: { par
       { "@type": "ListItem", position: 1, name: isEnglish ? "Home" : "Начало", item: localeUrl(locale) },
       { "@type": "ListItem", position: 2, name: "Art Studio", item: localeUrl(locale, "/art-studio") },
       { "@type": "ListItem", position: 3, name: isEnglish ? "Gallery" : "Галерия", item: localeUrl(locale, "/art-studio/gallery") },
-      { "@type": "ListItem", position: 4, name: product.title, item: productUrl }
+      ...(fromCategory ? [{
+        "@type": "ListItem",
+        position: 4,
+        name: fromCategory.name,
+        item: localeUrl(locale, `/art-studio/gallery/category/${fromCategory.slug}`)
+      }] : []),
+      {
+        "@type": "ListItem",
+        position: fromCategory ? 5 : 4,
+        name: product.title,
+        item: productUrl
+      }
     ]
   };
   const alternateHref = alternate
@@ -129,19 +156,23 @@ export default async function GalleryProductPage({ params, searchParams }: { par
         <nav className="text-sm text-stone-500" aria-label={isEnglish ? "Breadcrumb" : "Навигация"}>
           <Link href={localePath(locale, "/art-studio")}>Art Studio</Link><span className="px-2">/</span>
           <Link href={localePath(locale, "/art-studio/gallery")}>{isEnglish ? "Gallery" : "Галерия"}</Link><span className="px-2">/</span>
+          {fromCategory ? <><Link href={categoryHref}>{fromCategory.name}</Link><span className="px-2">/</span></> : null}
           <span>{product.title}</span>
         </nav>
 
-        {(product.previous_product || product.next_product) ? (
-          <nav className="mt-6 grid grid-cols-2 gap-3 border-y border-stone-200 py-4" aria-label={isEnglish ? "Product navigation" : "Навигация между продуктите"}>
+        {(product.previous_product || fromCategory || product.next_product) ? (
+          <nav className="mt-6 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-y border-stone-200 py-4 sm:gap-3" aria-label={isEnglish ? "Product navigation" : "Навигация между продуктите"}>
             {product.previous_product ? (
-              <Link href={localePath(locale, `/art-studio/gallery/${product.previous_product.slug}`)} rel="prev" className="group flex min-w-0 items-center gap-3 rounded-lg px-3 py-2 text-left text-stone-700 transition hover:bg-stone-100 hover:text-forest">
+              <Link href={productHref(product.previous_product.slug)} rel="prev" className="group flex min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-left text-stone-700 transition hover:bg-stone-100 hover:text-forest sm:gap-3 sm:px-3">
                 <span aria-hidden="true" className="text-xl">←</span>
                 <span className="min-w-0"><small className="block text-xs uppercase text-stone-500">{isEnglish ? "Previous" : "Предишен"}</small><strong className="block truncate text-sm">{product.previous_product.title}</strong></span>
               </Link>
             ) : <span />}
+            <Link href={categoryHref} className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-center text-xs font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white sm:px-4 sm:text-sm">
+              {fromCategory ? (isEnglish ? "Back to category" : "Към категорията") : (isEnglish ? "Back to gallery" : "Към галерията")}
+            </Link>
             {product.next_product ? (
-              <Link href={localePath(locale, `/art-studio/gallery/${product.next_product.slug}`)} rel="next" className="group flex min-w-0 items-center justify-end gap-3 rounded-lg px-3 py-2 text-right text-stone-700 transition hover:bg-stone-100 hover:text-forest">
+              <Link href={productHref(product.next_product.slug)} rel="next" className="group flex min-w-0 items-center justify-end gap-2 rounded-lg px-2 py-2 text-right text-stone-700 transition hover:bg-stone-100 hover:text-forest sm:gap-3 sm:px-3">
                 <span className="min-w-0"><small className="block text-xs uppercase text-stone-500">{isEnglish ? "Next" : "Следващ"}</small><strong className="block truncate text-sm">{product.next_product.title}</strong></span>
                 <span aria-hidden="true" className="text-xl">→</span>
               </Link>

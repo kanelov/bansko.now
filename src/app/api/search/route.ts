@@ -92,6 +92,6 @@ export async function GET(request: Request) {
 
   return NextResponse.json(
     { results: [...articleResults, ...businessResults, ...galleryResults, ...categoryResults, ...pageResults] },
-    { headers: { "Cache-Control": "public, s-maxage=60, stale-while-revalidate=300" } }
+    { headers: { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=1800" } }
   );
 }

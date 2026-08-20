@@ -2,6 +2,7 @@ import Link from "next/link";
 
 const items = [
   { href: "/admin/art-studio", label: "Преглед" },
+  { href: "/admin/art-studio/gallery", label: "Онлайн галерия" },
   { href: "/admin/art-studio/products", label: "Каталог" },
   { href: "/admin/art-studio/orders", label: "Поръчки" },
   { href: "/admin/art-studio/settings", label: "Доставка" }

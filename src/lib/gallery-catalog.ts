@@ -43,6 +43,8 @@ export type GalleryCatalogCategory = {
   parent_id: string | null;
   image_url: string;
   sort_order: number;
+  direct_product_count: number;
+  product_count: number;
   translations: GalleryCategoryTranslation[];
 };
 
@@ -124,6 +126,21 @@ export type GalleryCatalogQuery = {
   productSlug?: string | null;
   catalogId?: string | null;
   query?: string | null;
+  directOnly?: boolean;
+};
+
+export type GallerySitemapProduct = {
+  id: string;
+  updated_at: string;
+  image_url: string;
+  translations: Array<{
+    locale: Locale;
+    title: string;
+    slug: string;
+    image_alt: string;
+    image_caption: string;
+    robots_index: boolean;
+  }>;
 };
 
 type NextFetchInit = RequestInit & {
@@ -146,26 +163,29 @@ function reservationIntegrationAvailable() {
   return Boolean(artGalleryReservationApiUrl && artGalleryIntegrationSecret);
 }
 
-function catalogRequestUrl(query: GalleryCatalogQuery) {
+function catalogRequestUrl(query: GalleryCatalogQuery, mode?: "cards" | "categories" | "sitemap") {
   if (!artGalleryCatalogApiUrl) return null;
   const url = new URL(artGalleryCatalogApiUrl);
   url.searchParams.set("locale", query.locale === "en" ? "en" : "bg");
+  if (mode) url.searchParams.set("mode", mode);
   if (query.page && query.page > 1) url.searchParams.set("page", String(query.page));
   if (query.pageSize) url.searchParams.set("page_size", String(query.pageSize));
   if (query.categorySlug) url.searchParams.set("category", query.categorySlug);
   if (query.productSlug) url.searchParams.set("slug", query.productSlug);
   if (query.catalogId) url.searchParams.set("id", query.catalogId);
   if (query.query) url.searchParams.set("q", query.query);
+  if (query.directOnly) url.searchParams.set("direct", "1");
   return url.toString();
 }
 
 export async function getGalleryCatalog(query: GalleryCatalogQuery = {}): Promise<GalleryCatalog> {
-  const url = catalogRequestUrl(query);
+  const isDetailRequest = Boolean(query.productSlug || query.catalogId);
+  const url = catalogRequestUrl(query, isDetailRequest ? undefined : "cards");
   if (!url) return emptyCatalog;
 
   try {
     const response = await integrationFetch(url, {
-      next: { revalidate: 300, tags: ["art-gallery-catalog"] }
+      next: { revalidate: 900, tags: ["art-gallery-catalog"] }
     });
     if (!response?.ok) return emptyCatalog;
     const catalog = (await response.json()) as GalleryCatalog;
@@ -184,30 +204,95 @@ export async function getGalleryCatalog(query: GalleryCatalogQuery = {}): Promis
   }
 }
 
+export async function getGalleryCategories(locale: Locale) {
+  const url = catalogRequestUrl({ locale }, "categories");
+  if (!url) return [] as GalleryCatalogCategory[];
+
+  try {
+    const response = await integrationFetch(url, {
+      next: { revalidate: 900, tags: ["art-gallery-catalog"] }
+    });
+    if (!response.ok) return [] as GalleryCatalogCategory[];
+    const payload = await response.json() as { categories?: GalleryCatalogCategory[] };
+    return Array.isArray(payload.categories) ? payload.categories : [];
+  } catch (error) {
+    console.error("[gallery categories unavailable]", error);
+    return [] as GalleryCatalogCategory[];
+  }
+}
+
+export async function getGallerySitemapProducts() {
+  const url = catalogRequestUrl({ locale: "bg" }, "sitemap");
+  if (!url) return [] as GallerySitemapProduct[];
+
+  try {
+    const response = await integrationFetch(url, {
+      next: { revalidate: 86400, tags: ["art-gallery-sitemap"] }
+    });
+    if (!response.ok) return [] as GallerySitemapProduct[];
+    const payload = await response.json() as { products?: GallerySitemapProduct[] };
+    return Array.isArray(payload.products) ? payload.products : [];
+  } catch (error) {
+    console.error("[gallery sitemap unavailable]", error);
+    return [] as GallerySitemapProduct[];
+  }
+}
+
 function localizeCategory(category: GalleryCatalogCategory, locale: Locale) {
   const translation = category.translations.find((item) => item.locale === locale);
   if (!translation?.name || !translation.slug) return null;
   return { ...category, ...translation } satisfies LocalizedGalleryCategory;
 }
 
+export async function getLocalizedGalleryCategories(locale: Locale) {
+  const categories = await getGalleryCategories(locale);
+  return categories
+    .map((category) => localizeCategory(category, locale))
+    .filter((category): category is LocalizedGalleryCategory => Boolean(category))
+    .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name));
+}
+
 export async function getLocalizedGalleryCatalog(
   locale: Locale,
   query: Omit<GalleryCatalogQuery, "locale"> = {}
 ) {
-  const catalog = await getGalleryCatalog({ ...query, locale });
-  const categories = catalog.categories
-    .map((category) => localizeCategory(category, locale))
-    .filter((category): category is LocalizedGalleryCategory => Boolean(category))
-    .sort((a, b) => a.sort_order - b.sort_order || a.name.localeCompare(b.name));
+  const [catalog, categories] = await Promise.all([
+    getGalleryCatalog({ ...query, locale }),
+    getLocalizedGalleryCategories(locale)
+  ]);
   const categoryById = new Map(categories.map((category) => [category.id, category]));
   const products = catalog.products.flatMap((product) => {
     const translation = product.translations.find((item) => item.locale === locale);
     if (!translation?.title || !translation.slug) return [];
     const alternate = product.translations.find((item) => item.locale !== locale && item.title && item.slug);
+    const normalizedTranslation: GalleryCatalogTranslation = {
+      catalog_id: product.id,
+      locale,
+      title: translation.title,
+      slug: translation.slug,
+      short_description: translation.short_description || "",
+      description: translation.description || "",
+      material: translation.material || "",
+      image_alt: translation.image_alt || translation.title,
+      image_caption: translation.image_caption || "",
+      seo_title: translation.seo_title || "",
+      seo_description: translation.seo_description || "",
+      focus_keyword: translation.focus_keyword || "",
+      og_title: translation.og_title || "",
+      og_description: translation.og_description || "",
+      og_image_url: translation.og_image_url || "",
+      robots_index: translation.robots_index !== false,
+      robots_follow: translation.robots_follow !== false
+    };
     return [{
       ...product,
-      ...translation,
-      can_reserve: product.can_reserve && reservationIntegrationAvailable(),
+      ...normalizedTranslation,
+      brand: product.brand || "",
+      item_condition: product.item_condition || "new",
+      can_reserve: Boolean(product.can_reserve && reservationIntegrationAvailable()),
+      online_order_enabled: Boolean(product.online_order_enabled),
+      woocommerce_url: product.woocommerce_url || "",
+      variants: product.variants || [],
       alternate_slug: alternate?.slug ?? null,
       previous_product: null,
       next_product: null,
@@ -228,15 +313,20 @@ export async function getLocalizedGalleryCatalog(
   };
 }
 
-async function getGalleryProductContext(id: string, locale: Locale): Promise<GalleryProductContext | null> {
+async function getGalleryProductContext(
+  id: string,
+  locale: Locale,
+  categorySlug?: string | null
+): Promise<GalleryProductContext | null> {
   if (!artGalleryCatalogApiUrl) return null;
   const url = new URL(artGalleryCatalogApiUrl);
   url.searchParams.set("locale", locale);
   url.searchParams.set("context_for", id);
+  if (categorySlug) url.searchParams.set("category", categorySlug);
 
   try {
     const response = await integrationFetch(url.toString(), {
-      next: { revalidate: 300, tags: ["art-gallery-catalog"] }
+      next: { revalidate: 900, tags: ["art-gallery-catalog"] }
     });
     if (!response.ok) return null;
     const context = (await response.json()) as GalleryProductContext;
@@ -247,9 +337,13 @@ async function getGalleryProductContext(id: string, locale: Locale): Promise<Gal
   }
 }
 
-async function withProductContext(product: LocalizedGalleryProduct | null, locale: Locale) {
+async function withProductContext(
+  product: LocalizedGalleryProduct | null,
+  locale: Locale,
+  categorySlug?: string | null
+) {
   if (!product) return null;
-  const context = await getGalleryProductContext(product.id, locale);
+  const context = await getGalleryProductContext(product.id, locale, categorySlug);
   if (!context) return product;
   return {
     ...product,
@@ -260,25 +354,22 @@ async function withProductContext(product: LocalizedGalleryProduct | null, local
   } satisfies LocalizedGalleryProduct;
 }
 
-export async function getGalleryProductBySlug(slug: string, locale: Locale) {
+export async function getGalleryProductBySlug(
+  slug: string,
+  locale: Locale,
+  categorySlug?: string | null
+) {
   const { products } = await getLocalizedGalleryCatalog(locale, { productSlug: slug, pageSize: 1 });
-  return withProductContext(products.find((product) => product.slug === slug) ?? null, locale);
+  return withProductContext(
+    products.find((product) => product.slug === slug) ?? null,
+    locale,
+    categorySlug
+  );
 }
 
 export async function getGalleryProductById(id: string, locale: Locale) {
   const { products } = await getLocalizedGalleryCatalog(locale, { catalogId: id, pageSize: 1 });
   return withProductContext(products.find((product) => product.id === id) ?? null, locale);
-}
-
-export async function getAllLocalizedGalleryProducts(locale: Locale) {
-  const first = await getLocalizedGalleryCatalog(locale, { page: 1, pageSize: 100 });
-  if (first.pageCount <= 1) return first.products;
-  const remaining = await Promise.all(
-    Array.from({ length: first.pageCount - 1 }, (_, index) =>
-      getLocalizedGalleryCatalog(locale, { page: index + 2, pageSize: 100 })
-    )
-  );
-  return [first.products, ...remaining.map((page) => page.products)].flat();
 }
 
 export type GalleryReservationInput = {

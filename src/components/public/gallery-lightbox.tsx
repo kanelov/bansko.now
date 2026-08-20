@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useId, useState } from "react";
+import Image from "next/image";
 import type { GalleryImage } from "@/lib/markdown-blocks";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
@@ -84,7 +85,7 @@ export function GalleryLightbox({
                 aria-describedby={captionId}
                 className="group block w-full overflow-hidden rounded-[1.35rem] bg-stone-100 text-left text-stone-950 transition duration-200 hover:-translate-y-0.5 hover:shadow-soft focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-forest"
               >
-                <img
+                <Image
                   src={image.src}
                   alt={image.alt}
                   width={1200}
@@ -136,7 +137,7 @@ export function GalleryLightbox({
             </>
           ) : null}
           <figure className="grid max-h-[90vh] max-w-6xl gap-3" itemScope itemType="https://schema.org/ImageObject">
-            <img src={activeImage.src} alt={activeImage.alt} width={1600} height={1200} className="max-h-[82vh] w-full rounded-2xl object-contain" itemProp="contentUrl" />
+            <Image src={activeImage.src} alt={activeImage.alt} width={1600} height={1200} sizes="100vw" className="max-h-[82vh] w-auto max-w-[calc(100vw-2rem)] rounded-2xl object-contain" itemProp="contentUrl" />
             <figcaption className="text-center text-sm text-stone-100">
               {activeImage.alt ? <span>{activeImage.alt}</span> : null}
               {hasMultipleImages ? (

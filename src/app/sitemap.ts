@@ -2,7 +2,7 @@ import type { MetadataRoute } from "next";
 import { getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getArticlePath, getCategories, getPublishedArticles } from "@/lib/content";
-import { getAllLocalizedGalleryProducts } from "@/lib/gallery-catalog";
+import { getGallerySitemapProducts, getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
 import { localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
@@ -29,7 +29,7 @@ function localizedStaticEntry(locale: Locale, path: string, now: Date): SitemapE
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, bgGallery, enGallery] = await Promise.all([
+  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories] = await Promise.all([
     getCategories("bg"),
     getCategories("en"),
     getPublishedArticles({ limit: 500, locale: "bg" }),
@@ -40,8 +40,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getArtStudioProductTypes({ locale: "en" }),
     getArtStudioProducts({ locale: "bg" }),
     getArtStudioProducts({ locale: "en" }),
-    getAllLocalizedGalleryProducts("bg"),
-    getAllLocalizedGalleryProducts("en")
+    getGallerySitemapProducts(),
+    getLocalizedGalleryCategories("bg"),
+    getLocalizedGalleryCategories("en")
   ]);
   const now = new Date();
   const staticRoutes = ["/", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/art-studio", "/art-studio/gallery", "/about", "/contact", "/privacy", "/terms"];
@@ -50,7 +51,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const enBusinessById = new Map(enBusinesses.map((business) => [business.id, business]));
   const enProductTypeById = new Map(enProductTypes.map((productType) => [productType.id, productType]));
   const enProductById = new Map(enProducts.map((product) => [product.id, product]));
-  const enGalleryProductById = new Map(enGallery.map((product) => [product.id, product]));
+  const enGalleryCategoryById = new Map(enGalleryCategories.map((category) => [category.id, category]));
 
   for (const article of [...bgArticles, ...enArticles]) {
     const group = articleByGroup.get(article.translation_group_id) ?? {};
@@ -131,22 +132,48 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
     return entries;
   });
-  const galleryProductEntries = bgGallery.flatMap((product) => {
-    const english = enGalleryProductById.get(product.id);
-    const bgPath = `/art-studio/gallery/${product.slug}`;
-    const enPath = english ? `/art-studio/gallery/${english.slug}` : bgPath;
+  const galleryCategoryEntries = bgGalleryCategories.flatMap((category) => {
+    const english = enGalleryCategoryById.get(category.id);
+    const bgPath = `/art-studio/gallery/category/${category.slug}`;
+    const enPath = english ? `/art-studio/gallery/category/${english.slug}` : bgPath;
     const alternates = english ? languageAlternates(bgPath, enPath) : undefined;
     const entries: SitemapEntry[] = [{
       url: localeUrl("bg", bgPath),
-      lastModified: new Date(product.updated_at),
+      lastModified: now,
       changeFrequency: "weekly",
-      priority: 0.75,
-      images: product.image_urls.length ? product.image_urls : undefined,
+      priority: 0.7,
+      images: category.image_url ? [category.image_url] : undefined,
       alternates
     }];
     if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
     return entries;
   });
+  const galleryProductEntries = galleryFeed.flatMap((product) => {
+    const bulgarian = product.translations.find((translation) => translation.locale === "bg" && translation.robots_index);
+    const english = product.translations.find((translation) => translation.locale === "en" && translation.robots_index);
+    if (!bulgarian && !english) return [];
+    const bgPath = bulgarian ? `/art-studio/gallery/${bulgarian.slug}` : "";
+    const enPath = english ? `/art-studio/gallery/${english.slug}` : "";
+    const alternates = bulgarian && english ? languageAlternates(bgPath, enPath) : undefined;
+    return [
+      ...(bulgarian ? [{
+        url: localeUrl("bg", bgPath),
+        lastModified: new Date(product.updated_at),
+        changeFrequency: "weekly" as const,
+        priority: 0.75,
+        images: product.image_url ? [product.image_url] : undefined,
+        alternates
+      }] : []),
+      ...(english ? [{
+        url: localeUrl("en", enPath),
+        lastModified: new Date(product.updated_at),
+        changeFrequency: "weekly" as const,
+        priority: 0.75,
+        images: product.image_url ? [product.image_url] : undefined,
+        alternates
+      }] : [])
+    ];
+  });
 
-  return [...staticEntries, ...categoryEntries, ...articleEntries, ...businessEntries, ...artStudioTypeEntries, ...artStudioProductEntries, ...galleryProductEntries];
+  return [...staticEntries, ...categoryEntries, ...articleEntries, ...businessEntries, ...artStudioTypeEntries, ...artStudioProductEntries, ...galleryCategoryEntries, ...galleryProductEntries];
 }

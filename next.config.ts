@@ -7,6 +7,7 @@ const nextConfig: NextConfig = {
     }
   },
   images: {
+    minimumCacheTTL: 2592000,
     remotePatterns: [
       {
         protocol: "https",
@@ -19,6 +20,11 @@ const nextConfig: NextConfig = {
       {
         protocol: "https",
         hostname: "*.supabase.co"
+      },
+      {
+        protocol: "https",
+        hostname: "app.kanelov.com",
+        pathname: "/api/catalog-image"
       }
     ]
   }

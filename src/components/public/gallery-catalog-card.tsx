@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 import type { Route } from "next";
 import { localePath } from "@/lib/i18n";
 import type { LocalizedGalleryProduct } from "@/lib/gallery-catalog";
@@ -23,29 +24,33 @@ export function GalleryCatalogCard({
   product,
   locale,
   featured = false,
-  priority = false
+  priority = false,
+  categorySlug
 }: {
   product: LocalizedGalleryProduct;
   locale: Locale;
   featured?: boolean;
   priority?: boolean;
+  categorySlug?: string;
 }) {
-  const href = localePath(locale, `/art-studio/gallery/${product.slug}`) as Route;
-  const image = product.image_urls[0] || "";
+  const productPath = localePath(locale, `/art-studio/gallery/${product.slug}`);
+  const href = `${productPath}${categorySlug ? `?from=${encodeURIComponent(categorySlug)}` : ""}` as Route;
+  const rawImage = product.image_urls[0] || "";
+  const image = rawImage && product.updated_at
+    ? `${rawImage}${rawImage.includes("?") ? "&" : "?"}v=${encodeURIComponent(product.updated_at)}`
+    : rawImage;
 
   return (
     <article className={`group overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-soft ${featured ? "md:grid md:grid-cols-2 lg:col-span-3" : ""}`}>
-      <Link href={href} className="block overflow-hidden bg-stone-100">
+      <Link href={href} className="relative block aspect-square overflow-hidden bg-stone-100">
         {image ? (
-          <img
+          <Image
             src={image}
             alt={product.image_alt || product.title}
-            width={1200}
-            height={1200}
-            loading={priority ? "eager" : "lazy"}
-            fetchPriority={priority ? "high" : "low"}
-            decoding="async"
-            className="aspect-square w-full object-contain transition duration-300 group-hover:scale-[1.015]"
+            fill
+            priority={priority}
+            sizes={featured ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
+            className="object-contain transition duration-300 group-hover:scale-[1.015]"
           />
         ) : (
           <div className="aspect-square bg-sage" aria-hidden="true" />
