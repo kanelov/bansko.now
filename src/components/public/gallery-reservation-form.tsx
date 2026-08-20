@@ -81,7 +81,7 @@ export function GalleryReservationForm({
   if (!product.can_reserve || !product.variants.length) {
     return (
       <section id="reserve" className="rounded-lg border border-stone-200 bg-stone-100 p-6">
-        <h2 className="font-serif text-2xl font-semibold text-stone-950">{isEnglish ? "Gallery pickup" : "Взимане от галерията"}</h2>
+        <h2 className="font-serif text-2xl font-semibold text-stone-950">{isEnglish ? "Pick up from the gallery in Bansko" : "Вземи от галерията в Банско"}</h2>
         <p className="mt-3 text-sm leading-6 text-stone-650">{isEnglish ? "Requests for this product are temporarily unavailable." : "Заявките за този продукт временно не са активни."}</p>
       </section>
     );
@@ -95,13 +95,17 @@ export function GalleryReservationForm({
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
       <header>
-        <p className="text-sm font-semibold uppercase text-moss">{isEnglish ? "Reserve" : "Заяви"}</p>
-        <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">{isEnglish ? "Pick up from the gallery" : "Вземи от галерията"}</h2>
-        <p className="mt-2 text-sm leading-6 text-stone-650">{isEnglish ? "Choose any type and size. Available items can be reserved immediately; the rest are sent as a product request. Payment is made at the gallery." : "Избери произволен вид и размер. Наличните артикули се резервират, а останалите се изпращат като заявка за продукт. Плащането е в галерията."}</p>
+        <p className="text-sm font-semibold uppercase text-moss">{isEnglish ? "Place a request" : "Направи заявка"}</p>
+        <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">{isEnglish ? "Pick up from the gallery in Bansko" : "Вземи от галерията в Банско"}</h2>
+        <p className="mt-2 text-sm leading-6 text-stone-650">{isEnglish ? "Choose an available item or request one to be made for pickup at Art Idea Gallery in Bansko." : "Избери наличен продукт или заяви продукт за изработка и получаване от галерия „Арт Идея“ в Банско."}</p>
       </header>
 
       {availableVariants.length ? (
-        <section className="grid gap-3 rounded-lg border border-forest/15 bg-sage/35 p-4" aria-labelledby="available-now-heading">
+        <section className="grid gap-3 rounded-lg border border-forest/20 bg-sage/35 p-4" aria-labelledby="available-now-heading">
+          <p role="status" className="inline-flex w-fit items-center gap-2 rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white">
+            <span className="h-2 w-2 rounded-full bg-white" aria-hidden="true" />
+            {isEnglish ? "Available in the gallery" : "Има наличности в галерията"}
+          </p>
           <div>
             <h3 id="available-now-heading" className="font-semibold text-stone-950">{isEnglish ? "Available now in the gallery" : "Налично сега в галерията"}</h3>
             <p className="mt-1 text-xs leading-5 text-stone-600">{isEnglish ? "Choose a specific available type and size." : "Избери конкретен наличен вид и размер."}</p>

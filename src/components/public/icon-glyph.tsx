@@ -1,4 +1,6 @@
 import {
+  faArrowLeft,
+  faArrowRight,
   faArrowUp,
   faBagShopping,
   faBookOpen,
@@ -41,6 +43,8 @@ type FontAwesomeIconDefinition = {
 };
 
 const iconDefinitions: Record<string, FontAwesomeIconDefinition> = {
+  "arrow-left": faArrowLeft,
+  "arrow-right": faArrowRight,
   house: faHouse,
   clock: faClock,
   "calendar-days": faCalendarDays,

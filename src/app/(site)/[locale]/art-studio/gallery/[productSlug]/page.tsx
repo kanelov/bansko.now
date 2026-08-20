@@ -2,12 +2,13 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GalleryLightbox } from "@/components/public/gallery-lightbox";
+import { GalleryProductNavigation } from "@/components/public/gallery-product-navigation";
 import { GalleryReservationForm } from "@/components/public/gallery-reservation-form";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getSiteSettings } from "@/lib/content";
-import { getGalleryCatalog, getGalleryProductBySlug } from "@/lib/gallery-catalog";
+import { getGalleryCatalog, getGalleryProductBySlug, getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
@@ -17,6 +18,8 @@ type SearchParams = Promise<{
   reservation_error?: string;
   from?: string;
 }>;
+
+const mostLikedCategoryPattern = /най[-\s]?продав|най[-\s]?харес|nay[-\s]?prodav|nai[-\s]?hares|best[-\s]?sell|most[-\s]?liked/i;
 
 async function getAlternateProduct(id: string, locale: Locale) {
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
@@ -72,9 +75,10 @@ export default async function GalleryProductPage({ params, searchParams }: { par
   if (!isLocale(locale)) notFound();
   const product = await getGalleryProductBySlug(productSlug, locale, query.from);
   if (!product) notFound();
-  const [settings, alternate] = await Promise.all([
+  const [settings, alternate, categories] = await Promise.all([
     getSiteSettings(locale),
-    getAlternateProduct(product.id, locale)
+    getAlternateProduct(product.id, locale),
+    getLocalizedGalleryCategories(locale)
   ]);
   const isEnglish = locale === "en";
   const fromCategory = product.localized_categories.find((category) => category.slug === query.from)
@@ -87,6 +91,10 @@ export default async function GalleryProductPage({ params, searchParams }: { par
     const path = localePath(locale, `/art-studio/gallery/${slug}`);
     return `${path}${fromCategory ? `?from=${encodeURIComponent(fromCategory.slug)}` : ""}`;
   };
+  const mostLikedCategory = categories.find((category) => mostLikedCategoryPattern.test(`${category.name} ${category.slug}`));
+  const mostLikedHref = mostLikedCategory
+    ? localePath(locale, `/art-studio/gallery/category/${mostLikedCategory.slug}`)
+    : null;
   const productUrl = localeUrl(locale, `/art-studio/gallery/${product.slug}`);
   const images = product.image_urls.map((src, index) => ({
     src: product.updated_at
@@ -160,25 +168,15 @@ export default async function GalleryProductPage({ params, searchParams }: { par
           <span>{product.title}</span>
         </nav>
 
-        {(product.previous_product || fromCategory || product.next_product) ? (
-          <nav className="mt-6 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,1fr)] items-center gap-2 border-y border-stone-200 py-4 sm:gap-3" aria-label={isEnglish ? "Product navigation" : "Навигация между продуктите"}>
-            {product.previous_product ? (
-              <Link href={productHref(product.previous_product.slug)} rel="prev" className="group flex min-w-0 items-center gap-2 rounded-lg px-2 py-2 text-left text-stone-700 transition hover:bg-stone-100 hover:text-forest sm:gap-3 sm:px-3">
-                <span aria-hidden="true" className="text-xl">←</span>
-                <span className="min-w-0"><small className="block text-xs uppercase text-stone-500">{isEnglish ? "Previous" : "Предишен"}</small><strong className="block truncate text-sm">{product.previous_product.title}</strong></span>
-              </Link>
-            ) : <span />}
-            <Link href={categoryHref} className="rounded-lg border border-stone-200 bg-white px-3 py-2 text-center text-xs font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white sm:px-4 sm:text-sm">
-              {fromCategory ? (isEnglish ? "Back to category" : "Към категорията") : (isEnglish ? "Back to gallery" : "Към галерията")}
-            </Link>
-            {product.next_product ? (
-              <Link href={productHref(product.next_product.slug)} rel="next" className="group flex min-w-0 items-center justify-end gap-2 rounded-lg px-2 py-2 text-right text-stone-700 transition hover:bg-stone-100 hover:text-forest sm:gap-3 sm:px-3">
-                <span className="min-w-0"><small className="block text-xs uppercase text-stone-500">{isEnglish ? "Next" : "Следващ"}</small><strong className="block truncate text-sm">{product.next_product.title}</strong></span>
-                <span aria-hidden="true" className="text-xl">→</span>
-              </Link>
-            ) : null}
-          </nav>
-        ) : null}
+        <GalleryProductNavigation
+          locale={locale}
+          previousHref={product.previous_product ? productHref(product.previous_product.slug) : null}
+          previousTitle={product.previous_product?.title}
+          nextHref={product.next_product ? productHref(product.next_product.slug) : null}
+          nextTitle={product.next_product?.title}
+          homeHref={localePath(locale, "/art-studio/gallery")}
+          mostLikedHref={mostLikedHref}
+        />
 
         <div className="mt-10 grid items-start gap-10 lg:grid-cols-12">
           <article className="min-w-0 lg:col-span-7">

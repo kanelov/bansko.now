@@ -16,7 +16,7 @@ function availabilityLabel(product: LocalizedGalleryProduct, locale: Locale) {
   if (product.availability === "out_of_stock") return locale === "en" ? "Out of stock" : "Изчерпан";
   if (product.availability === "preorder") return locale === "en" ? "Pre-order" : "Предварителна заявка";
   if (product.availability === "in_gallery_only") return locale === "en" ? "In the gallery" : "В галерията";
-  if (product.availability === "catalog_only") return locale === "en" ? "Kiosk catalogue" : "Киоск каталог";
+  if (product.availability === "catalog_only") return locale === "en" ? "Catalogue" : "Каталог";
   return locale === "en" ? "Available" : "В наличност";
 }
 
@@ -68,7 +68,7 @@ export function GalleryCatalogCard({
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 pt-4">
           <strong className="text-lg text-forest">{product.price === null ? (locale === "en" ? "Price in gallery" : "Цена в галерията") : money(product.price, product.currency, locale)}</strong>
           <Link href={href} className="inline-flex rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
-            {locale === "en" ? "View product" : "Виж продукта"}
+            {locale === "en" ? "View and order" : "Виж и поръчай"}
           </Link>
         </div>
       </div>
