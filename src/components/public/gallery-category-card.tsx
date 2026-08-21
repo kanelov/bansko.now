@@ -18,10 +18,11 @@ export function GalleryCategoryCard({
   const productLabel = locale === "en"
     ? `${category.product_count} products`
     : `${category.product_count} продукта`;
+  const bypassImageOptimization = category.image_url.includes(".supabase.co/storage/v1/object/");
 
   return (
     <article className="group overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-soft">
-      <Link href={href} className="block">
+      <Link href={href} prefetch={false} className="block">
         <div className="relative aspect-square overflow-hidden bg-stone-100">
           {category.image_url ? (
             <Image
@@ -29,6 +30,7 @@ export function GalleryCategoryCard({
               alt={category.image_alt || category.name}
               fill
               priority={priority}
+              unoptimized={bypassImageOptimization}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover transition duration-300 group-hover:scale-[1.015]"
             />
