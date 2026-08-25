@@ -19,7 +19,7 @@ export function ArtStudioProductCard({ product, locale }: { product: LocalizedAr
   return (
     <article className="group overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-soft transition duration-300 hover:-translate-y-1 hover:shadow-[0_24px_55px_rgba(38,31,22,0.13)]">
       <Link href={localePath(locale, `/art-studio/${product.product_type.slug}/${product.slug}`) as Route} className="relative block aspect-[4/3] overflow-hidden bg-sage">
-        <Image src={product.image_url || fallbackImage} alt={product.image_alt || product.title} fill sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-[1.04]" />
+        <Image src={product.image_url || fallbackImage} alt={product.image_alt || product.title} fill unoptimized sizes="(min-width: 1280px) 33vw, (min-width: 640px) 50vw, 100vw" className="object-cover transition duration-500 group-hover:scale-[1.04]" />
       </Link>
       <div className="p-5 sm:p-6">
         <div className="flex flex-wrap items-center justify-between gap-2">

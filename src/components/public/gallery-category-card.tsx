@@ -28,6 +28,7 @@ export function GalleryCategoryCard({
               src={category.image_url}
               alt={category.image_alt || category.name}
               fill
+              unoptimized
               priority={priority}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
               className="object-cover transition duration-300 group-hover:scale-[1.015]"

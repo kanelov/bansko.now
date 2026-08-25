@@ -48,6 +48,7 @@ export function GalleryCatalogCard({
             src={image}
             alt={product.image_alt || product.title}
             fill
+            unoptimized
             priority={priority}
             sizes={featured ? "(max-width: 768px) 100vw, 50vw" : "(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"}
             className="object-contain transition duration-300 group-hover:scale-[1.015]"

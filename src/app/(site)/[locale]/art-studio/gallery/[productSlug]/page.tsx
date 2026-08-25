@@ -194,7 +194,7 @@ export default async function GalleryProductPage({ params, searchParams }: { par
             <p className="text-sm font-semibold uppercase text-moss">{product.localized_categories[0]?.name || (isEnglish ? "Art product" : "Арт продукт")}</p>
             <h1 className="mt-3 font-serif text-5xl font-semibold leading-tight text-stone-950 sm:text-6xl">{product.title}</h1>
             {product.short_description ? <p className="mt-5 max-w-3xl text-lg leading-8 text-stone-650">{product.short_description}</p> : null}
-            {images.length ? <GalleryLightbox images={images} locale={locale} priorityFirst square /> : <div className="mt-10 aspect-square rounded-lg bg-sage" />}
+            {images.length ? <GalleryLightbox images={images} locale={locale} priorityFirst square unoptimized /> : <div className="mt-10 aspect-square rounded-lg bg-sage" />}
             {product.image_caption ? <p className="mt-3 text-sm leading-6 text-stone-500">{product.image_caption}</p> : null}
             {product.description ? (
               <section className="mt-12 border-t border-stone-200 pt-10">

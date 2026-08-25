@@ -10,12 +10,14 @@ export function GalleryLightbox({
   images,
   locale = "bg",
   priorityFirst = false,
-  square = false
+  square = false,
+  unoptimized = false
 }: {
   images: GalleryImage[];
   locale?: Locale;
   priorityFirst?: boolean;
   square?: boolean;
+  unoptimized?: boolean;
 }) {
   const dictionary = getDictionary(locale);
   const galleryId = useId();
@@ -90,6 +92,7 @@ export function GalleryLightbox({
                   alt={image.alt}
                   width={1200}
                   height={square ? 1200 : 900}
+                  unoptimized={unoptimized}
                   className={`${square ? "aspect-square object-contain" : "aspect-[4/3] object-cover"} w-full rounded-[1.35rem] bg-stone-100 transition duration-300 group-hover:scale-[1.015]`}
                   loading={priorityFirst && index === 0 ? "eager" : "lazy"}
                   fetchPriority={priorityFirst && index === 0 ? "high" : "auto"}
@@ -137,7 +140,7 @@ export function GalleryLightbox({
             </>
           ) : null}
           <figure className="grid max-h-[90vh] max-w-6xl gap-3" itemScope itemType="https://schema.org/ImageObject">
-            <Image src={activeImage.src} alt={activeImage.alt} width={1600} height={1200} sizes="100vw" className="max-h-[82vh] w-auto max-w-[calc(100vw-2rem)] rounded-2xl object-contain" itemProp="contentUrl" />
+            <Image src={activeImage.src} alt={activeImage.alt} width={1600} height={1200} unoptimized={unoptimized} sizes="100vw" className="max-h-[82vh] w-auto max-w-[calc(100vw-2rem)] rounded-2xl object-contain" itemProp="contentUrl" />
             <figcaption className="text-center text-sm text-stone-100">
               {activeImage.alt ? <span>{activeImage.alt}</span> : null}
               {hasMultipleImages ? (

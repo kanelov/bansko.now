@@ -122,7 +122,7 @@ export default async function ArtStudioProductPage({ params, searchParams }: { p
             <h1 className="mt-3 font-serif text-5xl font-semibold leading-tight text-stone-950 sm:text-6xl">{product.title}</h1>
             {product.short_description ? <p className="mt-5 max-w-3xl text-lg leading-8 text-stone-650">{product.short_description}</p> : null}
 
-            {images.length ? <GalleryLightbox images={images} locale={locale} /> : <div className="mt-10 aspect-[4/3] rounded-2xl bg-sage" />}
+            {images.length ? <GalleryLightbox images={images} locale={locale} unoptimized /> : <div className="mt-10 aspect-[4/3] rounded-2xl bg-sage" />}
 
             {product.description ? (
               <section className="mt-12 border-t border-stone-200 pt-10">
