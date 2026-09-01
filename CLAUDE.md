@@ -1,0 +1,735 @@
+# CLAUDE.md - Bansko NOW project handoff
+
+This file is the working context for Claude Code. Read it before changing code.
+
+## 1. Communication and owner
+
+- Speak with the owner, Lubo Kanelov, in Bulgarian.
+- Explain actions in practical language. Avoid unexplained framework jargon.
+- This is a production website. Inspect the existing implementation before editing.
+- Continue through implementation, validation, Git, and deployment when the owner asks for a change. Do not stop at a proposal unless the owner explicitly asks for planning only.
+- Never print, commit, paste into documentation, or expose environment variable values, API keys, service-role keys, Stripe secrets, Resend keys, or the shared gallery integration secret.
+
+## 2. Product goal
+
+Bansko NOW is a bilingual premium local editorial platform for Bansko and Pirin:
+
+- Bulgarian is the primary language.
+- English is available under `/en`.
+- The main purpose is publishing fast, attractive, SEO-optimized articles.
+- The site also contains local businesses, Art Studio services/products, a synced gallery catalog, weather, community links, donations, and an admin panel.
+- Community discussion belongs mainly in the Facebook group, not in website comments.
+- The public site should feel like a modern digital magazine, not a WordPress blog or a generic news portal.
+
+Non-negotiable priorities:
+
+1. Correct public rendering and editorial workflow.
+2. SEO and bilingual consistency.
+3. Mobile usability and Core Web Vitals.
+4. Low Supabase egress and minimal client JavaScript.
+5. Security: RLS, server-only secrets, no public admin registration.
+6. No unnecessary architecture or large refactors.
+
+## 3. Repositories: do not confuse them
+
+There are three different projects in the owner's workspace.
+
+### A. Bansko NOW - this repository
+
+- Local path: `/Users/lubokanelov/Documents/GitHub/bansko.now`
+- GitHub: `https://github.com/kanelov/bansko.now.git`
+- Working branch at handoff: `codex/art-studio-commerce-mvp`
+- Handoff HEAD: `fd9e7d0` (`Bypass Vercel optimization for product images`)
+- The branch was clean and synced with `origin/codex/art-studio-commerce-mvp` on 2026-09-01.
+- Production: `https://bansko.now`
+- Vercel project: `bansko-now`
+- Vercel project ID: `prj_RBSY4G7tNRU7Gw7HHV6P16gPf4LZ`
+- Vercel team ID: `team_Ijdyu2h997ot1mqArESTOW53`
+- Supabase project ref: `rzjyawjdhcedddydmfge`
+
+### B. Source inventory/request/kiosk application
+
+This is the source of the products shown under Bansko NOW `/art-studio/gallery`.
+
+- GitHub remote: `https://github.com/kanelov/-.git`
+- Production: `https://app.kanelov.com`
+- Supabase project ref: `iofvptxecyxpqaozjtfm`
+- The owner may refer to it as the stock receipt, request, kiosk, catalog, gallery, or source application.
+- It is a static HTML/CSS/JavaScript app plus Vercel Functions in `/api`.
+- It has no normal npm build step.
+- Its whole site is intentionally `noindex, nofollow`; Bansko NOW is the indexable public catalog.
+- The shared catalog/reservation API is the only supported bridge between the two projects.
+
+Important branch state observed on 2026-09-01:
+
+- Latest fetched source `main`: `403bcb0` (`Make WooCommerce CSV actions visible`). Always fetch again because it may advance.
+- Integration feature branch: `codex/bansko-now-work-queue-and-categories`.
+- Feature branch HEAD: `0e33ee9` (`Track real and external product requests`).
+- Common base between the feature branch and current `main`: `7a8aa45`.
+- Feature-only commits, oldest first:
+  - `1102d94` - localized Bansko NOW catalog editor.
+  - `059e134` - shared Most Liked kiosk categories.
+  - `0e33ee9` - real and externally tracked request counters.
+- `main` has many newer commits for WooCommerce, scanner, limited editions, counters, mobile layout, and supplier tools.
+
+**Do not deploy the old feature branch directly and do not replace current `main` with it.** Create a new branch from the latest source `main`, inspect the three commits, and port only the intended behavior while preserving all newer work. Expect conflicts in `app.js`, `design-system.css`, `index.html`, and SQL migrations.
+
+Suggested source checkout:
+
+```bash
+git clone https://github.com/kanelov/-.git ~/Documents/GitHub/stokova-razpiska-zaqavka
+cd ~/Documents/GitHub/stokova-razpiska-zaqavka
+git fetch --all --prune
+git switch main
+git pull --ff-only origin main
+git switch -c claude/bansko-now-integration
+git fetch origin codex/bansko-now-work-queue-and-categories
+```
+
+Use the commits as references. Do not blindly cherry-pick all three over a newer `main`.
+
+### C. Kanelov Art - unrelated unless explicitly requested
+
+- Local path: `/Users/lubokanelov/Documents/GitHub/kanelov-art`
+- This is an AI product-generation/WooCommerce/Etsy pipeline.
+- It is not the request/kiosk source application.
+- Do not edit it for Bansko NOW tasks unless the owner explicitly asks.
+
+## 4. Current live state at handoff
+
+Verified on 2026-09-01:
+
+- `https://bansko.now/art-studio/gallery/alpaka-sa3450tee` returned HTTP 200.
+- Bansko NOW already has the corrected top product navigation:
+  - `Назад` uses browser history back.
+  - `Напред` uses browser history forward.
+  - A separate lower row keeps `Предишен продукт` and `Следващ продукт` within the current category/context.
+  - `Начало` and `Най-харесвани` remain in the compact top menu.
+- The implementation is in:
+  - `src/components/public/gallery-history-buttons.tsx`
+  - `src/components/public/gallery-product-navigation.tsx`
+  - commit `55553ca` (`linmit`)
+- Product images use direct image URLs instead of the Vercel image optimizer in the latest commit. Preserve this until there is a measured reason to change it; it avoids unnecessary image optimization traffic for source Supabase images.
+
+The source app at `https://app.kanelov.com` returned HTTP 200, but its live `app.js` did **not** contain the new two-counter UI at the time of handoff. The counter work exists on branch `codex/bansko-now-work-queue-and-categories`, commit `0e33ee9`, and still needs to be reconciled with current source `main`, migrated, tested, and deployed.
+
+## 5. Local start for Bansko NOW
+
+```bash
+cd /Users/lubokanelov/Documents/GitHub/bansko.now
+git fetch --all --prune
+git switch codex/art-studio-commerce-mvp
+git pull --ff-only origin codex/art-studio-commerce-mvp
+pnpm install --frozen-lockfile
+pnpm typecheck
+pnpm lint
+pnpm build
+pnpm dev
+```
+
+Local URL: `http://localhost:3000`.
+
+Notes:
+
+- `.env.local` is ignored by Git. Never overwrite it without inspecting its variable names first.
+- Local `NEXT_PUBLIC_SITE_URL` may be `http://localhost:3000`; Vercel production must use `https://bansko.now`.
+- If the local environment has a Turbopack-specific build issue, validate once with `pnpm exec next build --webpack`, but keep normal Vercel configuration unchanged unless there is a real production failure.
+- Existing ESLint warnings for deliberate raw `<img>` usage may exist. Do not convert all images mechanically. Some source images intentionally bypass Vercel optimization to reduce cost/traffic.
+
+## 6. Stack and high-level architecture
+
+- Next.js `16.1.6`, App Router.
+- React `19.2.4`.
+- Tailwind CSS `4.3.1` through PostCSS.
+- Supabase Auth, Postgres, RLS, and Storage.
+- Vercel deployment.
+- Resend for contact/admin notification email.
+- Stripe for native Art Studio checkout/webhooks and support links where configured.
+- Open-Meteo for weather.
+- Font Awesome packages rendered through the local `IconGlyph` abstraction.
+- Markdown article body rendered with `react-markdown` and `remark-gfm` plus custom blocks.
+
+Important directories:
+
+```text
+src/app/(site)/[locale]/     Public BG/EN pages
+src/app/admin/               Supabase-authenticated admin
+src/app/api/                 Search, weather, Stripe webhook
+src/components/public/       Public reusable UI
+src/components/admin/        Admin editors and shell
+src/lib/content.ts           Articles/categories/pages/settings data access
+src/lib/gallery-catalog.ts   Server-only bridge to the source catalog API
+src/lib/businesses.ts        Business admin/data access
+src/lib/business-public.ts   Public business projection
+src/lib/art-studio.ts        Native Art Studio commerce content
+src/lib/i18n.ts              Locale helpers and shared UI dictionaries
+src/lib/env.ts               Environment variable access and safe defaults
+src/lib/supabase/            Browser/server/admin Supabase clients
+src/lib/types.ts             Database and application types
+src/app/sitemap.ts           One multilingual sitemap implementation
+src/app/robots.ts            Robots metadata
+src/proxy.ts                 BG rewrite, EN prefix, and admin auth cookie refresh
+supabase/                    Base schema and additive migrations
+```
+
+## 7. Routing and multilingual rules
+
+- Bulgarian public URLs have no language prefix: `/nature`, `/articles`, `/art-studio/gallery/...`.
+- English public URLs use `/en`: `/en/nature`, `/en/articles`, `/en/art-studio/gallery/...`.
+- Internal routes use `[locale]`; `src/proxy.ts` rewrites unprefixed public requests to `/bg/...`.
+- `/bg/...` redirects permanently to the clean unprefixed BG URL.
+- Do not change this URL structure.
+- Always build links through `localePath()` and absolute SEO URLs through `localeUrl()` from `src/lib/i18n.ts`.
+- Shared interface labels belong in the BG/EN dictionaries in `src/lib/i18n.ts` or in localized site settings, not as BG-only text in a public component.
+- BG and EN articles are separate Supabase records linked by `translation_group_id`.
+- Product/category translations in the synced gallery also have independent locale records and publication status.
+- Never expose a draft translation through `hreflang`, sitemap, search, or public queries.
+- Each locale must have a self-canonical URL. EN must never canonicalize to BG.
+- `html lang`, metadata, Open Graph, JSON-LD, alt text, caption, slug, and descriptions must use the current localized record.
+
+## 8. Public article architecture and SEO
+
+Main public article file:
+
+```text
+src/app/(site)/[locale]/[categorySlug]/[articleSlug]/page.tsx
+```
+
+Related files:
+
+```text
+src/lib/content.ts
+src/lib/seo.ts
+src/components/public/markdown-renderer.tsx
+src/components/public/article-table-of-contents.tsx
+src/components/public/article-share-actions.tsx
+src/components/public/source-links.tsx
+src/app/sitemap.ts
+```
+
+Article requirements to preserve:
+
+- Published records only on public pages.
+- Draft and scheduled/unpublished records must not leak publicly.
+- Real featured `<img>` uses `featured_image_url` and localized `featured_image_alt`.
+- Localized caption and photo credit remain attached to the image.
+- Dynamic title/description, Open Graph, Twitter card, canonical, and mutual BG/EN `hreflang`.
+- Article/NewsArticle JSON-LD, BreadcrumbList, optional FAQ schema, and featured ImageObject/primary image semantics where already implemented.
+- `mainEntityOfPage` must match the current canonical URL.
+- The same physical image URL may be used for BG and EN; do not duplicate the file only for language.
+- Sitemap includes published BG and EN URLs separately and includes discoverable featured image data.
+- Keep exactly one sitemap system in `src/app/sitemap.ts`.
+
+Markdown/custom article features are centralized in `src/lib/markdown-blocks.ts` and `src/components/public/markdown-renderer.tsx`. Do not invent a second parser. Keep the admin guide in `src/app/admin/(protected)/guide/page.tsx` synchronized whenever article syntax or publishing behavior changes.
+
+## 9. Admin and content model
+
+- Admin URL: `/admin`.
+- Authentication: Supabase Auth; no public registration.
+- Protected admin layout: `src/app/admin/(protected)/layout.tsx`.
+- Admin writes use Server Actions and server Supabase clients.
+- `SUPABASE_SERVICE_ROLE_KEY` is server-only and must never be imported into client components.
+- Public reads rely on RLS and published/status filters.
+
+Main admin areas:
+
+- Dashboard.
+- Articles, new article, and edit article.
+- Categories and localized SEO.
+- Media.
+- Site settings.
+- Navigation, logo, social links, and support button.
+- CMS/editable pages.
+- Businesses.
+- Native Art Studio admin.
+- Site guide/instructions.
+
+When adding an admin feature:
+
+1. Reuse an existing protected page or the admin shell.
+2. Prefer tabs/sections over making the already dense admin navigation longer.
+3. Add validation on the server, not only in the browser.
+4. Update `src/lib/types.ts` when the database shape changes.
+5. Update the admin guide in the same change.
+
+## 10. Supabase schema and migration safety
+
+Bansko NOW base schema starts in `supabase/schema.sql`, but production also has additive migrations:
+
+- `bilingual-content.sql`
+- `pages-and-art-studio.sql`
+- `business-directory.sql`
+- `support-and-business-tiers.sql`
+- `simplify-business-visibility-plans.sql`
+- `header-navigation-settings.sql`
+- `article-native-block-settings.sql`
+- `art-studio-commerce-mvp.sql`
+- other focused seed/index files in `supabase/`
+
+Do not rerun or rewrite the full base schema blindly on production. For a new change:
+
+1. Inspect the live table/function/policy first.
+2. Create a small additive, idempotent SQL migration.
+3. Use `if not exists`, `create or replace`, guarded constraint changes, and explicit grants/revokes where appropriate.
+4. Preserve current data.
+5. Keep RLS enabled.
+6. Public policies must expose only published/approved public fields.
+7. Service-role operations belong only in server code.
+8. Check indexes for foreign keys and frequent status/locale/slug/category lookups.
+9. Apply the migration to the correct Supabase project ref. There are two projects; confusing them is a serious error.
+
+Never place private business owner contact fields or gallery customer details in public queries, public API responses, static page props, logs, or cacheable responses.
+
+## 11. Environment variables
+
+Use `.env.example` as the list of expected Bansko NOW variables:
+
+```text
+NEXT_PUBLIC_SUPABASE_URL
+NEXT_PUBLIC_SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+NEXT_PUBLIC_SITE_URL
+OPEN_METEO_API_BASE_URL
+RESEND_API_KEY
+ADMIN_NOTIFICATION_EMAIL
+EMAIL_FROM
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+ART_GALLERY_CATALOG_API_URL
+ART_GALLERY_RESERVATION_API_URL
+ART_GALLERY_INTEGRATION_SECRET
+```
+
+Production expectations:
+
+```text
+NEXT_PUBLIC_SITE_URL=https://bansko.now
+ART_GALLERY_CATALOG_API_URL=https://app.kanelov.com/api/public-catalog
+ART_GALLERY_RESERVATION_API_URL=https://app.kanelov.com/api/reservations
+ADMIN_NOTIFICATION_EMAIL=mail@kanelov.com
+```
+
+The shared secret relationship is:
+
+```text
+Bansko NOW: ART_GALLERY_INTEGRATION_SECRET
+Source app: BANSKO_INTEGRATION_SECRET
+```
+
+Their values must be identical in the two Vercel projects, server-side only. Never prefix either with `NEXT_PUBLIC_`.
+
+Source app server variables:
+
+```text
+SUPABASE_URL
+SUPABASE_ANON_KEY
+SUPABASE_SERVICE_ROLE_KEY
+BANSKO_INTEGRATION_SECRET
+```
+
+Before deployment, inspect names with `vercel env ls`; do not print values into the chat or terminal transcript.
+
+## 12. Native Art Studio vs synced gallery
+
+There are two related but technically different product systems.
+
+### Native Art Studio commerce
+
+Routes:
+
+```text
+/art-studio/[typeSlug]
+/art-studio/[typeSlug]/[productSlug]
+/art-studio/order/success
+```
+
+Data lives in the Bansko NOW Supabase project in `art_studio_*` tables. Admin pages are under `/admin/art-studio`. This system supports native product types, options, offers, Stripe payment links/webhooks, delivery settings, and orders.
+
+### Synced kiosk gallery
+
+Routes:
+
+```text
+/art-studio/gallery
+/art-studio/gallery/category/[categorySlug]
+/art-studio/gallery/[productSlug]
+```
+
+Data does **not** live as a duplicate editable catalog in Bansko NOW. It is read from the source app's server API through `src/lib/gallery-catalog.ts`.
+
+The source application remains the source of truth for:
+
+- Inventory catalog product and SKU.
+- Kiosk category tree and product/category relation.
+- Availability, variants, and stock.
+- Pickup requests/reservations and work queue.
+- BG/EN public product/category translations and SEO fields.
+- WooCommerce link and online-order availability.
+
+Bansko NOW is responsible for:
+
+- Public rendering.
+- Locale routes.
+- Canonical/hreflang/Open Graph/Product schema/Breadcrumb schema.
+- Sitemap entries.
+- Responsive visual gallery.
+- Reservation form UI.
+- Server-to-server call to the source reservation API.
+
+Do not create a second Bansko NOW editable copy of synced product data. That would create conflicts and duplicate content.
+
+## 13. Source API contract and caching
+
+Bansko NOW calls:
+
+```text
+GET  https://app.kanelov.com/api/public-catalog
+POST https://app.kanelov.com/api/reservations
+```
+
+Source files:
+
+```text
+api/public-catalog.js
+api/reservations.js
+server/supabase-rest.js
+```
+
+Catalog API modes:
+
+- Default: product detail/full catalog RPC.
+- `mode=cards`: paginated lightweight cards.
+- `mode=categories`: category tree.
+- `mode=sitemap`: published indexable products for sitemap.
+- `context_for=<uuid>`: variants plus previous/next product in category context.
+
+Current cache design:
+
+- Source API cards/categories/context: `s-maxage=900`, stale while revalidate for one day.
+- Source sitemap API: one day, stale while revalidate for seven days.
+- Bansko server fetches gallery catalog/categories/context with `revalidate: 900`.
+- Bansko sitemap gallery fetch uses `revalidate: 86400`.
+- Reservation POST is `no-store`.
+
+Do not add client-side periodic catalog polling. Do not fetch the whole inventory table for each page. Preserve pagination and lightweight RPC/view responses.
+
+## 14. Reservation flow
+
+1. Visitor opens a localized gallery product in Bansko NOW.
+2. Visitor chooses variant and quantity and submits name plus phone or email.
+3. Bansko NOW sends a server-to-server authenticated POST to the source `/api/reservations`.
+4. Source validates input and calls `create_bansko_now_reservation` in source Supabase.
+5. Client receives a reference such as `BN-2026-000002`.
+6. Reservation appears in the source `Bansko NOW` tab.
+7. Confirming it creates/links a normal work-queue request marked as Bansko NOW.
+8. Source staff process it with normal request actions.
+9. Reservation can be deleted with confirmation when cancelled or completed, according to the current source workflow.
+
+Security rules:
+
+- Reservation API requires the shared Bearer secret.
+- Customer fields must never enter a public catalog response.
+- `client_request_id` makes client submission idempotent.
+- Do not log full contact information.
+- Do not cache POST responses.
+
+## 15. Pending source work: two request counters
+
+Owner requirement:
+
+- First counter: real requested quantity recorded in the request system only.
+- Second counter: real requested quantity plus manually added external orders.
+- `+` adds exactly one external order and persists it.
+- A later real request increases both counters automatically.
+
+Example:
+
+```text
+Real requests: 10
+Tracked total: 10
+Click +       -> real 10, tracked 11
+New request   -> real 11, tracked 12
+```
+
+Reference implementation: source branch commit `0e33ee9`.
+
+Database model used by that commit:
+
+```text
+inventory_catalog.total_requested_quantity
+inventory_catalog.requested_quantity_adjustment
+```
+
+Derived values:
+
+```text
+real requested quantity = max(0, total_requested_quantity - requested_quantity_adjustment)
+tracked total quantity   = max(0, total_requested_quantity)
+```
+
+`refresh_inventory_catalog_stats()` recalculates real request quantity from `inventory_requests` and adds the saved adjustment. The request trigger therefore raises both displayed totals when a real request is inserted/updated/deleted.
+
+The manual `+` must use one atomic owner-only RPC:
+
+```text
+increment_inventory_catalog_order_adjustment(catalog_id, increment=1)
+```
+
+Reference migration:
+
+```text
+supabase-inventory-request-counters.sql
+```
+
+Reference UI labels:
+
+```text
+Заявки в системата: X бр.
+Общо проследени: Y бр. [+]
+```
+
+The implementation must preserve source `main` improvements for limited edition counters, WooCommerce, scanner, mobile category layout, and counter styling. Reconcile the behavior manually instead of replacing the newer card renderer.
+
+Low-egress requirements:
+
+- Keep `inventory_catalog_light`; add `requested_quantity_adjustment` to that view.
+- Use explicit selected columns.
+- Use the RPC result to merge the new total into local state.
+- Do not run an extra full catalog fetch after clicking `+`.
+- Realtime/request triggers may update the row naturally.
+- Disable the `+` while the request is pending to prevent double clicks.
+
+Before applying SQL, run read-only inspection in source Supabase:
+
+```sql
+select column_name, data_type
+from information_schema.columns
+where table_schema = 'public'
+  and table_name = 'inventory_catalog'
+  and column_name in ('total_requested_quantity', 'requested_quantity_adjustment');
+
+select routine_schema, routine_name
+from information_schema.routines
+where routine_name in (
+  'refresh_inventory_catalog_stats',
+  'increment_inventory_catalog_order_adjustment',
+  'set_inventory_catalog_order_total'
+);
+
+select definition
+from pg_views
+where schemaname = 'public'
+  and viewname = 'inventory_catalog_light';
+```
+
+Then compare the live definitions with the migration. Apply only what is missing. The private `security definer` function must check authenticated owner/admin access; revoke execution from `public` and `anon`. The public wrapper remains `security invoker` and authenticated-only.
+
+## 16. Pending source integration commits
+
+The same source feature branch also contains:
+
+### `1102d94` - localized catalog editor
+
+- BG/EN public product and category records.
+- Separate publication status per locale.
+- SEO title, description, focus keyword, alt, caption, Open Graph fields, robots flags, slug, descriptions.
+- Bansko NOW admin subsection inside the existing source app, not a separate overloaded global admin.
+
+### `059e134` - shared Most Liked categories
+
+- Root `Най-харесвани` / `Most liked`.
+- Child categories for T-shirts, Watercolours, Landscape photography, and Mugs.
+- Same category tree feeds kiosk and Bansko NOW.
+- Product assignment happens once in the source app.
+
+### `0e33ee9` - request counters
+
+- Two-counter UI and atomic external increment.
+- Lightweight catalog view field.
+- Additive SQL migration.
+
+Before porting each feature, inspect current source `main`; some behavior may already exist in a newer form. Preserve current working features and data.
+
+## 17. Performance and Supabase egress rules
+
+The owner is close to the Supabase free-plan egress limit. Every data change must be reviewed for transfer volume.
+
+Prefer:
+
+- Server Components for public pages.
+- Explicit column lists.
+- Lightweight views/RPCs for public catalog data.
+- Pagination and lazy loading.
+- Next/Vercel cache with deliberate revalidation.
+- Stable Storage URLs and browser/CDN caching.
+- A single small mutation response merged into state.
+- Server-only data access for private fields.
+
+Avoid:
+
+- `select('*')` on large/public paths when a projection is enough.
+- Fetching all products merely to render one product.
+- Duplicate BG/EN image files when the same physical image is intended.
+- Repeated client polling.
+- Re-fetching full inventory after one counter click.
+- Base64 images in database rows.
+- Proxying every image through a Vercel Function.
+- Adding a second sitemap or a second product database.
+
+When changing caching, document freshness tradeoffs. Editorial updates should remain reasonably fresh without turning every request into a Supabase query.
+
+## 18. Design and interaction rules
+
+- Preserve the existing premium editorial visual language: off-white, forest green, warm neutrals, large photography, restrained typography, clean spacing.
+- Do not redesign unrelated pages during a functional task.
+- No sidebars, banner ads, decorative gradients/orbs, or nested cards.
+- Cards use small radii consistent with the current system.
+- Public UI must be fully responsive and text must not overflow.
+- Use familiar icons through `IconGlyph`/Font Awesome. Do not draw imitation icons.
+- All buttons and icon buttons must have explicit contrast in normal, hover, focus, active, and disabled states.
+- Forest/green hover backgrounds need white text and white/current-color icons.
+- Use `focus-visible` states and accessible labels.
+- For client navigation behavior such as browser Back/Forward, keep the client component tiny. Product/category data remains server-rendered.
+- Do not regress square product image presentation in the synced gallery.
+- Product gallery/lightbox keeps previous/next/close controls and keyboard accessibility.
+
+## 19. SEO rules for synced gallery products
+
+For each published localized product page preserve:
+
+- Self-canonical.
+- Mutual BG/EN hreflang only when both localized records are published.
+- `x-default` to Bulgarian when BG exists.
+- Localized title, description, slug, alt, caption, Open Graph values.
+- Product JSON-LD and BreadcrumbList.
+- Offer only when the product has a valid online offer; do not claim online availability otherwise.
+- Indexing controlled by localized robots flags.
+- BG and EN sitemap URLs as separate entries.
+- Shared physical product image is allowed; localized text remains different.
+- Source kiosk/app stays noindex to prevent duplicate search results.
+
+The source catalog is authoritative for content. Bansko NOW is authoritative for final HTML rendering and metadata.
+
+## 20. Validation checklist
+
+### Bansko NOW code
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm build
+git diff --check
+```
+
+After frontend changes, inspect desktop and mobile with a real browser and check the console. Minimum pages:
+
+```text
+/
+/en
+/articles
+/en/articles
+/art-studio/gallery
+/art-studio/gallery/category/<known-category>
+/art-studio/gallery/<known-product>
+/en/art-studio/gallery/<known-en-product-if-published>
+/admin/login
+```
+
+For the product navigation:
+
+1. Open category.
+2. Open product A.
+3. Open product B through `Следващ продукт`.
+4. Top `Назад` must return through browser history.
+5. Top `Напред` must restore the page after going back.
+6. Lower previous/next links must move within the active category and preserve `?from=<category-slug>`.
+
+### Source app code
+
+```bash
+node --check app.js
+git diff --check
+```
+
+Open source app as owner and kiosk user where relevant. Confirm:
+
+- Existing WooCommerce, scanner, limited-edition, inventory, and request flows still work.
+- `Заявки в системата` equals summed request quantity.
+- `Общо проследени` equals real quantity plus external adjustment.
+- `+` is owner-only, disabled while pending, increments once, and survives reload.
+- A new normal/Bansko request increments both counters through the database trigger.
+- No full catalog refetch occurs after `+`.
+
+### End-to-end integration
+
+- Catalog API returns only published/visible kiosk products.
+- Product/category hierarchy matches source kiosk.
+- Draft BG/EN translation is absent from public API, Bansko page, sitemap, and hreflang.
+- Bansko reservation returns a BN number and appears in the source Bansko NOW tab.
+- Confirmed reservation enters the shared work queue and remains marked as Bansko NOW.
+- Do not create a real reservation or payment during automated testing without the owner's approval; use a clearly marked test record if approved and clean it up afterward.
+
+## 21. Git and deployment procedure
+
+Before edits:
+
+```bash
+git status --short
+git branch --show-current
+git pull --ff-only
+```
+
+Rules:
+
+- Never discard unrelated owner changes.
+- Never use `git reset --hard` or overwrite production data.
+- Keep Bansko NOW and source app commits separate.
+- Use a feature branch from the latest intended base.
+- Review `git diff` and run checks before commit.
+- Push before deploying.
+- Do not deploy the source integration branch while it is behind `main`.
+
+Bansko Vercel deployment:
+
+```bash
+vercel link
+vercel env ls
+vercel deploy --prod
+```
+
+The repo already has `.vercel/project.json`; verify it still points to `bansko-now` before deploying. Do not accept a relink to a different project accidentally.
+
+Source deployment:
+
+- Confirm the Vercel project/domain for `app.kanelov.com` before deployment.
+- Confirm current production `main` has been merged into the working branch.
+- Confirm the source Supabase migration is applied first if the UI depends on a new column/RPC.
+- Deploy the reconciled branch only after source regression testing.
+- Verify `X-Robots-Tag: noindex, nofollow, noarchive` remains on source app pages.
+- API image route may have a special header exception; preserve `vercel.json` behavior.
+
+## 22. First continuation task for Claude Code
+
+Unless the owner gives a newer priority, continue in this order:
+
+1. Read this file and inspect both repositories.
+2. Fetch the latest source `main` and compare it with `codex/bansko-now-work-queue-and-categories`.
+3. Do not modify Bansko navigation; it is already live and correct.
+4. Reimplement the two-counter behavior from `0e33ee9` on top of latest source `main`, preserving newer counter/limited-edition/Woo/scanner work.
+5. Inspect source Supabase before applying `supabase-inventory-request-counters.sql`; apply only missing definitions.
+6. Run source syntax and browser regression tests.
+7. Deploy the reconciled source app to the existing Vercel project.
+8. Verify live counters and then run a controlled end-to-end Bansko request test with owner approval.
+9. Update this `CLAUDE.md` if architecture, branch state, migration state, or operating rules change.
+
+## 23. Final guardrails
+
+- Do not expose private keys or private customer/business contact data.
+- Do not edit the wrong Supabase project.
+- Do not deploy an old source branch over a newer `main`.
+- Do not duplicate synced catalog data in Bansko NOW.
+- Do not remove localized SEO metadata while simplifying UI.
+- Do not trade low egress for stale or incorrect public content without discussing the tradeoff.
+- Do not change design globally to fix one component.
+- Do not claim a migration or deployment succeeded without verifying it.
+- Keep the owner-facing admin guide and this handoff document current as the system evolves.
