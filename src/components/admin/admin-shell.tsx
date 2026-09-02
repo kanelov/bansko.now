@@ -22,7 +22,7 @@ async function countNewOrders() {
   try {
     const supabase = await createSupabaseServerClient();
     if (!supabase) return 0;
-    const { count } = await supabase.from("art_studio_orders").select("id", { count: "exact", head: true }).eq("production_status", "new");
+    const { count } = await supabase.from("art_studio_orders").select("id", { count: "exact", head: true }).eq("production_status", "new").is("archived_at", null);
     return count ?? 0;
   } catch {
     return 0;

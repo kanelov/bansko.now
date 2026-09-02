@@ -417,11 +417,33 @@ export async function updateArtStudioOrderAction(formData: FormData) {
   if (!allowedPayment.includes(paymentStatus) || !allowedProduction.includes(productionStatus)) {
     redirect("/admin/art-studio/orders?error=invalid-status");
   }
+  // Completed and cancelled orders move to the history tab; any other status brings them back.
+  const closes = productionStatus === "completed" || productionStatus === "cancelled";
   const { error } = await supabase
     .from("art_studio_orders")
-    .update({ payment_status: paymentStatus as ArtStudioPaymentStatus, production_status: productionStatus as ArtStudioProductionStatus })
+    .update({
+      payment_status: paymentStatus as ArtStudioPaymentStatus,
+      production_status: productionStatus as ArtStudioProductionStatus,
+      archived_at: closes ? new Date().toISOString() : null,
+      archive_reason: closes ? (productionStatus === "completed" ? "Завършена от админа" : "Отказана от админа") : null
+    })
     .eq("id", id);
   if (error) redirect(`/admin/art-studio/orders?error=${encodeURIComponent(error.message)}`);
   revalidatePath("/admin/art-studio/orders");
-  redirect("/admin/art-studio/orders?saved=1");
+  redirect(`/admin/art-studio/orders?saved=1${closes ? "&tab=history" : ""}`);
+}
+
+/** Move an order to the history tab or back to the active list without changing its status. */
+export async function archiveArtStudioOrderAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+  if (!id) redirect("/admin/art-studio/orders?error=missing-order-id");
+  const archive = stringValue(formData, "archive") === "1";
+  const { error } = await supabase
+    .from("art_studio_orders")
+    .update({ archived_at: archive ? new Date().toISOString() : null, archive_reason: archive ? "Прехвърлена в историята от админа" : null })
+    .eq("id", id);
+  if (error) redirect(`/admin/art-studio/orders?error=${encodeURIComponent(error.message)}`);
+  revalidatePath("/admin/art-studio/orders");
+  redirect(`/admin/art-studio/orders?saved=1&tab=${archive ? "history" : "active"}`);
 }

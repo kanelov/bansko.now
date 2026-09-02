@@ -560,6 +560,11 @@ export type ArtStudioOrder = {
   attachment_path: string | null;
   source_request_id: string | null;
   source_synced_at: string | null;
+  /** Set when the order is in the history tab; null while active. */
+  archived_at: string | null;
+  archive_reason: string | null;
+  /** Last status event received from the request app. */
+  source_status: string | null;
 };
 
 export type BusinessStatus = "draft" | "approved" | "rejected";
