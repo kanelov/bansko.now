@@ -53,6 +53,7 @@ export type ContentHubPayload = {
   robots_follow: boolean;
   schema_type: string;
   author_name: string;
+  article_type: string;
 };
 
 export type ContentHubCategory = {
@@ -168,7 +169,8 @@ export function parseContentHubPayload(input: unknown): ContentHubPayload {
     robots_index: boolean(raw.robots_index, true),
     robots_follow: boolean(raw.robots_follow, true),
     schema_type: schemaTypes.has(schemaType) ? schemaType : "Article",
-    author_name: text(raw.author_name, 120)
+    author_name: text(raw.author_name, 120),
+    article_type: text(raw.article_type, 40).toLowerCase()
   };
 }
 
@@ -347,7 +349,8 @@ export async function publishContentHubArticle(supabase: SupabaseClient<Database
     locale: payload.locale,
     automation_source: "content_hub",
     automation_last_imported_at: now,
-    content_hub_item_id: payload.content_hub_item_id
+    content_hub_item_id: payload.content_hub_item_id,
+    ...(payload.article_type ? { article_type: payload.article_type } : {})
   };
 
   let articleId: string | null = null;
