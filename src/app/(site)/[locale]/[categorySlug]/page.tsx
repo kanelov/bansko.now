@@ -1,26 +1,40 @@
 import type { Metadata } from "next";
+import Link from "next/link";
+import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
 import { ArticleCard } from "@/components/public/article-card";
-import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
 import { CategoryCard } from "@/components/public/category-card";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { FeaturedArticle } from "@/components/public/featured-article";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
-import { getCategories, getCategoryBySlug, getPublishedArticles, getSiteSettings } from "@/lib/content";
+import { siteUrl } from "@/lib/env";
+import {
+  getArticlePath,
+  getCategories,
+  getCategoryBySlug,
+  getPublishedArticleCounts,
+  getPublishedArticles,
+  getSiteSettings
+} from "@/lib/content";
 import { getDictionary, isLocale, localePath, localeUrl } from "@/lib/i18n";
 
 type Params = Promise<{ locale: string; categorySlug: string }>;
 
+// Category pages are cached and refreshed every 15 minutes; publishing revalidates them immediately.
+export const revalidate = 900;
+
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, categorySlug } = await params;
   if (!isLocale(locale)) return {};
-  const category = await getCategoryBySlug(categorySlug, locale);
+  const [category, counts] = await Promise.all([getCategoryBySlug(categorySlug, locale), getPublishedArticleCounts(locale)]);
 
   if (!category) {
     return {};
   }
+
+  const hasArticles = (counts.get(category.id) ?? 0) > 0;
 
   return {
     title: {
@@ -39,10 +53,12 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
       title: category.og_title || category.seo_title || category.name,
       description: category.og_description || category.seo_description || category.description || undefined,
       images: category.og_image_url ? [category.og_image_url] : undefined,
-      type: "website"
+      type: "website",
+      url: localeUrl(locale, `/${category.slug}`)
     },
     robots: {
-      index: category.robots_index ?? true,
+      // An empty category is public but kept out of the index until it has content.
+      index: (category.robots_index ?? true) && hasArticles,
       follow: category.robots_follow ?? true
     }
   };
@@ -64,17 +80,39 @@ export default async function CategoryPage({ params }: { params: Params }) {
   }
 
   const [featured, ...rest] = articles;
-  const relatedCategories = categories
-    .filter((item) => item.slug !== category.slug)
-    .filter((item) => ["events", "explore", "nature", "culture", "living", "food"].includes(item.slug))
-    .slice(0, 3);
-  const schema = {
+  const otherCategories = categories.filter((item) => item.slug !== category.slug).slice(0, 3);
+  const categoryUrl = localeUrl(locale, `/${category.slug}`);
+  const collectionSchema = {
     "@context": "https://schema.org",
     "@type": category.schema_type || "CollectionPage",
     name: category.name,
     description: category.description,
-    url: localeUrl(locale, `/${category.slug}`),
-    inLanguage: locale === "en" ? "en" : "bg"
+    url: categoryUrl,
+    inLanguage: locale === "en" ? "en" : "bg",
+    isPartOf: { "@type": "WebSite", "@id": `${siteUrl}/#website`, url: localeUrl(locale) },
+    ...(articles.length
+      ? {
+          mainEntity: {
+            "@type": "ItemList",
+            numberOfItems: articles.length,
+            itemListElement: articles.map((article, index) => ({
+              "@type": "ListItem",
+              position: index + 1,
+              url: `${siteUrl}${getArticlePath(article)}`,
+              name: article.title
+            }))
+          }
+        }
+      : {})
+  };
+  const breadcrumbSchema = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      { "@type": "ListItem", position: 1, name: dictionary.home, item: localeUrl(locale) },
+      { "@type": "ListItem", position: 2, name: dictionary.articlesMenu, item: localeUrl(locale, "/articles") },
+      { "@type": "ListItem", position: 3, name: category.name, item: categoryUrl }
+    ]
   };
 
   return (
@@ -82,40 +120,61 @@ export default async function CategoryPage({ params }: { params: Params }) {
       <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", `/${category.slug}`)} />
       <main className="mx-auto grid max-w-7xl gap-12 px-4 py-14 sm:px-6 lg:px-8">
         <header className="max-w-4xl">
-          <p className="text-sm font-semibold uppercase text-moss">Bansko NOW</p>
+          <nav className="text-sm text-stone-500" aria-label={dictionary.navigation}>
+            <Link href={localePath(locale, "/") as Route}>{dictionary.home}</Link>
+            <span className="px-2">/</span>
+            <Link href={localePath(locale, "/articles") as Route}>{dictionary.articlesMenu}</Link>
+            <span className="px-2">/</span>
+            <span className="text-stone-700">{category.name}</span>
+          </nav>
+          <p className="mt-6 text-sm font-semibold uppercase text-moss">Bansko NOW</p>
           <h1 className="mt-3 font-serif text-5xl font-semibold text-stone-950">{category.name}</h1>
           {category.description ? (
             <p className="mt-5 text-lg leading-8 text-stone-650">{category.description}</p>
           ) : null}
         </header>
 
-        <FeaturedArticle article={featured ?? null} locale={locale} />
+        {featured ? <FeaturedArticle article={featured} locale={locale} /> : null}
 
-        <section>
-          <h2 className="font-serif text-3xl font-semibold text-stone-950">{dictionary.latestArticles}</h2>
-          <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {(rest.length ? rest : articles).map((article) => (
-              <ArticleCard key={article.id} article={article} locale={locale} />
-            ))}
-          </div>
-        </section>
+        {rest.length ? (
+          <section>
+            <h2 className="font-serif text-3xl font-semibold text-stone-950">{dictionary.latestArticles}</h2>
+            <div className="mt-6 grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {rest.map((article) => (
+                <ArticleCard key={article.id} article={article} locale={locale} />
+              ))}
+            </div>
+          </section>
+        ) : null}
 
-        {category.slug === "art-studio" || category.slug === "culture" ? <ArtStudioNativeBlock locale={locale} settings={settings} /> : null}
-        {category.slug === "bansko-collection" || category.slug === "explore" ? <BanskoCollectionBlock locale={locale} settings={settings} /> : null}
+        {!articles.length ? (
+          <section className="rounded-3xl border border-dashed border-stone-300 bg-white p-8 text-center">
+            <p className="text-lg text-stone-650">
+              {locale === "en" ? "The first articles in this category are on their way." : "Първите статии в тази категория са на път."}
+            </p>
+            <Link href={localePath(locale, "/articles") as Route} className="mt-5 inline-flex rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white transition hover:bg-moss">
+              {dictionary.allArticles}
+            </Link>
+          </section>
+        ) : null}
 
-        <section>
-          <h2 className="font-serif text-3xl font-semibold text-stone-950">{locale === "en" ? "Related categories" : "Свързани категории"}</h2>
-          <div className="mt-6 grid gap-5 md:grid-cols-3">
-            {relatedCategories.map((item) => (
-              <CategoryCard key={item.slug} category={item} locale={locale} />
-            ))}
-          </div>
-        </section>
+        {otherCategories.length ? (
+          <section>
+            <h2 className="font-serif text-3xl font-semibold text-stone-950">{locale === "en" ? "More categories" : "Още категории"}</h2>
+            <div className="mt-6 grid gap-5 md:grid-cols-3">
+              {otherCategories.map((item) => (
+                <CategoryCard key={item.slug} category={item} locale={locale} />
+              ))}
+            </div>
+          </section>
+        ) : null}
 
+        <ArtStudioNativeBlock locale={locale} settings={settings} />
         <FacebookGroupCTA settings={settings} locale={locale} />
       </main>
       <SiteFooter settings={settings} locale={locale} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />
+      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
     </div>
   );
 }

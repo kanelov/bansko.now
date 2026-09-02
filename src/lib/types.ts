@@ -22,6 +22,7 @@ export type Category = {
   robots_index?: boolean;
   robots_follow?: boolean;
   schema_type?: string | null;
+  is_visible?: boolean;
   created_at?: string;
   updated_at?: string;
 };

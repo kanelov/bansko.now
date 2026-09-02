@@ -4,6 +4,7 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { mediaBucket, publishArticleRecord, revalidateEditorialPaths, syncTags } from "@/lib/articles-admin";
+import { createImageVariants } from "@/lib/image-variants";
 import { estimateReadingTime } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
 import { hasAdminRole, requireAdmin } from "@/lib/supabase/auth";
@@ -378,7 +379,7 @@ export async function upsertCategoryAction(formData: FormData) {
       redirect(`/admin/categories?error=${encodeURIComponent(error.message)}`);
     }
   } else {
-    const basePayload = { slug, ...translationPayload };
+    const basePayload = { slug, ...translationPayload, is_visible: booleanValue(formData, "is_visible") };
     const result = id
       ? await supabase.from("categories").update(basePayload).eq("id", id).select("id").single()
       : await supabase.from("categories").insert(basePayload).select("id").single();
@@ -454,21 +455,33 @@ export async function uploadMediaAction(formData: FormData) {
   const baseName = file.name.replace(/\.[^.]+$/, "");
   const safeName = slugify(baseName) || "image";
   const extension = file.name.split(".").pop()?.toLowerCase().replace(/[^a-z0-9]/g, "") || "jpg";
-  const storagePath = `articles/${new Date().toISOString().slice(0, 10)}/${randomUUID()}-${safeName}.${extension}`;
+  let publicUrl: string;
 
-  const { error: uploadError } = await supabase.storage.from(mediaBucket).upload(storagePath, file, {
-    cacheControl: "31536000",
-    contentType: file.type || "application/octet-stream",
-    upsert: false
-  });
+  if (isImage && !/gif|svg/.test(file.type)) {
+    // Three WebP sizes so cards and article pages load the smallest fitting file.
+    try {
+      const variant = await createImageVariants(supabase, {
+        buffer: Buffer.from(await file.arrayBuffer()),
+        id: `${randomUUID()}-${safeName}`
+      });
+      publicUrl = variant.url;
+    } catch (error) {
+      redirect(`/admin/media?error=${encodeURIComponent(errorMessage(error, "Снимката не можа да бъде обработена."))}`);
+    }
+  } else {
+    const storagePath = `articles/${new Date().toISOString().slice(0, 10)}/${randomUUID()}-${safeName}.${extension}`;
+    const { error: uploadError } = await supabase.storage.from(mediaBucket).upload(storagePath, file, {
+      cacheControl: "31536000",
+      contentType: file.type || "application/octet-stream",
+      upsert: false
+    });
 
-  if (uploadError) {
-    redirect(`/admin/media?error=${encodeURIComponent(uploadError.message)}`);
+    if (uploadError) {
+      redirect(`/admin/media?error=${encodeURIComponent(uploadError.message)}`);
+    }
+
+    publicUrl = supabase.storage.from(mediaBucket).getPublicUrl(storagePath).data.publicUrl;
   }
-
-  const {
-    data: { publicUrl }
-  } = supabase.storage.from(mediaBucket).getPublicUrl(storagePath);
 
   const { error: mediaError } = await supabase.from("media").insert({
     file_url: publicUrl,

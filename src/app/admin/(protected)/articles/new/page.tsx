@@ -7,7 +7,7 @@ type SearchParams = Promise<{ error?: string; locale?: string; translation_group
 export default async function NewArticlePage({ searchParams }: { searchParams: SearchParams }) {
   const query = await searchParams;
   const locale = query.locale && isLocale(query.locale) ? query.locale : "bg";
-  const [categories, mediaItems, settings] = await Promise.all([getCategories(locale), getMediaItems(12), getSiteSettings(locale)]);
+  const [categories, mediaItems, settings] = await Promise.all([getCategories(locale, { includeHidden: true }), getMediaItems(12), getSiteSettings(locale)]);
 
   return (
     <div className="grid gap-8">

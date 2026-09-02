@@ -4,7 +4,7 @@ import { getCategories } from "@/lib/content";
 type SearchParams = Promise<{ saved?: string; deleted?: string; error?: string }>;
 
 export default async function AdminCategoriesPage({ searchParams }: { searchParams: SearchParams }) {
-  const [params, bgCategories, enCategories] = await Promise.all([searchParams, getCategories("bg"), getCategories("en")]);
+  const [params, bgCategories, enCategories] = await Promise.all([searchParams, getCategories("bg", { includeHidden: true }), getCategories("en", { includeHidden: true })]);
   const enById = new Map(enCategories.map((category) => [category.id, category]));
   const categoryRows = bgCategories.flatMap((category) => [
     { category, locale: "bg" as const },
@@ -39,7 +39,12 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
                   <p className="text-xs font-semibold uppercase text-stone-400">
                     {category ? `${locale.toUpperCase()} / ${locale === "en" ? "/en" : ""}/${category.slug}` : "Нова категория"}
                   </p>
-                  <h2 className="mt-3 font-serif text-2xl font-semibold">{category?.name || "Добави категория"}</h2>
+                  <h2 className="mt-3 font-serif text-2xl font-semibold">
+                    {category?.name || "Добави категория"}
+                    {category && category.is_visible === false ? (
+                      <span className="ml-3 rounded-full bg-amber-400/20 px-3 py-1 align-middle text-xs font-semibold text-amber-200">скрита</span>
+                    ) : null}
+                  </h2>
                   {category?.description ? <p className="mt-2 text-sm leading-6 text-stone-300">{category.description}</p> : null}
                 </div>
                 <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-stone-200">SEO</span>
@@ -77,6 +82,12 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
                     <input type="checkbox" name="robots_follow" defaultChecked={category?.robots_follow ?? true} />
                     Follow
                   </label>
+                  {locale === "bg" ? (
+                    <label className="flex items-center gap-2" title="Скритите категории не са в менюто, sitemap-а и публичните страници. Включват се сами при първа публикувана статия.">
+                      <input type="checkbox" name="is_visible" defaultChecked={category?.is_visible ?? true} />
+                      Видима
+                    </label>
+                  ) : null}
                 </div>
               </div>
               <button className="admin-button admin-button-forest w-fit px-5 py-3 text-sm font-semibold">

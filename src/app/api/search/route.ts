@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getBusinessPath } from "@/lib/business-public";
-import { getArticlePath, getCategories, getEditablePages, getPublishedArticles } from "@/lib/content";
+import { getArticlePath, getCategories, getEditablePages, searchPublishedArticles } from "@/lib/content";
 import { getLocalizedGalleryCatalog } from "@/lib/gallery-catalog";
 import { isLocale, localePath } from "@/lib/i18n";
 
@@ -22,7 +22,7 @@ export async function GET(request: Request) {
   }
 
   const [articles, businesses, categories, pages, gallery] = await Promise.all([
-    getPublishedArticles({ limit: 100, locale }),
+    searchPublishedArticles(query, locale, 5),
     getApprovedBusinesses(locale),
     getCategories(locale),
     getEditablePages({ locale }),
@@ -33,7 +33,6 @@ export async function GET(request: Request) {
     : { article: "Статия", business: "Бизнес", category: "Категория", page: "Страница", product: "Продукт от галерията" };
 
   const articleResults = articles
-    .filter((article) => includesQuery([article.title, article.excerpt, article.content], query))
     .slice(0, 5)
     .map((article) => ({
       id: `article-${article.id}`,

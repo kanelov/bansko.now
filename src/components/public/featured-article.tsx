@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ResponsiveImage } from "@/components/public/responsive-image";
 import { fallbackHeroImage, getArticleCategory, getArticlePath } from "@/lib/content";
 import type { Route } from "next";
 import type { ArticleWithCategory } from "@/lib/types";
@@ -18,7 +19,15 @@ export function FeaturedArticle({ article, locale = "bg" }: { article: ArticleWi
   return (
     <section className="grid overflow-hidden rounded-3xl border border-stone-200 bg-white shadow-soft lg:grid-cols-[1.08fr_0.92fr]">
       <Link href={articlePath} className="min-h-96 overflow-hidden bg-stone-200">
-        <img src={image} alt={article.featured_image_alt || article.title} className="h-full w-full object-cover" />
+        <ResponsiveImage
+          src={image}
+          alt={article.featured_image_alt || article.title}
+          width={1200}
+          height={900}
+          sizes="(min-width: 1024px) 54vw, 100vw"
+          className="h-full w-full object-cover"
+          priority
+        />
       </Link>
       <div className="flex flex-col justify-center p-8 sm:p-10">
         <p className="text-sm font-semibold uppercase text-moss">{dictionary.featured}</p>

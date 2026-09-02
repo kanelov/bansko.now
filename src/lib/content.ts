@@ -27,6 +27,11 @@ import type {
 
 export { categoryDefinitions, fallbackHeroImage, fallbackNavigationItems, fallbackSettings, fallbackSocialLinks };
 
+// Columns needed by cards, lists, feeds and the sitemap. The article body is fetched only on the article page,
+// which keeps list queries small (low Supabase egress).
+const articleListColumns =
+  "id,title,slug,excerpt,status,category_id,featured_image_url,featured_image_alt,published_at,scheduled_at,created_at,updated_at,seo_title,seo_description,og_image_url,robots_index,robots_follow,reading_time,author_name,schema_type,is_featured,is_homepage_highlight,locale,translation_group_id,article_type,image_caption,show_facebook_cta,show_art_studio_block,show_bansko_collection_block";
+
 const sampleArticle: ArticleWithCategory = {
   id: "sample",
   title: "Животът в Банско отблизо",
@@ -466,7 +471,7 @@ export async function getAllSocialLinks(settings?: SiteSettings): Promise<Social
   return data as SocialLink[];
 }
 
-export async function getCategories(locale: Locale = "bg"): Promise<Category[]> {
+export async function getCategories(locale: Locale = "bg", options?: { includeHidden?: boolean }): Promise<Category[]> {
   const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
@@ -475,7 +480,12 @@ export async function getCategories(locale: Locale = "bg"): Promise<Category[]> 
       : categoryDefinitions;
   }
 
-  const { data, error } = await supabase.from("categories").select("*").order("created_at");
+  let query = supabase.from("categories").select("*").order("created_at");
+  if (!options?.includeHidden) {
+    query = query.eq("is_visible", true);
+  }
+
+  const { data, error } = await query;
 
   if (error) {
     return locale === "en"
@@ -490,7 +500,11 @@ export async function getCategories(locale: Locale = "bg"): Promise<Category[]> 
   return categories.map((category) => localizeCategory(category, byId.get(category.id)));
 }
 
-export async function getCategoryBySlug(slug: string, locale: Locale = "bg"): Promise<Category | null> {
+export async function getCategoryBySlug(
+  slug: string,
+  locale: Locale = "bg",
+  options?: { includeHidden?: boolean }
+): Promise<Category | null> {
   const supabase = createPublicSupabaseClient();
 
   if (!supabase) {
@@ -498,7 +512,12 @@ export async function getCategoryBySlug(slug: string, locale: Locale = "bg"): Pr
     return category && locale === "en" ? { ...category, ...englishCategoryFallbacks[category.slug] } : category;
   }
 
-  const { data, error } = await supabase.from("categories").select("*").eq("slug", slug).maybeSingle();
+  let query = supabase.from("categories").select("*").eq("slug", slug);
+  if (!options?.includeHidden) {
+    query = query.eq("is_visible", true);
+  }
+
+  const { data, error } = await query.maybeSingle();
 
   if (error) {
     const category = categoryDefinitions.find((item) => item.slug === slug) ?? null;
@@ -519,11 +538,37 @@ export async function getCategoryBySlug(slug: string, locale: Locale = "bg"): Pr
   return localizeCategory(data, translation);
 }
 
+export async function getPublishedArticleCounts(locale: Locale = "bg"): Promise<Map<string, number>> {
+  const counts = new Map<string, number>();
+  const supabase = createPublicSupabaseClient();
+
+  if (!supabase) {
+    return counts;
+  }
+
+  const { data } = await supabase
+    .from("articles")
+    .select("category_id")
+    .eq("locale", locale)
+    .eq("status", "published")
+    .or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`);
+
+  for (const row of data ?? []) {
+    if (row.category_id) {
+      counts.set(row.category_id, (counts.get(row.category_id) ?? 0) + 1);
+    }
+  }
+
+  return counts;
+}
+
 export async function getPublishedArticles(options?: {
   limit?: number;
   categorySlug?: string;
   featured?: boolean;
   locale?: Locale;
+  /** Include the Markdown body. Lists and feeds should leave this off. */
+  full?: boolean;
 }): Promise<ArticleWithCategory[]> {
   const locale = options?.locale ?? "bg";
   const supabase = createPublicSupabaseClient();
@@ -538,7 +583,7 @@ export async function getPublishedArticles(options?: {
 
   let query = supabase
     .from("articles")
-    .select("*, category:categories(*)")
+    .select(options?.full ? "*, category:categories(*)" : `${articleListColumns}, category:categories(*)`)
     .eq("locale", locale)
     .eq("status", "published")
     .or(`published_at.is.null,published_at.lte.${new Date().toISOString()}`)
@@ -553,7 +598,9 @@ export async function getPublishedArticles(options?: {
   }
 
   const { data } = await query;
-  let articles = ((data ?? []) as unknown as ArticleWithCategory[]).map(normalizeArticle);
+  let articles = ((data ?? []) as unknown as ArticleWithCategory[]).map((article) =>
+    normalizeArticle({ ...article, content: typeof article.content === "string" ? article.content : "" })
+  );
 
   if (articles.length) {
     const localizedCategories = await getCategories(locale);
@@ -569,6 +616,33 @@ export async function getPublishedArticles(options?: {
   }
 
   return articles;
+}
+
+/** Search in the database (title, excerpt, body) and return light rows only. */
+export async function searchPublishedArticles(query: string, locale: Locale = "bg", limit = 5): Promise<ArticleWithCategory[]> {
+  const supabase = createPublicSupabaseClient();
+  const term = query.replace(/[%_,()]/g, " ").trim();
+
+  if (!supabase || !term) {
+    return [];
+  }
+
+  const pattern = `%${term}%`;
+  const { data } = await supabase
+    .from("articles")
+    .select(`${articleListColumns}, category:categories(*)`)
+    .eq("locale", locale)
+    .eq("status", "published")
+    .or(`title.ilike.${pattern},excerpt.ilike.${pattern},content.ilike.${pattern}`)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+  const localizedCategories = await getCategories(locale, { includeHidden: true });
+  const categoriesById = new Map(localizedCategories.map((category) => [category.id, category]));
+
+  return ((data ?? []) as unknown as ArticleWithCategory[]).map((article) => {
+    const category = article.category_id ? categoriesById.get(article.category_id) ?? getArticleCategory(article) : null;
+    return { ...normalizeArticle({ ...article, content: "" }), category, categories: category };
+  });
 }
 
 export async function getAllAdminArticles(): Promise<ArticleWithCategory[]> {

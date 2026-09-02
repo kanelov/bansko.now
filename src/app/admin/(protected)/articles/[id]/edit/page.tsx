@@ -16,7 +16,7 @@ export default async function EditArticlePage({ params, searchParams }: { params
   }
 
   const [categories, tags, mediaItems, translations, settings] = await Promise.all([
-    getCategories(article.locale),
+    getCategories(article.locale, { includeHidden: true }),
     getTagsForArticle(id),
     getMediaItems(12),
     getAdminArticleTranslations(article.translation_group_id),

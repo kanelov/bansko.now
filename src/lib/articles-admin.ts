@@ -75,5 +75,21 @@ export async function publishArticleRecord(supabase: SupabaseClient<Database>, a
     throw new Error(error?.message || "Статията не можа да бъде публикувана.");
   }
 
+  await ensureArticleCategoryVisible(supabase, articleId);
+
   return data;
+}
+
+/**
+ * Blog categories stay hidden until they have content. Publishing an article into a hidden
+ * category makes the category public again (menu, sitemap, category page).
+ */
+export async function ensureArticleCategoryVisible(supabase: SupabaseClient<Database>, articleId: string) {
+  const { data: article } = await supabase.from("articles").select("category_id").eq("id", articleId).maybeSingle();
+
+  if (!article?.category_id) {
+    return;
+  }
+
+  await supabase.from("categories").update({ is_visible: true }).eq("id", article.category_id).eq("is_visible", false);
 }

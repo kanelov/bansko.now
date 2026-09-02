@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
 import { getApprovedBusinesses } from "@/lib/businesses";
-import { getArticlePath, getCategories, getPublishedArticles } from "@/lib/content";
+import { getArticlePath, getCategories, getPublishedArticleCounts, getPublishedArticles } from "@/lib/content";
 import { getGallerySitemapProducts, getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
 import { localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
@@ -29,7 +29,7 @@ function localizedStaticEntry(locale: Locale, path: string, now: Date): SitemapE
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories] = await Promise.all([
+  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts] = await Promise.all([
     getCategories("bg"),
     getCategories("en"),
     getPublishedArticles({ limit: 500, locale: "bg" }),
@@ -42,7 +42,9 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getArtStudioProducts({ locale: "en" }),
     getGallerySitemapProducts(),
     getLocalizedGalleryCategories("bg"),
-    getLocalizedGalleryCategories("en")
+    getLocalizedGalleryCategories("en"),
+    getPublishedArticleCounts("bg"),
+    getPublishedArticleCounts("en")
   ]);
   const now = new Date();
   const staticRoutes = ["/", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/art-studio", "/art-studio/gallery", "/about", "/contact", "/privacy", "/terms"];
@@ -60,8 +62,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   }
 
   const staticEntries = staticRoutes.flatMap((path) => [localizedStaticEntry("bg", path, now), localizedStaticEntry("en", path, now)]);
-  const categoryEntries = bgCategories.filter((category) => category.slug !== "art-studio").flatMap((category) => {
-    const enCategory = enCategoryById.get(category.id);
+  const categoryEntries = bgCategories.filter((category) => category.slug !== "art-studio" && (bgCounts.get(category.id) ?? 0) > 0).flatMap((category) => {
+    const enCategory = (enCounts.get(category.id) ?? 0) > 0 ? enCategoryById.get(category.id) : undefined;
     const alternates = enCategory ? languageAlternates(`/${category.slug}`, `/${enCategory.slug}`) : undefined;
     const entries: SitemapEntry[] = [{
       url: localeUrl("bg", `/${category.slug}`),

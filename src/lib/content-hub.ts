@@ -3,6 +3,7 @@ import { randomUUID } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { mediaBucket, revalidateEditorialPaths, syncTags } from "@/lib/articles-admin";
+import { createImageVariants } from "@/lib/image-variants";
 import { getSupabaseConfig } from "@/lib/env";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import { estimateReadingTime } from "@/lib/seo";
@@ -61,9 +62,10 @@ export type ContentHubCategory = {
   slug: string;
   name: string;
   locale: Locale;
+  hidden: boolean;
 };
 
-type CategoryRow = { id: string; slug: string; name: string };
+type CategoryRow = { id: string; slug: string; name: string; is_visible: boolean | null };
 type TranslationRow = { category_id: string; locale: string; name: string };
 
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
@@ -175,7 +177,7 @@ export function parseContentHubPayload(input: unknown): ContentHubPayload {
 }
 
 async function loadCategories(supabase: SupabaseClient<Database>) {
-  const { data: categories, error } = await supabase.from("categories").select("id, slug, name").order("created_at");
+  const { data: categories, error } = await supabase.from("categories").select("id, slug, name, is_visible").order("created_at");
 
   if (error) {
     throw new ContentHubError(500, `Категориите не могат да бъдат прочетени: ${error.message}`);
@@ -196,11 +198,12 @@ export async function listContentHubCategories(supabase: SupabaseClient<Database
   for (const category of categories) {
     const own = translations.filter((translation) => translation.category_id === category.id);
     const bgName = own.find((translation) => translation.locale === "bg")?.name || category.name;
-    result.push({ id: category.id, slug: category.slug, name: bgName, locale: "bg" });
+    const hidden = category.is_visible === false;
+    result.push({ id: category.id, slug: category.slug, name: bgName, locale: "bg", hidden });
 
     const en = own.find((translation) => translation.locale === "en");
     if (en?.name) {
-      result.push({ id: category.id, slug: category.slug, name: en.name, locale: "en" });
+      result.push({ id: category.id, slug: category.slug, name: en.name, locale: "en", hidden });
     }
   }
 
@@ -271,24 +274,19 @@ async function copyFeaturedImage(
     if (bytes.byteLength > maxImageBytes) throw new Error("файлът е над 12 MB");
     if (bytes.byteLength < 200) throw new Error("файлът е празен");
 
-    // Deterministic path per item: a re-publish refreshes the same file instead of adding copies.
-    const storagePath = `articles/content-hub/${payload.content_hub_item_id}.${extension}`;
-    const { error: uploadError } = await supabase.storage.from(mediaBucket).upload(storagePath, bytes, {
-      cacheControl: "3600",
-      contentType,
-      upsert: true
+    // Deterministic id per item: a re-publish in the same month refreshes the same files.
+    const variant = await createImageVariants(supabase, {
+      buffer: bytes,
+      id: payload.content_hub_item_id,
+      cacheControl: "31536000"
     });
-    if (uploadError) throw new Error(uploadError.message);
-
-    const {
-      data: { publicUrl }
-    } = supabase.storage.from(mediaBucket).getPublicUrl(storagePath);
+    const publicUrl = variant.url;
 
     const { data: existingMedia } = await supabase.from("media").select("id").eq("file_url", publicUrl).maybeSingle();
     if (!existingMedia) {
       await supabase.from("media").insert({
         file_url: publicUrl,
-        file_name: `${payload.slug || payload.content_hub_item_id}.${extension}`,
+        file_name: `${payload.slug || payload.content_hub_item_id}.webp`,
         alt_text: payload.featured_image_alt || payload.title,
         caption: payload.image_caption || null
       });
@@ -347,6 +345,9 @@ export async function publishContentHubArticle(supabase: SupabaseClient<Database
     source_links: payload.source_links,
     schema_type: payload.schema_type,
     locale: payload.locale,
+    show_facebook_cta: true,
+    show_art_studio_block: true,
+    show_bansko_collection_block: false,
     automation_source: "content_hub",
     automation_last_imported_at: now,
     content_hub_item_id: payload.content_hub_item_id,
@@ -381,6 +382,11 @@ export async function publishContentHubArticle(supabase: SupabaseClient<Database
 
   if (!articleId) {
     throw new ContentHubError(409, `Няма свободен slug за „${baseSlug}“.`);
+  }
+
+  if (publish && category.is_visible === false) {
+    await supabase.from("categories").update({ is_visible: true }).eq("id", category.id);
+    warnings.push(`Категорията „${category.slug}“ беше скрита и вече е видима в менюто.`);
   }
 
   try {

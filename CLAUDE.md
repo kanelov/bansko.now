@@ -760,3 +760,15 @@ The source request app (`https://app.kanelov.com`) has a Content Hub module („
 - After writing it revalidates the editorial paths, the article path, the category path and `/admin/articles`.
 - Migration: `supabase/content-hub-publish.sql` must be applied to project `rzjyawjdhcedddydmfge` before the first publish.
 - Testing without a real publish: `GET` with the secret returns categories; `POST` with an unknown category returns 422 without writing. A real test writes a `status: draft` article that must be deleted afterwards from `/admin/articles`.
+
+## 25. Blog structure, caching and images (2026-09-02)
+
+- **Categories have `is_visible`.** Public queries (`getCategories`, `getCategoryBySlug`) return visible categories only; pass `{ includeHidden: true }` in the admin. A hidden category page returns 404, is not in the menu or the sitemap. `publishArticleRecord()` and the Content Hub endpoint make the category visible when an article is published into it. Visible categories with zero published articles render with `noindex` and stay out of the sitemap. Only „Банско сега“ (`now`) was visible at handoff; the four published articles were moved into it.
+- **Article URL by category.** `/{categorySlug}/{articleSlug}` redirects permanently to the article's current category path when the category changed. The old `/art-studio/...` article URLs are redirected in `next.config.ts` because the shop route shadows them.
+- **Header menu.** „Статии“ is a built-in dropdown (desktop: CSS hover/focus, mobile: nested `<details>`) listing „Всички статии“ plus visible categories with counts from `getPublishedArticleCounts()`. It is not a `navigation_items` row. Active nav rows at handoff: Art Studio, Бизнеси, Галерия.
+- **Caching.** Home, `/articles`, category and article pages export `revalidate = 900`; admin and Content Hub publishing still call `revalidatePath`. Do not add dynamic APIs (cookies/headers) to public pages or they fall back to per-request rendering.
+- **Light queries.** `getPublishedArticles()` selects `articleListColumns` (no body) unless `{ full: true }`. Search uses `searchPublishedArticles()` (database `ilike`, light rows). Keep it that way; the owner is close to the Supabase egress limit.
+- **Responsive images.** `src/lib/image-variants.ts` (sharp) stores new uploads as `articles/r/<yyyy-mm>/<id>-w480|w960|w1600.webp`; `ResponsiveImage` builds the `srcset` from the `-w1600.webp` name, older single files render unchanged. Used by the admin media upload and the Content Hub endpoint. Do not route these through Vercel image optimization.
+- **No stock photos.** Product type, product and service cards render a colour panel when no image is set instead of Unsplash fallbacks. Real photos are uploaded in the admin.
+- **Security headers** (nosniff, SAMEORIGIN, referrer policy, permissions policy) are set in `next.config.ts`.
+- **Art Studio page** (`/art-studio`) is a static-content page with Store, FAQPage and BreadcrumbList schema; hero/eyebrow/excerpt/content/CTA still come from the editable page `art-studio` when set.

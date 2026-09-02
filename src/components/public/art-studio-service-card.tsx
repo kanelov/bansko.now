@@ -4,8 +4,6 @@ import type { ArtStudioService } from "@/lib/types";
 import { localePath } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
-const fallbackServiceImage = "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1200&q=80";
-
 export function ArtStudioServiceCard({
   service,
   featured = false,
@@ -17,7 +15,6 @@ export function ArtStudioServiceCard({
 }) {
   const href = service.button_url || localePath(locale, "/contact");
   const isExternal = /^https?:\/\//i.test(href);
-  const image = service.image_url || fallbackServiceImage;
 
   return (
     <article
@@ -27,12 +24,22 @@ export function ArtStudioServiceCard({
       ].join(" ")}
     >
       <div className={featured || service.is_premium ? "min-h-72 overflow-hidden bg-sage" : "aspect-[4/3] overflow-hidden bg-sage"}>
-        <img
-          src={image}
-          alt={service.image_alt || service.title}
-          className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-          loading={featured || service.is_premium ? "eager" : "lazy"}
-        />
+        {service.image_url ? (
+          // eslint-disable-next-line @next/next/no-img-element -- deliberate: no Vercel image optimization traffic
+          <img
+            src={service.image_url}
+            alt={service.image_alt || service.title}
+            width={1200}
+            height={900}
+            decoding="async"
+            className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+            loading={featured || service.is_premium ? "eager" : "lazy"}
+          />
+        ) : (
+          <div className="grid h-full min-h-48 w-full place-items-center bg-[radial-gradient(circle_at_30%_30%,rgba(24,59,42,0.12),transparent_60%)] text-forest" aria-hidden="true">
+            <span className="font-serif text-5xl font-semibold opacity-30">A</span>
+          </div>
+        )}
       </div>
       <div className="flex flex-col p-6 sm:p-7">
         <div className="flex flex-wrap items-center gap-2">

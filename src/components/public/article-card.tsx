@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ResponsiveImage } from "@/components/public/responsive-image";
 import { fallbackHeroImage, getArticleCategory, getArticlePath } from "@/lib/content";
 import type { Route } from "next";
 import type { ArticleWithCategory } from "@/lib/types";
@@ -14,11 +15,13 @@ export function ArticleCard({ article, priority = false, locale = article.locale
     <article className="group grid overflow-hidden rounded-2xl border border-stone-200 bg-white shadow-soft transition hover:-translate-y-0.5 hover:shadow-xl">
       <Link href={articlePath} className="block">
         <div className="aspect-[4/3] overflow-hidden bg-stone-200">
-          <img
+          <ResponsiveImage
             src={image}
             alt={article.featured_image_alt || article.title}
+            width={800}
+            height={600}
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-            loading={priority ? "eager" : "lazy"}
+            priority={priority}
           />
         </div>
       </Link>

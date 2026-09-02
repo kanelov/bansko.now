@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
 import { ArticleCard } from "@/components/public/article-card";
 import { ArticleShareActions } from "@/components/public/article-share-actions";
@@ -8,6 +8,7 @@ import { ArticleTableOfContents } from "@/components/public/article-table-of-con
 import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
+import { ResponsiveImage } from "@/components/public/responsive-image";
 import { ScrollToTopButton } from "@/components/public/scroll-to-top-button";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
@@ -27,6 +28,9 @@ import { getDictionary, isLocale, localePath, localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
 type Params = Promise<{ locale: string; categorySlug: string; articleSlug: string }>;
+
+// Article pages are cached and refreshed every 15 minutes; publishing revalidates them immediately.
+export const revalidate = 900;
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, articleSlug } = await params;
@@ -132,8 +136,12 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
   const category = getArticleCategory(article);
 
-  if (!category || category.slug !== categorySlug) {
+  if (!category) {
     notFound();
+  }
+
+  if (category.slug !== categorySlug) {
+    permanentRedirect(getArticlePath(article));
   }
 
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
@@ -260,13 +268,14 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
           {image ? (
             <figure className="mt-10">
-              <img
+              <ResponsiveImage
                 src={image}
                 alt={article.featured_image_alt || ""}
                 width={1600}
                 height={1000}
+                sizes="(min-width: 900px) 836px, 100vw"
                 className="aspect-[16/10] w-full rounded-3xl object-cover"
-                decoding="async"
+                priority
               />
               {article.image_caption || article.photo_credit ? (
                 <figcaption className="mt-3 text-sm text-stone-500">
