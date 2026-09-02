@@ -23,7 +23,15 @@ import { getDictionary, isLocale, localePath, localeUrl } from "@/lib/i18n";
 type Params = Promise<{ locale: string; categorySlug: string }>;
 
 // Category pages are cached and refreshed every 15 minutes; publishing revalidates them immediately.
+// Known categories are generated at build time; new ones render on demand and are then cached.
 export const revalidate = 900;
+export const dynamicParams = true;
+
+export async function generateStaticParams({ params }: { params: { locale: string } }) {
+  if (!isLocale(params.locale)) return [];
+  const categories = await getCategories(params.locale);
+  return categories.map((category) => ({ categorySlug: category.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, categorySlug } = await params;

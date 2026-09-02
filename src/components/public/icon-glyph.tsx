@@ -27,7 +27,12 @@ import {
   faUsers,
   faUtensils,
   faXmark,
-  faChurch
+  faChurch,
+  faChevronDown,
+  faStore,
+  faTruck,
+  faPenNib,
+  faTag
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebookF,
@@ -45,6 +50,11 @@ type FontAwesomeIconDefinition = {
 const iconDefinitions: Record<string, FontAwesomeIconDefinition> = {
   "arrow-left": faArrowLeft,
   "arrow-right": faArrowRight,
+  "chevron-down": faChevronDown,
+  store: faStore,
+  truck: faTruck,
+  "pen-nib": faPenNib,
+  tag: faTag,
   house: faHouse,
   clock: faClock,
   "calendar-days": faCalendarDays,
