@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArtStudioEnquiryForm } from "@/components/public/art-studio-enquiry-form";
+import { normalizeFormConfig, sourceGroupsForConfig } from "@/lib/art-studio-forms";
+import { getSourceVariantOptions } from "@/lib/gallery-catalog";
 import { GalleryLightbox } from "@/components/public/gallery-lightbox";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SiteFooter } from "@/components/public/site-footer";
@@ -78,11 +80,13 @@ export default async function ArtStudioProductPage({ params }: { params: Params 
   if (!product) notFound();
 
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
-  const [settings, siteSettings, alternate] = await Promise.all([
+  const [settings, siteSettings, alternate, sourceOptions] = await Promise.all([
     getArtStudioPublicSettings(),
     getSiteSettings(locale),
-    getAlternateProduct(product, locale)
+    getAlternateProduct(product, locale),
+    getSourceVariantOptions()
   ]);
+  const sourceGroups = sourceGroupsForConfig(normalizeFormConfig(product.product_type.form_config), sourceOptions);
   const path = `/art-studio/${product.product_type.slug}/${product.slug}`;
   const productUrl = localeUrl(locale, path);
   const images = [product.image_url, ...(product.gallery_urls || [])]
@@ -153,7 +157,7 @@ export default async function ArtStudioProductPage({ params }: { params: Params 
           </article>
 
           <aside className="lg:sticky lg:top-24 lg:col-span-5">
-            <ArtStudioEnquiryForm productType={product.product_type} product={product} settings={settings} locale={locale} />
+            <ArtStudioEnquiryForm productType={product.product_type} product={product} settings={settings} locale={locale} sourceGroups={sourceGroups} />
           </aside>
         </div>
       </main>

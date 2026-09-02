@@ -28,5 +28,7 @@ export const artGalleryCatalogApiUrl = process.env.ART_GALLERY_CATALOG_API_URL
   || "https://app.kanelov.com/api/public-catalog";
 export const artGalleryReservationApiUrl = process.env.ART_GALLERY_RESERVATION_API_URL
   || "https://app.kanelov.com/api/reservations";
+export const artGalleryArtStudioOrdersApiUrl = process.env.ART_GALLERY_ART_STUDIO_API_URL
+  || artGalleryReservationApiUrl.replace(/\/api\/reservations\/?$/, "/api/art-studio-orders");
 export const artGalleryIntegrationSecret = process.env.ART_GALLERY_INTEGRATION_SECRET || null;
 export const contentHubPublishSecret = process.env.CONTENT_HUB_PUBLISH_SECRET || null;

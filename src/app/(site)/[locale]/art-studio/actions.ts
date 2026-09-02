@@ -3,8 +3,9 @@
 import { randomBytes } from "node:crypto";
 import { redirect } from "next/navigation";
 import { getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings } from "@/lib/art-studio";
-import { attachmentMimeTypes, fieldLabel, maxAttachmentBytes, normalizeFormConfig, optionLabel } from "@/lib/art-studio-forms";
+import { attachmentMimeTypes, defaultSourceSku, fieldLabel, maxAttachmentBytes, normalizeFormConfig, optionLabel, sourceGroupLabel, sourceGroupsForConfig, sourceModelLabel, sourceSizeLabel, visibleFields } from "@/lib/art-studio-forms";
 import { sendNotificationEmail } from "@/lib/email";
+import { createArtStudioSourceOrder, getSourceVariantOptions, type ArtStudioSourceOrder } from "@/lib/gallery-catalog";
 import { siteUrl } from "@/lib/env";
 import { localePath } from "@/lib/i18n";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -207,7 +208,35 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
 
   const config = normalizeFormConfig(productType.form_config);
   const selected: Record<string, SelectedValue> = {};
-  for (const field of config.fields) {
+
+  // Sizes from the request app catalog (when configured for this product type).
+  const sourceGroups = config.source_sizes ? sourceGroupsForConfig(config, await getSourceVariantOptions()) : [];
+  const sourceActive = sourceGroups.length > 0;
+  let sourceVariant: { id: string; label: string; groupId: string } | null = null;
+  if (sourceActive && config.source_sizes) {
+    const typeId = stringValue(formData, "source_type_id", 40);
+    const variantId = stringValue(formData, "source_variant_id", 40);
+    for (const group of sourceGroups) {
+      if (typeId && group.id !== typeId) continue;
+      const variant = group.variants.find((item) => item.id === variantId);
+      if (variant) {
+        sourceVariant = { id: variant.id, label: variant.label, groupId: group.id };
+        break;
+      }
+    }
+    if (!sourceVariant && config.source_sizes.required) fail("options");
+    const chosenGroupId = sourceVariant?.groupId;
+    const group = chosenGroupId ? sourceGroups.find((item) => item.id === chosenGroupId) : null;
+    const trivial = sourceGroups.length === 1 && sourceGroups[0].variants.length === 1;
+    if (sourceVariant && group && !trivial) {
+      if (sourceGroups.length > 1) {
+        selected.source_model = { field: sourceModelLabel(config.source_sizes, locale), value: group.id, label: sourceGroupLabel(group, config.source_sizes, locale) };
+      }
+      selected.source_size = { field: sourceSizeLabel(config.source_sizes, locale), value: sourceVariant.id, label: sourceVariant.label };
+    }
+  }
+
+  for (const field of visibleFields(config, sourceActive)) {
     const chosen = stringValue(formData, `field_${field.key}`, 80);
     const option = field.options.find((item) => item.value === chosen);
     if (field.required && !option) fail("options");
@@ -262,7 +291,7 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
   };
   const selectedOptions: Json = Object.fromEntries(Object.entries(selected).map(([key, item]) => [key, { value: item.value, label: item.label, field: item.field }]));
 
-  const { error } = await supabase.from("art_studio_orders").insert({
+  const { data: inserted, error } = await supabase.from("art_studio_orders").insert({
     order_number: reference,
     product_id: product?.id ?? null,
     offer_id: offer?.id ?? null,
@@ -289,8 +318,8 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
     payment_link_url: null,
     request_type: "enquiry",
     attachment_path: attachmentPath
-  });
-  if (error) fail("save-failed");
+  }).select("id").single();
+  if (error || !inserted) fail("save-failed");
 
   let attachmentUrl: string | null = null;
   if (attachmentPath) {
@@ -300,11 +329,52 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
 
   const productLabel = product ? `${productType.title} · ${product.title}` : productType.title;
   const deliveryLabel = deliveryMethod === "econt_office"
-    ? (isEnglish ? "Econt office" : "Офис на Еконт")
+    ? (isEnglish ? "Econt office or locker" : "Офис или автомат на Еконт")
     : (isEnglish ? "Gallery pickup" : "Взимане от галерията");
   const price = offer ? `${offer.label_bg}${offer.label_en && isEnglish ? ` / ${offer.label_en}` : ""}: ${unitPrice.toFixed(2)} ${currency}` : null;
   const optionRows = Object.values(selected).map((item) => ({ label: item.field, value: item.label }));
   const productUrl = `${siteUrl}${backPath}`;
+
+  // Register the order in the request app (work queue) with a clear "Art Studio" mark.
+  const detailLines = [
+    `Продукт: ${productLabel}`,
+    ...optionRows.map((row) => `${row.label}: ${row.value}`),
+    `Количество: ${quantity}`,
+    personalizationText ? `Текст върху продукта: ${personalizationText}` : "",
+    message ? `Съобщение: ${message.slice(0, 300)}` : "",
+    `Получаване: ${deliveryMethod === "econt_office" ? `Офис или автомат на Еконт · ${deliveryCity}, ${deliveryOffice}` : "Взимане от галерията"}`,
+    deliveryNotes ? `Бележка за получаване: ${deliveryNotes.slice(0, 200)}` : "",
+    attachmentUrl ? `Снимка от клиента (линк 7 дни): ${attachmentUrl}` : "",
+    `Език: ${locale.toUpperCase()}`
+  ].filter(Boolean);
+  let sourceOrder: ArtStudioSourceOrder | null = null;
+  let sourceError: string | null = null;
+  try {
+    sourceOrder = await createArtStudioSourceOrder({
+      client_request_id: inserted.id,
+      order_code: reference,
+      catalog_sku: config.source_sku || defaultSourceSku(productType.internal_name),
+      variant_id: sourceVariant?.id ?? null,
+      locale,
+      customer_name: `${firstName} ${lastName}`,
+      customer_phone: phone,
+      customer_email: email,
+      quantity,
+      note: ["Поръчка от bansko.now/art-studio", ...detailLines].join("\n").slice(0, 1200),
+      product: {
+        name: `Art Studio · ${productLabel}`,
+        image_url: product?.image_url ?? productType.image_url ?? "",
+        details: detailLines,
+        bansko_order: reference,
+        product_type_slug: productType.slug,
+        product_url: productUrl
+      }
+    });
+    await supabase.from("art_studio_orders").update({ source_request_id: sourceOrder.id, source_synced_at: new Date().toISOString() }).eq("id", inserted.id);
+  } catch (syncError) {
+    sourceError = syncError instanceof Error ? syncError.message : "unknown error";
+    console.error("Art Studio order sync with the request app failed", reference, sourceError);
+  }
 
   await Promise.allSettled([
     sendNotificationEmail({
@@ -325,9 +395,15 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
         { label: "Имейл", value: email },
         { label: "Получаване", value: deliveryLabel },
         { label: "Град", value: deliveryMethod === "econt_office" ? deliveryCity : null },
-        { label: "Офис на Еконт", value: deliveryMethod === "econt_office" ? deliveryOffice : null },
+        { label: "Офис или автомат на Еконт", value: deliveryMethod === "econt_office" ? deliveryOffice : null },
         { label: "Бележка за получаване", value: deliveryNotes },
         { label: "Снимка от клиента (линк 7 дни)", value: attachmentUrl },
+        {
+          label: "В приложението за заявки",
+          value: sourceOrder
+            ? `Добавена автоматично като Art Studio поръчка (${sourceOrder.reservation_code})`
+            : `НЕ е добавена автоматично (${sourceError || "грешка"}). Въведи я ръчно в заявките.`
+        },
         { label: "Страница", value: productUrl },
         { label: "Език", value: locale.toUpperCase() }
       ],

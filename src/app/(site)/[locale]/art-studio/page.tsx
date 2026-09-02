@@ -7,6 +7,7 @@ import { ArtStudioServiceCard } from "@/components/public/art-studio-service-car
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { IconGlyph } from "@/components/public/icon-glyph";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
+import { getFaqItemsFromMarkdown } from "@/lib/markdown-blocks";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings } from "@/lib/art-studio";
@@ -240,13 +241,15 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
         }
       : undefined
   };
+  const cmsFaq = page?.content ? getFaqItemsFromMarkdown(page.content) : [];
+  const faqItems = cmsFaq.length ? cmsFaq : text.faq;
   const faqSchema = {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: text.faq.map((item) => ({
+    mainEntity: faqItems.map((item) => ({
       "@type": "Question",
       name: item.question,
-      acceptedAnswer: { "@type": "Answer", text: item.answer }
+      acceptedAnswer: { "@type": "Answer", text: item.answer.replace(/[*_`#>]/g, "").trim() }
     }))
   };
   const breadcrumbSchema = {
@@ -274,7 +277,7 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
             <p className="mt-5 text-lg leading-8 text-stone-650">{heroLead}</p>
           </div>
           {productTypes.length ? (
-            <div id="art-studio-products" className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div id="art-studio-products" className={`mt-10 grid gap-5 sm:grid-cols-2 ${productTypes.length === 4 || productTypes.length === 8 ? "lg:grid-cols-4" : "lg:grid-cols-3"}`}>
               {productTypes.map((productType, index) => (
                 <ArtStudioProductTypeCard
                   key={productType.id}
@@ -409,18 +412,25 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
             </div>
           </section>
 
-          <section aria-labelledby="art-studio-faq-heading" className="mx-auto w-full max-w-4xl">
-            <p className="text-sm font-semibold uppercase text-moss">{text.faqEyebrow}</p>
-            <h2 id="art-studio-faq-heading" className="mt-3 font-serif text-4xl font-semibold text-stone-950">{text.faqTitle}</h2>
-            <div className="mt-8 grid gap-3">
-              {text.faq.map((item) => (
-                <details key={item.question} className="group rounded-2xl border border-stone-200 bg-white p-5 shadow-soft">
-                  <summary className="cursor-pointer list-none font-serif text-xl font-semibold text-stone-950">{item.question}</summary>
-                  <p className="mt-3 text-base leading-7 text-stone-650">{item.answer}</p>
-                </details>
-              ))}
-            </div>
-          </section>
+          {!cmsFaq.length ? (
+            <section aria-labelledby="art-studio-faq-heading" className="mx-auto w-full max-w-4xl">
+              <p className="text-sm font-semibold uppercase text-moss">{text.faqEyebrow}</p>
+              <h2 id="art-studio-faq-heading" className="mt-3 font-serif text-4xl font-semibold text-stone-950">{text.faqTitle}</h2>
+              <div className="mt-8 grid gap-3">
+                {faqItems.map((item) => (
+                  <details key={item.question} className="group rounded-2xl border border-stone-200 bg-white p-5 shadow-soft">
+                    <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-serif text-xl font-semibold text-stone-950 [&::-webkit-details-marker]:hidden">
+                      <span>{item.question}</span>
+                      <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sage text-forest transition group-open:rotate-180" aria-hidden="true">
+                        <IconGlyph name="chevron-down" className="h-4 w-4" />
+                      </span>
+                    </summary>
+                    <p className="mt-3 text-base leading-7 text-stone-650">{item.answer}</p>
+                  </details>
+                ))}
+              </div>
+            </section>
+          ) : null}
 
           <FacebookGroupCTA settings={settings} locale={locale} />
         </div>

@@ -10,6 +10,8 @@ import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings, getArtStudioTypeBySlug } from "@/lib/art-studio";
 import { getArtStudioTypeCopy } from "@/lib/art-studio-copy";
+import { normalizeFormConfig, sourceGroupsForConfig } from "@/lib/art-studio-forms";
+import { getSourceVariantOptions } from "@/lib/gallery-catalog";
 import { getSiteSettings } from "@/lib/content";
 import { siteUrl } from "@/lib/env";
 import { getFaqItemsFromMarkdown } from "@/lib/markdown-blocks";
@@ -79,13 +81,17 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
 
   const isEnglish = locale === "en";
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
-  const [products, settings, pickupSettings, alternate] = await Promise.all([
+  const [products, settings, pickupSettings, alternate, sourceOptions] = await Promise.all([
     getArtStudioProducts({ locale, productTypeId: productType.id }),
     getSiteSettings(locale),
     getArtStudioPublicSettings(),
-    getAlternateType(productType.id, locale)
+    getAlternateType(productType.id, locale),
+    getSourceVariantOptions()
   ]);
   const copy = getArtStudioTypeCopy(productType.internal_name, locale);
+  const sourceGroups = sourceGroupsForConfig(normalizeFormConfig(productType.form_config), sourceOptions);
+  const featuredProducts = products.slice(0, 4);
+  const designsHref = localePath(locale, `/art-studio/${productType.slug}/designs`) as Route;
   const content = productType.content?.trim() || "";
   const contentFaq = content ? getFaqItemsFromMarkdown(content) : [];
   const faq = contentFaq.length ? contentFaq : copy.faq;
@@ -139,7 +145,7 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
         "@context": "https://schema.org",
         "@type": "ItemList",
         name: `${productType.title}: ${isEnglish ? "designs" : "дизайни"}`,
-        itemListElement: products.map((product, index) => ({
+        itemListElement: featuredProducts.map((product, index) => ({
           "@type": "ListItem",
           position: index + 1,
           name: product.title,
@@ -202,6 +208,12 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
               <section className="mt-12 border-t border-stone-200 pt-10">
                 <MarkdownRenderer content={content} locale={locale} />
               </section>
+            ) : copy.intro.length ? (
+              <section className="mt-12 grid gap-5 border-t border-stone-200 pt-10" aria-label={isEnglish ? "About this product" : "За продукта"}>
+                {copy.intro.map((paragraph) => (
+                  <p key={paragraph.slice(0, 40)} className="max-w-3xl text-base leading-8 text-stone-650">{paragraph}</p>
+                ))}
+              </section>
             ) : null}
 
             {products.length ? (
@@ -211,10 +223,18 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
                   {isEnglish ? "Pick a ready design or order a custom one through the form." : "Избери готов дизайн или поръчай собствен през формата."}
                 </p>
                 <div className="mt-7 grid gap-6 sm:grid-cols-2">
-                  {products.map((product) => (
+                  {featuredProducts.map((product) => (
                     <ArtStudioProductCard key={product.id} product={product} locale={locale} />
                   ))}
                 </div>
+                {products.length > featuredProducts.length ? (
+                  <div className="mt-7">
+                    <Link href={designsHref} className="inline-flex items-center gap-2 rounded-full border border-stone-300 px-6 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest">
+                      {isEnglish ? `See all designs (${products.length})` : `Виж още готови дизайни (${products.length})`}
+                      <IconGlyph name="arrow-right" className="h-4 w-4" />
+                    </Link>
+                  </div>
+                ) : null}
               </section>
             ) : null}
 
@@ -223,8 +243,13 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
                 <h2 id="type-faq-heading" className="font-serif text-4xl font-semibold text-stone-950">{isEnglish ? "Frequently asked questions" : "Често задавани въпроси"}</h2>
                 <div className="mt-6 grid gap-3">
                   {faq.map((item) => (
-                    <details key={item.question} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-soft">
-                      <summary className="cursor-pointer list-none font-serif text-xl font-semibold text-stone-950">{item.question}</summary>
+                    <details key={item.question} className="group rounded-2xl border border-stone-200 bg-white p-5 shadow-soft">
+                      <summary className="flex cursor-pointer list-none items-center justify-between gap-4 font-serif text-xl font-semibold text-stone-950 [&::-webkit-details-marker]:hidden">
+                        <span>{item.question}</span>
+                        <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-sage text-forest transition group-open:rotate-180" aria-hidden="true">
+                          <IconGlyph name="chevron-down" className="h-4 w-4" />
+                        </span>
+                      </summary>
                       <p className="mt-3 text-base leading-7 text-stone-650">{item.answer}</p>
                     </details>
                   ))}
@@ -234,7 +259,7 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
           </article>
 
           <aside className="lg:sticky lg:top-24 lg:col-span-5">
-            <ArtStudioEnquiryForm productType={productType} settings={pickupSettings} locale={locale} />
+            <ArtStudioEnquiryForm productType={productType} settings={pickupSettings} locale={locale} sourceGroups={sourceGroups} />
           </aside>
         </div>
       </main>

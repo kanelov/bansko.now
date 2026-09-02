@@ -50,6 +50,9 @@ export default async function AdminArtStudioOrdersPage({ searchParams }: { searc
                       }).join(" · ") || "—"
                     : "—"}</p>
                   <p><strong>Тип:</strong> {order.request_type === "enquiry" ? "Заявка през формата (без предплащане)" : "Онлайн плащане"}</p>
+                  <p><strong>В приложението за заявки:</strong> {order.source_request_id
+                    ? `Добавена автоматично${order.source_synced_at ? ` (${new Date(order.source_synced_at).toLocaleString("bg-BG")})` : ""}`
+                    : "Не е добавена автоматично, въведи я ръчно"}</p>
                   {order.attachment_path ? (
                     <p><strong>Снимка от клиента:</strong> {attachmentLinks.get(order.id) ? <a href={attachmentLinks.get(order.id)} target="_blank" rel="noopener noreferrer" className="font-semibold text-forest underline">Отвори (линкът е валиден 1 час)</a> : order.attachment_path}</p>
                   ) : null}

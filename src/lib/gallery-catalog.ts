@@ -1,11 +1,7 @@
 import "server-only";
 
-import {
-  artGalleryCatalogApiUrl,
-  artGalleryIntegrationSecret,
-  artGalleryReservationApiUrl
-} from "@/lib/env";
-import type { Locale } from "@/lib/types";
+import { artGalleryArtStudioOrdersApiUrl, artGalleryCatalogApiUrl, artGalleryIntegrationSecret, artGalleryReservationApiUrl } from "@/lib/env";
+import type { Locale, SourceVariantGroup } from "@/lib/types";
 
 export type GalleryCatalogTranslation = {
   catalog_id: string;
@@ -439,4 +435,82 @@ export async function createGalleryReservation(input: GalleryReservationInput) {
   const body = await response.json() as { reservation?: GalleryReservation };
   if (!body.reservation?.reservation_code) throw new Error("Missing reservation number");
   return body.reservation;
+}
+
+/**
+ * Product types with their sizes from the request app catalog, so Art Studio order forms
+ * offer exactly the sizes staff work with. Cached for 15 minutes; empty list on failure.
+ */
+export async function getSourceVariantOptions(): Promise<SourceVariantGroup[]> {
+  if (!artGalleryCatalogApiUrl) return [];
+  const url = new URL(artGalleryCatalogApiUrl);
+  url.searchParams.set("mode", "variant-options");
+
+  try {
+    const response = await integrationFetch(url.toString(), {
+      next: { revalidate: 900, tags: ["art-gallery-catalog"] }
+    });
+    if (!response?.ok) return [];
+    const body = await response.json() as {
+      product_types?: Array<{ id?: string; name?: string; variants?: Array<{ id?: string; label?: string }> }>;
+    };
+    return (body.product_types ?? [])
+      .filter((type) => type.id && type.name)
+      .map((type) => ({
+        id: String(type.id),
+        name: String(type.name),
+        variants: (type.variants ?? [])
+          .filter((variant) => variant.id && variant.label)
+          .map((variant) => ({ id: String(variant.id), label: String(variant.label) }))
+      }))
+      .filter((type) => type.variants.length > 0);
+  } catch {
+    return [];
+  }
+}
+
+export type ArtStudioSourceOrderInput = {
+  client_request_id: string;
+  order_code: string;
+  catalog_sku: string;
+  variant_id: string | null;
+  locale: Locale;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string;
+  quantity: number;
+  note: string;
+  product: Record<string, unknown>;
+};
+
+export type ArtStudioSourceOrder = {
+  id: string;
+  reservation_code: string;
+  status: string;
+  inventory_request_id: string | null;
+};
+
+/**
+ * Registers an Art Studio order in the request app: a confirmed Bansko NOW reservation plus
+ * an open work-queue request marked "Art Studio". Idempotent by client_request_id.
+ */
+export async function createArtStudioSourceOrder(input: ArtStudioSourceOrderInput): Promise<ArtStudioSourceOrder> {
+  if (!artGalleryArtStudioOrdersApiUrl || !artGalleryIntegrationSecret) {
+    throw new Error("Art Studio order integration is not configured");
+  }
+
+  const response = await integrationFetch(artGalleryArtStudioOrdersApiUrl, {
+    method: "POST",
+    cache: "no-store",
+    body: JSON.stringify(input),
+    signal: AbortSignal.timeout(10000)
+  });
+  if (!response?.ok) {
+    const body = await response?.json().catch(() => null) as { error?: string } | null;
+    throw new Error(body?.error || `Art Studio order sync failed (${response?.status ?? "no response"})`);
+  }
+
+  const body = await response.json() as { order?: ArtStudioSourceOrder };
+  if (!body.order?.id) throw new Error("Missing order reference from the request app");
+  return body.order;
 }

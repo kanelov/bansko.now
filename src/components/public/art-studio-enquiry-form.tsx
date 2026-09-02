@@ -3,44 +3,108 @@
 import Link from "next/link";
 import { useState } from "react";
 import { submitArtStudioEnquiryAction } from "@/app/(site)/[locale]/art-studio/actions";
-import { fieldLabel, normalizeFormConfig, optionLabel, photoLabel } from "@/lib/art-studio-forms";
+import {
+  fieldLabel,
+  normalizeFormConfig,
+  optionLabel,
+  photoLabel,
+  sourceGroupLabel,
+  sourceModelLabel,
+  sourceSizeLabel,
+  visibleFields,
+  visibleOptions
+} from "@/lib/art-studio-forms";
 import { localePath } from "@/lib/i18n";
-import type { ArtStudioPublicSettings, Locale, LocalizedArtStudioProduct, LocalizedArtStudioProductType } from "@/lib/types";
+import type { ArtStudioPublicSettings, Locale, LocalizedArtStudioProduct, LocalizedArtStudioProductType, SourceVariantGroup } from "@/lib/types";
 
 const fieldClass =
   "w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-forest focus:ring-2 focus:ring-sage";
+const chipClass =
+  "inline-flex min-w-[2.75rem] cursor-pointer items-center justify-center rounded-full border border-stone-300 bg-white px-3.5 py-2 text-sm font-semibold text-stone-800 transition hover:border-moss peer-checked:border-forest peer-checked:bg-forest peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-sage peer-focus-visible:ring-offset-1";
 
 function money(value: number, currency: string, locale: Locale) {
   return new Intl.NumberFormat(locale === "en" ? "en-GB" : "bg-BG", { style: "currency", currency }).format(value);
 }
 
+/** Pill-style radio option. The input stays in the DOM for native validation and keyboard use. */
+function Chip({
+  name,
+  value,
+  label,
+  checked,
+  required,
+  onChange
+}: {
+  name: string;
+  value: string;
+  label: string;
+  checked: boolean;
+  required?: boolean;
+  onChange: () => void;
+}) {
+  return (
+    <label>
+      <input type="radio" name={name} value={value} checked={checked} required={required} onChange={onChange} className="peer sr-only" />
+      <span className={chipClass}>{label}</span>
+    </label>
+  );
+}
+
+function ChipGroup({ legend, children }: { legend: string; children: React.ReactNode }) {
+  return (
+    <fieldset className="grid gap-2">
+      <legend className="text-sm font-semibold text-stone-800">{legend}</legend>
+      <div className="flex flex-wrap gap-2">{children}</div>
+    </fieldset>
+  );
+}
+
 /**
- * Enquiry-style order form. The owner receives the details by email and confirms
- * price and timing; nothing is charged here.
+ * Enquiry-style order form. Sizes come from the request app catalog when configured
+ * (sourceGroups), otherwise from the static form_config. The owner receives the details
+ * by email and confirms price and timing; nothing is charged here.
  */
 export function ArtStudioEnquiryForm({
   productType,
   product = null,
   settings,
-  locale
+  locale,
+  sourceGroups = []
 }: {
   productType: LocalizedArtStudioProductType;
   product?: LocalizedArtStudioProduct | null;
   settings: ArtStudioPublicSettings;
   locale: Locale;
+  sourceGroups?: SourceVariantGroup[];
 }) {
   const isEnglish = locale === "en";
   const config = normalizeFormConfig(productType.form_config);
+  const sourceSizes = config.source_sizes;
+  const sourceActive = Boolean(sourceSizes) && sourceGroups.length > 0;
+  const singleVariant = sourceGroups.length === 1 && sourceGroups[0].variants.length === 1 ? sourceGroups[0].variants[0] : null;
+  const fields = visibleFields(config, sourceActive);
   const offers = (product?.offers ?? []).filter((offer) => offer.is_active);
+
   const [offerId, setOfferId] = useState(offers[0]?.id || "");
+  const [sourceTypeId, setSourceTypeId] = useState(sourceGroups[0]?.id || "");
+  const [sourceVariantId, setSourceVariantId] = useState(singleVariant?.id || "");
+  const [selected, setSelected] = useState<Record<string, string>>({});
   const [deliveryMethod, setDeliveryMethod] = useState<"econt_office" | "gallery_pickup">("gallery_pickup");
   const [fileName, setFileName] = useState("");
+
+  const activeGroup = sourceGroups.find((group) => group.id === sourceTypeId) ?? sourceGroups[0] ?? null;
   const pickupName = isEnglish ? settings.pickup_name_en || settings.pickup_name_bg : settings.pickup_name_bg;
   const pickupAddress = isEnglish ? settings.pickup_address_en || settings.pickup_address_bg : settings.pickup_address_bg;
   const pickupInstructions = isEnglish ? settings.pickup_instructions_en || settings.pickup_instructions_bg : settings.pickup_instructions_bg;
   const econtInstructions = isEnglish ? settings.econt_instructions_en || settings.econt_instructions_bg : settings.econt_instructions_bg;
   const showPersonalization = product ? product.personalization_text_enabled : true;
   const title = product?.title || productType.title;
+  const chooseLabel = isEnglish ? "Choose" : "Избери";
+  const hasOptions = sourceActive || fields.length > 0 || (product?.options.length ?? 0) > 0;
+
+  function choose(key: string, value: string) {
+    setSelected((current) => ({ ...current, [key]: value }));
+  }
 
   return (
     <form id="order" action={submitArtStudioEnquiryAction} className="grid gap-7 rounded-2xl border border-stone-200 bg-white p-5 shadow-soft sm:p-7">
@@ -75,43 +139,126 @@ export function ArtStudioEnquiryForm({
         </fieldset>
       ) : null}
 
-      {config.fields.length || product?.options.length ? (
-        <fieldset className="grid gap-4 border-t border-stone-200 pt-5">
-          <legend className="font-semibold text-stone-950">{isEnglish ? "Options" : "Опции"}</legend>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {config.fields.map((field) => (
-              <label key={field.key} className="grid gap-2 text-sm font-semibold text-stone-800">
-                {fieldLabel(field, locale)}
-                {field.required ? <span className="sr-only">*</span> : null}
-                <select name={`field_${field.key}`} required={field.required} defaultValue="" className={fieldClass}>
-                  <option value="" disabled={field.required}>
-                    {isEnglish ? (field.required ? "Choose" : "Not selected") : field.required ? "Избери" : "Без избор"}
-                  </option>
-                  {field.options.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {optionLabel(option, locale)}
-                    </option>
+      {hasOptions ? (
+        <div className="grid gap-5 border-t border-stone-200 pt-5">
+          <p className="font-semibold text-stone-950">{isEnglish ? "Options" : "Опции"}</p>
+
+          {sourceActive && sourceSizes ? (
+            <>
+              {sourceGroups.length > 1 ? (
+                <ChipGroup legend={sourceModelLabel(sourceSizes, locale)}>
+                  {sourceGroups.map((group) => (
+                    <Chip
+                      key={group.id}
+                      name="source_type_id"
+                      value={group.id}
+                      label={sourceGroupLabel(group, sourceSizes, locale)}
+                      checked={activeGroup?.id === group.id}
+                      required={sourceSizes.required}
+                      onChange={() => {
+                        setSourceTypeId(group.id);
+                        setSourceVariantId("");
+                      }}
+                    />
                   ))}
-                </select>
-              </label>
-            ))}
-            {(product?.options ?? []).map((option) => (
-              <label key={option.id} className="grid gap-2 text-sm font-semibold text-stone-800">
-                {isEnglish ? option.label_en || option.label_bg : option.label_bg}
-                <select name={`option_${option.option_key}`} required={option.is_required} defaultValue="" className={fieldClass}>
-                  <option value="" disabled={option.is_required}>
-                    {isEnglish ? "Choose" : "Избери"}
-                  </option>
-                  {option.values.map((value) => (
-                    <option key={value.value} value={value.value}>
-                      {isEnglish ? value.label_en || value.label_bg : value.label_bg}
-                    </option>
+                </ChipGroup>
+              ) : (
+                <input type="hidden" name="source_type_id" value={activeGroup?.id || ""} />
+              )}
+              {singleVariant ? (
+                <input type="hidden" name="source_variant_id" value={singleVariant.id} />
+              ) : activeGroup ? (
+                <ChipGroup legend={sourceSizeLabel(sourceSizes, locale)}>
+                  {activeGroup.variants.map((variant) => (
+                    <Chip
+                      key={variant.id}
+                      name="source_variant_id"
+                      value={variant.id}
+                      label={variant.label}
+                      checked={sourceVariantId === variant.id}
+                      required={sourceSizes.required}
+                      onChange={() => setSourceVariantId(variant.id)}
+                    />
                   ))}
-                </select>
-              </label>
-            ))}
-          </div>
-        </fieldset>
+                </ChipGroup>
+              ) : null}
+            </>
+          ) : null}
+
+          {fields.map((field) => {
+            const options = visibleOptions(field, selected);
+            const current = options.some((option) => option.value === selected[field.key]) ? selected[field.key] : "";
+            const name = `field_${field.key}`;
+            if (field.display === "select" || options.length > 12) {
+              return (
+                <label key={field.key} className="grid gap-2 text-sm font-semibold text-stone-800">
+                  {fieldLabel(field, locale)}
+                  <select name={name} required={field.required} value={current} onChange={(event) => choose(field.key, event.target.value)} className={fieldClass}>
+                    <option value="" disabled={field.required}>
+                      {isEnglish ? (field.required ? "Choose" : "Not selected") : field.required ? "Избери" : "Без избор"}
+                    </option>
+                    {options.map((option) => (
+                      <option key={option.value} value={option.value}>
+                        {optionLabel(option, locale)}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              );
+            }
+            return (
+              <ChipGroup key={field.key} legend={fieldLabel(field, locale)}>
+                {options.map((option) => (
+                  <Chip
+                    key={option.value}
+                    name={name}
+                    value={option.value}
+                    label={optionLabel(option, locale)}
+                    checked={current === option.value}
+                    required={field.required}
+                    onChange={() => choose(field.key, option.value)}
+                  />
+                ))}
+              </ChipGroup>
+            );
+          })}
+
+          {(product?.options ?? []).map((option) => {
+            const key = `opt:${option.option_key}`;
+            const name = `option_${option.option_key}`;
+            const label = isEnglish ? option.label_en || option.label_bg : option.label_bg;
+            if (option.values.length > 12) {
+              return (
+                <label key={option.id} className="grid gap-2 text-sm font-semibold text-stone-800">
+                  {label}
+                  <select name={name} required={option.is_required} value={selected[key] ?? ""} onChange={(event) => choose(key, event.target.value)} className={fieldClass}>
+                    <option value="" disabled={option.is_required}>{chooseLabel}</option>
+                    {option.values.map((value) => (
+                      <option key={value.value} value={value.value}>
+                        {isEnglish ? value.label_en || value.label_bg : value.label_bg}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+              );
+            }
+            return (
+              <ChipGroup key={option.id} legend={label}>
+                {option.values.map((value) => (
+                  <Chip
+                    key={value.value}
+                    name={name}
+                    value={value.value}
+                    label={isEnglish ? value.label_en || value.label_bg : value.label_bg}
+                    checked={(selected[key] ?? "") === value.value}
+                    required={option.is_required}
+                    onChange={() => choose(key, value.value)}
+                  />
+                ))}
+              </ChipGroup>
+            );
+          })}
+        </div>
       ) : null}
 
       <fieldset className="grid gap-4 border-t border-stone-200 pt-5">
@@ -177,7 +324,7 @@ export function ArtStudioEnquiryForm({
           </label>
           <label className={`choice-row cursor-pointer rounded-xl border p-4 ${deliveryMethod === "econt_office" ? "border-forest bg-sage/40" : "border-stone-200"}`}>
             <input type="radio" name="delivery_method" value="econt_office" checked={deliveryMethod === "econt_office"} onChange={() => setDeliveryMethod("econt_office")} className="choice-control" />
-            <span><strong className="block">{isEnglish ? "Econt office" : "До офис на Еконт"}</strong><small className="mt-1 block text-stone-600">{isEnglish ? "Delivery fee by the courier tariff" : "Такса по тарифата на куриера"}</small></span>
+            <span><strong className="block">{isEnglish ? "Econt office or locker" : "До офис или автомат на Еконт"}</strong><small className="mt-1 block text-stone-600">{isEnglish ? "Delivery fee by the courier tariff" : "Такса по тарифата на куриера"}</small></span>
           </label>
         </div>
         {deliveryMethod === "gallery_pickup" ? (
@@ -191,7 +338,10 @@ export function ArtStudioEnquiryForm({
           <div className="grid gap-4 sm:grid-cols-2">
             {econtInstructions ? <p className="text-sm text-stone-600 sm:col-span-2">{econtInstructions}</p> : null}
             <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "City" : "Град"}<input name="delivery_city" required className={fieldClass} /></label>
-            <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "Econt office" : "Офис на Еконт"}<input name="delivery_office" required className={fieldClass} placeholder={isEnglish ? "Office name or address" : "Име или адрес на офиса"} /></label>
+            <label className="grid gap-2 text-sm font-semibold">
+              {isEnglish ? "Econt office or locker" : "Офис или автомат на Еконт"}
+              <input name="delivery_office" required className={fieldClass} placeholder={isEnglish ? "Office or locker name / address" : "Име или адрес на офиса или автомата"} />
+            </label>
           </div>
         )}
         <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "Note for pickup or delivery" : "Бележка за получаването"}<textarea name="delivery_notes" rows={2} className={fieldClass} /></label>

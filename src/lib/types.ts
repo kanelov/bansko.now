@@ -403,6 +403,8 @@ export type ArtStudioFormFieldOption = {
   value: string;
   label_bg: string;
   label_en?: string | null;
+  /** Group tags used by filter_by on another field (for example "adult", "kids", "baby"). */
+  tags?: string[];
 };
 
 export type ArtStudioFormField = {
@@ -410,7 +412,28 @@ export type ArtStudioFormField = {
   label_bg: string;
   label_en?: string | null;
   required?: boolean;
+  /** "chips" renders pill buttons (default), "select" a dropdown. */
+  display?: "chips" | "select";
+  /** Show only options whose tags include map[selected value of another field]. */
+  filter_by?: { field: string; map: Record<string, string> } | null;
   options: ArtStudioFormFieldOption[];
+};
+
+/**
+ * Sizes taken live from the request app catalog (app.kanelov.com) instead of static options.
+ * `types` lists the source product type names to offer (for example "Унисекс тениски").
+ */
+export type ArtStudioSourceSizes = {
+  types: string[];
+  variants_include: string[];
+  labels_en: Record<string, string>;
+  model_label_bg: string | null;
+  model_label_en: string | null;
+  size_label_bg: string | null;
+  size_label_en: string | null;
+  /** Static field keys hidden while the source sizes are available (default model, size). */
+  replaces: string[];
+  required: boolean;
 };
 
 export type ArtStudioFormConfig = {
@@ -419,6 +442,16 @@ export type ArtStudioFormConfig = {
   photo_label_bg?: string | null;
   photo_label_en?: string | null;
   quantity: boolean;
+  /** Placeholder SKU in the request app used for the automatic work-queue request. */
+  source_sku: string | null;
+  source_sizes: ArtStudioSourceSizes | null;
+};
+
+/** Product type with its size variants as published by the request app catalog API. */
+export type SourceVariantGroup = {
+  id: string;
+  name: string;
+  variants: Array<{ id: string; label: string }>;
 };
 
 export type ArtStudioProductOption = {
@@ -509,6 +542,8 @@ export type ArtStudioOrder = {
   updated_at: string;
   request_type: "payment" | "enquiry";
   attachment_path: string | null;
+  source_request_id: string | null;
+  source_synced_at: string | null;
 };
 
 export type BusinessStatus = "draft" | "approved" | "rejected";
