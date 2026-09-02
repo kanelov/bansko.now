@@ -56,6 +56,7 @@ export default async function AdminArtStudioProductsPage({ searchParams }: { sea
                   <input name="icon_name" defaultValue={type?.icon_name || ""} className={fieldClass} placeholder="Font Awesome icon" />
                 </div>
                 <input name="image_url" type="url" defaultValue={type?.image_url || ""} className={fieldClass} placeholder="Image URL" />
+                <textarea name="gallery_urls" defaultValue={(type?.gallery_urls ?? []).join("\n")} rows={3} className={fieldClass} placeholder="Примерни дизайни за миниатюрите на страницата: по един URL на снимка на ред" />
                 <div className="grid gap-3 sm:grid-cols-2">
                   <input name="image_alt_bg" defaultValue={type?.image_alt || ""} className={fieldClass} placeholder="Image alt BG" />
                   <input name="image_alt_en" defaultValue={english?.image_alt || ""} className={fieldClass} placeholder="Image alt EN" />

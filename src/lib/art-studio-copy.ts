@@ -1,4 +1,4 @@
-import type { Locale } from "@/lib/types";
+import type { Json, Locale } from "@/lib/types";
 
 /**
  * Default selling copy for the Art Studio product type pages. Used when the type has no
@@ -233,4 +233,325 @@ export function getArtStudioTypeCopy(internalName: string, locale: Locale): ArtS
   const specific = byType[internalName]?.[locale];
   const intro = introByType[internalName]?.[locale] ?? base.intro;
   return { ...base, ...(specific || {}), intro };
+}
+
+export type ArtStudioTrustItem = { icon: string; title: string; text: string };
+export type ArtStudioStep = { title: string; text: string };
+export type ArtStudioLandingCopy = {
+  eyebrow: string;
+  title: string;
+  lead: string;
+  metaDescription: string;
+  ctaGallery: string;
+  ctaProducts: string;
+  trust: ArtStudioTrustItem[];
+  productsEyebrow: string;
+  productsTitle: string;
+  productsText: string;
+  collectionsEyebrow: string;
+  collectionsTitle: string;
+  collectionsText: string;
+  collectionsButton: string;
+  servicesEyebrow: string;
+  servicesTitle: string;
+  servicesButton: string;
+  stepsEyebrow: string;
+  stepsTitle: string;
+  steps: ArtStudioStep[];
+  customEyebrow: string;
+  customTitle: string;
+  customText: string;
+  customButton: string;
+  faqEyebrow: string;
+  faqTitle: string;
+  faq: ArtStudioFaqItem[];
+  breadcrumbHome: string;
+};
+
+/** Default texts of the /art-studio landing page; the admin "Текстове" tab overrides them. */
+export const landingDefaults: Record<Locale, ArtStudioLandingCopy> = {
+  bg: {
+    eyebrow: "Art Studio Банско",
+    title: "Art Studio Банско: авторски тениски, арт принтове и чаши",
+    lead: "Дизайни, вдъхновени от Банско и Пирин, отпечатани с внимание в малко студио в града. Поръчай онлайн или заяви за взимане от галерията.",
+    metaDescription:
+      "Art Studio в Банско: авторски тениски, fine art принтове, платна и чаши с дизайни от Пирин. Онлайн поръчка или взимане от галерията в Банско, доставка с Еконт.",
+    ctaGallery: "Разгледай галерията",
+    ctaProducts: "Виж продуктите",
+    trust: [
+      { icon: "mountain", title: "Дизайни от Пирин", text: "Планината, дивите животни и Банско, нарисувани и снимани от нас." },
+      { icon: "store", title: "Галерия в Банско", text: "Виж продуктите на живо и вземи поръчката си от галерията." },
+      { icon: "truck", title: "Доставка с Еконт", text: "Поръчай онлайн и получи в удобен офис в цялата страна." },
+      { icon: "pen-nib", title: "Лични поръчки", text: "Твоя снимка или идея върху платно, тениска или чаша." }
+    ],
+    productsEyebrow: "Какво правим",
+    productsTitle: "Избери продукт",
+    productsText: "Всяка категория има собствени модели, размери и цени. Плащаш онлайн или заявяваш за взимане от галерията.",
+    collectionsEyebrow: "Галерията в Банско",
+    collectionsTitle: "Колекции с готови дизайни",
+    collectionsText: "Актуалните колекции от галерията, синхронизирани с наличностите в магазина. Заяви продукт и го вземи от Банско.",
+    collectionsButton: "Отвори цялата галерия",
+    servicesEyebrow: "Услуги",
+    servicesTitle: "Печат и визуални услуги",
+    servicesButton: "Индивидуална заявка",
+    stepsEyebrow: "Как се поръчва",
+    stepsTitle: "Три стъпки до готовия продукт",
+    steps: [
+      { title: "Избери", text: "Разгледай продуктите на Art Studio или колекциите в галерията и избери дизайн, размер и вариант." },
+      { title: "Поръчай или заяви", text: "Плати онлайн или остави име и телефон за заявка. Ще потвърдим наличността и срока." },
+      { title: "Получи", text: "Вземи поръчката от галерията в Банско или я получи в офис на Еконт." }
+    ],
+    customEyebrow: "Лични проекти",
+    customTitle: "Твоя снимка или идея върху продукт",
+    customText: "Правим индивидуални поръчки: принт на платно от твоя снимка, тениска с текст или рисунка, подарък за екип или събитие. Пиши ни какво искаш и ще предложим формат, материал и цена.",
+    customButton: "Пиши ни",
+    faqEyebrow: "Въпроси",
+    faqTitle: "Често задавани въпроси",
+    faq: [
+      {
+        question: "Как получавам поръчката си?",
+        answer: "Можеш да я вземеш лично от галерията в Банско или да я получиш в офис на Еконт в цялата страна. Начинът на получаване се избира при поръчката."
+      },
+      {
+        question: "Мога ли да поръчам със своя снимка или дизайн?",
+        answer: "Да. Правим лични поръчки за принт на платно, тениска или чаша по твоя снимка, текст или идея. Пиши ни през страницата за контакт и ще уточним размер, материал и цена."
+      },
+      {
+        question: "Какви размери и модели тениски има?",
+        answer: "Дамски, унисекс, детски и бебешки модели. Наличните размери за всеки дизайн са показани в страницата на продукта или в галерията."
+      },
+      {
+        question: "Как да се грижа за принта?",
+        answer: "Пери тениските обърнати наопаки на ниска температура и без сушилня. Платната и принтовете се пазят от пряка слънчева светлина и влага."
+      },
+      {
+        question: "Мога ли да видя продуктите на живо?",
+        answer: "Да. Колекциите са изложени в галерията в Банско. В галерията онлайн виждаш кои продукти са налични в момента и можеш да ги заявиш за взимане."
+      }
+    ],
+    breadcrumbHome: "Начало"
+  },
+  en: {
+    eyebrow: "Art Studio Bansko",
+    title: "Art Studio Bansko: original T-shirts, art prints and mugs",
+    lead: "Designs inspired by Bansko and Pirin, printed with care in a small studio in town. Order online or reserve for pickup at the gallery.",
+    metaDescription:
+      "Art Studio in Bansko: original T-shirts, fine art prints, canvas and mugs with Pirin designs. Order online or pick up at the gallery in Bansko, delivery by Econt.",
+    ctaGallery: "Browse the gallery",
+    ctaProducts: "View products",
+    trust: [
+      { icon: "mountain", title: "Designs from Pirin", text: "The mountain, its wildlife and Bansko, drawn and photographed by us." },
+      { icon: "store", title: "Gallery in Bansko", text: "See the products in person and collect your order at the gallery." },
+      { icon: "truck", title: "Econt delivery", text: "Order online and receive it at a convenient office anywhere in Bulgaria." },
+      { icon: "pen-nib", title: "Custom orders", text: "Your photo or idea on canvas, a T-shirt or a mug." }
+    ],
+    productsEyebrow: "What we make",
+    productsTitle: "Choose a product",
+    productsText: "Each category has its own models, sizes and prices. Pay online or reserve for pickup at the gallery.",
+    collectionsEyebrow: "The gallery in Bansko",
+    collectionsTitle: "Collections with ready designs",
+    collectionsText: "Current collections from the gallery, synced with the shop stock. Reserve a product and collect it in Bansko.",
+    collectionsButton: "Open the full gallery",
+    servicesEyebrow: "Services",
+    servicesTitle: "Printing and visual services",
+    servicesButton: "Custom enquiry",
+    stepsEyebrow: "How to order",
+    stepsTitle: "Three steps to your product",
+    steps: [
+      { title: "Choose", text: "Browse the Art Studio products or the gallery collections and pick a design, size and variant." },
+      { title: "Order or reserve", text: "Pay online or leave your name and phone to reserve. We confirm availability and timing." },
+      { title: "Receive", text: "Collect your order at the gallery in Bansko or receive it at an Econt office." }
+    ],
+    customEyebrow: "Custom projects",
+    customTitle: "Your photo or idea on a product",
+    customText: "We take custom orders: a canvas print from your photo, a T-shirt with text or artwork, gifts for a team or an event. Tell us what you have in mind and we will suggest a format, material and price.",
+    customButton: "Contact us",
+    faqEyebrow: "Questions",
+    faqTitle: "Frequently asked questions",
+    faq: [
+      {
+        question: "How do I receive my order?",
+        answer: "You can collect it in person at the gallery in Bansko or receive it at an Econt office anywhere in Bulgaria. You choose the method when ordering."
+      },
+      {
+        question: "Can I order with my own photo or design?",
+        answer: "Yes. We make custom canvas prints, T-shirts and mugs from your photo, text or idea. Contact us and we will agree on size, material and price."
+      },
+      {
+        question: "Which T-shirt sizes and models are available?",
+        answer: "Women's, unisex, kids' and baby models. The available sizes for each design are shown on the product page or in the gallery."
+      },
+      {
+        question: "How do I care for the print?",
+        answer: "Wash T-shirts inside out at a low temperature and skip the dryer. Keep canvas and prints away from direct sunlight and moisture."
+      },
+      {
+        question: "Can I see the products in person?",
+        answer: "Yes. The collections are on display at the gallery in Bansko. The online gallery shows what is in stock right now and lets you reserve for pickup."
+      }
+    ],
+    breadcrumbHome: "Home"
+  }
+};
+
+export const landingTextKeys = [
+  "eyebrow", "title", "lead", "metaDescription", "ctaGallery", "ctaProducts",
+  "productsEyebrow", "productsTitle", "productsText",
+  "collectionsEyebrow", "collectionsTitle", "collectionsText", "collectionsButton",
+  "servicesEyebrow", "servicesTitle", "servicesButton",
+  "stepsEyebrow", "stepsTitle",
+  "customEyebrow", "customTitle", "customText", "customButton",
+  "faqEyebrow", "faqTitle"
+] as const;
+export type LandingTextKey = (typeof landingTextKeys)[number];
+export const typeTextKeys = ["eyebrow", "lead", "cta"] as const;
+export type TypeTextKey = (typeof typeTextKeys)[number];
+
+type CopyOverrides = {
+  landing?: Record<string, Record<string, unknown>>;
+  types?: Record<string, Record<string, Record<string, unknown>>>;
+};
+
+function readOverrides(pageCopy: Json | null | undefined): CopyOverrides {
+  return pageCopy && typeof pageCopy === "object" && !Array.isArray(pageCopy) ? (pageCopy as CopyOverrides) : {};
+}
+
+function overrideText(value: unknown, maxLength = 1000) {
+  return typeof value === "string" ? value.trim().slice(0, maxLength) : "";
+}
+
+function overridePairs(value: unknown): ArtStudioStep[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => (item && typeof item === "object" && !Array.isArray(item) ? (item as Record<string, unknown>) : null))
+    .map((item) => (item ? { title: overrideText(item.title, 200), text: overrideText(item.text, 1000) } : null))
+    .filter((item): item is ArtStudioStep => Boolean(item && item.title))
+    .slice(0, 12);
+}
+
+function overrideTrust(value: unknown): ArtStudioTrustItem[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => (item && typeof item === "object" && !Array.isArray(item) ? (item as Record<string, unknown>) : null))
+    .map((item) => (item ? { icon: overrideText(item.icon, 40) || "check", title: overrideText(item.title, 200), text: overrideText(item.text, 600) } : null))
+    .filter((item): item is ArtStudioTrustItem => Boolean(item && item.title))
+    .slice(0, 8);
+}
+
+function overrideFaq(value: unknown): ArtStudioFaqItem[] {
+  if (!Array.isArray(value)) return [];
+  return value
+    .map((item) => (item && typeof item === "object" && !Array.isArray(item) ? (item as Record<string, unknown>) : null))
+    .map((item) => (item ? { question: overrideText(item.question, 300), answer: overrideText(item.answer, 2000) } : null))
+    .filter((item): item is ArtStudioFaqItem => Boolean(item && item.question && item.answer))
+    .slice(0, 20);
+}
+
+function overrideParagraphs(value: unknown): string[] {
+  return Array.isArray(value) ? value.map((item) => overrideText(item, 2000)).filter(Boolean).slice(0, 8) : [];
+}
+
+/** Landing texts: admin overrides from art_studio_public_settings.page_copy over the defaults. */
+export function resolveArtStudioLandingCopy(pageCopy: Json | null | undefined, locale: Locale): ArtStudioLandingCopy {
+  const base = landingDefaults[locale];
+  const raw = readOverrides(pageCopy).landing?.[locale] ?? {};
+  const result: ArtStudioLandingCopy = { ...base, trust: [...base.trust], steps: [...base.steps], faq: [...base.faq] };
+  for (const key of landingTextKeys) {
+    const value = overrideText(raw[key]);
+    if (value) result[key] = value;
+  }
+  const trust = overrideTrust(raw.trust);
+  if (trust.length) result.trust = trust;
+  const steps = overridePairs(raw.steps);
+  if (steps.length) result.steps = steps;
+  const faq = overrideFaq(raw.faq);
+  if (faq.length) result.faq = faq;
+  return result;
+}
+
+/** Product type texts: admin overrides over the defaults keyed by internal_name. */
+export function resolveArtStudioTypeCopy(pageCopy: Json | null | undefined, internalName: string, locale: Locale): ArtStudioTypeCopy {
+  const base = getArtStudioTypeCopy(internalName, locale);
+  const raw = readOverrides(pageCopy).types?.[internalName]?.[locale] ?? {};
+  const result: ArtStudioTypeCopy = { ...base, benefits: [...base.benefits], intro: [...base.intro], faq: [...base.faq] };
+  for (const key of typeTextKeys) {
+    const value = overrideText(raw[key]);
+    if (value) result[key] = value;
+  }
+  const benefits = overridePairs(raw.benefits);
+  if (benefits.length) result.benefits = benefits;
+  const intro = overrideParagraphs(raw.intro);
+  if (intro.length) result.intro = intro;
+  const faq = overrideFaq(raw.faq);
+  if (faq.length) result.faq = faq;
+  return result;
+}
+
+// Line formats used by the admin textareas: "Заглавие | Текст" per line, paragraphs split by blank lines.
+function splitLine(line: string) {
+  return line.split("|").map((part) => part.trim());
+}
+
+export function parsePairLines(text: string): ArtStudioStep[] {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [title, ...rest] = splitLine(line);
+      return { title: title || "", text: rest.join(" | ") };
+    })
+    .filter((item) => item.title)
+    .slice(0, 12);
+}
+
+export function parseTrustLines(text: string): ArtStudioTrustItem[] {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const parts = splitLine(line);
+      if (parts.length >= 3) return { icon: parts[0] || "check", title: parts[1], text: parts.slice(2).join(" | ") };
+      return { icon: "check", title: parts[0] || "", text: parts[1] || "" };
+    })
+    .filter((item) => item.title)
+    .slice(0, 8);
+}
+
+export function parseFaqLines(text: string): ArtStudioFaqItem[] {
+  return text
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .map((line) => {
+      const [question, ...rest] = splitLine(line);
+      return { question: question || "", answer: rest.join(" | ") };
+    })
+    .filter((item) => item.question && item.answer)
+    .slice(0, 20);
+}
+
+export function parseParagraphs(text: string): string[] {
+  return text
+    .split(/\r?\n\s*\r?\n/)
+    .map((paragraph) => paragraph.replace(/\s*\r?\n\s*/g, " ").trim())
+    .filter(Boolean)
+    .slice(0, 8);
+}
+
+export function formatPairLines(items: ArtStudioStep[]) {
+  return items.map((item) => `${item.title} | ${item.text}`).join("\n");
+}
+
+export function formatTrustLines(items: ArtStudioTrustItem[]) {
+  return items.map((item) => `${item.icon} | ${item.title} | ${item.text}`).join("\n");
+}
+
+export function formatFaqLines(items: ArtStudioFaqItem[]) {
+  return items.map((item) => `${item.question} | ${item.answer}`).join("\n");
+}
+
+export function formatParagraphs(paragraphs: string[]) {
+  return paragraphs.join("\n\n");
 }

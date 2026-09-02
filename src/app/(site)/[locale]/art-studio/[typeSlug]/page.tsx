@@ -4,12 +4,13 @@ import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { ArtStudioEnquiryForm } from "@/components/public/art-studio-enquiry-form";
 import { ArtStudioProductCard } from "@/components/public/art-studio-product-card";
+import { ArtStudioThumbnailStrip, type ThumbnailImage } from "@/components/public/art-studio-thumbnail-strip";
 import { IconGlyph } from "@/components/public/icon-glyph";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings, getArtStudioTypeBySlug } from "@/lib/art-studio";
-import { getArtStudioTypeCopy } from "@/lib/art-studio-copy";
+import { resolveArtStudioTypeCopy } from "@/lib/art-studio-copy";
 import { normalizeFormConfig, sourceGroupsForConfig } from "@/lib/art-studio-forms";
 import { getSourceVariantOptions } from "@/lib/gallery-catalog";
 import { getSiteSettings } from "@/lib/content";
@@ -53,7 +54,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     languages["x-default"] = canonical;
   }
 
-  const copy = getArtStudioTypeCopy(productType.internal_name, locale);
+  const pickupSettings = await getArtStudioPublicSettings();
+  const copy = resolveArtStudioTypeCopy(pickupSettings.page_copy, productType.internal_name, locale);
   const title = productType.seo_title || `${productType.title} | Art Studio Bansko`;
   const description = productType.seo_description || productType.description || copy.lead;
   const image = productType.og_image_url || productType.image_url || undefined;
@@ -88,7 +90,17 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
     getAlternateType(productType.id, locale),
     getSourceVariantOptions()
   ]);
-  const copy = getArtStudioTypeCopy(productType.internal_name, locale);
+  const copy = resolveArtStudioTypeCopy(pickupSettings.page_copy, productType.internal_name, locale);
+  const thumbnails: ThumbnailImage[] = [
+    ...(productType.gallery_urls ?? []).map((src) => ({ src, alt: productType.image_alt || productType.title })),
+    ...products.flatMap((product) =>
+      [product.image_url, ...(product.gallery_urls || [])]
+        .filter((src): src is string => Boolean(src))
+        .map((src) => ({ src, alt: product.image_alt || product.title, href: localePath(locale, `/art-studio/${productType.slug}/${product.slug}`) }))
+    )
+  ]
+    .filter((image, index, all) => all.findIndex((other) => other.src === image.src) === index)
+    .slice(0, 12);
   const sourceGroups = sourceGroupsForConfig(normalizeFormConfig(productType.form_config), sourceOptions);
   const featuredProducts = products.slice(0, 4);
   const designsHref = localePath(locale, `/art-studio/${productType.slug}/designs`) as Route;
@@ -191,6 +203,8 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
                 />
               </figure>
             ) : null}
+
+            <ArtStudioThumbnailStrip images={thumbnails} locale={locale} />
 
             <section className="mt-10 grid gap-4 sm:grid-cols-2" aria-label={isEnglish ? "Why order from us" : "Защо да поръчаш от нас"}>
               {copy.benefits.map((benefit) => (

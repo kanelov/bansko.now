@@ -1,4 +1,4 @@
-import type { ArtStudioFormConfig, ArtStudioFormField, ArtStudioFormFieldOption, ArtStudioSourceSizes, Json, Locale, SourceVariantGroup } from "@/lib/types";
+import type { ArtStudioFormConfig, ArtStudioFormField, ArtStudioFormFieldOption, ArtStudioSourceSizeGroup, ArtStudioSourceSizes, Json, Locale, SourceVariantGroup } from "@/lib/types";
 
 /**
  * Order form configuration stored in art_studio_product_types.form_config.
@@ -18,7 +18,24 @@ function normalizeOption(value: unknown): ArtStudioFormFieldOption | null {
   const labelBg = text(raw.label_bg, 120) || optionValue;
   if (!optionValue) return null;
   const tags = Array.isArray(raw.tags) ? raw.tags.map((tag) => text(tag, 40).toLowerCase()).filter(Boolean).slice(0, 10) : [];
-  return { value: optionValue, label_bg: labelBg, label_en: text(raw.label_en, 120) || null, ...(tags.length ? { tags } : {}) };
+  const swatch = text(raw.swatch, 30);
+  return {
+    value: optionValue,
+    label_bg: labelBg,
+    label_en: text(raw.label_en, 120) || null,
+    ...(tags.length ? { tags } : {}),
+    ...(swatchPattern.test(swatch) ? { swatch } : {})
+  };
+}
+
+const swatchPattern = /^(#[0-9a-f]{3,8}|[a-z]{3,20}|rgba?\([0-9.,\s%]+\)|hsla?\([0-9.,\s%]+\))$/i;
+
+function normalizeShowWhen(value: unknown): ArtStudioFormField["show_when"] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const raw = value as Record<string, unknown>;
+  const field = text(raw.field, 50).toLowerCase();
+  const values = Array.isArray(raw.values) ? raw.values.map((item) => text(item, 80)).filter(Boolean).slice(0, 20) : [];
+  return field && values.length ? { field, values } : null;
 }
 
 function normalizeFilter(value: unknown): ArtStudioFormField["filter_by"] {
@@ -50,8 +67,15 @@ function normalizeField(value: unknown): ArtStudioFormField | null {
     required: raw.required === true || raw.required === "true",
     display,
     filter_by: normalizeFilter(raw.filter_by),
+    show_when: normalizeShowWhen(raw.show_when),
     options
   };
+}
+
+/** Whether a field is shown given the current selections (show_when rule). */
+export function fieldIsVisible(field: ArtStudioFormField, selected: Record<string, string>) {
+  if (!field.show_when) return true;
+  return field.show_when.values.includes(selected[field.show_when.field] ?? "");
 }
 
 /** Options visible for a field given the currently selected values of the other fields. */
@@ -73,8 +97,6 @@ function textList(value: unknown, maxItems = 20, maxLength = 80) {
 function normalizeSourceSizes(value: unknown): ArtStudioSourceSizes | null {
   if (!value || typeof value !== "object" || Array.isArray(value)) return null;
   const raw = value as Record<string, unknown>;
-  const types = textList(raw.types);
-  if (!types.length) return null;
   const labelsRaw = raw.labels_en && typeof raw.labels_en === "object" && !Array.isArray(raw.labels_en) ? (raw.labels_en as Record<string, unknown>) : {};
   const labels_en: Record<string, string> = {};
   for (const [key, label] of Object.entries(labelsRaw)) {
@@ -82,8 +104,25 @@ function normalizeSourceSizes(value: unknown): ArtStudioSourceSizes | null {
     const cleanLabel = text(label, 80);
     if (cleanKey && cleanLabel) labels_en[cleanKey] = cleanLabel;
   }
+
+  // `types` entries are source product type names or { label_bg, label_en, types: [...] } merges.
+  const groups: ArtStudioSourceSizeGroup[] = [];
+  for (const entry of Array.isArray(raw.types) ? raw.types.slice(0, 20) : []) {
+    if (typeof entry === "string") {
+      const name = text(entry, 80);
+      if (name) groups.push({ key: name, label_bg: name, label_en: labels_en[name] ?? null, types: [name] });
+    } else if (entry && typeof entry === "object" && !Array.isArray(entry)) {
+      const rawGroup = entry as Record<string, unknown>;
+      const types = textList(rawGroup.types);
+      const labelBg = text(rawGroup.label_bg, 80) || types[0] || "";
+      if (types.length && labelBg) {
+        groups.push({ key: labelBg.toLowerCase().replace(/\s+/g, "-"), label_bg: labelBg, label_en: text(rawGroup.label_en, 80) || null, types });
+      }
+    }
+  }
+  if (!groups.length) return null;
   return {
-    types,
+    groups,
     variants_include: textList(raw.variants_include),
     labels_en,
     model_label_bg: text(raw.model_label_bg, 120) || null,
@@ -128,23 +167,47 @@ export function defaultSourceSku(internalName: string) {
   }
 }
 
-/** Source product types (with sizes) that this form offers, in the configured order. */
+/** Source product types (with sizes) that this form offers, merged and ordered as configured. */
 export function sourceGroupsForConfig(config: ArtStudioFormConfig, groups: SourceVariantGroup[]): SourceVariantGroup[] {
   const sizes = config.source_sizes;
   if (!sizes) return [];
   const include = sizes.variants_include.map((part) => part.toLowerCase());
-  return sizes.types
-    .map((name) => groups.find((group) => group.name.toLowerCase() === name.toLowerCase()))
-    .filter((group): group is SourceVariantGroup => Boolean(group))
-    .map((group) => ({
-      ...group,
-      variants: include.length ? group.variants.filter((variant) => include.some((part) => variant.label.toLowerCase().includes(part))) : group.variants
-    }))
-    .filter((group) => group.variants.length > 0);
+  const result: SourceVariantGroup[] = [];
+  for (const entry of sizes.groups) {
+    const matched = entry.types
+      .map((name) => groups.find((group) => group.name.toLowerCase() === name.toLowerCase()))
+      .filter((group): group is SourceVariantGroup => Boolean(group));
+    const variants = matched
+      .flatMap((group) => group.variants)
+      .filter((variant) => !include.length || include.some((part) => variant.label.toLowerCase().includes(part)));
+    if (variants.length) result.push({ id: entry.key, name: entry.label_bg, label_en: entry.label_en, variants });
+  }
+  return result;
 }
 
 export function sourceGroupLabel(group: SourceVariantGroup, sizes: ArtStudioSourceSizes, locale: Locale) {
-  return locale === "en" ? sizes.labels_en[group.name] || group.name : group.name;
+  return locale === "en" ? group.label_en || sizes.labels_en[group.name] || group.name : group.name;
+}
+
+/**
+ * Short labels for the size pills: drops the type suffix ("M - Унисекс" → "M") and words shared
+ * by every variant ("Бебешко боди 0-3 месеца" → "0-3 месеца") while keeping labels unique.
+ * The full catalog label is still what gets stored with the order.
+ */
+export function displayVariantLabels(group: SourceVariantGroup): Record<string, string> {
+  const originals = group.variants.map((variant) => variant.label);
+  let labels = originals.map((label) => label.replace(/\s+-\s+[^-]+$/, "").trim() || label);
+  if (new Set(labels).size !== labels.length) labels = [...originals];
+  if (labels.length > 1) {
+    const words = labels.map((label) => label.split(/\s+/));
+    let prefix = 0;
+    while (words.every((parts) => parts.length > prefix + 1 && parts[prefix] === words[0][prefix])) prefix += 1;
+    let suffix = 0;
+    while (words.every((parts) => parts.length > prefix + suffix + 1 && parts[parts.length - 1 - suffix] === words[0][words[0].length - 1 - suffix])) suffix += 1;
+    if (prefix || suffix) labels = words.map((parts) => parts.slice(prefix, parts.length - suffix).join(" "));
+    if (new Set(labels).size !== labels.length || labels.some((label) => !label)) labels = [...originals];
+  }
+  return Object.fromEntries(group.variants.map((variant, index) => [variant.id, labels[index] || variant.label]));
 }
 
 export function sourceModelLabel(sizes: ArtStudioSourceSizes, locale: Locale) {

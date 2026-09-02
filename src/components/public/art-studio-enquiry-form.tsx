@@ -1,9 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useId, useState } from "react";
 import { submitArtStudioEnquiryAction } from "@/app/(site)/[locale]/art-studio/actions";
 import {
+  displayVariantLabels,
+  fieldIsVisible,
   fieldLabel,
   normalizeFormConfig,
   optionLabel,
@@ -20,19 +22,20 @@ import type { ArtStudioPublicSettings, Locale, LocalizedArtStudioProduct, Locali
 const fieldClass =
   "w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-forest focus:ring-2 focus:ring-sage";
 const chipClass =
-  "inline-flex min-w-[2.75rem] cursor-pointer items-center justify-center rounded-full border border-stone-300 bg-white px-3.5 py-2 text-sm font-semibold text-stone-800 transition hover:border-moss peer-checked:border-forest peer-checked:bg-forest peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-sage peer-focus-visible:ring-offset-1";
+  "inline-flex h-10 min-w-[3.5rem] cursor-pointer items-center justify-center gap-2 rounded-full border border-stone-300 bg-white px-4 text-sm font-semibold text-stone-800 transition hover:border-moss peer-checked:border-forest peer-checked:bg-forest peer-checked:text-white peer-focus-visible:ring-2 peer-focus-visible:ring-sage peer-focus-visible:ring-offset-1";
 
 function money(value: number, currency: string, locale: Locale) {
   return new Intl.NumberFormat(locale === "en" ? "en-GB" : "bg-BG", { style: "currency", currency }).format(value);
 }
 
-/** Pill-style radio option. The input stays in the DOM for native validation and keyboard use. */
+/** Pill-style radio option, optionally with a colour swatch. The input stays in the DOM for native validation. */
 function Chip({
   name,
   value,
   label,
   checked,
   required,
+  swatch,
   onChange
 }: {
   name: string;
@@ -40,22 +43,27 @@ function Chip({
   label: string;
   checked: boolean;
   required?: boolean;
+  swatch?: string | null;
   onChange: () => void;
 }) {
   return (
     <label>
       <input type="radio" name={name} value={value} checked={checked} required={required} onChange={onChange} className="peer sr-only" />
-      <span className={chipClass}>{label}</span>
+      <span className={chipClass}>
+        {swatch ? <span aria-hidden="true" className="inline-block h-4 w-4 shrink-0 rounded-full border border-black/15 shadow-inner" style={{ backgroundColor: swatch }} /> : null}
+        {label}
+      </span>
     </label>
   );
 }
 
-function ChipGroup({ legend, children }: { legend: string; children: React.ReactNode }) {
+function ChipGroup({ label, children }: { label: string; children: React.ReactNode }) {
+  const id = useId();
   return (
-    <fieldset className="grid gap-2">
-      <legend className="text-sm font-semibold text-stone-800">{legend}</legend>
+    <div role="radiogroup" aria-labelledby={id} className="grid gap-2.5">
+      <p id={id} className="text-sm font-semibold text-stone-800">{label}</p>
       <div className="flex flex-wrap gap-2">{children}</div>
-    </fieldset>
+    </div>
   );
 }
 
@@ -93,6 +101,7 @@ export function ArtStudioEnquiryForm({
   const [fileName, setFileName] = useState("");
 
   const activeGroup = sourceGroups.find((group) => group.id === sourceTypeId) ?? sourceGroups[0] ?? null;
+  const sizeLabels = activeGroup ? displayVariantLabels(activeGroup) : {};
   const pickupName = isEnglish ? settings.pickup_name_en || settings.pickup_name_bg : settings.pickup_name_bg;
   const pickupAddress = isEnglish ? settings.pickup_address_en || settings.pickup_address_bg : settings.pickup_address_bg;
   const pickupInstructions = isEnglish ? settings.pickup_instructions_en || settings.pickup_instructions_bg : settings.pickup_instructions_bg;
@@ -140,13 +149,13 @@ export function ArtStudioEnquiryForm({
       ) : null}
 
       {hasOptions ? (
-        <div className="grid gap-5 border-t border-stone-200 pt-5">
+        <div className="grid gap-6 border-t border-stone-200 pt-5">
           <p className="font-semibold text-stone-950">{isEnglish ? "Options" : "Опции"}</p>
 
           {sourceActive && sourceSizes ? (
             <>
               {sourceGroups.length > 1 ? (
-                <ChipGroup legend={sourceModelLabel(sourceSizes, locale)}>
+                <ChipGroup label={sourceModelLabel(sourceSizes, locale)}>
                   {sourceGroups.map((group) => (
                     <Chip
                       key={group.id}
@@ -168,13 +177,13 @@ export function ArtStudioEnquiryForm({
               {singleVariant ? (
                 <input type="hidden" name="source_variant_id" value={singleVariant.id} />
               ) : activeGroup ? (
-                <ChipGroup legend={sourceSizeLabel(sourceSizes, locale)}>
+                <ChipGroup label={sourceSizeLabel(sourceSizes, locale)}>
                   {activeGroup.variants.map((variant) => (
                     <Chip
                       key={variant.id}
                       name="source_variant_id"
                       value={variant.id}
-                      label={variant.label}
+                      label={sizeLabels[variant.id] || variant.label}
                       checked={sourceVariantId === variant.id}
                       required={sourceSizes.required}
                       onChange={() => setSourceVariantId(variant.id)}
@@ -185,13 +194,13 @@ export function ArtStudioEnquiryForm({
             </>
           ) : null}
 
-          {fields.map((field) => {
+          {fields.filter((field) => fieldIsVisible(field, selected)).map((field) => {
             const options = visibleOptions(field, selected);
             const current = options.some((option) => option.value === selected[field.key]) ? selected[field.key] : "";
             const name = `field_${field.key}`;
             if (field.display === "select" || options.length > 12) {
               return (
-                <label key={field.key} className="grid gap-2 text-sm font-semibold text-stone-800">
+                <label key={field.key} className="grid gap-2.5 text-sm font-semibold text-stone-800">
                   {fieldLabel(field, locale)}
                   <select name={name} required={field.required} value={current} onChange={(event) => choose(field.key, event.target.value)} className={fieldClass}>
                     <option value="" disabled={field.required}>
@@ -207,7 +216,7 @@ export function ArtStudioEnquiryForm({
               );
             }
             return (
-              <ChipGroup key={field.key} legend={fieldLabel(field, locale)}>
+              <ChipGroup key={field.key} label={fieldLabel(field, locale)}>
                 {options.map((option) => (
                   <Chip
                     key={option.value}
@@ -216,6 +225,7 @@ export function ArtStudioEnquiryForm({
                     label={optionLabel(option, locale)}
                     checked={current === option.value}
                     required={field.required}
+                    swatch={option.swatch}
                     onChange={() => choose(field.key, option.value)}
                   />
                 ))}
@@ -229,7 +239,7 @@ export function ArtStudioEnquiryForm({
             const label = isEnglish ? option.label_en || option.label_bg : option.label_bg;
             if (option.values.length > 12) {
               return (
-                <label key={option.id} className="grid gap-2 text-sm font-semibold text-stone-800">
+                <label key={option.id} className="grid gap-2.5 text-sm font-semibold text-stone-800">
                   {label}
                   <select name={name} required={option.is_required} value={selected[key] ?? ""} onChange={(event) => choose(key, event.target.value)} className={fieldClass}>
                     <option value="" disabled={option.is_required}>{chooseLabel}</option>
@@ -243,7 +253,7 @@ export function ArtStudioEnquiryForm({
               );
             }
             return (
-              <ChipGroup key={option.id} legend={label}>
+              <ChipGroup key={option.id} label={label}>
                 {option.values.map((value) => (
                   <Chip
                     key={value.value}

@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { landingTextKeys, parseFaqLines, parsePairLines, parseParagraphs, parseTrustLines, typeTextKeys } from "@/lib/art-studio-copy";
 import { requireAdmin } from "@/lib/supabase/auth";
 import type {
   ArtStudioOptionValue,
@@ -94,6 +95,7 @@ export async function upsertArtStudioProductTypeAction(formData: FormData) {
     internal_name: stringValue(formData, "internal_name") || slugify(titleEn || titleBg),
     icon_name: stringValue(formData, "icon_name") || null,
     image_url: safeHttpsUrl(stringValue(formData, "image_url")),
+    gallery_urls: lines(stringValue(formData, "gallery_urls")).map(safeHttpsUrl).filter(Boolean) as string[],
     is_featured: booleanValue(formData, "is_featured"),
     is_active: booleanValue(formData, "is_active"),
     sort_order: integerValue(formData, "sort_order"),
@@ -331,6 +333,61 @@ export async function saveArtStudioSettingsAction(formData: FormData) {
   if (result.error) redirect(`/admin/art-studio/settings?error=${encodeURIComponent(result.error.message)}`);
   revalidateArtStudio();
   redirect("/admin/art-studio/settings?saved=1");
+}
+
+/**
+ * Texts of the Art Studio landing and product type pages (admin "Текстове" tab).
+ * Empty fields fall back to the defaults in art-studio-copy.ts.
+ */
+export async function saveArtStudioPageCopyAction(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+  const locales: Locale[] = ["bg", "en"];
+
+  const landing: Record<string, Record<string, unknown>> = {};
+  for (const locale of locales) {
+    const entry: Record<string, unknown> = {};
+    for (const key of landingTextKeys) {
+      const value = stringValue(formData, `landing.${locale}.${key}`).slice(0, 1000);
+      if (value) entry[key] = value;
+    }
+    const trust = parseTrustLines(stringValue(formData, `landing.${locale}.trust`));
+    if (trust.length) entry.trust = trust;
+    const steps = parsePairLines(stringValue(formData, `landing.${locale}.steps`));
+    if (steps.length) entry.steps = steps;
+    const faq = parseFaqLines(stringValue(formData, `landing.${locale}.faq`));
+    if (faq.length) entry.faq = faq;
+    landing[locale] = entry;
+  }
+
+  const types: Record<string, Record<string, Record<string, unknown>>> = {};
+  const typeNames = formData.getAll("type_names").map((value) => (typeof value === "string" ? value.trim() : "")).filter(Boolean).slice(0, 30);
+  for (const internalName of typeNames) {
+    const perLocale: Record<string, Record<string, unknown>> = {};
+    for (const locale of locales) {
+      const entry: Record<string, unknown> = {};
+      for (const key of typeTextKeys) {
+        const value = stringValue(formData, `type.${internalName}.${locale}.${key}`).slice(0, 1000);
+        if (value) entry[key] = value;
+      }
+      const benefits = parsePairLines(stringValue(formData, `type.${internalName}.${locale}.benefits`));
+      if (benefits.length) entry.benefits = benefits;
+      const intro = parseParagraphs(stringValue(formData, `type.${internalName}.${locale}.intro`));
+      if (intro.length) entry.intro = intro;
+      const faq = parseFaqLines(stringValue(formData, `type.${internalName}.${locale}.faq`));
+      if (faq.length) entry.faq = faq;
+      perLocale[locale] = entry;
+    }
+    types[internalName] = perLocale;
+  }
+
+  const payload = { page_copy: { landing, types } as Json };
+  const result = id
+    ? await supabase.from("art_studio_public_settings").update(payload).eq("id", id)
+    : await supabase.from("art_studio_public_settings").insert(payload);
+  if (result.error) redirect(`/admin/art-studio/copy?error=${encodeURIComponent(result.error.message)}`);
+  revalidateArtStudio();
+  redirect("/admin/art-studio/copy?saved=1");
 }
 
 export async function updateArtStudioOrderAction(formData: FormData) {

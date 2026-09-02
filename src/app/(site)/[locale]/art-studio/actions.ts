@@ -237,6 +237,7 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
   }
 
   for (const field of visibleFields(config, sourceActive)) {
+    if (field.show_when && !field.show_when.values.includes(selected[field.show_when.field]?.value ?? "")) continue;
     const chosen = stringValue(formData, `field_${field.key}`, 80);
     const option = field.options.find((item) => item.value === chosen);
     if (field.required && !option) fail("options");

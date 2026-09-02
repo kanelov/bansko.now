@@ -29,6 +29,7 @@ const fallbackPublicSettings: ArtStudioPublicSettings = {
   econt_instructions_bg: "Посочи град и предпочитан офис на Еконт.",
   econt_instructions_en: "Enter the city and preferred Econt office.",
   orders_enabled: true,
+  page_copy: {},
   created_at: new Date(0).toISOString(),
   updated_at: new Date(0).toISOString()
 };

@@ -103,7 +103,7 @@ function DesktopArticlesMenu({ locale, data }: { locale: Locale; data: ArticlesM
             <Link key={category.id} href={localePath(locale, `/${category.slug}`) as Route} className={itemClassName}>
               <span>{category.name}</span>
               {data.counts.get(category.id) ? (
-                <span className="rounded-full bg-sage px-2 py-0.5 text-xs font-semibold text-forest">
+                <span className="rounded-full bg-sage px-2 py-0.5 text-xs font-semibold text-forest transition group-hover/item:bg-white">
                   {data.counts.get(category.id)}
                 </span>
               ) : null}
@@ -134,7 +134,7 @@ function MobileArticlesMenu({ locale, data }: { locale: Locale; data: ArticlesMe
           <Link key={category.id} href={localePath(locale, `/${category.slug}`) as Route} className={itemClassName}>
             <span>{category.name}</span>
             {data.counts.get(category.id) ? (
-              <span className="rounded-full bg-sage px-2 py-0.5 text-xs font-semibold text-forest">{data.counts.get(category.id)}</span>
+              <span className="rounded-full bg-sage px-2 py-0.5 text-xs font-semibold text-forest transition group-hover:bg-white">{data.counts.get(category.id)}</span>
             ) : null}
           </Link>
         ))}

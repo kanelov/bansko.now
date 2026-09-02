@@ -303,6 +303,7 @@ export type ArtStudioProductType = {
   created_at: string;
   updated_at: string;
   form_config: Json;
+  gallery_urls: string[];
 };
 
 export type ArtStudioProductTypeTranslation = {
@@ -405,6 +406,8 @@ export type ArtStudioFormFieldOption = {
   label_en?: string | null;
   /** Group tags used by filter_by on another field (for example "adult", "kids", "baby"). */
   tags?: string[];
+  /** Colour swatch (CSS colour) shown inside the pill, for colour choices. */
+  swatch?: string | null;
 };
 
 export type ArtStudioFormField = {
@@ -416,6 +419,8 @@ export type ArtStudioFormField = {
   display?: "chips" | "select";
   /** Show only options whose tags include map[selected value of another field]. */
   filter_by?: { field: string; map: Record<string, string> } | null;
+  /** Show the whole field only when another field has one of these values. */
+  show_when?: { field: string; values: string[] } | null;
   options: ArtStudioFormFieldOption[];
 };
 
@@ -423,8 +428,16 @@ export type ArtStudioFormField = {
  * Sizes taken live from the request app catalog (app.kanelov.com) instead of static options.
  * `types` lists the source product type names to offer (for example "Унисекс тениски").
  */
-export type ArtStudioSourceSizes = {
+export type ArtStudioSourceSizeGroup = {
+  key: string;
+  label_bg: string;
+  label_en: string | null;
+  /** Source product type names merged into this choice (for example kids + baby T-shirts). */
   types: string[];
+};
+
+export type ArtStudioSourceSizes = {
+  groups: ArtStudioSourceSizeGroup[];
   variants_include: string[];
   labels_en: Record<string, string>;
   model_label_bg: string | null;
@@ -451,6 +464,7 @@ export type ArtStudioFormConfig = {
 export type SourceVariantGroup = {
   id: string;
   name: string;
+  label_en?: string | null;
   variants: Array<{ id: string; label: string }>;
 };
 
@@ -502,6 +516,8 @@ export type ArtStudioPublicSettings = {
   econt_instructions_bg: string | null;
   econt_instructions_en: string | null;
   orders_enabled: boolean;
+  /** Editable texts for the Art Studio landing and product type pages (see art-studio-copy.ts). */
+  page_copy: Json;
   created_at: string;
   updated_at: string;
 };
