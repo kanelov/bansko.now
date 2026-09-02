@@ -264,6 +264,7 @@ Bansko NOW base schema starts in `supabase/schema.sql`, but production also has 
 - `header-navigation-settings.sql`
 - `article-native-block-settings.sql`
 - `art-studio-commerce-mvp.sql`
+- `content-hub-publish.sql` (adds `articles.content_hub_item_id` + unique index; required by `/api/content/publish`)
 - other focused seed/index files in `supabase/`
 
 Do not rerun or rewrite the full base schema blindly on production. For a new change:
@@ -298,6 +299,7 @@ STRIPE_WEBHOOK_SECRET
 ART_GALLERY_CATALOG_API_URL
 ART_GALLERY_RESERVATION_API_URL
 ART_GALLERY_INTEGRATION_SECRET
+CONTENT_HUB_PUBLISH_SECRET
 ```
 
 Production expectations:
@@ -317,6 +319,15 @@ Source app: BANSKO_INTEGRATION_SECRET
 ```
 
 Their values must be identical in the two Vercel projects, server-side only. Never prefix either with `NEXT_PUBLIC_`.
+
+A second, separate secret protects the reverse direction (Content Hub in the source app publishing articles into Bansko NOW):
+
+```text
+Bansko NOW: CONTENT_HUB_PUBLISH_SECRET   (Vercel env, production + preview; set on 2026-09-02)
+Source app: stored per site in Supabase Vault through Настройки → Статии → Bansko NOW → Ключове
+```
+
+`SUPABASE_SERVICE_ROLE_KEY` was missing from the bansko-now Vercel production environment on 2026-09-02. The content publish endpoint (and the Stripe webhook) need it; the owner must add it in the Vercel dashboard.
 
 Source app server variables:
 
@@ -733,3 +744,19 @@ Unless the owner gives a newer priority, continue in this order:
 - Do not change design globally to fix one component.
 - Do not claim a migration or deployment succeeded without verifying it.
 - Keep the owner-facing admin guide and this handoff document current as the system evolves.
+
+## 24. Content Hub publish endpoint (2026-09-02)
+
+The source request app (`https://app.kanelov.com`) has a Content Hub module („Статии“) that approves AI-generated articles and publishes them to several sites. Bansko NOW receives them through its own API; the two Supabase projects are never linked directly.
+
+- Route: `src/app/api/content/publish/route.ts` (`runtime = nodejs`, `force-dynamic`).
+  - `GET` returns `{ ok, site, categories[] }` for the category dropdown and the connection test.
+  - `POST` creates or updates one article. Idempotent by `articles.content_hub_item_id` (unique partial index). Slug collisions get `-2`, `-3`, … suffixes.
+- Auth: `Authorization: Bearer <CONTENT_HUB_PUBLISH_SECRET>` compared with `timingSafeEqual`. Server-to-server only. Returns 503 when the secret or the service role key is missing.
+- Logic: `src/lib/content-hub.ts` (`parseContentHubPayload`, `listContentHubCategories`, `publishContentHubArticle`). Shared article helpers (`syncTags`, `publishArticleRecord`, `revalidateEditorialPaths`, `mediaBucket`) were extracted to `src/lib/articles-admin.ts` and are used by both the admin actions and the endpoint.
+- Content must be Markdown (HTML is rejected with 422). The category is matched by slug, translated name or base name, then by `fallback_category`; unknown categories return 422 with the available slugs.
+- Featured images are copied into `bansko-media/articles/content-hub/<item-id>.<ext>` (deterministic path, upsert) and registered in `media`; on failure the original URL is kept and a warning is returned.
+- Fields written: title, slug, excerpt, content, category, featured image + alt + caption, seo_title, seo_description, focus_keyword, canonical_url, og_*, robots_*, reading_time, author_name, source_links, schema_type, locale, `automation_source = 'content_hub'`, `automation_last_imported_at`, `content_hub_item_id`. Status `published` (published_at kept on re-publish) or `draft`.
+- After writing it revalidates the editorial paths, the article path, the category path and `/admin/articles`.
+- Migration: `supabase/content-hub-publish.sql` must be applied to project `rzjyawjdhcedddydmfge` before the first publish.
+- Testing without a real publish: `GET` with the secret returns categories; `POST` with an unknown category returns 422 without writing. A real test writes a `status: draft` article that must be deleted afterwards from `/admin/articles`.

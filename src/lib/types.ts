@@ -98,6 +98,7 @@ export type Article = {
   image_caption?: string | null;
   photo_credit?: string | null;
   automation_last_imported_at?: string | null;
+  content_hub_item_id?: string | null;
 };
 
 export type ArticleWithCategory = Article & {
