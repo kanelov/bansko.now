@@ -16,9 +16,9 @@ export default async function AdminArtStudioPage() {
     <div className="grid gap-8">
       <header className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Bansko NOW</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Bansko NOW</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold">Art Studio</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-300">Продукти, цени, Stripe Payment Links, доставка и поръчки в един лек модул.</p>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">Продукти, цени, Stripe Payment Links, доставка и поръчки в един лек модул.</p>
         </div>
         <ArtStudioAdminNav />
       </header>
@@ -30,8 +30,8 @@ export default async function AdminArtStudioPage() {
           ["Платени поръчки", paidOrders],
           ["За производство", productionOrders]
         ].map(([label, value]) => (
-          <div key={label} className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="text-sm text-stone-400">{label}</p>
+          <div key={label} className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
+            <p className="text-sm text-[var(--admin-muted)]">{label}</p>
             <p className="mt-2 font-serif text-4xl font-semibold">{value}</p>
           </div>
         ))}

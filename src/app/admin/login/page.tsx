@@ -21,22 +21,22 @@ export default async function AdminLoginPage({
       : "Неуспешен вход. Провери имейла, паролата и Supabase настройките.";
 
   return (
-    <main className="flex min-h-screen items-center justify-center bg-stone-950 px-4 py-10 text-white">
-      <div className="w-full max-w-md rounded-3xl border border-white/10 bg-white/5 p-8 shadow-2xl">
+    <main className="flex min-h-screen items-center justify-center bg-[var(--admin-bg)] px-4 py-10 text-[var(--admin-ink)]">
+      <div className="w-full max-w-md rounded-3xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-8 shadow-2xl">
         <p className="font-serif text-3xl font-semibold">Bansko NOW</p>
         <h1 className="mt-8 font-serif text-4xl font-semibold">Admin login</h1>
-        <p className="mt-3 text-sm leading-6 text-stone-300">
+        <p className="mt-3 text-sm leading-6 text-[var(--admin-muted)]">
           Вход само за администратори. Публична регистрация няма.
         </p>
 
         {!configured ? (
-          <div className="mt-6 rounded-2xl bg-clay/20 p-4 text-sm text-stone-100">
+          <div className="mt-6 rounded-2xl bg-clay/15 p-4 text-sm text-[var(--admin-ink)]">
             Липсват Supabase environment variables. Добави ги в `.env.local` преди вход.
           </div>
         ) : null}
 
         {error ? (
-          <div className="mt-6 rounded-2xl bg-clay/20 p-4 text-sm text-stone-100">
+          <div className="mt-6 rounded-2xl bg-clay/15 p-4 text-sm text-[var(--admin-ink)]">
             {errorMessage}
           </div>
         ) : null}
@@ -47,7 +47,7 @@ export default async function AdminLoginPage({
             <input
               type="email"
               name="email"
-              className="rounded-xl border border-white/15 bg-white px-4 py-3 text-stone-950"
+              className="rounded-xl border border-[var(--admin-line)] bg-white px-4 py-3 text-stone-950"
               required
             />
           </label>
@@ -56,7 +56,7 @@ export default async function AdminLoginPage({
             <input
               type="password"
               name="password"
-              className="rounded-xl border border-white/15 bg-white px-4 py-3 text-stone-950"
+              className="rounded-xl border border-[var(--admin-line)] bg-white px-4 py-3 text-stone-950"
               required
             />
           </label>

@@ -5,7 +5,7 @@ import { getAllNavigationItems, getAllSocialLinks, getSiteSettings } from "@/lib
 
 type SearchParams = Promise<{ saved?: string; error?: string }>;
 
-const fieldClass = "w-full rounded-xl border border-white/10 bg-white px-4 py-3 text-sm text-stone-950";
+const fieldClass = "w-full rounded-xl border border-[var(--admin-line)] bg-white px-4 py-3 text-sm text-stone-950";
 
 function savedMessage(value?: string) {
   if (value === "menu") return "Главното меню е запазено.";
@@ -26,9 +26,9 @@ export default async function AdminNavigationPage({ searchParams }: { searchPara
   return (
     <div className="grid max-w-6xl gap-8">
       <header>
-        <p className="text-sm font-semibold uppercase text-stone-400">Site chrome</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Site chrome</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Меню и хедър</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-300">
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
           Управлявай логото, навигацията, социалните икони и бутона за подкрепа от едно място. Търсенето и смяната на езика остават системни контроли.
         </p>
       </header>
@@ -37,18 +37,18 @@ export default async function AdminNavigationPage({ searchParams }: { searchPara
         <div className="rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">{savedMessage(params.saved)}</div>
       ) : null}
       {params.error ? (
-        <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">{params.error}</div>
+        <div className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">{params.error}</div>
       ) : null}
 
-      <section className="grid gap-5 rounded-2xl border border-white/10 bg-white/5 p-6">
+      <section className="grid gap-5 rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-6">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Brand and support</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Brand and support</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Лого и „Подкрепи ни“</h2>
         </div>
         <form action={saveHeaderSettingsAction} className="grid gap-6">
           {settings.id !== "fallback" ? <input type="hidden" name="id" value={settings.id} /> : null}
 
-          <div className="grid gap-5 rounded-2xl border border-white/10 bg-black/10 p-5">
+          <div className="grid gap-5 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-5">
             <div className="grid gap-4 md:grid-cols-2">
               <label className="grid gap-2 text-sm font-semibold">
                 Име на сайта / текстово лого
@@ -63,26 +63,26 @@ export default async function AdminNavigationPage({ searchParams }: { searchPara
               Alt текст на логото
               <input name="logo_image_alt" defaultValue={settings.logo_image_alt || settings.site_name || "Bansko NOW"} className={fieldClass} />
             </label>
-            <div className="flex flex-wrap items-center gap-4 rounded-xl border border-white/10 bg-white/5 p-4">
-              <span className="text-xs font-semibold uppercase text-stone-400">Преглед</span>
+            <div className="flex flex-wrap items-center gap-4 rounded-xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-4">
+              <span className="text-xs font-semibold uppercase text-[var(--admin-muted)]">Преглед</span>
               {settings.logo_image_url ? (
                 <img src={settings.logo_image_url} alt={settings.logo_image_alt || settings.site_name || "Bansko NOW"} width={180} height={48} className="h-10 w-auto max-w-44 object-contain" />
               ) : (
-                <span className="font-serif text-2xl font-semibold text-white">{settings.site_name || "Bansko NOW"}</span>
+                <span className="font-serif text-2xl font-semibold text-[var(--admin-ink)]">{settings.site_name || "Bansko NOW"}</span>
               )}
               <Link href="/admin/media" className="admin-button admin-button-secondary ml-auto px-4 py-2 text-sm font-semibold">
                 Отвори Медия
               </Link>
             </div>
-            <p className="text-xs leading-5 text-stone-400">Остави URL полето празно, за да се използва текстовото лого. Изображението се показва с фиксирана височина, за да няма разместване на страницата.</p>
+            <p className="text-xs leading-5 text-[var(--admin-muted)]">Остави URL полето празно, за да се използва текстовото лого. Изображението се показва с фиксирана височина, за да няма разместване на страницата.</p>
           </div>
 
-          <div className="grid gap-5 rounded-2xl border border-white/10 bg-black/10 p-5">
+          <div className="grid gap-5 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-5">
             <div>
               <h3 className="font-serif text-2xl font-semibold">Подкрепи Bansko NOW</h3>
-              <p className="mt-2 text-sm leading-6 text-stone-300">Този бутон стои до социалните икони и отваря картата за доброволна подкрепа.</p>
+              <p className="mt-2 text-sm leading-6 text-[var(--admin-muted)]">Този бутон стои до социалните икони и отваря картата за доброволна подкрепа.</p>
             </div>
-            <label className="choice-row cursor-pointer rounded-xl border border-white/10 bg-white/5 p-4 text-sm font-semibold">
+            <label className="choice-row cursor-pointer rounded-xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-4 text-sm font-semibold">
               <input className="choice-control" type="checkbox" name="support_enabled" defaultChecked={settings.support_enabled ?? true} />
               <span>Показвай бутона „Подкрепи ни“</span>
             </label>
@@ -146,20 +146,20 @@ export default async function AdminNavigationPage({ searchParams }: { searchPara
         </form>
       </section>
 
-      <section className="grid gap-5 rounded-2xl border border-white/10 bg-white/5 p-6">
+      <section className="grid gap-5 rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-6">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Navigation</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Navigation</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Главно меню</h2>
-          <p className="mt-2 text-sm leading-6 text-stone-300">Поддържа вътрешни и външни линкове, BG/EN имена и реални Font Awesome икони. По-ниският номер се показва по-напред.</p>
+          <p className="mt-2 text-sm leading-6 text-[var(--admin-muted)]">Поддържа вътрешни и външни линкове, BG/EN имена и реални Font Awesome икони. По-ниският номер се показва по-напред.</p>
         </div>
         <NavigationItemsEditor items={navigationItems} englishItems={englishNavigationItems} />
       </section>
 
-      <section className="grid gap-5 rounded-2xl border border-white/10 bg-white/5 p-6">
+      <section className="grid gap-5 rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-6">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Header and footer</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Header and footer</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Социални икони</h2>
-          <p className="mt-2 text-sm leading-6 text-stone-300">Активните икони с валиден URL се показват в публичния header и footer.</p>
+          <p className="mt-2 text-sm leading-6 text-[var(--admin-muted)]">Активните икони с валиден URL се показват в публичния header и footer.</p>
         </div>
         <SocialLinksEditor items={socialLinks} />
       </section>

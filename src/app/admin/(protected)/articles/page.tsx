@@ -22,7 +22,7 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
     <div className="grid gap-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Content</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Content</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold">Articles</h1>
         </div>
         <Link href="/admin/articles/new" className="admin-button admin-button-primary px-5 py-3 text-sm font-semibold">
@@ -43,15 +43,15 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
       ) : null}
 
       {params.error ? (
-        <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+        <div className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">
           {params.error}
         </div>
       ) : null}
 
-      <div className="overflow-hidden rounded-2xl border border-white/10 bg-white/5">
+      <div className="overflow-hidden rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)]">
         <div className="overflow-x-auto">
           <table className="w-full min-w-[980px] text-left text-sm">
-            <thead className="bg-white/10 text-stone-300">
+            <thead className="bg-[var(--admin-panel-strong)] text-[var(--admin-muted)]">
               <tr>
                 <th className="px-4 py-3">Title</th>
                 <th className="px-4 py-3">Language</th>
@@ -68,12 +68,12 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                 return (
                   <tr key={article.id}>
                     <td className="px-4 py-4 font-semibold">{article.title}</td>
-                    <td className="px-4 py-4"><span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{article.locale === "en" ? "EN" : "BG"}</span></td>
-                    <td className="px-4 py-4 text-stone-300">{category?.name || "—"}</td>
+                    <td className="px-4 py-4"><span className="rounded-full bg-[var(--admin-panel-strong)] px-3 py-1 text-xs font-semibold">{article.locale === "en" ? "EN" : "BG"}</span></td>
+                    <td className="px-4 py-4 text-[var(--admin-muted)]">{category?.name || "—"}</td>
                     <td className="px-4 py-4">
-                      <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{article.status}</span>
+                      <span className="rounded-full bg-[var(--admin-panel-strong)] px-3 py-1 text-xs font-semibold">{article.status}</span>
                     </td>
-                    <td className="px-4 py-4 text-stone-300">{formatDate(article.published_at)}</td>
+                    <td className="px-4 py-4 text-[var(--admin-muted)]">{formatDate(article.published_at)}</td>
                     <td className="px-4 py-4">{getSeoScore(article)}/100</td>
                     <td className="px-4 py-4">
                       <div className="flex flex-wrap gap-2">
@@ -98,9 +98,9 @@ export default async function AdminArticlesPage({ searchParams }: { searchParams
                           <summary className="admin-button admin-button-danger list-none px-3 py-1.5 text-xs font-semibold">
                             Delete
                           </summary>
-                          <form action={deleteArticleAction} className="mt-2 grid min-w-44 gap-2 rounded-xl border border-red-300/20 bg-red-950/30 p-3">
+                          <form action={deleteArticleAction} className="mt-2 grid min-w-44 gap-2 rounded-xl border border-red-300 bg-red-100 p-3">
                             <input type="hidden" name="id" value={article.id} />
-                            <p className="text-xs leading-5 text-red-100">Потвърди изтриването.</p>
+                            <p className="text-xs leading-5 text-red-900">Потвърди изтриването.</p>
                             <button className="admin-button admin-button-danger px-3 py-1.5 text-xs font-semibold">
                               Confirm delete
                             </button>

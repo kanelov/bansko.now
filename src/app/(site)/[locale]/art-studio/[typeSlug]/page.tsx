@@ -10,7 +10,7 @@ import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings, getArtStudioTypeBySlug } from "@/lib/art-studio";
-import { resolveArtStudioTypeCopy } from "@/lib/art-studio-copy";
+import { resolveArtStudioTypeCopy, resolveArtStudioTypeSections } from "@/lib/art-studio-copy";
 import { normalizeFormConfig, sourceGroupsForConfig } from "@/lib/art-studio-forms";
 import { getSourceVariantOptions } from "@/lib/gallery-catalog";
 import { getSiteSettings } from "@/lib/content";
@@ -91,6 +91,7 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
     getSourceVariantOptions()
   ]);
   const copy = resolveArtStudioTypeCopy(pickupSettings.page_copy, productType.internal_name, locale);
+  const sections = resolveArtStudioTypeSections(pickupSettings.page_copy, productType.internal_name);
   const thumbnails: ThumbnailImage[] = [
     ...(productType.gallery_urls ?? []).map((src) => ({ src, alt: productType.image_alt || productType.title })),
     ...products.flatMap((product) =>
@@ -102,7 +103,7 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
     .filter((image, index, all) => all.findIndex((other) => other.src === image.src) === index)
     .slice(0, 12);
   const sourceGroups = sourceGroupsForConfig(normalizeFormConfig(productType.form_config), sourceOptions);
-  const featuredProducts = products.slice(0, 4);
+  const featuredProducts = products.slice(0, sections.designsCount);
   const designsHref = localePath(locale, `/art-studio/${productType.slug}/designs`) as Route;
   const content = productType.content?.trim() || "";
   const contentFaq = content ? getFaqItemsFromMarkdown(content) : [];
@@ -204,8 +205,9 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
               </figure>
             ) : null}
 
-            <ArtStudioThumbnailStrip images={thumbnails} locale={locale} />
+            {sections.thumbnails ? <ArtStudioThumbnailStrip images={thumbnails} locale={locale} title={copy.thumbnailsTitle} /> : null}
 
+            {sections.benefits ? (
             <section className="mt-10 grid gap-4 sm:grid-cols-2" aria-label={isEnglish ? "Why order from us" : "Защо да поръчаш от нас"}>
               {copy.benefits.map((benefit) => (
                 <div key={benefit.title} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-soft">
@@ -217,12 +219,13 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
                 </div>
               ))}
             </section>
+            ) : null}
 
             {content ? (
               <section className="mt-12 border-t border-stone-200 pt-10">
                 <MarkdownRenderer content={content} locale={locale} />
               </section>
-            ) : copy.intro.length ? (
+            ) : sections.intro && copy.intro.length ? (
               <section className="mt-12 grid gap-5 border-t border-stone-200 pt-10" aria-label={isEnglish ? "About this product" : "За продукта"}>
                 {copy.intro.map((paragraph) => (
                   <p key={paragraph.slice(0, 40)} className="max-w-3xl text-base leading-8 text-stone-650">{paragraph}</p>
@@ -230,12 +233,10 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
               </section>
             ) : null}
 
-            {products.length ? (
+            {sections.designs && products.length ? (
               <section id="designs" className="mt-12 border-t border-stone-200 pt-10" aria-labelledby="designs-heading">
-                <h2 id="designs-heading" className="font-serif text-4xl font-semibold text-stone-950">{isEnglish ? "Ready designs" : "Готови дизайни"}</h2>
-                <p className="mt-3 max-w-2xl leading-7 text-stone-650">
-                  {isEnglish ? "Pick a ready design or order a custom one through the form." : "Избери готов дизайн или поръчай собствен през формата."}
-                </p>
+                <h2 id="designs-heading" className="font-serif text-4xl font-semibold text-stone-950">{copy.designsTitle}</h2>
+                <p className="mt-3 max-w-2xl leading-7 text-stone-650">{copy.designsText}</p>
                 <div className="mt-7 grid gap-6 sm:grid-cols-2">
                   {featuredProducts.map((product) => (
                     <ArtStudioProductCard key={product.id} product={product} locale={locale} />
@@ -252,7 +253,7 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
               </section>
             ) : null}
 
-            {!contentFaq.length ? (
+            {sections.faq && !contentFaq.length ? (
               <section className="mt-12 border-t border-stone-200 pt-10" aria-labelledby="type-faq-heading">
                 <h2 id="type-faq-heading" className="font-serif text-4xl font-semibold text-stone-950">{isEnglish ? "Frequently asked questions" : "Често задавани въпроси"}</h2>
                 <div className="mt-6 grid gap-3">
@@ -273,7 +274,7 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
           </article>
 
           <aside className="lg:sticky lg:top-24 lg:col-span-5">
-            <ArtStudioEnquiryForm productType={productType} settings={pickupSettings} locale={locale} sourceGroups={sourceGroups} />
+            <ArtStudioEnquiryForm productType={productType} settings={pickupSettings} locale={locale} sourceGroups={sourceGroups} formCopy={{ eyebrow: copy.formEyebrow, intro: copy.formIntro, button: copy.cta }} />
           </aside>
         </div>
       </main>

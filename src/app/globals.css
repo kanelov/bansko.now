@@ -9,6 +9,14 @@
   --sage: #dfe8d8;
   --clay: #b6653c;
   --sand: #f2eadb;
+  /* Admin: warm latte/coffee palette with forest green accents (handmade shop feel). */
+  --admin-bg: #ebe2d4;
+  --admin-side: #e2d6c4;
+  --admin-panel: #f6f1e9;
+  --admin-panel-strong: #e7dccb;
+  --admin-line: #d5c7b2;
+  --admin-ink: #2f2620;
+  --admin-muted: #6b5a4d;
 }
 
 @theme inline {
@@ -141,7 +149,7 @@ a {
   justify-content: center;
   border-radius: 9999px;
   cursor: pointer;
-  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.14);
+  box-shadow: 0 8px 20px rgba(60, 44, 30, 0.12);
   transition:
     transform 180ms ease,
     background-color 180ms ease,
@@ -157,12 +165,12 @@ a {
 
 .admin-button:hover {
   transform: translateY(-2px);
-  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.22);
+  box-shadow: 0 14px 30px rgba(60, 44, 30, 0.18);
 }
 
 .admin-button:active {
   transform: translateY(0);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.16);
+  box-shadow: 0 6px 14px rgba(60, 44, 30, 0.14);
 }
 
 .admin-button:disabled,
@@ -174,29 +182,38 @@ a {
 }
 
 .admin-button:focus-visible {
-  outline: 2px solid var(--sage);
+  outline: 2px solid var(--forest);
   outline-offset: 4px;
 }
 
 .admin-button-primary {
-  background: #fff !important;
-  color: var(--ink) !important;
-}
-
-.admin-button-primary:hover {
-  background: var(--sage) !important;
-  color: var(--forest) !important;
-}
-
-.admin-button-secondary {
-  border: 1px solid rgba(255, 255, 255, 0.28);
-  background: transparent !important;
+  background: var(--forest) !important;
   color: #fff !important;
 }
 
-.admin-button-secondary:hover {
+.admin-button-primary:hover {
+  background: var(--moss) !important;
+  color: #fff !important;
+}
+
+.admin-button-primary * {
+  color: inherit !important;
+}
+
+.admin-button-secondary {
+  border: 1px solid var(--admin-line);
   background: #fff !important;
-  color: var(--ink) !important;
+  color: var(--admin-ink) !important;
+}
+
+.admin-button-secondary:hover {
+  border-color: var(--forest);
+  background: var(--forest) !important;
+  color: #fff !important;
+}
+
+.admin-button-secondary * {
+  color: inherit !important;
 }
 
 .admin-button-forest {
@@ -215,8 +232,8 @@ a {
 }
 
 .admin-button-sage:hover {
-  background: #fff !important;
-  color: var(--forest) !important;
+  background: var(--forest) !important;
+  color: #fff !important;
 }
 
 .admin-button-danger {
@@ -240,23 +257,24 @@ a {
 }
 
 .admin-tab[aria-selected="true"] {
-  background: #fff !important;
-  color: var(--ink) !important;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.14);
+  background: var(--forest) !important;
+  color: #fff !important;
+  box-shadow: 0 1px 3px rgba(60, 44, 30, 0.18);
 }
 
 .admin-tab[aria-selected="false"] {
-  background: rgba(255, 255, 255, 0.1) !important;
-  color: #fff !important;
+  background: #fff !important;
+  color: var(--admin-ink) !important;
+  border: 1px solid var(--admin-line);
 }
 
 .admin-tab[aria-selected="false"]:hover {
-  background: rgba(255, 255, 255, 0.2) !important;
-  color: #fff !important;
+  background: var(--sage) !important;
+  color: var(--forest) !important;
 }
 
 .admin-tab:focus-visible {
-  outline: 2px solid var(--sage);
+  outline: 2px solid var(--forest);
   outline-offset: 3px;
 }
 

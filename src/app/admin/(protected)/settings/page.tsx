@@ -2,7 +2,7 @@ import { saveSettingsAction } from "@/app/admin/actions";
 import { getSiteSettings } from "@/lib/content";
 
 function fieldClass() {
-  return "w-full rounded-xl border border-white/10 bg-white px-4 py-3 text-sm text-stone-950";
+  return "w-full rounded-xl border border-[var(--admin-line)] bg-white px-4 py-3 text-sm text-stone-950";
 }
 
 function textAreaValue(value: string[] | null | undefined) {
@@ -18,7 +18,7 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
   return (
     <div className="grid gap-8">
       <div>
-        <p className="text-sm font-semibold uppercase text-stone-400">Configuration</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Configuration</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Settings</h1>
       </div>
       {params.saved ? (
@@ -27,11 +27,11 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
         </div>
       ) : null}
       {params.error ? (
-        <div className="max-w-3xl rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+        <div className="max-w-3xl rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">
           {params.error}
         </div>
       ) : null}
-      <form action={saveSettingsAction} className="grid max-w-3xl gap-6 rounded-2xl border border-white/10 bg-white/5 p-6">
+      <form action={saveSettingsAction} className="grid max-w-3xl gap-6 rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-6">
         {settings.id !== "fallback" ? <input type="hidden" name="id" value={settings.id} /> : null}
         <section className="grid gap-5">
           <h2 className="font-serif text-2xl font-semibold">General</h2>
@@ -49,16 +49,16 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
           </label>
         </section>
 
-        <section className="grid gap-5 border-t border-white/10 pt-6">
+        <section className="grid gap-5 border-t border-[var(--admin-line)] pt-6">
           <div>
             <h2 className="font-serif text-2xl font-semibold">Блокове под статията</h2>
-            <p className="mt-2 text-sm leading-6 text-stone-300">
+            <p className="mt-2 text-sm leading-6 text-[var(--admin-muted)]">
               Тук редактираш общите български текстове. Във всяка статия от Settings избираш кои блокове да се покажат.
               Картите с конкретните Art Studio услуги се управляват от „Страници“ → „Art Studio“.
             </p>
           </div>
-          <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
-            <p className="text-sm font-semibold uppercase text-stone-300">Facebook общност</p>
+          <div className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-4">
+            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Facebook общност</p>
             <div className="grid gap-4 md:grid-cols-2">
               <input name="facebook_cta_eyebrow" defaultValue={settings.facebook_cta_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
               <input name="facebook_cta_title" defaultValue={settings.facebook_cta_title || ""} className={fieldClass()} placeholder="Заглавие" />
@@ -66,8 +66,8 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
             <textarea name="facebook_cta_text" defaultValue={settings.facebook_cta_text || ""} className={fieldClass()} rows={3} placeholder="Текст" />
             <input name="facebook_cta_button_label" defaultValue={settings.facebook_cta_button_label || ""} className={fieldClass()} placeholder="Текст на бутона" />
           </div>
-          <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
-            <p className="text-sm font-semibold uppercase text-stone-300">Art Studio</p>
+          <div className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-4">
+            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Art Studio</p>
             <div className="grid gap-4 md:grid-cols-2">
               <input name="art_studio_block_eyebrow" defaultValue={settings.art_studio_block_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
               <input name="art_studio_block_title" defaultValue={settings.art_studio_block_title || ""} className={fieldClass()} placeholder="Заглавие" />
@@ -75,8 +75,8 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
             <textarea name="art_studio_block_text" defaultValue={settings.art_studio_block_text || ""} className={fieldClass()} rows={3} placeholder="Текст" />
             <input name="art_studio_block_button_label" defaultValue={settings.art_studio_block_button_label || ""} className={fieldClass()} placeholder="Текст на бутона" />
           </div>
-          <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
-            <p className="text-sm font-semibold uppercase text-stone-300">Bansko Collection</p>
+          <div className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-4">
+            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Bansko Collection</p>
             <div className="grid gap-4 md:grid-cols-2">
               <input name="collection_block_eyebrow" defaultValue={settings.collection_block_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
               <input name="collection_block_title" defaultValue={settings.collection_block_title || ""} className={fieldClass()} placeholder="Заглавие" />
@@ -90,9 +90,9 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
           </div>
         </section>
 
-        <section className="grid gap-5 border-t border-white/10 pt-6">
+        <section className="grid gap-5 border-t border-[var(--admin-line)] pt-6">
           <div>
-            <p className="text-sm font-semibold uppercase text-stone-400">English</p>
+            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">English</p>
             <h2 className="mt-2 font-serif text-2xl font-semibold">English public texts</h2>
           </div>
           <label className="grid gap-2 text-sm font-semibold">
@@ -103,8 +103,8 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
             Hero image alt
             <input name="hero_image_alt_en" defaultValue={englishSettings.hero_image_alt || ""} className={fieldClass()} />
           </label>
-          <div className="grid gap-4 rounded-2xl border border-white/10 bg-black/10 p-4">
-            <p className="text-sm font-semibold uppercase text-stone-300">Article blocks</p>
+          <div className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-4">
+            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Article blocks</p>
             <div className="grid gap-3 md:grid-cols-2">
               <input name="facebook_cta_eyebrow_en" defaultValue={englishSettings.facebook_cta_eyebrow || ""} className={fieldClass()} placeholder="Community eyebrow" />
               <input name="facebook_cta_title_en" defaultValue={englishSettings.facebook_cta_title || ""} className={fieldClass()} placeholder="Community title" />
@@ -127,9 +127,9 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
           </div>
         </section>
 
-        <section className="grid gap-5 border-t border-white/10 pt-6">
+        <section className="grid gap-5 border-t border-[var(--admin-line)] pt-6">
           <h2 className="font-serif text-2xl font-semibold">Homepage hero media</h2>
-          <p className="text-sm leading-6 text-stone-300">
+          <p className="text-sm leading-6 text-[var(--admin-muted)]">
             За най-чист hero без YouTube controls използвай Hosted video: качи кратък MP4/WebM файл в Media и постави публичния URL тук.
             YouTube/Vimeo embed работи, но платформата може да покаже собствен loading/chrome за момент.
           </p>

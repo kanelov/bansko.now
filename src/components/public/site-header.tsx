@@ -81,7 +81,7 @@ function DesktopArticlesMenu({ locale, data }: { locale: Locale; data: ArticlesM
     <div className="group relative">
       <Link
         href={localePath(locale, "/articles") as Route}
-        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white group-focus-within:bg-forest group-focus-within:text-white group-hover:bg-forest group-hover:text-white"
+        className="inline-flex items-center gap-1.5 rounded-full px-2.5 py-2 text-sm font-medium text-stone-700 transition hover:bg-sage hover:text-forest group-focus-within:bg-sage group-focus-within:text-forest group-hover:bg-sage group-hover:text-forest"
         aria-haspopup="true"
       >
         <IconGlyph name="newspaper" className="h-3.5 w-3.5 shrink-0" />
@@ -92,7 +92,7 @@ function DesktopArticlesMenu({ locale, data }: { locale: Locale; data: ArticlesM
         <div className="w-72 rounded-2xl border border-stone-200 bg-paper p-2 shadow-xl">
           <Link href={localePath(locale, "/articles") as Route} className={itemClassName}>
             <span className="flex items-center gap-2">
-              <IconGlyph name="newspaper" className="h-4 w-4 text-forest transition group-hover/item:text-white" />
+              <IconGlyph name="newspaper" className="h-4 w-4 text-forest" />
               {dictionary.allArticles}
             </span>
           </Link>
@@ -117,12 +117,12 @@ function DesktopArticlesMenu({ locale, data }: { locale: Locale; data: ArticlesM
 
 function MobileArticlesMenu({ locale, data }: { locale: Locale; data: ArticlesMenuData }) {
   const dictionary = getDictionary(locale);
-  const itemClassName = "group flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white";
+  const itemClassName = "group flex items-center justify-between gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-sage hover:text-forest";
 
   return (
     <details className="rounded-xl" open>
-      <summary className="group flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white">
-        <IconGlyph name="newspaper" className="h-4 w-4 text-forest transition group-hover:text-white" />
+      <summary className="group flex cursor-pointer list-none items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-sage hover:text-forest">
+        <IconGlyph name="newspaper" className="h-4 w-4 text-forest" />
         <span>{dictionary.articlesMenu}</span>
         <IconGlyph name="chevron-down" className="ml-auto h-3 w-3" />
       </summary>

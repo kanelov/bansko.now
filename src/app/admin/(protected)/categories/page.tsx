@@ -14,7 +14,7 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
   return (
     <div className="grid gap-8">
       <div>
-        <p className="text-sm font-semibold uppercase text-stone-400">Taxonomy</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Taxonomy</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Categories</h1>
       </div>
 
@@ -25,29 +25,29 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
       ) : null}
 
       {params.error ? (
-        <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+        <div className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">
           {params.error}
         </div>
       ) : null}
 
       <div className="grid gap-4">
         {[...categoryRows, { category: null, locale: "bg" as const }].map(({ category, locale }, index) => (
-          <details key={category ? `${category.id}-${locale}` : "new-category"} className="rounded-2xl border border-white/10 bg-white/5 p-5" open={!category}>
+          <details key={category ? `${category.id}-${locale}` : "new-category"} className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5" open={!category}>
             <summary className="cursor-pointer list-none">
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div>
-                  <p className="text-xs font-semibold uppercase text-stone-400">
+                  <p className="text-xs font-semibold uppercase text-[var(--admin-muted)]">
                     {category ? `${locale.toUpperCase()} / ${locale === "en" ? "/en" : ""}/${category.slug}` : "Нова категория"}
                   </p>
                   <h2 className="mt-3 font-serif text-2xl font-semibold">
                     {category?.name || "Добави категория"}
                     {category && category.is_visible === false ? (
-                      <span className="ml-3 rounded-full bg-amber-400/20 px-3 py-1 align-middle text-xs font-semibold text-amber-200">скрита</span>
+                      <span className="ml-3 rounded-full bg-amber-100 px-3 py-1 align-middle text-xs font-semibold text-amber-900">скрита</span>
                     ) : null}
                   </h2>
-                  {category?.description ? <p className="mt-2 text-sm leading-6 text-stone-300">{category.description}</p> : null}
+                  {category?.description ? <p className="mt-2 text-sm leading-6 text-[var(--admin-muted)]">{category.description}</p> : null}
                 </div>
-                <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-stone-200">SEO</span>
+                <span className="rounded-full bg-[var(--admin-panel-strong)] px-3 py-1 text-xs font-semibold text-[var(--admin-ink)]">SEO</span>
               </div>
             </summary>
 
@@ -100,9 +100,9 @@ export default async function AdminCategoriesPage({ searchParams }: { searchPara
               <summary className="admin-button admin-button-danger list-none px-4 py-2 text-xs font-semibold">
                 Delete category
               </summary>
-              <form action={deleteCategoryAction} className="mt-3 grid gap-3 rounded-xl border border-red-300/20 bg-red-950/30 p-3">
+              <form action={deleteCategoryAction} className="mt-3 grid gap-3 rounded-xl border border-red-300 bg-red-100 p-3">
                 <input type="hidden" name="id" value={category.id} />
-                <p className="text-xs leading-5 text-red-100">
+                <p className="text-xs leading-5 text-red-900">
                   Статиите остават в базата, но губят тази категория.
                 </p>
                 <button className="admin-button admin-button-danger px-4 py-2 text-xs font-semibold">

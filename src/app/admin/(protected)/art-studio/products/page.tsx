@@ -24,20 +24,20 @@ export default async function AdminArtStudioProductsPage({ searchParams }: { sea
     <div className="grid gap-10">
       <header className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Art Studio</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Art Studio</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold">Каталог</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-300">Типове, категории, продукти, прости опции и Stripe Payment Links.</p>
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">Типове, категории, продукти, прости опции и Stripe Payment Links.</p>
         </div>
         <ArtStudioAdminNav />
       </header>
 
-      {params.saved || params.archived ? <p className="rounded-xl border border-emerald-300/30 bg-emerald-500/10 p-4 text-sm font-semibold text-emerald-100">Промените са запазени.</p> : null}
-      {params.error ? <p className="rounded-xl border border-red-300/30 bg-red-500/10 p-4 text-sm font-semibold text-red-100">{params.error}</p> : null}
-      {!bgTypes.length ? <p className="rounded-xl border border-amber-300/30 bg-amber-500/10 p-4 text-sm text-amber-100">Art Studio таблиците или продуктовите типове още не са добавени. След миграцията създай първия тип от формата по-долу.</p> : null}
+      {params.saved || params.archived ? <p className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm font-semibold text-emerald-900">Промените са запазени.</p> : null}
+      {params.error ? <p className="rounded-xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">{params.error}</p> : null}
+      {!bgTypes.length ? <p className="rounded-xl border border-amber-300 bg-amber-100 p-4 text-sm text-amber-900">Art Studio таблиците или продуктовите типове още не са добавени. След миграцията създай първия тип от формата по-долу.</p> : null}
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Структура</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Структура</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Продуктови типове</h2>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
@@ -94,7 +94,7 @@ export default async function AdminArtStudioProductsPage({ searchParams }: { sea
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Организация</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Организация</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Категории</h2>
         </div>
         <div className="grid gap-4 lg:grid-cols-2 xl:grid-cols-3">
@@ -145,7 +145,7 @@ export default async function AdminArtStudioProductsPage({ searchParams }: { sea
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Продукти</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Продукти</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Карти и поръчки</h2>
         </div>
         <div className="grid gap-4">

@@ -19,21 +19,21 @@ export default async function AdminArtStudioOrdersPage({ searchParams }: { searc
   return (
     <div className="grid gap-8">
       <header className="grid gap-4">
-        <div><p className="text-sm font-semibold uppercase text-stone-400">Art Studio</p><h1 className="mt-2 font-serif text-4xl font-semibold">Поръчки</h1></div>
+        <div><p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Art Studio</p><h1 className="mt-2 font-serif text-4xl font-semibold">Поръчки</h1></div>
         <ArtStudioAdminNav />
       </header>
-      {params.saved ? <p className="rounded-xl bg-emerald-500/10 p-4 text-sm font-semibold text-emerald-100">Статусът е обновен.</p> : null}
-      {params.error ? <p className="rounded-xl bg-red-500/10 p-4 text-sm font-semibold text-red-100">{params.error}</p> : null}
+      {params.saved ? <p className="rounded-xl bg-emerald-100 p-4 text-sm font-semibold text-emerald-900">Статусът е обновен.</p> : null}
+      {params.error ? <p className="rounded-xl bg-red-100 p-4 text-sm font-semibold text-red-900">{params.error}</p> : null}
       <div className="grid gap-4">
         {orders.map((order) => {
           const snapshot = order.product_snapshot && typeof order.product_snapshot === "object" && !Array.isArray(order.product_snapshot) ? order.product_snapshot as Record<string, unknown> : {};
           return (
-            <details key={order.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <details key={order.id} className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
               <summary className="cursor-pointer list-none">
                 <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto_auto] md:items-center">
-                  <div><p className="text-xs font-semibold uppercase text-stone-400">{order.order_number}</p><h2 className="mt-1 font-serif text-2xl font-semibold">{String(snapshot.title || "Art Studio продукт")}</h2></div>
-                  <p className="text-sm text-stone-300">{order.customer_first_name} {order.customer_last_name}<br />{order.customer_email}</p>
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{order.request_type === "enquiry" ? "заявка" : order.payment_status}</span>
+                  <div><p className="text-xs font-semibold uppercase text-[var(--admin-muted)]">{order.order_number}</p><h2 className="mt-1 font-serif text-2xl font-semibold">{String(snapshot.title || "Art Studio продукт")}</h2></div>
+                  <p className="text-sm text-[var(--admin-muted)]">{order.customer_first_name} {order.customer_last_name}<br />{order.customer_email}</p>
+                  <span className="rounded-full bg-[var(--admin-panel-strong)] px-3 py-1 text-xs font-semibold">{order.request_type === "enquiry" ? "заявка" : order.payment_status}</span>
                   <strong>{Number(order.total).toFixed(2)} {order.currency}</strong>
                 </div>
               </summary>
@@ -77,7 +77,7 @@ export default async function AdminArtStudioOrdersPage({ searchParams }: { searc
             </details>
           );
         })}
-        {!orders.length ? <p className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-stone-300">Все още няма Art Studio поръчки.</p> : null}
+        {!orders.length ? <p className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-6 text-sm text-[var(--admin-muted)]">Все още няма Art Studio поръчки.</p> : null}
       </div>
     </div>
   );

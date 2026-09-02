@@ -246,7 +246,7 @@ function ArticleFormActions({
   return (
     <div className="flex flex-wrap items-center justify-end gap-3">
       {isExisting && hasUnsavedChanges ? (
-        <p className="mr-auto text-sm font-medium text-amber-200">Има незапазени промени. Първо ги запази.</p>
+        <p className="mr-auto text-sm font-medium text-amber-900">Има незапазени промени. Първо ги запази.</p>
       ) : null}
       <button
         type="submit"
@@ -378,7 +378,7 @@ export function ArticleEditorForm({
         <input key={field} type="hidden" name={field} value={String(draft[field])} />
       ))}
       <div className="flex flex-wrap gap-2">
-        <span className="inline-flex items-center rounded-full border border-white/15 bg-white/10 px-4 py-2 text-sm font-semibold text-white">
+        <span className="inline-flex items-center rounded-full border border-[var(--admin-line)] bg-[var(--admin-panel-strong)] px-4 py-2 text-sm font-semibold text-[var(--admin-ink)]">
           {draft.locale === "en" ? "English" : "Български"}
         </span>
         {tabs.map((tab) => (

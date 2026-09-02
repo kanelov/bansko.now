@@ -10,7 +10,7 @@ export type ThumbnailImage = { src: string; alt: string; href?: string };
  * Small square thumbnails of example designs with a minimal lightbox
  * (previous/next/close, keyboard). Images are plain <img> tags on purpose.
  */
-export function ArtStudioThumbnailStrip({ images, locale }: { images: ThumbnailImage[]; locale: Locale }) {
+export function ArtStudioThumbnailStrip({ images, locale, title: customTitle }: { images: ThumbnailImage[]; locale: Locale; title?: string }) {
   const isEnglish = locale === "en";
   const [active, setActive] = useState<number | null>(null);
   const close = useCallback(() => setActive(null), []);
@@ -30,7 +30,7 @@ export function ArtStudioThumbnailStrip({ images, locale }: { images: ThumbnailI
 
   if (!images.length) return null;
   const current = active === null ? null : images[active];
-  const title = isEnglish ? "Example designs" : "Примерни дизайни";
+  const title = customTitle || (isEnglish ? "Example designs" : "Примерни дизайни");
   const buttonClass = "grid h-10 w-10 place-items-center rounded-full bg-white text-forest shadow transition hover:bg-forest hover:text-white focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white";
 
   return (

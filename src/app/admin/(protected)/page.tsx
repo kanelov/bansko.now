@@ -23,7 +23,7 @@ export default async function AdminDashboardPage() {
     <div className="grid gap-8">
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Admin</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Admin</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold">Dashboard</h1>
         </div>
         <Link href="/admin/articles/new" className="admin-button admin-button-primary px-5 py-3 text-sm font-semibold">
@@ -32,8 +32,8 @@ export default async function AdminDashboardPage() {
       </div>
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-5">
         {metrics.map((metric) => (
-          <div key={metric.label} className="rounded-2xl border border-white/10 bg-white/5 p-5">
-            <p className="text-sm text-stone-400">{metric.label}</p>
+          <div key={metric.label} className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
+            <p className="text-sm text-[var(--admin-muted)]">{metric.label}</p>
             <p className="mt-4 text-4xl font-semibold">{metric.value}</p>
           </div>
         ))}

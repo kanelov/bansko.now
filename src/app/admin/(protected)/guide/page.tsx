@@ -109,7 +109,7 @@ color: stone
 
 function CodeBlock({ children }: { children: string }) {
   return (
-    <pre className="mt-4 overflow-x-auto rounded-xl bg-stone-950 p-4 text-sm leading-6 text-stone-100">
+    <pre className="mt-4 overflow-x-auto rounded-xl bg-[var(--admin-bg)] p-4 text-sm leading-6 text-[var(--admin-ink)]">
       <code>{children}</code>
     </pre>
   );
@@ -156,9 +156,9 @@ export default function AdminGuidePage() {
   return (
     <div className="mx-auto grid max-w-5xl gap-8">
       <header>
-        <p className="text-sm font-semibold uppercase text-stone-400">Работен наръчник</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Работен наръчник</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Инструкции за Bansko NOW</h1>
-        <p className="mt-4 max-w-3xl text-sm leading-7 text-stone-300">
+        <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--admin-muted)]">
           Практично описание на функциите в сайта. Документът е част от проекта и трябва да се допълва при всяка нова възможност или промяна в работния процес.
         </p>
         <p className="mt-3 text-xs font-semibold uppercase text-stone-500">Актуализирано: 20 август 2026</p>
@@ -362,7 +362,7 @@ status: draft`}</CodeBlock>
             Опциите се показват като бутончета (по подразбиране), а с <code>&quot;display&quot;: &quot;select&quot;</code> на полето стават падащо меню. Опция може да има <code>tags</code>, а друго поле <code>filter_by</code> (<code>{`{"field": "model", "map": {"kids": "kids"}}`}</code>), за да се показват само подходящите размери. Размерите могат да идват директно от каталога на приложението за заявки: <code>source_sizes</code> с <code>types</code> (имена на продуктови типове там, напр. „Унисекс тениски“), по желание <code>variants_include</code>, <code>labels_en</code>, <code>replaces</code> (кои статични полета да се скрият) и <code>required</code>. <code>source_sku</code> е плейсхолдър артикулът в приложението (<code>ART-STUDIO-TSHIRT</code>, <code>-PRINT</code>, <code>-MUG</code>, <code>-ICON</code>, <code>-CUSTOM</code>). Всяка поръчка се записва автоматично и в приложението за заявки като „Art Studio поръчка“ с номера на поръчката; ако това не успее, имейлът към теб го казва и я въвеждаш ръчно. Страницата на типа показва до 4 готови дизайна и бутон към <code>/art-studio/&lt;тип&gt;/designs</code> с всички.
           </p>
           <p>
-            Опция с <code>swatch</code> (напр. <code>&quot;#ffffff&quot;</code>) се показва като цветно кръгче в балончето. Поле с <code>show_when</code> (<code>{`{"field": "frame", "values": ["framed"]}`}</code>) се появява само при избрана стойност на друго поле, например цвят на рамката само при „С рамка“. В <code>source_sizes.types</code> елемент може да е и обект <code>{`{"label_bg": "Детски", "label_en": "Kids", "types": ["Детски тениски", "Бебешки тениски"]}`}</code>, който обединява няколко продуктови типа от приложението в един модел. Миниатюрите „Примерни дизайни“ на страницата на типа идват от полето „Примерни дизайни“ (по един URL на ред) плюс снимките на готовите дизайни. Всички останали текстове на Art Studio страниците (надписи, водещи текстове, предимства, стъпки, въпроси, SEO абзаци) се редактират в Art Studio → „Текстове“, на български и английски.
+            Опция с <code>swatch</code> (напр. <code>&quot;#ffffff&quot;</code>) се показва като цветно кръгче в балончето. Поле с <code>show_when</code> (<code>{`{"field": "frame", "values": ["framed"]}`}</code>) се появява само при избрана стойност на друго поле, например цвят на рамката само при „С рамка“. В <code>source_sizes.types</code> елемент може да е и обект <code>{`{"label_bg": "Детски", "label_en": "Kids", "types": ["Детски тениски", "Бебешки тениски"]}`}</code>, който обединява няколко продуктови типа от приложението в един модел. Миниатюрите „Примерни дизайни“ на страницата на типа идват от полето „Примерни дизайни“ (по един URL на ред) плюс снимките на готовите дизайни. Всички останали текстове на Art Studio страниците (надписи, водещи текстове, предимства, стъпки, въпроси, SEO абзаци, текстовете на формата за поръчка) се редактират в Art Studio → „Текстове“, на български и английски. Там се включват и изключват секциите на началната страница и на всяка продуктова страница, задават се връзките на двата бутона и броят готови дизайни, показани преди „Виж още“. Поръчките от Art Studio са и в главното меню на админа като „Поръчки“ с брой на новите.
           </p>
           <h3 className="mt-6 font-semibold text-stone-950">Stripe Payment Link</h3>
           <ul className="mt-3 grid list-disc gap-2 pl-5">

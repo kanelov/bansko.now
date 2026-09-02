@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArtStudioEnquiryForm } from "@/components/public/art-studio-enquiry-form";
+import { resolveArtStudioTypeCopy } from "@/lib/art-studio-copy";
 import { normalizeFormConfig, sourceGroupsForConfig } from "@/lib/art-studio-forms";
 import { getSourceVariantOptions } from "@/lib/gallery-catalog";
 import { GalleryLightbox } from "@/components/public/gallery-lightbox";
@@ -87,6 +88,7 @@ export default async function ArtStudioProductPage({ params }: { params: Params 
     getSourceVariantOptions()
   ]);
   const sourceGroups = sourceGroupsForConfig(normalizeFormConfig(product.product_type.form_config), sourceOptions);
+  const typeCopy = resolveArtStudioTypeCopy(settings.page_copy, product.product_type.internal_name, locale);
   const path = `/art-studio/${product.product_type.slug}/${product.slug}`;
   const productUrl = localeUrl(locale, path);
   const images = [product.image_url, ...(product.gallery_urls || [])]
@@ -157,7 +159,7 @@ export default async function ArtStudioProductPage({ params }: { params: Params 
           </article>
 
           <aside className="lg:sticky lg:top-24 lg:col-span-5">
-            <ArtStudioEnquiryForm productType={product.product_type} product={product} settings={settings} locale={locale} sourceGroups={sourceGroups} />
+            <ArtStudioEnquiryForm productType={product.product_type} product={product} settings={settings} locale={locale} sourceGroups={sourceGroups} formCopy={{ eyebrow: typeCopy.formEyebrow, intro: typeCopy.formIntro, button: typeCopy.cta }} />
           </aside>
         </div>
       </main>

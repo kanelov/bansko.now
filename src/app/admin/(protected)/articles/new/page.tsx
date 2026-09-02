@@ -12,11 +12,11 @@ export default async function NewArticlePage({ searchParams }: { searchParams: S
   return (
     <div className="grid gap-8">
       <div>
-        <p className="text-sm font-semibold uppercase text-stone-400">{locale === "en" ? "English version" : "Българска версия"}</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">{locale === "en" ? "English version" : "Българска версия"}</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Create article</h1>
       </div>
       {query.error ? (
-        <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+        <div className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">
           {query.error}
         </div>
       ) : null}

@@ -38,9 +38,9 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
   return (
     <div className="grid gap-10">
       <header>
-        <p className="text-sm font-semibold uppercase text-stone-400">CMS</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">CMS</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Страници</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-300">
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
           Редактирай статични страници, SEO мета данни и Art Studio услугите, които се показват като карти на сайта.
         </p>
       </header>
@@ -51,14 +51,14 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
         </div>
       ) : null}
       {params.error ? (
-        <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+        <div className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">
           {params.error}
         </div>
       ) : null}
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Public pages</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Public pages</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Съдържание на страници</h2>
         </div>
 
@@ -73,18 +73,18 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
             <details
               id={page ? `page-${page.id}` : "new-page"}
               key={page?.id || "new-page"}
-              className="rounded-2xl border border-white/10 bg-white/5 p-5"
+              className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5"
               open={!page}
             >
               <summary className="cursor-pointer list-none">
                 <div className="flex flex-wrap items-center justify-between gap-4">
                   <div>
-                    <p className="text-xs font-semibold uppercase text-stone-400">
+                    <p className="text-xs font-semibold uppercase text-[var(--admin-muted)]">
                       {page ? `${page.locale.toUpperCase()} / ${page.locale === "en" ? "/en" : ""}/${page.slug} / ${page.status}` : "Нова страница"}
                     </p>
                     <h3 className="mt-2 font-serif text-2xl font-semibold">{page?.title || "Добави страница"}</h3>
                   </div>
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold text-stone-200">
+                  <span className="rounded-full bg-[var(--admin-panel-strong)] px-3 py-1 text-xs font-semibold text-[var(--admin-ink)]">
                     SEO + content
                   </span>
                 </div>
@@ -201,7 +201,7 @@ export default async function AdminPagesPage({ searchParams }: { searchParams: S
 
       <section id="art-studio-services" className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Art Studio</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Art Studio</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Услуги като карти</h2>
         </div>
 

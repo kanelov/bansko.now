@@ -15,6 +15,11 @@ export type ArtStudioTypeCopy = {
   benefits: ArtStudioBenefit[];
   faq: ArtStudioFaqItem[];
   cta: string;
+  formEyebrow: string;
+  formIntro: string;
+  designsTitle: string;
+  designsText: string;
+  thumbnailsTitle: string;
 };
 
 const generic: Record<Locale, ArtStudioTypeCopy> = {
@@ -32,6 +37,11 @@ const generic: Record<Locale, ArtStudioTypeCopy> = {
       { question: "Колко време отнема?", answer: "Зависи от продукта и наличностите. Ще получиш точен срок при потвърждението на поръчката." }
     ],
     cta: "Изпрати поръчката",
+    formEyebrow: "Поръчай",
+    formIntro: "Избери опциите и остави данните си. Потвърждаваме цена, срок и получаване по телефон или имейл. Без плащане сега.",
+    designsTitle: "Готови дизайни",
+    designsText: "Избери готов дизайн или поръчай собствен през формата.",
+    thumbnailsTitle: "Примерни дизайни",
     intro: [
       "Art Studio е ателието на галерия Kanelov Art в Банско. Тук печатаме и изработваме на място продукти с авторски дизайни от Банско и Пирин или с твоя снимка и текст, така че всеки подарък или спомен от планината да е личен.",
       "Поръчката става през формата на страницата: избираш опциите, качваш снимка при желание и оставяш телефон и имейл. Ние потвърждаваме цената и срока, а после взимаш готовия продукт от галерията в Банско или го получаваш с Еконт в цялата страна."
@@ -51,6 +61,11 @@ const generic: Record<Locale, ArtStudioTypeCopy> = {
       { question: "How long does it take?", answer: "It depends on the product and stock. You will get an exact timeline when we confirm the order." }
     ],
     cta: "Send the order",
+    formEyebrow: "Order",
+    formIntro: "Choose your options and leave your details. We confirm the price, timing and pickup by phone or email. No payment now.",
+    designsTitle: "Ready designs",
+    designsText: "Pick a ready design or order a custom one through the form.",
+    thumbnailsTitle: "Example designs",
     intro: [
       "Art Studio is the workshop of the Kanelov Art gallery in Bansko. We print and make products on site with original designs from Bansko and Pirin, or with your own photo and text, so every gift or mountain memory is personal.",
       "Ordering happens through the form on the page: pick the options, upload a photo if you like and leave your phone and email. We confirm the price and timing, then you collect the finished product at the gallery in Bansko or receive it by Econt anywhere in Bulgaria."
@@ -404,7 +419,7 @@ export const landingTextKeys = [
   "faqEyebrow", "faqTitle"
 ] as const;
 export type LandingTextKey = (typeof landingTextKeys)[number];
-export const typeTextKeys = ["eyebrow", "lead", "cta"] as const;
+export const typeTextKeys = ["eyebrow", "lead", "cta", "formEyebrow", "formIntro", "designsTitle", "designsText", "thumbnailsTitle"] as const;
 export type TypeTextKey = (typeof typeTextKeys)[number];
 
 type CopyOverrides = {
@@ -554,4 +569,85 @@ export function formatFaqLines(items: ArtStudioFaqItem[]) {
 
 export function formatParagraphs(paragraphs: string[]) {
   return paragraphs.join("\n\n");
+}
+
+/** Which blocks of the landing page are shown. */
+export type ArtStudioLandingSections = {
+  trust: boolean;
+  collections: boolean;
+  services: boolean;
+  steps: boolean;
+  custom: boolean;
+  faq: boolean;
+  facebook: boolean;
+};
+export const landingSectionKeys = ["trust", "collections", "services", "steps", "custom", "faq", "facebook"] as const;
+export const landingSectionLabels: Record<keyof ArtStudioLandingSections, string> = {
+  trust: "Лента с предимства",
+  collections: "Колекции от галерията",
+  services: "Услуги",
+  steps: "Стъпки за поръчка",
+  custom: "Лични проекти",
+  faq: "Често задавани въпроси",
+  facebook: "Покана за Facebook групата"
+};
+
+/** Which blocks of a product type page are shown and how many ready designs. */
+export type ArtStudioTypeSections = {
+  benefits: boolean;
+  thumbnails: boolean;
+  designs: boolean;
+  intro: boolean;
+  faq: boolean;
+  designsCount: number;
+};
+export const typeSectionKeys = ["benefits", "thumbnails", "designs", "intro", "faq"] as const;
+export const typeSectionLabels: Record<(typeof typeSectionKeys)[number], string> = {
+  benefits: "Предимства (карти под снимката)",
+  thumbnails: "Миниатюри „Примерни дизайни“",
+  designs: "Готови дизайни",
+  intro: "Описателен текст (SEO)",
+  faq: "Често задавани въпроси"
+};
+
+export type ArtStudioLandingLinks = { gallery: string; custom: string };
+
+const defaultLandingSections: ArtStudioLandingSections = { trust: true, collections: true, services: true, steps: true, custom: true, faq: true, facebook: true };
+const defaultTypeSections: ArtStudioTypeSections = { benefits: true, thumbnails: true, designs: true, intro: true, faq: true, designsCount: 4 };
+const defaultLandingLinks: ArtStudioLandingLinks = { gallery: "/art-studio/gallery", custom: "" };
+
+function readFlags<T extends Record<string, boolean | number>>(raw: unknown, defaults: T): T {
+  const result = { ...defaults };
+  if (!raw || typeof raw !== "object" || Array.isArray(raw)) return result;
+  const source = raw as Record<string, unknown>;
+  for (const key of Object.keys(defaults) as Array<keyof T>) {
+    const value = source[key as string];
+    if (typeof defaults[key] === "boolean" && typeof value === "boolean") (result as Record<string, boolean | number>)[key as string] = value;
+    if (typeof defaults[key] === "number" && typeof value === "number" && Number.isFinite(value)) (result as Record<string, boolean | number>)[key as string] = Math.min(24, Math.max(1, Math.round(value)));
+  }
+  return result;
+}
+
+export function resolveArtStudioLandingSections(pageCopy: Json | null | undefined): ArtStudioLandingSections {
+  return readFlags((readOverrides(pageCopy) as Record<string, unknown>).landing_sections, defaultLandingSections);
+}
+
+export function resolveArtStudioTypeSections(pageCopy: Json | null | undefined, internalName: string): ArtStudioTypeSections {
+  const all = (readOverrides(pageCopy) as Record<string, unknown>).type_sections;
+  const raw = all && typeof all === "object" && !Array.isArray(all) ? (all as Record<string, unknown>)[internalName] : undefined;
+  return readFlags(raw, defaultTypeSections);
+}
+
+/** Internal paths (or https URLs) for the landing buttons; empty custom link falls back to the CMS page CTA or /contact. */
+export function resolveArtStudioLandingLinks(pageCopy: Json | null | undefined): ArtStudioLandingLinks {
+  const raw = (readOverrides(pageCopy) as Record<string, unknown>).landing_links;
+  const result = { ...defaultLandingLinks };
+  if (raw && typeof raw === "object" && !Array.isArray(raw)) {
+    const source = raw as Record<string, unknown>;
+    for (const key of ["gallery", "custom"] as const) {
+      const value = overrideText(source[key], 300);
+      if (value && (/^\//.test(value) || /^https:\/\//i.test(value))) result[key] = value;
+    }
+  }
+  return result;
 }

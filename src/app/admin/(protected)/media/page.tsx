@@ -21,7 +21,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
   return (
     <div className="grid gap-8">
       <div>
-        <p className="text-sm font-semibold uppercase text-stone-400">Assets</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Assets</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Media</h1>
       </div>
 
@@ -38,7 +38,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
       ) : null}
 
       {errorMessage ? (
-        <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+        <div className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">
           {errorMessage}
         </div>
       ) : null}
@@ -89,10 +89,10 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
       <section className="grid gap-4">
         <div className="flex flex-wrap items-end justify-between gap-3">
           <div>
-            <p className="text-sm font-semibold uppercase text-stone-400">Library</p>
+            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Library</p>
             <h2 className="mt-2 font-serif text-3xl font-semibold">Последни файлове</h2>
           </div>
-          <p className="text-sm text-stone-400">{mediaItems.length} файла</p>
+          <p className="text-sm text-[var(--admin-muted)]">{mediaItems.length} файла</p>
         </div>
 
         {mediaItems.length ? (
@@ -137,7 +137,7 @@ export default async function AdminMediaPage({ searchParams }: { searchParams: S
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm leading-6 text-stone-300">
+          <div className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-6 text-sm leading-6 text-[var(--admin-muted)]">
             Все още няма качени файлове. Качи първата снимка или кратко видео и то ще се появи тук.
           </div>
         )}

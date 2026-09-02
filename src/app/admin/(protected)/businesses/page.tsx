@@ -67,9 +67,9 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
   return (
     <div className="grid gap-10">
       <header>
-        <p className="text-sm font-semibold uppercase text-stone-400">Местен каталог</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Местен каталог</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Бизнес каталог</h1>
-        <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-300">
+        <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
           Управлявай бизнес заявки, годишни нива за видимост, позиции на картата, Stripe линкове и контактни съобщения.
         </p>
       </header>
@@ -80,28 +80,28 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
         </div>
       ) : null}
       {params.error ? (
-        <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-4 text-sm font-semibold text-red-100">
+        <div className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">
           {params.error}
         </div>
       ) : null}
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Заявки</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Заявки</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Бизнес заявки</h2>
         </div>
         {businesses.length ? (
           <div className="grid gap-4">
             {businesses.map((business) => (
-              <details key={business.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+              <details key={business.id} className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
                 <summary className="cursor-pointer list-none">
                   <div className="flex flex-wrap items-center justify-between gap-4">
                     <div>
-                      <p className="text-xs font-semibold uppercase text-stone-400">{business.category} / {businessStatusLabels[business.status]}</p>
+                      <p className="text-xs font-semibold uppercase text-[var(--admin-muted)]">{business.category} / {businessStatusLabels[business.status]}</p>
                       <h3 className="mt-2 font-serif text-2xl font-semibold">{business.name}</h3>
-                      <p className="mt-1 text-sm text-stone-300">{business.address}</p>
+                      <p className="mt-1 text-sm text-[var(--admin-muted)]">{business.address}</p>
                     </div>
-                    <div className="text-right text-sm text-stone-300">
+                    <div className="text-right text-sm text-[var(--admin-muted)]">
                       <p>{businessTierLabels[business.listing_tier]} / {businessPaymentStatusLabels[business.payment_status]}</p>
                       <p>Активен до: {formatDate(business.paid_until)}</p>
                     </div>
@@ -309,9 +309,9 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                     </form>
                     <details>
                       <summary className="admin-button admin-button-danger list-none px-5 py-3 text-sm font-semibold">Изтрий / отхвърли</summary>
-                      <form action={deleteBusinessAction} className="mt-3 grid gap-3 rounded-2xl bg-red-950/30 p-4">
+                      <form action={deleteBusinessAction} className="mt-3 grid gap-3 rounded-2xl bg-red-100 p-4">
                         <input type="hidden" name="id" value={business.id} />
-                        <p className="text-sm text-red-100">Изтрива бизнеса, private контакта и качените снимки.</p>
+                        <p className="text-sm text-red-900">Изтрива бизнеса, private контакта и качените снимки.</p>
                         <button className="admin-button admin-button-danger px-4 py-2 text-sm font-semibold">Потвърди изтриването</button>
                       </form>
                     </details>
@@ -321,15 +321,15 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
             ))}
           </div>
         ) : (
-          <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-stone-300">Няма бизнес заявки.</div>
+          <div className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-6 text-sm text-[var(--admin-muted)]">Няма бизнес заявки.</div>
         )}
       </section>
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">План за видимост</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">План за видимост</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Годишни нива и Stripe линкове</h2>
-          <p className="mt-2 max-w-3xl text-sm leading-6 text-stone-300">
+          <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
             Безплатният план е по подразбиране. Всички платени нива са за една година, за да бъдат офертата и подновяването ясни.
           </p>
         </div>
@@ -368,7 +368,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
 
       <section className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Settings</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Settings</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Directory, Map, About</h2>
         </div>
         <form action={saveBusinessDirectorySettingsAction} className="grid gap-4 rounded-2xl bg-white p-5 text-stone-950">
@@ -410,17 +410,17 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
 
       <section id="messages" className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Messages</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Messages</p>
           <h2 className="mt-2 font-serif text-3xl font-semibold">Contact form</h2>
         </div>
         <div className="grid gap-3">
           {messages.map((message) => (
-            <article key={message.id} className="rounded-2xl border border-white/10 bg-white/5 p-5">
+            <article key={message.id} className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
               <div className="flex flex-wrap justify-between gap-3">
                 <div>
-                  <p className="text-xs font-semibold uppercase text-stone-400">{message.status} / {formatDate(message.created_at)}</p>
+                  <p className="text-xs font-semibold uppercase text-[var(--admin-muted)]">{message.status} / {formatDate(message.created_at)}</p>
                   <h3 className="mt-2 text-lg font-semibold">{message.subject || "Съобщение"}</h3>
-                  <p className="mt-1 text-sm text-stone-300">{message.name} · {message.email} · {message.phone || "—"}</p>
+                  <p className="mt-1 text-sm text-[var(--admin-muted)]">{message.name} · {message.email} · {message.phone || "—"}</p>
                 </div>
                 <form action={markContactMessageAction}>
                   <input type="hidden" name="id" value={message.id} />
@@ -430,7 +430,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                   </button>
                 </form>
               </div>
-              <p className="mt-4 text-sm leading-6 text-stone-200">{message.message}</p>
+              <p className="mt-4 text-sm leading-6 text-[var(--admin-ink)]">{message.message}</p>
             </article>
           ))}
         </div>

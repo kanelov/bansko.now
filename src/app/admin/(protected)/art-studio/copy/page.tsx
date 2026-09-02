@@ -6,9 +6,16 @@ import {
   formatPairLines,
   formatParagraphs,
   formatTrustLines,
+  landingSectionKeys,
+  landingSectionLabels,
   landingTextKeys,
   resolveArtStudioLandingCopy,
+  resolveArtStudioLandingLinks,
+  resolveArtStudioLandingSections,
   resolveArtStudioTypeCopy,
+  resolveArtStudioTypeSections,
+  typeSectionKeys,
+  typeSectionLabels,
   typeTextKeys,
   type LandingTextKey,
   type TypeTextKey
@@ -45,7 +52,17 @@ const landingLabels: Record<LandingTextKey, string> = {
   faqTitle: "Въпроси: заглавие"
 };
 const longLandingKeys: LandingTextKey[] = ["lead", "metaDescription", "productsText", "collectionsText", "customText"];
-const typeLabels: Record<TypeTextKey, string> = { eyebrow: "Надпис над заглавието", lead: "Водещ текст", cta: "Текст на бутона за поръчка" };
+const typeLabels: Record<TypeTextKey, string> = {
+  eyebrow: "Надпис над заглавието",
+  lead: "Водещ текст",
+  cta: "Текст на бутона за поръчка",
+  formEyebrow: "Форма: надпис над заглавието",
+  formIntro: "Форма: уводен текст",
+  designsTitle: "Готови дизайни: заглавие",
+  designsText: "Готови дизайни: текст",
+  thumbnailsTitle: "Миниатюри: надпис"
+};
+const longTypeKeys: TypeTextKey[] = ["lead", "formIntro", "designsText"];
 
 function Field({ name, label, value, long = false }: { name: string; label: string; value: string; long?: boolean }) {
   return (
@@ -73,26 +90,43 @@ export default async function ArtStudioCopyPage({ searchParams }: { searchParams
     getArtStudioPublicSettings({ includeAdmin: true }),
     getArtStudioProductTypes({ locale: "bg", includeInactive: true })
   ]);
+  const landingSections = resolveArtStudioLandingSections(settings.page_copy);
+  const landingLinks = resolveArtStudioLandingLinks(settings.page_copy);
 
   return (
     <div className="grid gap-8">
       <div className="grid gap-4">
-        <p className="text-sm font-semibold uppercase text-stone-400">Art Studio</p>
-        <h1 className="font-serif text-4xl font-semibold">Текстове на страниците</h1>
-        <p className="max-w-3xl text-sm leading-6 text-stone-300">
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Art Studio</p>
+        <h1 className="font-serif text-4xl font-semibold">Текстове и секции на страниците</h1>
+        <p className="max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
           Тук са всички текстове на страницата <code>/art-studio</code> и на страниците на продуктовите типове, на български и английски. Полетата са попълнени с текущия текст. Изтрито поле връща стандартния текст. В списъците всеки ред е един елемент, а „ | “ разделя частите му.
         </p>
         <ArtStudioAdminNav />
       </div>
 
-      {saved ? <p className="rounded-xl border border-emerald-400/30 bg-emerald-500/10 p-4 text-sm text-emerald-100">Текстовете са запазени. Страниците се обновяват до няколко секунди.</p> : null}
-      {error ? <p className="rounded-xl border border-red-400/30 bg-red-500/10 p-4 text-sm text-red-100">Грешка: {error}</p> : null}
+      {saved ? <p className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm text-emerald-900">Текстовете са запазени. Страниците се обновяват до няколко секунди.</p> : null}
+      {error ? <p className="rounded-xl border border-red-300 bg-red-100 p-4 text-sm text-red-900">Грешка: {error}</p> : null}
 
       <form action={saveArtStudioPageCopyAction} className="grid gap-8">
         {settings.id !== "fallback" ? <input type="hidden" name="id" value={settings.id} /> : null}
 
         <section className="grid gap-4 rounded-2xl bg-white p-5 text-stone-950">
           <h2 className="font-serif text-2xl font-semibold">Начална страница на Art Studio</h2>
+          <div className="grid gap-4 rounded-xl border border-stone-200 p-4 sm:grid-cols-2">
+            <div className="grid gap-2">
+              <p className="text-sm font-semibold">Показани секции</p>
+              {landingSectionKeys.map((key) => (
+                <label key={key} className="choice-row text-sm">
+                  <input type="checkbox" name={`landing_sections.${key}`} defaultChecked={landingSections[key]} className="choice-control" />
+                  {landingSectionLabels[key]}
+                </label>
+              ))}
+            </div>
+            <div className="grid gap-3">
+              <Field name="landing_links.gallery" label="Връзка на бутона „Разгледай галерията“ (път като /art-studio/gallery или https адрес)" value={landingLinks.gallery} />
+              <Field name="landing_links.custom" label="Връзка на бутона за лични поръчки (празно = бутонът от CMS страницата или /contact)" value={landingLinks.custom} />
+            </div>
+          </div>
           <div className="grid gap-6 lg:grid-cols-2">
             {locales.map((locale) => {
               const copy = resolveArtStudioLandingCopy(settings.page_copy, locale);
@@ -115,7 +149,27 @@ export default async function ArtStudioCopyPage({ searchParams }: { searchParams
           <details key={type.id} className="rounded-2xl bg-white p-5 text-stone-950">
             <summary className="cursor-pointer font-serif text-2xl font-semibold">{type.title} <span className="text-sm font-sans font-normal text-stone-500">/art-studio/{type.slug}</span></summary>
             <input type="hidden" name="type_names" value={type.internal_name} />
-            <p className="mt-2 text-sm text-stone-600">Заглавието, описанието, SEO полетата, продаващият текст (Markdown) и формата за поръчка се редактират в „Каталог“. Тук са останалите текстове на страницата.</p>
+            <p className="mt-2 text-sm text-stone-600">Заглавието, описанието, SEO полетата, продаващият текст (Markdown), снимките и формата за поръчка се редактират в „Каталог“. Тук са останалите текстове и секциите на страницата.</p>
+            {(() => {
+              const sections = resolveArtStudioTypeSections(settings.page_copy, type.internal_name);
+              return (
+                <div className="mt-4 grid gap-4 rounded-xl border border-stone-200 p-4 sm:grid-cols-2">
+                  <div className="grid gap-2">
+                    <p className="text-sm font-semibold">Показани секции</p>
+                    {typeSectionKeys.map((key) => (
+                      <label key={key} className="choice-row text-sm">
+                        <input type="checkbox" name={`type_sections.${type.internal_name}.${key}`} defaultChecked={sections[key]} className="choice-control" />
+                        {typeSectionLabels[key]}
+                      </label>
+                    ))}
+                  </div>
+                  <label className="grid gap-1 self-start text-xs font-semibold text-stone-700">
+                    Брой готови дизайни на страницата (останалите са в „Виж още“)
+                    <input type="number" name={`type_sections.${type.internal_name}.designsCount`} min={1} max={24} defaultValue={sections.designsCount} className={fieldClass} />
+                  </label>
+                </div>
+              );
+            })()}
             <div className="mt-4 grid gap-6 lg:grid-cols-2">
               {locales.map((locale) => {
                 const copy = resolveArtStudioTypeCopy(settings.page_copy, type.internal_name, locale);
@@ -124,7 +178,7 @@ export default async function ArtStudioCopyPage({ searchParams }: { searchParams
                   <div key={locale} className="grid gap-3 rounded-xl border border-stone-200 p-4">
                     <p className="text-sm font-semibold uppercase text-moss">{locale === "bg" ? "Български" : "English"}</p>
                     {typeTextKeys.map((key) => (
-                      <Field key={key} name={`${prefix}.${key}`} label={typeLabels[key]} value={copy[key]} long={key === "lead"} />
+                      <Field key={key} name={`${prefix}.${key}`} label={typeLabels[key]} value={copy[key]} long={longTypeKeys.includes(key)} />
                     ))}
                     <Lines name={`${prefix}.benefits`} label="Предимства (карти под снимката)" value={formatPairLines(copy.benefits)} hint="Ред: Заглавие | Текст." rows={4} />
                     <Lines name={`${prefix}.intro`} label="Описателен текст (SEO)" value={formatParagraphs(copy.intro)} hint="Абзаците се разделят с празен ред. Не се показва, ако типът има продаващ текст в „Каталог“." rows={8} />

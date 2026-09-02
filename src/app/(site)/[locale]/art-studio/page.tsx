@@ -7,7 +7,7 @@ import { ArtStudioServiceCard } from "@/components/public/art-studio-service-car
 import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { IconGlyph } from "@/components/public/icon-glyph";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
-import { resolveArtStudioLandingCopy } from "@/lib/art-studio-copy";
+import { resolveArtStudioLandingCopy, resolveArtStudioLandingLinks, resolveArtStudioLandingSections } from "@/lib/art-studio-copy";
 import { getFaqItemsFromMarkdown } from "@/lib/markdown-blocks";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
@@ -71,6 +71,8 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
     getArtStudioPublicSettings()
   ]);
   const text = resolveArtStudioLandingCopy(pickupSettings.page_copy, locale);
+  const sections = resolveArtStudioLandingSections(pickupSettings.page_copy);
+  const links = resolveArtStudioLandingLinks(pickupSettings.page_copy);
   const typeImages = new Map<string, string>();
   for (const product of products) {
     if (product.image_url && !typeImages.has(product.product_type_id)) typeImages.set(product.product_type_id, product.image_url);
@@ -85,8 +87,9 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
   const heroTitle = page?.title || text.title;
   const heroLead = page?.excerpt || text.lead;
   const pageUrl = localeUrl(locale, "/art-studio");
-  const galleryHref = localePath(locale, "/art-studio/gallery") as Route;
-  const contactHref = localePath(locale, page?.cta_url && !/^https?:\/\//i.test(page.cta_url) ? page.cta_url : "/contact") as Route;
+  const galleryHref = (/^https:\/\//i.test(links.gallery) ? links.gallery : localePath(locale, links.gallery)) as Route;
+  const customTarget = links.custom || (page?.cta_url && !/^https?:\/\//i.test(page.cta_url) ? page.cta_url : "/contact");
+  const contactHref = (/^https:\/\//i.test(customTarget) ? customTarget : localePath(locale, customTarget)) as Route;
   const studioName = pickupName(locale, pickupSettings);
   const address = locale === "en" ? pickupSettings.pickup_address_en : pickupSettings.pickup_address_bg;
 
@@ -176,6 +179,7 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
         </section>
 
         <div className="mx-auto grid max-w-7xl gap-16 px-4 py-16 sm:px-6 lg:px-8">
+          {sections.trust ? (
           <section className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4" aria-label={text.eyebrow}>
             {text.trust.map((item) => (
               <div key={item.title} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-soft">
@@ -187,6 +191,7 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
               </div>
             ))}
           </section>
+          ) : null}
 
           {page?.content ? (
             <section className="mx-auto w-full max-w-4xl">
@@ -194,7 +199,7 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
             </section>
           ) : null}
 
-          {collections.length ? (
+          {sections.collections && collections.length ? (
             <section aria-labelledby="art-studio-collections-heading">
               <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
                 <div className="max-w-3xl">
@@ -239,7 +244,7 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
             </section>
           ) : null}
 
-          {services.length ? (
+          {sections.services && services.length ? (
             <section aria-labelledby="art-studio-services-heading">
               <div className="mb-8 flex flex-wrap items-end justify-between gap-5">
                 <div>
@@ -261,6 +266,7 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
             </section>
           ) : null}
 
+          {sections.steps ? (
           <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-soft sm:p-10" aria-labelledby="art-studio-steps-heading">
             <p className="text-sm font-semibold uppercase text-moss">{text.stepsEyebrow}</p>
             <h2 id="art-studio-steps-heading" className="mt-3 font-serif text-4xl font-semibold text-stone-950">{text.stepsTitle}</h2>
@@ -274,7 +280,9 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
               ))}
             </ol>
           </section>
+          ) : null}
 
+          {sections.custom ? (
           <section className="grid gap-8 rounded-3xl bg-[#f7f2e8] p-8 shadow-soft sm:p-10 md:grid-cols-[1.2fr_0.8fr] md:items-center" aria-labelledby="art-studio-custom-heading">
             <div>
               <p className="text-sm font-semibold uppercase text-moss">{text.customEyebrow}</p>
@@ -287,8 +295,9 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
               </Link>
             </div>
           </section>
+          ) : null}
 
-          {!cmsFaq.length ? (
+          {sections.faq && !cmsFaq.length ? (
             <section aria-labelledby="art-studio-faq-heading" className="mx-auto w-full max-w-4xl">
               <p className="text-sm font-semibold uppercase text-moss">{text.faqEyebrow}</p>
               <h2 id="art-studio-faq-heading" className="mt-3 font-serif text-4xl font-semibold text-stone-950">{text.faqTitle}</h2>
@@ -308,12 +317,12 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
             </section>
           ) : null}
 
-          <FacebookGroupCTA settings={settings} locale={locale} />
+          {sections.facebook ? <FacebookGroupCTA settings={settings} locale={locale} /> : null}
         </div>
       </main>
       <SiteFooter settings={settings} locale={locale} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(storeSchema) }} />
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} />
+      {sections.faq || cmsFaq.length ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} /> : null}
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
     </div>
   );

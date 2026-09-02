@@ -106,14 +106,14 @@ export function ArtStudioProductEditor({
   ]);
 
   return (
-    <details className="rounded-2xl border border-white/10 bg-white/5 p-5" open={!product}>
+    <details className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5" open={!product}>
       <summary className="cursor-pointer list-none">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <p className="text-xs font-semibold uppercase text-stone-400">{product ? product.product_type.title : "Нов продукт"}</p>
+            <p className="text-xs font-semibold uppercase text-[var(--admin-muted)]">{product ? product.product_type.title : "Нов продукт"}</p>
             <h3 className="mt-1 font-serif text-2xl font-semibold">{product?.title || "Добави продукт"}</h3>
           </div>
-          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${product?.is_active ? "bg-emerald-100 text-emerald-900" : "bg-stone-700 text-stone-100"}`}>
+          <span className={`rounded-full px-3 py-1 text-xs font-semibold ${product?.is_active ? "bg-emerald-100 text-emerald-900" : "bg-stone-700 text-[var(--admin-ink)]"}`}>
             {product?.is_active ? "Публикуван" : "Чернова"}
           </span>
         </div>

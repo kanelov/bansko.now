@@ -17,9 +17,9 @@ export default async function AdminOnlineGalleryPage() {
     <div className="grid gap-8">
       <header className="grid gap-4">
         <div>
-          <p className="text-sm font-semibold uppercase text-stone-400">Art Studio</p>
+          <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Art Studio</p>
           <h1 className="mt-2 font-serif text-4xl font-semibold">Онлайн галерия</h1>
-          <p className="mt-3 max-w-3xl text-sm leading-6 text-stone-300">
+          <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
             Статус и инструкции за каталога, който Bansko NOW синхронизира от системата за заявки и киоска.
           </p>
         </div>
@@ -27,24 +27,24 @@ export default async function AdminOnlineGalleryPage() {
       </header>
 
       <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <p className="text-sm text-stone-400">Връзка</p>
-          <p className={`mt-2 text-lg font-semibold ${connected ? "text-emerald-300" : "text-amber-300"}`}>
+        <article className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
+          <p className="text-sm text-[var(--admin-muted)]">Връзка</p>
+          <p className={`mt-2 text-lg font-semibold ${connected ? "text-emerald-800" : "text-amber-800"}`}>
             {connected ? "Работи" : "Няма данни"}
           </p>
         </article>
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <p className="text-sm text-stone-400">BG категории</p>
+        <article className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
+          <p className="text-sm text-[var(--admin-muted)]">BG категории</p>
           <p className="mt-2 font-serif text-4xl font-semibold">{bgCategories.length}</p>
         </article>
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <p className="text-sm text-stone-400">BG продукти</p>
+        <article className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
+          <p className="text-sm text-[var(--admin-muted)]">BG продукти</p>
           <p className="mt-2 font-serif text-4xl font-semibold">{bgCatalog.totalCount}</p>
         </article>
-        <article className="rounded-2xl border border-white/10 bg-white/5 p-5">
-          <p className="text-sm text-stone-400">EN продукти</p>
+        <article className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
+          <p className="text-sm text-[var(--admin-muted)]">EN продукти</p>
           <p className="mt-2 font-serif text-4xl font-semibold">{enCatalog.totalCount}</p>
-          <p className="mt-1 text-xs text-stone-400">{enCategories.length} категории</p>
+          <p className="mt-1 text-xs text-[var(--admin-muted)]">{enCategories.length} категории</p>
         </article>
       </section>
 

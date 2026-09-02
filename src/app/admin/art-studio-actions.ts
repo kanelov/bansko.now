@@ -2,7 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { landingTextKeys, parseFaqLines, parsePairLines, parseParagraphs, parseTrustLines, typeTextKeys } from "@/lib/art-studio-copy";
+import { landingSectionKeys, landingTextKeys, parseFaqLines, parsePairLines, parseParagraphs, parseTrustLines, typeSectionKeys, typeTextKeys } from "@/lib/art-studio-copy";
 import { requireAdmin } from "@/lib/supabase/auth";
 import type {
   ArtStudioOptionValue,
@@ -381,7 +381,23 @@ export async function saveArtStudioPageCopyAction(formData: FormData) {
     types[internalName] = perLocale;
   }
 
-  const payload = { page_copy: { landing, types } as Json };
+  const landingSections: Record<string, boolean> = {};
+  for (const key of landingSectionKeys) landingSections[key] = booleanValue(formData, `landing_sections.${key}`);
+  const typeSections: Record<string, Record<string, boolean | number>> = {};
+  for (const internalName of typeNames) {
+    const entry: Record<string, boolean | number> = {};
+    for (const key of typeSectionKeys) entry[key] = booleanValue(formData, `type_sections.${internalName}.${key}`);
+    const count = Number.parseInt(stringValue(formData, `type_sections.${internalName}.designsCount`), 10);
+    entry.designsCount = Number.isFinite(count) ? Math.min(24, Math.max(1, count)) : 4;
+    typeSections[internalName] = entry;
+  }
+  const linkValue = (key: string) => {
+    const value = stringValue(formData, `landing_links.${key}`).slice(0, 300);
+    return value && (value.startsWith("/") || /^https:\/\//i.test(value)) ? value : "";
+  };
+  const landingLinks = { gallery: linkValue("gallery"), custom: linkValue("custom") };
+
+  const payload = { page_copy: { landing, types, landing_sections: landingSections, type_sections: typeSections, landing_links: landingLinks } as Json };
   const result = id
     ? await supabase.from("art_studio_public_settings").update(payload).eq("id", id)
     : await supabase.from("art_studio_public_settings").insert(payload);

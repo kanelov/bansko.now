@@ -77,13 +77,16 @@ export function ArtStudioEnquiryForm({
   product = null,
   settings,
   locale,
-  sourceGroups = []
+  sourceGroups = [],
+  formCopy
 }: {
   productType: LocalizedArtStudioProductType;
   product?: LocalizedArtStudioProduct | null;
   settings: ArtStudioPublicSettings;
   locale: Locale;
   sourceGroups?: SourceVariantGroup[];
+  /** Editable texts from the admin "Текстове" tab; defaults below. */
+  formCopy?: { eyebrow?: string; intro?: string; button?: string };
 }) {
   const isEnglish = locale === "en";
   const config = normalizeFormConfig(productType.form_config);
@@ -123,12 +126,13 @@ export function ArtStudioEnquiryForm({
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
       <header>
-        <p className="text-sm font-semibold uppercase text-moss">{isEnglish ? "Order" : "Поръчай"}</p>
+        <p className="text-sm font-semibold uppercase text-moss">{formCopy?.eyebrow || (isEnglish ? "Order" : "Поръчай")}</p>
         <h2 className="mt-2 font-serif text-3xl font-semibold text-stone-950">{title}</h2>
         <p className="mt-2 text-sm leading-6 text-stone-650">
-          {isEnglish
-            ? "Choose your options and leave your details. We confirm the price, timing and pickup by phone or email. No payment now."
-            : "Избери опциите и остави данните си. Потвърждаваме цена, срок и получаване по телефон или имейл. Без плащане сега."}
+          {formCopy?.intro ||
+            (isEnglish
+              ? "Choose your options and leave your details. We confirm the price, timing and pickup by phone or email. No payment now."
+              : "Избери опциите и остави данните си. Потвърждаваме цена, срок и получаване по телефон или имейл. Без плащане сега.")}
         </p>
       </header>
 
@@ -365,7 +369,7 @@ export function ArtStudioEnquiryForm({
         </span>
       </label>
 
-      <button className="admin-button admin-button-forest w-full px-6 py-4 text-base font-semibold">{isEnglish ? "Send the order" : "Изпрати поръчката"}</button>
+      <button className="admin-button admin-button-forest w-full px-6 py-4 text-base font-semibold">{formCopy?.button || (isEnglish ? "Send the order" : "Изпрати поръчката")}</button>
       <p className="text-center text-xs leading-5 text-stone-500">
         {isEnglish ? "You receive a confirmation email right away and we call or write back to agree the details." : "Получаваш потвърждение по имейл веднага, а ние се обаждаме или пишем, за да уточним детайлите."}
       </p>

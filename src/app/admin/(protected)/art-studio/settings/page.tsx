@@ -11,11 +11,11 @@ export default async function AdminArtStudioSettingsPage({ searchParams }: { sea
   return (
     <div className="grid gap-8">
       <header className="grid gap-4">
-        <div><p className="text-sm font-semibold uppercase text-stone-400">Art Studio</p><h1 className="mt-2 font-serif text-4xl font-semibold">Доставка и галерия</h1></div>
+        <div><p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Art Studio</p><h1 className="mt-2 font-serif text-4xl font-semibold">Доставка и галерия</h1></div>
         <ArtStudioAdminNav />
       </header>
-      {params.saved ? <p className="rounded-xl bg-emerald-500/10 p-4 text-sm font-semibold text-emerald-100">Настройките са запазени.</p> : null}
-      {params.error ? <p className="rounded-xl bg-red-500/10 p-4 text-sm font-semibold text-red-100">{params.error}</p> : null}
+      {params.saved ? <p className="rounded-xl bg-emerald-100 p-4 text-sm font-semibold text-emerald-900">Настройките са запазени.</p> : null}
+      {params.error ? <p className="rounded-xl bg-red-100 p-4 text-sm font-semibold text-red-900">{params.error}</p> : null}
       <form action={saveArtStudioSettingsAction} className="grid gap-5 rounded-2xl bg-white p-6 text-stone-950">
         {settings.id !== "fallback" ? <input type="hidden" name="id" value={settings.id} /> : null}
         <div className="grid gap-4 md:grid-cols-2">
