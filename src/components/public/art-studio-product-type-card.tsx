@@ -11,20 +11,23 @@ import type { Locale, LocalizedArtStudioProductType } from "@/lib/types";
 export function ArtStudioProductTypeCard({
   productType,
   locale,
-  priority = false
+  priority = false,
+  imageUrl
 }: {
   productType: LocalizedArtStudioProductType;
   locale: Locale;
   priority?: boolean;
+  imageUrl?: string | null;
 }) {
   const href = localePath(locale, `/art-studio/${productType.slug}`) as Route;
+  const image = productType.image_url || imageUrl || null;
 
   return (
     <article className="group relative min-h-80 overflow-hidden rounded-2xl bg-forest text-white shadow-soft">
-      {productType.image_url ? (
+      {image ? (
         // eslint-disable-next-line @next/next/no-img-element -- deliberate: no Vercel image optimization traffic
         <img
-          src={productType.image_url}
+          src={image}
           alt={productType.image_alt || productType.title}
           width={1200}
           height={800}
@@ -43,7 +46,7 @@ export function ArtStudioProductTypeCard({
         <h3 className="mt-5 font-serif text-3xl font-semibold leading-tight sm:text-4xl">{productType.title}</h3>
         {productType.description ? <p className="mt-3 max-w-xl text-sm leading-6 text-stone-100">{productType.description}</p> : null}
         <Link href={href} className="mt-6 inline-flex w-fit rounded-full bg-white px-5 py-3 text-sm font-semibold text-forest transition hover:bg-sage hover:text-forest">
-          {locale === "en" ? "View products" : "Виж продуктите"}
+          {locale === "en" ? "View and order" : "Виж и поръчай"}
         </Link>
       </div>
     </article>

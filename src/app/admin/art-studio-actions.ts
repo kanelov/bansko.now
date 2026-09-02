@@ -9,6 +9,7 @@ import type {
   ArtStudioProductionStatus,
   ArtStudioProductOffer,
   ArtStudioProductOption,
+  Json,
   Locale
 } from "@/lib/types";
 
@@ -77,13 +78,26 @@ export async function upsertArtStudioProductTypeAction(formData: FormData) {
   const titleEn = stringValue(formData, "title_en") || titleBg;
   if (!titleBg) redirect("/admin/art-studio/products?error=missing-type-title");
 
+  let formConfig: Record<string, unknown> | undefined;
+  const formConfigJson = stringValue(formData, "form_config_json");
+  if (formConfigJson) {
+    try {
+      const parsed = JSON.parse(formConfigJson) as unknown;
+      if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) throw new Error("Формата за поръчка трябва да е JSON обект.");
+      formConfig = parsed as Record<string, unknown>;
+    } catch (error) {
+      redirect(`/admin/art-studio/products?error=${encodeURIComponent(error instanceof Error ? error.message : "Невалиден JSON за формата за поръчка.")}`);
+    }
+  }
+
   const basePayload = {
     internal_name: stringValue(formData, "internal_name") || slugify(titleEn || titleBg),
     icon_name: stringValue(formData, "icon_name") || null,
     image_url: safeHttpsUrl(stringValue(formData, "image_url")),
     is_featured: booleanValue(formData, "is_featured"),
     is_active: booleanValue(formData, "is_active"),
-    sort_order: integerValue(formData, "sort_order")
+    sort_order: integerValue(formData, "sort_order"),
+    ...(formConfig ? { form_config: formConfig as Json } : {})
   };
 
   const result = id
@@ -103,6 +117,7 @@ export async function upsertArtStudioProductTypeAction(formData: FormData) {
       title,
       slug: stringValue(formData, `slug_${suffix}`) || slugify(title),
       description: stringValue(formData, `description_${suffix}`) || null,
+      content: stringValue(formData, `content_${suffix}`) || null,
       image_alt: stringValue(formData, `image_alt_${suffix}`) || title,
       seo_title: stringValue(formData, `seo_title_${suffix}`) || null,
       seo_description: stringValue(formData, `seo_description_${suffix}`) || null,

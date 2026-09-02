@@ -1,18 +1,31 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArtStudioOrderForm } from "@/components/public/art-studio-order-form";
+import { ArtStudioEnquiryForm } from "@/components/public/art-studio-enquiry-form";
 import { GalleryLightbox } from "@/components/public/gallery-lightbox";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
-import { getArtStudioProductBySlugs, getArtStudioProducts, getArtStudioPublicSettings } from "@/lib/art-studio";
+import { getArtStudioProductBySlugs, getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings } from "@/lib/art-studio";
+import { getFaqItemsFromMarkdown } from "@/lib/markdown-blocks";
 import { getSiteSettings } from "@/lib/content";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import type { Locale, LocalizedArtStudioProduct } from "@/lib/types";
 
 type Params = Promise<{ locale: string; typeSlug: string; productSlug: string }>;
-type SearchParams = Promise<{ order_error?: string }>;
+
+// Product pages are cached and refreshed every 15 minutes; admin saves revalidate them.
+export const revalidate = 900;
+export const dynamicParams = true;
+
+export async function generateStaticParams({ params }: { params: { locale: string; typeSlug: string } }) {
+  if (!isLocale(params.locale)) return [];
+  const types = await getArtStudioProductTypes({ locale: params.locale });
+  const productType = types.find((item) => item.slug === params.typeSlug);
+  if (!productType) return [];
+  const products = await getArtStudioProducts({ locale: params.locale, productTypeId: productType.id });
+  return products.map((product) => ({ productSlug: product.slug }));
+}
 
 async function getAlternateProduct(product: LocalizedArtStudioProduct, locale: Locale) {
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
@@ -58,8 +71,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   };
 }
 
-export default async function ArtStudioProductPage({ params, searchParams }: { params: Params; searchParams: SearchParams }) {
-  const [{ locale, typeSlug, productSlug }, query] = await Promise.all([params, searchParams]);
+export default async function ArtStudioProductPage({ params }: { params: Params }) {
+  const { locale, typeSlug, productSlug } = await params;
   if (!isLocale(locale)) notFound();
   const product = await getArtStudioProductBySlugs(typeSlug, productSlug, locale);
   if (!product) notFound();
@@ -76,6 +89,14 @@ export default async function ArtStudioProductPage({ params, searchParams }: { p
     .filter((url, index, all): url is string => Boolean(url) && all.indexOf(url) === index)
     .map((src, index) => ({ src, alt: index === 0 ? product.image_alt || product.title : `${product.image_alt || product.title} ${index + 1}` }));
   const activeOffers = product.offers.filter((offer) => offer.is_active);
+  const faqItems = product.description ? getFaqItemsFromMarkdown(product.description) : [];
+  const faqSchema = faqItems.length
+    ? {
+        "@context": "https://schema.org",
+        "@type": "FAQPage",
+        mainEntity: faqItems.map((item) => ({ "@type": "Question", name: item.question, acceptedAnswer: { "@type": "Answer", text: item.answer.replace(/[*_`#>]/g, "").trim() } }))
+      }
+    : null;
   const productSchema = {
     "@context": "https://schema.org",
     "@type": "Product",
@@ -132,13 +153,14 @@ export default async function ArtStudioProductPage({ params, searchParams }: { p
           </article>
 
           <aside className="lg:sticky lg:top-24 lg:col-span-5">
-            <ArtStudioOrderForm product={product} settings={settings} locale={locale} orderError={query.order_error || null} />
+            <ArtStudioEnquiryForm productType={product.product_type} product={product} settings={settings} locale={locale} />
           </aside>
         </div>
       </main>
       <SiteFooter settings={siteSettings} locale={locale} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbSchema) }} />
+      {faqSchema ? <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }} /> : null}
     </div>
   );
 }

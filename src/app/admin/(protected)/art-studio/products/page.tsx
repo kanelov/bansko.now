@@ -71,6 +71,9 @@ export default async function AdminArtStudioProductsPage({ searchParams }: { sea
                   <textarea name="og_description_en" defaultValue={english?.og_description || ""} rows={2} className={fieldClass} placeholder="Open Graph description EN" />
                   <input name="og_image_url_bg" type="url" defaultValue={type?.og_image_url || ""} className={fieldClass} placeholder="Open Graph image URL BG" />
                   <input name="og_image_url_en" type="url" defaultValue={english?.og_image_url || ""} className={fieldClass} placeholder="Open Graph image URL EN" />
+                  <textarea name="content_bg" defaultValue={type?.content || ""} rows={8} className={`${fieldClass} sm:col-span-2`} placeholder="Продаващ текст BG (Markdown). Може да съдържа :::faq блок с въпроси и отговори." />
+                  <textarea name="content_en" defaultValue={english?.content || ""} rows={8} className={`${fieldClass} sm:col-span-2`} placeholder="Selling copy EN (Markdown), optional :::faq block." />
+                  <textarea name="form_config_json" defaultValue={type ? JSON.stringify(type.form_config ?? {}, null, 2) : ""} rows={10} className={`${fieldClass} font-mono text-xs sm:col-span-2`} placeholder='Форма за поръчка (JSON): {"photo_upload":"optional","quantity":true,"fields":[{"key":"size","label_bg":"Размер","label_en":"Size","required":true,"options":[{"value":"m","label_bg":"M","label_en":"M"}]}]}' />
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
                   <label className="choice-row text-sm font-semibold"><input type="checkbox" name="is_featured" defaultChecked={type?.is_featured ?? false} className="choice-control" />Препоръчан</label>

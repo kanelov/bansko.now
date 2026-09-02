@@ -772,3 +772,13 @@ The source request app (`https://app.kanelov.com`) has a Content Hub module („
 - **No stock photos.** Product type, product and service cards render a colour panel when no image is set instead of Unsplash fallbacks. Real photos are uploaded in the admin.
 - **Security headers** (nosniff, SAMEORIGIN, referrer policy, permissions policy) are set in `next.config.ts`.
 - **Art Studio page** (`/art-studio`) is a static-content page with Store, FAQPage and BreadcrumbList schema; hero/eyebrow/excerpt/content/CTA still come from the editable page `art-studio` when set.
+
+## 26. Art Studio selling pages and enquiry orders (2026-09-02)
+
+- `/art-studio` has no hero: intro + clickable product type cards (`ArtStudioProductTypeCard`, image = type image or first product image), then trust strip, CMS content, gallery collections, services, steps, custom projects, FAQ.
+- `/art-studio/[typeSlug]` is a selling landing page: copy from `art_studio_product_type_translations.content` (Markdown, optional `:::faq`) or defaults in `src/lib/art-studio-copy.ts` keyed by `internal_name`; designs grid; sticky `ArtStudioEnquiryForm`; Product (AggregateOffer), FAQPage, BreadcrumbList and ItemList schema; ISR 15 min with `generateStaticParams`.
+- `/art-studio/[typeSlug]/[productSlug]` uses the same enquiry form (plus product options and price options). Stripe checkout code (`ArtStudioOrderForm`, `createArtStudioOrderAction`, webhook) stays in the repo but is not rendered; the owner chose contact-form ordering.
+- Enquiry action `submitArtStudioEnquiryAction` (`src/app/(site)/[locale]/art-studio/actions.ts`): validates `form_config` fields (`src/lib/art-studio-forms.ts`), stores `art_studio_orders` rows with `request_type = 'enquiry'`, uploads the optional photo to the private bucket `art-studio-orders` (`<yyyy-mm>/<order>/<file>`), emails the owner (signed URL valid 7 days) and the customer, then redirects to `/art-studio/order/success?type=enquiry&ref=…`; errors go to the same page with `status=error&code=…`. Pages never read `searchParams`, so they stay cached.
+- `art_studio_product_types.form_config` (jsonb) is edited as JSON in the admin products page; seeded for the four types. `art_studio_product_type_translations.content` holds the selling copy.
+- Admin orders page shows enquiry badge, readable options and a 1-hour signed link to the customer photo (admin client).
+- Migration: `supabase/art-studio-enquiry-orders.sql` (applied through the Supabase MCP as `art_studio_enquiry_orders`).

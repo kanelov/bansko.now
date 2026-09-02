@@ -1,11 +1,21 @@
 import { updateArtStudioOrderAction } from "@/app/admin/art-studio-actions";
 import { ArtStudioAdminNav } from "@/components/admin/art-studio-admin-nav";
 import { getArtStudioOrders } from "@/lib/art-studio";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
 type SearchParams = Promise<{ saved?: string; error?: string }>;
 
 export default async function AdminArtStudioOrdersPage({ searchParams }: { searchParams: SearchParams }) {
   const [params, orders] = await Promise.all([searchParams, getArtStudioOrders()]);
+  const admin = createSupabaseAdminClient();
+  const attachmentLinks = new Map<string, string>();
+  if (admin) {
+    for (const order of orders) {
+      if (!order.attachment_path) continue;
+      const { data } = await admin.storage.from("art-studio-orders").createSignedUrl(order.attachment_path, 60 * 60);
+      if (data?.signedUrl) attachmentLinks.set(order.id, data.signedUrl);
+    }
+  }
   return (
     <div className="grid gap-8">
       <header className="grid gap-4">
@@ -23,7 +33,7 @@ export default async function AdminArtStudioOrdersPage({ searchParams }: { searc
                 <div className="grid gap-3 md:grid-cols-[1fr_1fr_auto_auto] md:items-center">
                   <div><p className="text-xs font-semibold uppercase text-stone-400">{order.order_number}</p><h2 className="mt-1 font-serif text-2xl font-semibold">{String(snapshot.title || "Art Studio продукт")}</h2></div>
                   <p className="text-sm text-stone-300">{order.customer_first_name} {order.customer_last_name}<br />{order.customer_email}</p>
-                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{order.payment_status}</span>
+                  <span className="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold">{order.request_type === "enquiry" ? "заявка" : order.payment_status}</span>
                   <strong>{Number(order.total).toFixed(2)} {order.currency}</strong>
                 </div>
               </summary>
@@ -33,7 +43,16 @@ export default async function AdminArtStudioOrdersPage({ searchParams }: { searc
                   <p><strong>Количество:</strong> {order.quantity}</p>
                   <p><strong>Име/текст:</strong> {order.personalization_text || "—"}</p>
                   <p><strong>Бележка:</strong> {order.idea_note || "—"}</p>
-                  <p><strong>Опции:</strong> {JSON.stringify(order.selected_options)}</p>
+                  <p><strong>Опции:</strong> {order.selected_options && typeof order.selected_options === "object" && !Array.isArray(order.selected_options)
+                    ? Object.values(order.selected_options as Record<string, unknown>).map((value) => {
+                        const item = value && typeof value === "object" && !Array.isArray(value) ? (value as Record<string, unknown>) : null;
+                        return item ? `${String(item.field || "")}: ${String(item.label || item.value || "")}` : String(value);
+                      }).join(" · ") || "—"
+                    : "—"}</p>
+                  <p><strong>Тип:</strong> {order.request_type === "enquiry" ? "Заявка през формата (без предплащане)" : "Онлайн плащане"}</p>
+                  {order.attachment_path ? (
+                    <p><strong>Снимка от клиента:</strong> {attachmentLinks.get(order.id) ? <a href={attachmentLinks.get(order.id)} target="_blank" rel="noopener noreferrer" className="font-semibold text-forest underline">Отвори (линкът е валиден 1 час)</a> : order.attachment_path}</p>
+                  ) : null}
                 </div>
                 <div className="grid gap-2 text-sm">
                   <p><strong>Доставка:</strong> {order.delivery_method === "econt_office" ? "Еконт" : "Взимане от галерията"}</p>

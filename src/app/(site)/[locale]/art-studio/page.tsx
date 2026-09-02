@@ -9,7 +9,7 @@ import { IconGlyph } from "@/components/public/icon-glyph";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
-import { getArtStudioProductTypes, getArtStudioPublicSettings } from "@/lib/art-studio";
+import { getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings } from "@/lib/art-studio";
 import { getArtStudioServices, getEditablePageBySlug, getSiteSettings } from "@/lib/content";
 import { siteUrl } from "@/lib/env";
 import { getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
@@ -185,14 +185,19 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
   if (!isLocale(locale)) notFound();
   const text = copy[locale];
   const dictionary = getDictionary(locale);
-  const [settings, page, services, productTypes, galleryCategories, pickupSettings] = await Promise.all([
+  const [settings, page, services, productTypes, products, galleryCategories, pickupSettings] = await Promise.all([
     getSiteSettings(locale),
     getEditablePageBySlug("art-studio", { locale }),
     getArtStudioServices({ locale }),
     getArtStudioProductTypes({ locale }),
+    getArtStudioProducts({ locale }),
     getLocalizedGalleryCategories(locale).catch(() => []),
     getArtStudioPublicSettings()
   ]);
+  const typeImages = new Map<string, string>();
+  for (const product of products) {
+    if (product.image_url && !typeImages.has(product.product_type_id)) typeImages.set(product.product_type_id, product.image_url);
+  }
   const premium = services.find((service) => service.is_premium) ?? services[0] ?? null;
   const regularServices = services.filter((service) => service.id !== premium?.id);
   const collections = galleryCategories
@@ -257,37 +262,37 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
     <div>
       <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", "/art-studio")} />
       <main>
-        <section className="relative overflow-hidden bg-forest text-white">
-          {heroImage ? (
-            // eslint-disable-next-line @next/next/no-img-element -- deliberate: no Vercel image optimization traffic
-            <img
-              src={heroImage}
-              alt={page?.hero_image_alt || heroTitle}
-              width={1920}
-              height={1080}
-              fetchPriority="high"
-              decoding="async"
-              className="absolute inset-0 h-full w-full object-cover opacity-60"
-            />
-          ) : null}
-          <div className="absolute inset-0 bg-gradient-to-b from-black/10 via-black/30 to-black/75" />
-          <div className="relative mx-auto flex min-h-[70vh] max-w-7xl flex-col justify-end px-4 pb-14 pt-28 sm:px-6 lg:px-8">
-            <nav className="text-sm text-stone-200" aria-label={dictionary.navigation}>
-              <Link href={localePath(locale, "/") as Route} className="hover:text-white">{text.breadcrumbHome}</Link>
-              <span className="px-2">/</span>
-              <span>{page?.eyebrow || text.eyebrow}</span>
-            </nav>
-            <p className="mt-6 text-sm font-semibold uppercase">{page?.eyebrow || text.eyebrow}</p>
-            <h1 className="mt-4 max-w-4xl font-serif text-4xl font-semibold leading-tight sm:text-6xl">{heroTitle}</h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-stone-100">{heroLead}</p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Link href={galleryHref} className="inline-flex rounded-full bg-white px-6 py-3 text-sm font-semibold text-stone-950 shadow-sm transition hover:bg-stone-100">
-                {text.ctaGallery}
-              </Link>
-              <a href="#art-studio-products" className="inline-flex rounded-full border border-white/70 bg-black/30 px-6 py-3 text-sm font-semibold text-white transition hover:bg-black/45">
-                {text.ctaProducts}
-              </a>
+        <section className="mx-auto max-w-7xl px-4 pb-4 pt-24 sm:px-6 lg:px-8">
+          <nav className="text-sm text-stone-500" aria-label={dictionary.navigation}>
+            <Link href={localePath(locale, "/") as Route} className="hover:text-forest">{text.breadcrumbHome}</Link>
+            <span className="px-2">/</span>
+            <span className="text-stone-700">{page?.eyebrow || text.eyebrow}</span>
+          </nav>
+          <div className="mt-8 max-w-4xl">
+            <p className="text-sm font-semibold uppercase text-moss">{page?.eyebrow || text.eyebrow}</p>
+            <h1 className="mt-3 font-serif text-4xl font-semibold leading-tight text-stone-950 sm:text-6xl">{heroTitle}</h1>
+            <p className="mt-5 text-lg leading-8 text-stone-650">{heroLead}</p>
+          </div>
+          {productTypes.length ? (
+            <div id="art-studio-products" className="mt-10 grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+              {productTypes.map((productType, index) => (
+                <ArtStudioProductTypeCard
+                  key={productType.id}
+                  productType={productType}
+                  locale={locale}
+                  priority={index < 2}
+                  imageUrl={typeImages.get(productType.id) ?? null}
+                />
+              ))}
             </div>
+          ) : null}
+          <div className="mt-6 flex flex-wrap gap-3">
+            <Link href={galleryHref} className="inline-flex rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white transition hover:bg-moss">
+              {text.ctaGallery}
+            </Link>
+            <Link href={contactHref} className="inline-flex rounded-full border border-stone-300 px-6 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
+              {page?.cta_label || text.customButton}
+            </Link>
           </div>
         </section>
 
@@ -307,21 +312,6 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
           {page?.content ? (
             <section className="mx-auto w-full max-w-4xl">
               <MarkdownRenderer content={page.content} locale={locale} />
-            </section>
-          ) : null}
-
-          {productTypes.length ? (
-            <section id="art-studio-products" aria-labelledby="art-studio-products-heading" className="scroll-mt-24">
-              <div className="mb-8 max-w-3xl">
-                <p className="text-sm font-semibold uppercase text-moss">{text.productsEyebrow}</p>
-                <h2 id="art-studio-products-heading" className="mt-3 font-serif text-4xl font-semibold text-stone-950">{text.productsTitle}</h2>
-                <p className="mt-4 text-base leading-7 text-stone-650">{text.productsText}</p>
-              </div>
-              <div className="grid gap-6 md:grid-cols-2">
-                {productTypes.map((productType, index) => (
-                  <ArtStudioProductTypeCard key={productType.id} productType={productType} locale={locale} priority={index < 2} />
-                ))}
-              </div>
             </section>
           ) : null}
 

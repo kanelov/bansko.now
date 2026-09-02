@@ -302,6 +302,7 @@ export type ArtStudioProductType = {
   sort_order: number;
   created_at: string;
   updated_at: string;
+  form_config: Json;
 };
 
 export type ArtStudioProductTypeTranslation = {
@@ -320,6 +321,7 @@ export type ArtStudioProductTypeTranslation = {
   robots_follow: boolean;
   created_at: string;
   updated_at: string;
+  content: string | null;
 };
 
 export type LocalizedArtStudioProductType = ArtStudioProductType & ArtStudioProductTypeTranslation & {
@@ -395,6 +397,28 @@ export type ArtStudioOptionValue = {
   label_bg: string;
   label_en: string | null;
   hex_color: string | null;
+};
+
+export type ArtStudioFormFieldOption = {
+  value: string;
+  label_bg: string;
+  label_en?: string | null;
+};
+
+export type ArtStudioFormField = {
+  key: string;
+  label_bg: string;
+  label_en?: string | null;
+  required?: boolean;
+  options: ArtStudioFormFieldOption[];
+};
+
+export type ArtStudioFormConfig = {
+  fields: ArtStudioFormField[];
+  photo_upload: "none" | "optional" | "required";
+  photo_label_bg?: string | null;
+  photo_label_en?: string | null;
+  quantity: boolean;
 };
 
 export type ArtStudioProductOption = {
@@ -483,6 +507,8 @@ export type ArtStudioOrder = {
   paid_at: string | null;
   created_at: string;
   updated_at: string;
+  request_type: "payment" | "enquiry";
+  attachment_path: string | null;
 };
 
 export type BusinessStatus = "draft" | "approved" | "rejected";
