@@ -2,7 +2,7 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
-import { mediaBucket, revalidateEditorialPaths, syncTags } from "@/lib/articles-admin";
+import { mediaBucket, revalidateEditorialPaths, revalidateLocalePath, syncTags } from "@/lib/articles-admin";
 import { createImageVariants } from "@/lib/image-variants";
 import { getSupabaseConfig } from "@/lib/env";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
@@ -397,11 +397,11 @@ export async function publishContentHubArticle(supabase: SupabaseClient<Database
 
   const path = `/${category.slug}/${finalSlug}`;
   revalidateEditorialPaths();
-  revalidatePath(localePath(payload.locale, path));
-  revalidatePath(localePath(payload.locale, `/${category.slug}`));
+  revalidateLocalePath(payload.locale, path);
+  revalidateLocalePath(payload.locale, `/${category.slug}`);
   revalidatePath("/admin/articles");
   if (existing && existing.slug !== finalSlug) {
-    revalidatePath(localePath(payload.locale, `/${category.slug}/${existing.slug}`));
+    revalidateLocalePath(payload.locale, `/${category.slug}/${existing.slug}`);
   }
 
   return {

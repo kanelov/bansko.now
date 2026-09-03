@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { revalidatePublicPath } from "@/lib/articles-admin";
 import { redirect } from "next/navigation";
 import { landingSectionKeys, landingTextKeys, parseFaqLines, parsePairLines, parseParagraphs, parseTrustLines, typeSectionKeys, typeTextKeys } from "@/lib/art-studio-copy";
 import { requireAdmin } from "@/lib/supabase/auth";
@@ -66,8 +67,7 @@ function parseArray<T>(formData: FormData, key: string): T[] {
 }
 
 function revalidateArtStudio() {
-  revalidatePath("/art-studio", "layout");
-  revalidatePath("/en/art-studio", "layout");
+  revalidatePublicPath("/art-studio", "layout");
   revalidatePath("/admin/art-studio", "layout");
   revalidatePath("/sitemap.xml");
 }

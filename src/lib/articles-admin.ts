@@ -6,14 +6,28 @@ import type { Database, Locale } from "@/lib/types";
 
 export const mediaBucket = "bansko-media";
 
+/**
+ * Public BG URLs carry no locale prefix (/now), but they render under /bg/now because
+ * src/proxy.ts rewrites them. revalidatePath matches the internal route, so a BG path only
+ * clears its cache with the prefix; without it a publish waits for the 15 minute ISR window.
+ */
+export function revalidateLocalePath(locale: Locale, path = "/", type?: "layout" | "page") {
+  const normalized = path === "/" ? "" : path.startsWith("/") ? path : `/${path}`;
+  const withoutLocale = normalized.replace(/^\/(bg|en)(?=\/|$)/, "");
+  revalidatePath(`/${locale}${withoutLocale}`, type);
+}
+
+/** Same, for a path that exists in both locales. */
+export function revalidatePublicPath(path = "/", type?: "layout" | "page") {
+  revalidateLocalePath("bg", path, type);
+  revalidateLocalePath("en", path, type);
+}
+
 export function revalidateEditorialPaths() {
-  revalidatePath("/");
-  revalidatePath("/en");
-  revalidatePath("/articles");
-  revalidatePath("/en/articles");
+  revalidatePublicPath("/");
+  revalidatePublicPath("/articles");
+  revalidatePublicPath("/feed.xml");
   revalidatePath("/sitemap.xml");
-  revalidatePath("/feed.xml");
-  revalidatePath("/en/feed.xml");
 }
 
 export async function syncTags(

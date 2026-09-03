@@ -2,6 +2,7 @@
 
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { revalidateLocalePath, revalidatePublicPath } from "@/lib/articles-admin";
 import { redirect } from "next/navigation";
 import { sendNotificationEmail } from "@/lib/email";
 import { siteUrl } from "@/lib/env";
@@ -88,12 +89,9 @@ function contactMessageStatusValue(value: string | null): "new" | "read" | "arch
 }
 
 function revalidateBusinessPaths() {
-  revalidatePath("/");
-  revalidatePath("/en");
-  revalidatePath("/businesses");
-  revalidatePath("/en/businesses");
-  revalidatePath("/businesses/map");
-  revalidatePath("/en/businesses/map");
+  revalidatePublicPath("/");
+  revalidatePublicPath("/businesses");
+  revalidatePublicPath("/businesses/map");
   revalidatePath("/sitemap.xml");
   revalidatePath("/admin/businesses");
 }
@@ -169,8 +167,8 @@ export async function saveBusinessDirectorySettingsAction(formData: FormData) {
     await supabase.from("business_directory_settings").insert(payload);
   }
 
-  revalidatePath("/about");
-  revalidatePath("/contact");
+  revalidatePublicPath("/about");
+  revalidatePublicPath("/contact");
   revalidateBusinessPaths();
 }
 
@@ -315,9 +313,9 @@ export async function updateBusinessAction(formData: FormData) {
   }
 
   revalidateBusinessPaths();
-  revalidatePath(`/businesses/${payload.slug}`);
+  revalidateLocalePath("bg", `/businesses/${payload.slug}`);
   if (stringValue(formData, "slug_en")) {
-    revalidatePath(`/en/businesses/${stringValue(formData, "slug_en")}`);
+    revalidateLocalePath("en", `/businesses/${stringValue(formData, "slug_en")}`);
   }
   redirect("/admin/businesses?saved=1");
 }

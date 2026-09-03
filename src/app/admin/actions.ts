@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { mediaBucket, publishArticleRecord, revalidateEditorialPaths, syncTags } from "@/lib/articles-admin";
+import { mediaBucket, publishArticleRecord, revalidateEditorialPaths, revalidatePublicPath, syncTags } from "@/lib/articles-admin";
 import { createImageVariants } from "@/lib/image-variants";
 import { estimateReadingTime } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
@@ -94,22 +94,18 @@ function articleEditorErrorPath(articleId: string | null, message: string) {
 }
 
 function revalidatePagePaths(slug?: string | null) {
-  revalidatePath("/", "layout");
-  revalidatePath("/");
+  revalidatePublicPath("/", "layout");
   revalidatePath("/admin/cms");
   revalidatePath("/sitemap.xml");
 
   if (slug) {
-    revalidatePath(`/${slug}`);
-    revalidatePath(`/en/${slug}`);
+    revalidatePublicPath(`/${slug}`);
   }
 }
 
 function revalidateSiteChrome() {
-  revalidatePath("/", "layout");
-  revalidatePath("/");
-  revalidatePath("/articles");
-  revalidatePath("/en/articles");
+  revalidatePublicPath("/", "layout");
+  revalidatePublicPath("/articles");
   revalidatePath("/admin/navigation");
   revalidatePath("/admin/settings");
 }
@@ -340,7 +336,7 @@ export async function deleteCategoryAction(formData: FormData) {
   revalidatePath("/admin/articles");
 
   if (category?.slug) {
-    revalidatePath(`/${category.slug}`);
+    revalidatePublicPath(`/${category.slug}`);
   }
 
   redirect("/admin/categories?deleted=1");
@@ -399,7 +395,7 @@ export async function upsertCategoryAction(formData: FormData) {
 
   revalidateEditorialPaths();
   revalidatePath("/admin/categories");
-  revalidatePath(`/${slug}`);
+  revalidatePublicPath(`/${slug}`);
   redirect("/admin/categories?saved=1");
 }
 
@@ -428,7 +424,7 @@ export async function deleteMediaAction(formData: FormData) {
     redirect(`/admin/media?error=${encodeURIComponent(error.message)}`);
   }
 
-  revalidatePath("/", "layout");
+  revalidatePublicPath("/", "layout");
   revalidatePath("/admin/media");
   redirect("/admin/media?deleted=1");
 }
@@ -777,7 +773,6 @@ export async function upsertEditablePageAction(formData: FormData) {
   }
 
   revalidatePagePaths(slug);
-  revalidatePath(`/en/${slug}`);
   redirect("/admin/cms?saved=1");
 }
 
