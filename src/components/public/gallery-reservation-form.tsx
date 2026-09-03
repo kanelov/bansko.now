@@ -3,21 +3,12 @@
 import Link from "next/link";
 import { useMemo, useState } from "react";
 import { createGalleryReservationAction } from "@/app/(site)/[locale]/art-studio/gallery/actions";
+import { localizeGalleryProductType } from "@/lib/art-studio-gallery-types";
 import { localePath } from "@/lib/i18n";
 import type { LocalizedGalleryProduct } from "@/lib/gallery-catalog";
 import type { Locale } from "@/lib/types";
 
 const fieldClass = "w-full rounded-lg border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-forest focus:ring-2 focus:ring-sage";
-
-const englishProductTypes: Record<string, string> = {
-  "Дамски тениски": "Women's T-shirts",
-  "Унисекс тениски": "Unisex T-shirts",
-  "Детски тениски": "Kids' T-shirts",
-  "Бебешки бодита": "Baby bodysuits",
-  "Принтове": "Prints",
-  "Платна": "Canvas prints",
-  "Аксесоари": "Accessories"
-};
 
 export function GalleryReservationForm({
   product,
@@ -47,7 +38,7 @@ export function GalleryReservationForm({
   const selectedVariant = product.variants.find((variant) => variant.id === selectedVariantId) ?? null;
   const availableVariants = product.variants.filter((variant) => variant.quantity_available > 0);
   const selectedFromStock = Boolean(selectedVariant && selectedVariant.quantity_available >= quantity);
-  const typeName = (name: string) => isEnglish ? englishProductTypes[name] || name : name;
+  const typeName = (name: string) => localizeGalleryProductType(name, locale);
 
   function chooseType(typeId: string) {
     setSelectedTypeId(typeId);

@@ -16,6 +16,7 @@ import {
   visibleFields,
   visibleOptions
 } from "@/lib/art-studio-forms";
+import type { SelectedGalleryDesign } from "@/lib/art-studio-gallery-types";
 import { localePath } from "@/lib/i18n";
 import type { ArtStudioPublicSettings, Locale, LocalizedArtStudioProduct, LocalizedArtStudioProductType, SourceVariantGroup } from "@/lib/types";
 
@@ -78,7 +79,9 @@ export function ArtStudioEnquiryForm({
   settings,
   locale,
   sourceGroups = [],
-  formCopy
+  formCopy,
+  galleryDesign = null,
+  onClearGalleryDesign
 }: {
   productType: LocalizedArtStudioProductType;
   product?: LocalizedArtStudioProduct | null;
@@ -87,6 +90,9 @@ export function ArtStudioEnquiryForm({
   sourceGroups?: SourceVariantGroup[];
   /** Editable texts from the admin "Текстове" tab; defaults below. */
   formCopy?: { eyebrow?: string; intro?: string; button?: string };
+  /** Optional ready design chosen in the gallery picker; only its id is sent, the server re-validates. */
+  galleryDesign?: SelectedGalleryDesign | null;
+  onClearGalleryDesign?: () => void;
 }) {
   const isEnglish = locale === "en";
   const config = normalizeFormConfig(productType.form_config);
@@ -123,6 +129,7 @@ export function ArtStudioEnquiryForm({
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="product_type_id" value={productType.id} />
       {product ? <input type="hidden" name="product_id" value={product.id} /> : null}
+      {galleryDesign ? <input type="hidden" name="gallery_design_id" value={galleryDesign.id} /> : null}
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
       <header>
@@ -134,6 +141,23 @@ export function ArtStudioEnquiryForm({
               ? "Choose your options and leave your details. We confirm the price, timing and pickup by phone or email. No payment now."
               : "Избери опциите и остави данните си. Потвърждаваме цена, срок и получаване по телефон или имейл. Без плащане сега.")}
         </p>
+        {galleryDesign ? (
+          <p className="mt-3 flex items-center gap-3 rounded-xl border border-forest/30 bg-sage/30 px-3 py-2 text-sm" aria-live="polite">
+            {galleryDesign.image_url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- deliberate: no Vercel image optimization traffic
+              <img src={galleryDesign.image_url} alt="" width={80} height={80} className="h-10 w-10 shrink-0 rounded-lg border border-stone-200 object-cover" />
+            ) : null}
+            <span className="min-w-0 flex-1">
+              <span className="block text-xs font-semibold uppercase text-moss">{isEnglish ? "Gallery design" : "Дизайн от галерията"}</span>
+              <span className="block truncate font-semibold text-stone-950">{galleryDesign.title}</span>
+            </span>
+            {onClearGalleryDesign ? (
+              <button type="button" onClick={onClearGalleryDesign} className="shrink-0 text-xs font-semibold text-stone-600 hover:text-stone-900 hover:underline">
+                {isEnglish ? "Use my own design" : "Използвай собствен дизайн"}
+              </button>
+            ) : null}
+          </p>
+        ) : null}
       </header>
 
       {offers.length ? (

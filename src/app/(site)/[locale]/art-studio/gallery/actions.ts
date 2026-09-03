@@ -7,6 +7,7 @@ import {
   createGalleryReservation,
   getGalleryProductById
 } from "@/lib/gallery-catalog";
+import { localizeGalleryProductType } from "@/lib/art-studio-gallery-types";
 import { localePath } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
@@ -19,28 +20,29 @@ function productPath(locale: Locale, slug: string, query = "") {
   return `${localePath(locale, `/art-studio/gallery/${slug}`)}${query}`;
 }
 
-const englishProductTypes: Record<string, string> = {
-  "Дамски тениски": "Women's T-shirts",
-  "Унисекс тениски": "Unisex T-shirts",
-  "Детски тениски": "Kids' T-shirts",
-  "Бебешки бодита": "Baby bodysuits",
-  "Принтове": "Prints",
-  "Платна": "Canvas prints",
-  "Аксесоари": "Accessories"
-};
+export type GalleryReservationErrorCode = "invalid" | "unavailable" | "required" | "save";
 
-export async function createGalleryReservationAction(formData: FormData) {
+type ReservationOutcome =
+  | { ok: true; locale: Locale; slug: string; code: string; fromStock: boolean }
+  | { ok: false; locale: Locale; slug: string; code: GalleryReservationErrorCode };
+
+/**
+ * The one gallery reservation flow: validates the product and variant against the live gallery
+ * data, creates the reservation through the source app API and sends both emails.
+ * Used by the gallery product page (redirect) and by the Art Studio design picker (inline state).
+ */
+async function processGalleryReservation(formData: FormData): Promise<ReservationOutcome> {
   const locale: Locale = stringValue(formData, "locale") === "en" ? "en" : "bg";
   const productId = stringValue(formData, "product_id", 40);
   const fallbackSlug = stringValue(formData, "product_slug", 160);
 
   if (stringValue(formData, "company_website")) {
-    redirect(productPath(locale, fallbackSlug, "?reservation_error=invalid#reserve"));
+    return { ok: false, locale, slug: fallbackSlug, code: "invalid" };
   }
 
-  const product = await getGalleryProductById(productId, locale);
+  const product = await getGalleryProductById(productId, locale, { revalidate: 60 });
   if (!product?.can_reserve) {
-    redirect(productPath(locale, fallbackSlug, "?reservation_error=unavailable#reserve"));
+    return { ok: false, locale, slug: fallbackSlug, code: "unavailable" };
   }
 
   const variantId = stringValue(formData, "variant_id", 40);
@@ -62,7 +64,7 @@ export async function createGalleryReservationAction(formData: FormData) {
     || quantity > 20
     || formData.get("accept_terms") !== "on"
   ) {
-    redirect(productPath(locale, product.slug, "?reservation_error=required#reserve"));
+    return { ok: false, locale, slug: product.slug, code: "required" };
   }
 
   let reservation;
@@ -80,12 +82,10 @@ export async function createGalleryReservationAction(formData: FormData) {
     });
   } catch (error) {
     console.error("[gallery reservation failed]", error);
-    redirect(productPath(locale, product.slug, "?reservation_error=save#reserve"));
+    return { ok: false, locale, slug: product.slug, code: "save" };
   }
 
-  const productTypeName = locale === "en" && variant.product_type
-    ? englishProductTypes[variant.product_type.name] || variant.product_type.name
-    : variant.product_type?.name;
+  const productTypeName = variant.product_type ? localizeGalleryProductType(variant.product_type.name, locale) : undefined;
   const variantLabel = [productTypeName, variant.label].filter(Boolean).join(" · ");
   const isStockReservation = variant.quantity_available >= quantity;
   await Promise.allSettled([
@@ -125,5 +125,25 @@ export async function createGalleryReservationAction(formData: FormData) {
     })
   ]);
 
-  redirect(productPath(locale, product.slug, `?reservation=${encodeURIComponent(reservation.reservation_code)}#reserve`));
+  return { ok: true, locale, slug: product.slug, code: reservation.reservation_code, fromStock: isStockReservation };
+}
+
+/** Gallery product page: full-page form that redirects back to the product with the result. */
+export async function createGalleryReservationAction(formData: FormData) {
+  const outcome = await processGalleryReservation(formData);
+  if (!outcome.ok) {
+    redirect(productPath(outcome.locale, outcome.slug, `?reservation_error=${outcome.code}#reserve`));
+  }
+  redirect(productPath(outcome.locale, outcome.slug, `?reservation=${encodeURIComponent(outcome.code)}#reserve`));
+}
+
+export type GalleryReservationState =
+  | { status: "idle" }
+  | { status: "success"; code: string; fromStock: boolean }
+  | { status: "error"; code: GalleryReservationErrorCode };
+
+/** Art Studio design picker: same reservation flow, result returned inline so the customer stays on the page. */
+export async function createGalleryReservationInlineAction(_state: GalleryReservationState, formData: FormData): Promise<GalleryReservationState> {
+  const outcome = await processGalleryReservation(formData);
+  return outcome.ok ? { status: "success", code: outcome.code, fromStock: outcome.fromStock } : { status: "error", code: outcome.code };
 }

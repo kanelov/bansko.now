@@ -21,6 +21,7 @@ const errorMessages: Record<string, { bg: string; en: string }> = {
   options: { bg: "Избери всички задължителни опции на продукта.", en: "Choose all required product options." },
   attachment: { bg: "Файлът не можа да бъде приет. Разрешени са JPG, PNG, WebP, HEIC и PDF до 15 MB.", en: "The file could not be accepted. JPG, PNG, WebP, HEIC and PDF up to 15 MB are allowed." },
   unavailable: { bg: "Този продукт в момента не приема поръчки.", en: "This product is not accepting orders right now." },
+  design: { bg: "Избраният дизайн от галерията не беше намерен. Избери го отново или поръчай със собствена идея.", en: "The selected gallery design was not found. Pick it again or order with your own idea." },
   "save-failed": { bg: "Поръчката не можа да бъде записана. Опитай отново или ни пиши.", en: "The order could not be saved. Try again or contact us." },
   "server-config": { bg: "Поръчките са временно недостъпни. Свържи се с нас директно.", en: "Ordering is temporarily unavailable. Please contact us directly." },
   invalid: { bg: "Заявката не беше приета.", en: "The request was not accepted." }

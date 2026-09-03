@@ -2,20 +2,23 @@ import { ArtStudioAdminNav } from "@/components/admin/art-studio-admin-nav";
 import { ArtStudioProductEditor } from "@/components/admin/art-studio-product-editor";
 import { upsertArtStudioCategoryAction, upsertArtStudioProductTypeAction } from "@/app/admin/art-studio-actions";
 import { getArtStudioCategories, getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
+import { getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
 
 type SearchParams = Promise<{ saved?: string; archived?: string; error?: string }>;
 const fieldClass = "w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-sm text-stone-950";
 
 export default async function AdminArtStudioProductsPage({ searchParams }: { searchParams: SearchParams }) {
-  const [params, bgTypes, enTypes, bgCategories, enCategories, bgProducts, enProducts] = await Promise.all([
+  const [params, bgTypes, enTypes, bgCategories, enCategories, bgProducts, enProducts, galleryCategories] = await Promise.all([
     searchParams,
     getArtStudioProductTypes({ locale: "bg", includeInactive: true }),
     getArtStudioProductTypes({ locale: "en", includeInactive: true }),
     getArtStudioCategories({ locale: "bg", includeInactive: true }),
     getArtStudioCategories({ locale: "en", includeInactive: true }),
     getArtStudioProducts({ locale: "bg", includeInactive: true }),
-    getArtStudioProducts({ locale: "en", includeInactive: true })
+    getArtStudioProducts({ locale: "en", includeInactive: true }),
+    getLocalizedGalleryCategories("bg").catch(() => [])
   ]);
+  const galleryRoots = galleryCategories.filter((category) => !category.parent_id);
   const enTypeById = new Map(enTypes.map((item) => [item.id, item]));
   const enCategoryById = new Map(enCategories.map((item) => [item.id, item]));
   const enProductById = new Map(enProducts.map((item) => [item.id, item]));
@@ -75,6 +78,23 @@ export default async function AdminArtStudioProductsPage({ searchParams }: { sea
                   <textarea name="content_bg" defaultValue={type?.content || ""} rows={8} className={`${fieldClass} sm:col-span-2`} placeholder="Продаващ текст BG (Markdown). Може да съдържа :::faq блок с въпроси и отговори." />
                   <textarea name="content_en" defaultValue={english?.content || ""} rows={8} className={`${fieldClass} sm:col-span-2`} placeholder="Selling copy EN (Markdown), optional :::faq block." />
                   <textarea name="form_config_json" defaultValue={type ? JSON.stringify(type.form_config ?? {}, null, 2) : ""} rows={10} className={`${fieldClass} font-mono text-xs sm:col-span-2`} placeholder='Форма за поръчка (JSON): {"photo_upload":"optional","quantity":true,"fields":[{"key":"size","label_bg":"Размер","label_en":"Size","required":true,"options":[{"value":"m","label_bg":"M","label_en":"M"}]}]}' />
+                </div>
+                <div className="grid gap-3 rounded-xl border border-stone-200 p-4">
+                  <p className="text-sm font-semibold">Интеграция с галерията</p>
+                  <label className="choice-row text-sm"><input type="checkbox" name="gallery_picker_enabled" defaultChecked={type?.gallery_picker_enabled ?? false} className="choice-control" />Показвай готови дизайни от галерията</label>
+                  <label className="grid gap-1 text-xs font-semibold text-stone-700">
+                    Категория от галерията
+                    <select name="gallery_category_id" defaultValue={type?.gallery_category_id || ""} className={fieldClass}>
+                      <option value="">— без —</option>
+                      {type?.gallery_category_id && !galleryRoots.some((category) => category.id === type.gallery_category_id) ? (
+                        <option value={type.gallery_category_id}>Запазена категория (недостъпна в момента)</option>
+                      ) : null}
+                      {galleryRoots.map((category) => (
+                        <option key={category.id} value={category.id}>{category.name} ({category.product_count})</option>
+                      ))}
+                    </select>
+                  </label>
+                  <p className="text-xs text-stone-500">Подкатегориите на избраната категория стават избор в „Готови дизайни“ над формата за поръчка. Записва се ID-то на категорията, не името.</p>
                 </div>
                 <div className="grid gap-3 sm:grid-cols-3 lg:grid-cols-4">
                   <label className="choice-row text-sm font-semibold"><input type="checkbox" name="is_featured" defaultChecked={type?.is_featured ?? false} className="choice-control" />Препоръчан</label>

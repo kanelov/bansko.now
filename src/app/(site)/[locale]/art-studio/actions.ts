@@ -5,7 +5,7 @@ import { redirect } from "next/navigation";
 import { getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings } from "@/lib/art-studio";
 import { attachmentMimeTypes, defaultSourceSku, fieldLabel, maxAttachmentBytes, normalizeFormConfig, optionLabel, sourceGroupLabel, sourceGroupsForConfig, sourceModelLabel, sourceSizeLabel, visibleFields } from "@/lib/art-studio-forms";
 import { sendNotificationEmail } from "@/lib/email";
-import { createArtStudioSourceOrder, getSourceVariantOptions, type ArtStudioSourceOrder } from "@/lib/gallery-catalog";
+import { createArtStudioSourceOrder, getGalleryProductById, getSourceVariantOptions, type ArtStudioSourceOrder } from "@/lib/gallery-catalog";
 import { siteUrl } from "@/lib/env";
 import { localePath } from "@/lib/i18n";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
@@ -209,6 +209,18 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
   const config = normalizeFormConfig(productType.form_config);
   const selected: Record<string, SelectedValue> = {};
 
+  // Optional ready design from the gallery picker: only the catalog id is trusted, the rest is
+  // fetched from the gallery here and stored as a snapshot with the order.
+  const galleryDesignId = stringValue(formData, "gallery_design_id", 40);
+  let galleryDesign: { catalog_id: string; sku: string; title: string; slug: string; image_url: string } | null = null;
+  if (galleryDesignId) {
+    if (!productType.gallery_picker_enabled || !/^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(galleryDesignId)) fail("design");
+    const design = await getGalleryProductById(galleryDesignId, locale).catch(() => null);
+    if (!design) fail("design");
+    galleryDesign = { catalog_id: design.id, sku: design.sku, title: design.title, slug: design.slug, image_url: design.image_urls[0] || "" };
+    selected.gallery_design = { field: isEnglish ? "Gallery design" : "Дизайн от галерията", value: design.id, label: `${design.title} (${design.sku})` };
+  }
+
   // Sizes from the request app catalog (when configured for this product type).
   const sourceGroups = config.source_sizes ? sourceGroupsForConfig(config, await getSourceVariantOptions()) : [];
   const sourceActive = sourceGroups.length > 0;
@@ -288,6 +300,7 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
     image_url: product?.image_url ?? productType.image_url ?? null,
     sku: product?.sku ?? null,
     request: "enquiry",
+    gallery_design: galleryDesign,
     offer: offer ? { id: offer.id, label: isEnglish ? offer.label_en || offer.label_bg : offer.label_bg, price: unitPrice, currency } : null
   };
   const selectedOptions: Json = Object.fromEntries(Object.entries(selected).map(([key, item]) => [key, { value: item.value, label: item.label, field: item.field }]));
@@ -363,8 +376,10 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
       quantity,
       note: ["Поръчка от bansko.now/art-studio", ...detailLines].join("\n").slice(0, 1200),
       product: {
-        name: `Art Studio · ${productLabel}`,
-        image_url: product?.image_url ?? productType.image_url ?? "",
+        name: galleryDesign ? `Art Studio · ${productLabel} · ${galleryDesign.title}` : `Art Studio · ${productLabel}`,
+        image_url: galleryDesign?.image_url || product?.image_url || productType.image_url || "",
+        gallery_catalog_id: galleryDesign?.catalog_id ?? null,
+        gallery_sku: galleryDesign?.sku ?? null,
         details: detailLines,
         bansko_order: reference,
         product_type_slug: productType.slug,

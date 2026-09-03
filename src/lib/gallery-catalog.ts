@@ -342,7 +342,8 @@ export async function getLocalizedGalleryCatalog(
 async function getGalleryProductContext(
   id: string,
   locale: Locale,
-  categorySlug?: string | null
+  categorySlug?: string | null,
+  revalidate = 900
 ): Promise<GalleryProductContext | null> {
   if (!artGalleryCatalogApiUrl) return null;
   const url = new URL(artGalleryCatalogApiUrl);
@@ -352,7 +353,7 @@ async function getGalleryProductContext(
 
   try {
     const response = await integrationFetch(url.toString(), {
-      next: { revalidate: 900, tags: ["art-gallery-catalog"] }
+      next: { revalidate, tags: ["art-gallery-catalog"] }
     });
     if (!response.ok) return null;
     const context = (await response.json()) as GalleryProductContext;
@@ -366,10 +367,11 @@ async function getGalleryProductContext(
 async function withProductContext(
   product: LocalizedGalleryProduct | null,
   locale: Locale,
-  categorySlug?: string | null
+  categorySlug?: string | null,
+  revalidate = 900
 ) {
   if (!product) return null;
-  const context = await getGalleryProductContext(product.id, locale, categorySlug);
+  const context = await getGalleryProductContext(product.id, locale, categorySlug, revalidate);
   if (!context) return product;
   return {
     ...product,
@@ -393,9 +395,13 @@ export async function getGalleryProductBySlug(
   );
 }
 
-export async function getGalleryProductById(id: string, locale: Locale) {
+/**
+ * Product by catalog id with its variant context. `options.revalidate` shortens the cache of the
+ * variant/stock context (the picker uses 60 s) without touching the catalog cache.
+ */
+export async function getGalleryProductById(id: string, locale: Locale, options?: { revalidate?: number }) {
   const { products } = await getLocalizedGalleryCatalog(locale, { catalogId: id, pageSize: 1 });
-  return withProductContext(products.find((product) => product.id === id) ?? null, locale);
+  return withProductContext(products.find((product) => product.id === id) ?? null, locale, null, options?.revalidate ?? 900);
 }
 
 export type GalleryReservationInput = {

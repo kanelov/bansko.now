@@ -304,6 +304,10 @@ export type ArtStudioProductType = {
   updated_at: string;
   form_config: Json;
   gallery_urls: string[];
+  /** Show ready designs from the synced gallery above the order form. */
+  gallery_picker_enabled: boolean;
+  /** Root gallery category id (stable id from the request app), never a name or slug. */
+  gallery_category_id: string | null;
 };
 
 export type ArtStudioProductTypeTranslation = {

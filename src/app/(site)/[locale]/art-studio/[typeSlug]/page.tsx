@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
-import { ArtStudioEnquiryForm } from "@/components/public/art-studio-enquiry-form";
+import { ArtStudioOrderSidebar } from "@/components/public/art-studio-order-sidebar";
 import { ArtStudioProductCard } from "@/components/public/art-studio-product-card";
 import { ArtStudioThumbnailStrip, type ThumbnailImage } from "@/components/public/art-studio-thumbnail-strip";
 import { IconGlyph } from "@/components/public/icon-glyph";
@@ -12,6 +12,7 @@ import { SiteHeader } from "@/components/public/site-header";
 import { getArtStudioProducts, getArtStudioProductTypes, getArtStudioPublicSettings, getArtStudioTypeBySlug } from "@/lib/art-studio";
 import { resolveArtStudioTypeCopy, resolveArtStudioTypeSections } from "@/lib/art-studio-copy";
 import { normalizeFormConfig, sourceGroupsForConfig } from "@/lib/art-studio-forms";
+import { getArtStudioGalleryPicker } from "@/lib/art-studio-gallery";
 import { getSourceVariantOptions } from "@/lib/gallery-catalog";
 import { getSiteSettings } from "@/lib/content";
 import { siteUrl } from "@/lib/env";
@@ -83,12 +84,13 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
 
   const isEnglish = locale === "en";
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
-  const [products, settings, pickupSettings, alternate, sourceOptions] = await Promise.all([
+  const [products, settings, pickupSettings, alternate, sourceOptions, galleryPicker] = await Promise.all([
     getArtStudioProducts({ locale, productTypeId: productType.id }),
     getSiteSettings(locale),
     getArtStudioPublicSettings(),
     getAlternateType(productType.id, locale),
-    getSourceVariantOptions()
+    getSourceVariantOptions(),
+    getArtStudioGalleryPicker(productType, locale)
   ]);
   const copy = resolveArtStudioTypeCopy(pickupSettings.page_copy, productType.internal_name, locale);
   const sections = resolveArtStudioTypeSections(pickupSettings.page_copy, productType.internal_name);
@@ -273,8 +275,15 @@ export default async function ArtStudioTypePage({ params }: { params: Params }) 
             ) : null}
           </article>
 
-          <aside className="lg:sticky lg:top-24 lg:col-span-5">
-            <ArtStudioEnquiryForm productType={productType} settings={pickupSettings} locale={locale} sourceGroups={sourceGroups} formCopy={{ eyebrow: copy.formEyebrow, intro: copy.formIntro, button: copy.cta }} />
+          <aside className={galleryPicker ? "lg:col-span-5" : "lg:sticky lg:top-24 lg:col-span-5"}>
+            <ArtStudioOrderSidebar
+              productType={productType}
+              settings={pickupSettings}
+              locale={locale}
+              sourceGroups={sourceGroups}
+              formCopy={{ eyebrow: copy.formEyebrow, intro: copy.formIntro, button: copy.cta }}
+              picker={galleryPicker}
+            />
           </aside>
         </div>
       </main>

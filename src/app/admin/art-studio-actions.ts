@@ -96,6 +96,8 @@ export async function upsertArtStudioProductTypeAction(formData: FormData) {
     icon_name: stringValue(formData, "icon_name") || null,
     image_url: safeHttpsUrl(stringValue(formData, "image_url")),
     gallery_urls: lines(stringValue(formData, "gallery_urls")).map(safeHttpsUrl).filter(Boolean) as string[],
+    gallery_picker_enabled: booleanValue(formData, "gallery_picker_enabled"),
+    gallery_category_id: stringValue(formData, "gallery_category_id").slice(0, 80) || null,
     is_featured: booleanValue(formData, "is_featured"),
     is_active: booleanValue(formData, "is_active"),
     sort_order: integerValue(formData, "sort_order"),
