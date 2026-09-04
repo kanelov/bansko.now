@@ -18,6 +18,14 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
     : { data: [] };
   const photos = (data ?? []) as Photo[];
   const published = photos.filter((photo) => photo.is_published).length;
+  // Recent license sales, so the download link can be handed over if an email does not arrive.
+  const { data: licenseOrders } = supabase
+    ? await supabase
+        .from("photo_license_orders")
+        .select("order_code,license_code,amount,currency,status,customer_email,customer_name,created_at,paid_at,download_token,download_count,photo_id")
+        .order("created_at", { ascending: false })
+        .limit(20)
+    : { data: [] };
   const { data: failedJobs } = supabase
     ? await supabase
         .from("photo_import_jobs")
@@ -69,6 +77,48 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
       <PhotoUploader />
 
       {photos.length ? <PhotoCsvTools /> : null}
+
+      {licenseOrders?.length ? (
+        <section className="grid gap-3 rounded-2xl bg-white p-5 text-stone-950">
+          <div>
+            <h2 className="font-serif text-2xl font-semibold">Продажби на лицензи</h2>
+            <p className="mt-1 text-sm text-stone-600">
+              Линкът за сваляне работи само при платена поръчка и всеки път създава нов временен адрес. Ако имейлът до клиента не пристигне, изпрати му този линк.
+            </p>
+          </div>
+          <ul className="grid gap-2 text-sm">
+            {licenseOrders.map((order) => {
+              const photo = photos.find((item) => item.id === order.photo_id);
+              return (
+                <li key={order.order_code} className="grid gap-1 rounded-xl border border-stone-200 p-3 sm:grid-cols-[10rem_1fr_auto] sm:items-center sm:gap-3">
+                  <span>
+                    <strong className="block">{order.order_code}</strong>
+                    <span className="text-xs text-stone-500">{new Date(order.created_at).toLocaleString("bg-BG")}</span>
+                  </span>
+                  <span>
+                    <span className="block">{photo?.title_bg || photo?.photo_code || "фотография"} · {order.license_code === "PRINT_EXTENDED" ? "печатен лиценз" : "уеб лиценз"}</span>
+                    <span className="text-xs text-stone-500">{order.customer_name} · {order.customer_email}</span>
+                  </span>
+                  <span className="flex items-center gap-3 justify-self-start sm:justify-self-end">
+                    <span className={`rounded-full px-3 py-1 text-xs font-semibold ${order.status === "paid" ? "bg-forest text-white" : "bg-stone-200 text-stone-700"}`}>
+                      {order.status === "paid" ? "платена" : order.status === "pending" ? "чака плащане" : order.status}
+                    </span>
+                    <strong>{Number(order.amount).toFixed(0)} {order.currency}</strong>
+                    {order.status === "paid" ? (
+                      <a
+                        href={`/api/photo-license/download/${order.download_token}`}
+                        className="text-xs font-semibold text-forest underline-offset-2 hover:underline"
+                      >
+                        линк за сваляне ({order.download_count})
+                      </a>
+                    ) : null}
+                  </span>
+                </li>
+              );
+            })}
+          </ul>
+        </section>
+      ) : null}
 
       <div className="grid gap-4">
         {photos.map((photo) => {
