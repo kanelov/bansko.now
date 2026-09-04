@@ -19,7 +19,7 @@ export function ArticlePhotoPicker({
   onInsert: (snippet: string) => void;
 }) {
   const [photos, setPhotos] = useState<LocalizedPhotoCard[]>([]);
-  const loaded = useRef(false);
+  const [opened, setOpened] = useState(false);
   const [query, setQuery] = useState("");
   const [loading, setLoading] = useState(false);
   const [failed, setFailed] = useState(false);
@@ -44,17 +44,30 @@ export function ArticlePhotoPicker({
     }
   }, [locale]);
 
-  // Loaded on first paint through a ref instead of an effect, so no cascading render.
-  if (!loaded.current) {
-    loaded.current = true;
-    void load("");
-  }
 
   function snippetFor(photo: LocalizedPhotoCard) {
     if (!photo.article_url) return "";
     const licenseUrl = `/${locale === "en" ? "en/" : ""}photos/${photo.slug}`;
     const credit = locale === "en" ? "License this photograph" : "Лицензирай тази фотография";
     return `\n\n![${photo.alt}](${photo.article_url})\n*© Lubo Kanelov · [${credit}](${licenseUrl})*\n`;
+  }
+
+  if (!opened) {
+    return (
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl bg-stone-50 p-4">
+        <h3 className="font-serif text-2xl font-semibold">Фотоархив</h3>
+        <button
+          type="button"
+          onClick={() => {
+            setOpened(true);
+            void load("");
+          }}
+          className="admin-button admin-button-secondary px-4 py-2 text-sm font-semibold"
+        >
+          Избери фотография
+        </button>
+      </div>
+    );
   }
 
   return (
