@@ -63,17 +63,26 @@ function objectUrl(key: string) {
 }
 
 export async function uploadPhoto(key: string, body: Buffer, contentType: string) {
-  const response = await client().fetch(objectUrl(key), {
+  const payload = new Uint8Array(body);
+  const signed = await client().sign(objectUrl(key), {
     method: "PUT",
-    body: new Uint8Array(body),
+    body: payload,
     headers: {
       "Content-Type": contentType,
       // Derivatives are immutable: the key changes when a photo is reprocessed.
       "Cache-Control": "public, max-age=31536000, immutable"
     }
   });
+
+  // Send the signed request with a plain body and an explicit length: a Request object turns the
+  // body into a stream, the length header is lost and R2 answers 411 Length Required.
+  const headers = new Headers(signed.headers);
+  headers.set("Content-Length", String(payload.byteLength));
+
+  const response = await fetch(signed.url, { method: "PUT", headers, body: payload });
   if (!response.ok) {
-    throw new Error(`R2 upload failed (${response.status}) for ${key}`);
+    const detail = await response.text().catch(() => "");
+    throw new Error(`R2 upload failed (${response.status}) for ${key}${detail ? `: ${detail.slice(0, 200)}` : ""}`);
   }
   return key;
 }
