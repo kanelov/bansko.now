@@ -9,7 +9,7 @@ import { getArtStudioProductTypes } from "@/lib/art-studio";
 import { getSiteSettings } from "@/lib/content";
 import { siteUrl } from "@/lib/env";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
-import { getPhotoBySlug, getPhotoLicenseTypes, getRelatedPhotos, photoLicensePrice } from "@/lib/photos";
+import { getPhotoBySlug, getPhotoLicenseTypes, getRecentPhotoSlugs, getRelatedPhotos, photoLicensePrice } from "@/lib/photos";
 import type { Locale } from "@/lib/types";
 
 type Params = Promise<{ locale: string; slug: string }>;
@@ -17,6 +17,11 @@ type Params = Promise<{ locale: string; slug: string }>;
 // Each photograph is its own indexable page; this is the entry point from Google Images.
 export const revalidate = 900;
 export const dynamicParams = true;
+
+export async function generateStaticParams() {
+  const slugs = await getRecentPhotoSlugs(100);
+  return slugs.map((slug) => ({ slug }));
+}
 
 const money = (value: number, locale: Locale) =>
   new Intl.NumberFormat(locale === "en" ? "en-GB" : "bg-BG", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);

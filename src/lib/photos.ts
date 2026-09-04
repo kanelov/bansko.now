@@ -1,7 +1,7 @@
 import "server-only";
 
 import { cache } from "react";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createPublicSupabaseClient } from "@/lib/supabase/public";
 import { getPublicPhotoUrl } from "@/lib/photo-storage";
 import type { Locale, Photo, PhotoLicenseType } from "@/lib/types";
 
@@ -85,7 +85,7 @@ export function localizePhoto(photo: Photo, locale: Locale): LocalizedPhoto {
 }
 
 export async function getPublishedPhotos(locale: Locale, options: PhotoQuery = {}) {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicSupabaseClient();
   if (!supabase) return { photos: [] as LocalizedPhotoCard[], total: 0, page: 1, pageCount: 0 };
 
   const page = Math.max(1, options.page ?? 1);
@@ -122,7 +122,7 @@ export async function getPublishedPhotos(locale: Locale, options: PhotoQuery = {
 
 /** Distinct values for the archive filters; one small query, cached per render. */
 export const getPhotoFacets = cache(async () => {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicSupabaseClient();
   if (!supabase) return { categories: [] as string[], locations: [] as string[], years: [] as number[] };
   const { data } = await supabase
     .from("photos")
@@ -146,14 +146,14 @@ export const getPhotoFacets = cache(async () => {
 });
 
 export async function getPhotoBySlug(slug: string, locale: Locale) {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicSupabaseClient();
   if (!supabase) return null;
   const { data } = await supabase.from("photos").select("*").eq("slug", slug).eq("is_published", true).maybeSingle();
   return data ? localizePhoto(data as Photo, locale) : null;
 }
 
 export async function getRelatedPhotos(photo: LocalizedPhoto, locale: Locale, limit = 6) {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicSupabaseClient();
   if (!supabase) return [] as LocalizedPhotoCard[];
   let query = supabase
     .from("photos")
@@ -167,7 +167,7 @@ export async function getRelatedPhotos(photo: LocalizedPhoto, locale: Locale, li
 }
 
 export async function getPhotoLicenseTypes() {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicSupabaseClient();
   if (!supabase) return [] as PhotoLicenseType[];
   const { data } = await supabase
     .from("photo_license_types")
@@ -186,7 +186,7 @@ export function photoLicensePrice(photo: Pick<Photo, "price_tier" | "price_overr
 
 /** Published photos for the sitemap. */
 export async function getPhotoSitemapEntries() {
-  const supabase = await createSupabaseServerClient();
+  const supabase = createPublicSupabaseClient();
   if (!supabase) return [] as Array<Pick<Photo, "slug" | "updated_at" | "title_bg" | "title_en" | "thumb_key">>;
   const { data } = await supabase
     .from("photos")
@@ -195,4 +195,17 @@ export async function getPhotoSitemapEntries() {
     .order("published_at", { ascending: false })
     .limit(5000);
   return (data ?? []) as Array<Pick<Photo, "slug" | "updated_at" | "title_bg" | "title_en" | "thumb_key">>;
+}
+
+/** Slugs prerendered at build time; the rest render on first visit. */
+export async function getRecentPhotoSlugs(limit = 100) {
+  const supabase = createPublicSupabaseClient();
+  if (!supabase) return [] as string[];
+  const { data } = await supabase
+    .from("photos")
+    .select("slug")
+    .eq("is_published", true)
+    .order("published_at", { ascending: false })
+    .limit(limit);
+  return (data ?? []).map((row) => row.slug as string);
 }
