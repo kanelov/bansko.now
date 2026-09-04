@@ -53,33 +53,23 @@ function watermarkSvg(width: number, height: number, strength: "light" | "strong
 export async function createPhotoDerivatives(buffer: Buffer, photoCode: string): Promise<PhotoDerivatives> {
   if (buffer.byteLength > maxSourceBytes) throw new Error("Файлът е над 80 MB.");
 
-  const base = sharp(buffer, { failOn: "none" }).rotate();
-  const metadata = await base.metadata();
-  const width = metadata.width ?? 0;
-  const height = metadata.height ?? 0;
-  if (!width || !height) throw new Error("Файлът не е разпознат като изображение.");
+  let width = 0;
+  let height = 0;
+  let dominant: string | null = null;
 
-  const stats = await base.stats();
-  const dominant = stats.dominant
-    ? `#${[stats.dominant.r, stats.dominant.g, stats.dominant.b].map((value) => value.toString(16).padStart(2, "0")).join("")}`
-    : null;
-
-  const resize = (targetWidth: number) =>
-    sharp(buffer, { failOn: "none" }).rotate().resize({ width: targetWidth, withoutEnlargement: true });
-
-  // Public derivatives. EXIF is dropped by sharp unless explicitly kept, so no GPS leaks.
-  const thumb = await resize(800).webp({ quality: 78, effort: 4 }).toBuffer();
-  const article = await resize(1800).webp({ quality: 82, effort: 4 }).toBuffer();
-
-  const previewBase = await resize(2000).toBuffer({ resolveWithObject: true });
-  const preview = await sharp(previewBase.data)
-    .composite([{ input: watermarkSvg(previewBase.info.width, previewBase.info.height, "strong"), gravity: "southeast" }])
-    .webp({ quality: 80, effort: 4 })
-    .toBuffer();
-
-  // Private licensed files, clean and without a watermark.
-  const webLicense = await resize(3000).jpeg({ quality: 92, mozjpeg: true }).toBuffer();
-  const fullResolution = await sharp(buffer, { failOn: "none" }).rotate().jpeg({ quality: 95, mozjpeg: true }).toBuffer();
+  try {
+    const probe = sharp(buffer, { failOn: "none" }).rotate();
+    const metadata = await probe.metadata();
+    width = metadata.width ?? 0;
+    height = metadata.height ?? 0;
+    if (!width || !height) throw new Error("Файлът не е разпознат като изображение.");
+    const stats = await probe.stats();
+    dominant = stats.dominant
+      ? `#${[stats.dominant.r, stats.dominant.g, stats.dominant.b].map((value) => value.toString(16).padStart(2, "0")).join("")}`
+      : null;
+  } catch (error) {
+    throw new Error(`Четене на файла: ${error instanceof Error ? error.message : String(error)}`);
+  }
 
   const keys = {
     thumb_key: photoObjectKey("thumb", photoCode),
@@ -89,13 +79,32 @@ export async function createPhotoDerivatives(buffer: Buffer, photoCode: string):
     full_resolution_key: photoObjectKey("full_resolution", photoCode)
   };
 
-  await Promise.all([
-    uploadPhoto(keys.thumb_key, thumb, "image/webp"),
-    uploadPhoto(keys.article_key, article, "image/webp"),
-    uploadPhoto(keys.preview_key, preview, "image/webp"),
-    uploadPhoto(keys.web_license_key, webLicense, "image/jpeg"),
-    uploadPhoto(keys.full_resolution_key, fullResolution, "image/jpeg")
-  ]);
+  // One derivative at a time: create, upload, release. EXIF is dropped, so no GPS leaks.
+  const step = async (label: string, key: string, contentType: string, make: () => Promise<Buffer>) => {
+    try {
+      const output = await make();
+      await uploadPhoto(key, output, contentType);
+    } catch (error) {
+      throw new Error(`${label}: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  };
+
+  const resize = (targetWidth: number) =>
+    sharp(buffer, { failOn: "none" }).rotate().resize({ width: targetWidth, withoutEnlargement: true });
+
+  await step("миниатюра", keys.thumb_key, "image/webp", () => resize(800).webp({ quality: 78, effort: 4 }).toBuffer());
+  await step("за статии", keys.article_key, "image/webp", () => resize(1800).webp({ quality: 82, effort: 4 }).toBuffer());
+  await step("преглед с воден знак", keys.preview_key, "image/webp", async () => {
+    const base = await resize(2000).toBuffer({ resolveWithObject: true });
+    return sharp(base.data)
+      .composite([{ input: watermarkSvg(base.info.width, base.info.height, "strong"), gravity: "southeast" }])
+      .webp({ quality: 80, effort: 4 })
+      .toBuffer();
+  });
+  await step("файл за уеб лиценз", keys.web_license_key, "image/jpeg", () => resize(3000).jpeg({ quality: 92, mozjpeg: true }).toBuffer());
+  await step("оригинал", keys.full_resolution_key, "image/jpeg", () =>
+    sharp(buffer, { failOn: "none" }).rotate().jpeg({ quality: 95, mozjpeg: true }).toBuffer()
+  );
 
   return {
     ...keys,

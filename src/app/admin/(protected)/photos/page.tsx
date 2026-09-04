@@ -17,6 +17,14 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
     : { data: [] };
   const photos = (data ?? []) as Photo[];
   const published = photos.filter((photo) => photo.is_published).length;
+  const { data: failedJobs } = supabase
+    ? await supabase
+        .from("photo_import_jobs")
+        .select("source_filename,error_message,processed_at")
+        .eq("status", "failed")
+        .order("created_at", { ascending: false })
+        .limit(5)
+    : { data: [] };
 
   return (
     <div className="grid gap-8">
@@ -43,6 +51,19 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
       {params.saved ? <p className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm font-semibold text-emerald-900">Записано.</p> : null}
       {params.deleted ? <p className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm font-semibold text-emerald-900">Фотографията е изтрита.</p> : null}
       {params.error ? <p className="rounded-xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">{params.error}</p> : null}
+
+      {failedJobs?.length ? (
+        <section className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm text-red-900">
+          <p className="font-semibold">Последни неуспешни качвания</p>
+          <ul className="mt-2 grid gap-1">
+            {failedJobs.map((job) => (
+              <li key={`${job.source_filename}-${job.processed_at}`}>
+                <strong>{job.source_filename || "файл"}</strong>: {job.error_message}
+              </li>
+            ))}
+          </ul>
+        </section>
+      ) : null}
 
       <PhotoUploader />
 
