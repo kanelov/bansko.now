@@ -28,8 +28,11 @@ function localizedStaticEntry(locale: Locale, path: string, now: Date): SitemapE
   };
 }
 
+import { getPhotoFacets, getPhotoSitemapEntries } from "@/lib/photos";
+import { getPublicPhotoUrl } from "@/lib/photo-storage";
+
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts] = await Promise.all([
+  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts, photoFeed, photoFacets] = await Promise.all([
     getCategories("bg"),
     getCategories("en"),
     getPublishedArticles({ limit: 500, locale: "bg" }),
@@ -44,10 +47,12 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getLocalizedGalleryCategories("bg"),
     getLocalizedGalleryCategories("en"),
     getPublishedArticleCounts("bg"),
-    getPublishedArticleCounts("en")
+    getPublishedArticleCounts("en"),
+    getPhotoSitemapEntries(),
+    getPhotoFacets()
   ]);
   const now = new Date();
-  const staticRoutes = ["/", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/art-studio", "/art-studio/gallery", "/about", "/contact", "/privacy", "/terms"];
+  const staticRoutes = ["/", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/art-studio", "/art-studio/gallery", "/photos", "/about", "/contact", "/privacy", "/terms"];
   const enCategoryById = new Map(enCategories.map((category) => [category.id, category]));
   const articleByGroup = new Map<string, { bg?: (typeof bgArticles)[number]; en?: (typeof enArticles)[number] }>();
   const enBusinessById = new Map(enBusinesses.map((business) => [business.id, business]));
@@ -177,5 +182,33 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
   });
 
-  return [...staticEntries, ...categoryEntries, ...articleEntries, ...businessEntries, ...artStudioTypeEntries, ...artStudioProductEntries, ...galleryCategoryEntries, ...galleryProductEntries];
+  // Photo library: one entry per photograph in both locales, with the image so Google Images can pick it up.
+  const photoEntries = photoFeed.flatMap((photo) => {
+    const image = getPublicPhotoUrl(photo.thumb_key);
+    return (["bg", "en"] as const).map((locale) => ({
+      url: localeUrl(locale, `/photos/${photo.slug}`),
+      lastModified: new Date(photo.updated_at),
+      changeFrequency: "monthly" as const,
+      priority: 0.5,
+      images: image ? [image] : undefined,
+      alternates: {
+        languages: {
+          bg: localeUrl("bg", `/photos/${photo.slug}`),
+          en: localeUrl("en", `/photos/${photo.slug}`)
+        }
+      }
+    }));
+  });
+
+  const photoCategoryEntries = photoFacets.categories.flatMap((category) => {
+    const path = `/photos/category/${encodeURIComponent(category.toLowerCase())}`;
+    return (["bg", "en"] as const).map((locale) => ({
+      url: localeUrl(locale, path),
+      lastModified: now,
+      changeFrequency: "weekly" as const,
+      priority: 0.5
+    }));
+  });
+
+  return [...staticEntries, ...categoryEntries, ...articleEntries, ...businessEntries, ...artStudioTypeEntries, ...artStudioProductEntries, ...galleryCategoryEntries, ...galleryProductEntries, ...photoCategoryEntries, ...photoEntries];
 }

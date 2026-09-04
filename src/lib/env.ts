@@ -32,3 +32,11 @@ export const artGalleryArtStudioOrdersApiUrl = process.env.ART_GALLERY_ART_STUDI
   || artGalleryReservationApiUrl.replace(/\/api\/reservations\/?$/, "/api/art-studio-orders");
 export const artGalleryIntegrationSecret = process.env.ART_GALLERY_INTEGRATION_SECRET || null;
 export const contentHubPublishSecret = process.env.CONTENT_HUB_PUBLISH_SECRET || null;
+
+/** Cloudflare R2 holds the photo library derivatives; masters stay in Google Drive. */
+export const r2AccountId = process.env.R2_ACCOUNT_ID || null;
+export const r2AccessKeyId = process.env.R2_ACCESS_KEY_ID || null;
+export const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY || null;
+export const r2BucketName = process.env.R2_BUCKET_NAME || null;
+/** Public base URL of the bucket (r2.dev subdomain today, photos.bansko.now later). */
+export const photoPublicBaseUrl = (process.env.PHOTO_PUBLIC_BASE_URL || "").replace(/\/$/, "") || null;

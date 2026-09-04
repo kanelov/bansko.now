@@ -711,6 +711,124 @@ export type ContactMessage = {
   created_at: string;
 };
 
+/** Photo library: the archive, its licenses and the link to articles. */
+export type PhotoPriceTier = "standard" | "premium";
+export type PhotoMonitoringStatus = "not_submitted" | "submitted" | "monitoring" | "disabled";
+
+export type Photo = {
+  id: string;
+  photo_code: string;
+  slug: string;
+  price_tier: PhotoPriceTier;
+  price_override_web: number | null;
+  price_override_print: number | null;
+  title_bg: string;
+  title_en: string | null;
+  description_bg: string | null;
+  description_en: string | null;
+  alt_bg: string | null;
+  alt_en: string | null;
+  caption_bg: string | null;
+  caption_en: string | null;
+  location_name: string | null;
+  latitude: number | null;
+  longitude: number | null;
+  date_taken: string | null;
+  year_taken: number | null;
+  season: "winter" | "spring" | "summer" | "autumn" | null;
+  orientation: "landscape" | "portrait" | "square" | null;
+  width: number | null;
+  height: number | null;
+  camera_model: string | null;
+  lens: string | null;
+  category: string | null;
+  tags: string[];
+  master_source: string;
+  google_drive_file_id: string | null;
+  thumb_key: string | null;
+  article_key: string | null;
+  preview_key: string | null;
+  web_license_key: string | null;
+  full_resolution_key: string | null;
+  dominant_color: string | null;
+  is_published: boolean;
+  is_featured: boolean;
+  licensing_enabled: boolean;
+  print_enabled: boolean;
+  monitoring_status: PhotoMonitoringStatus;
+  monitoring_reference: string | null;
+  created_at: string;
+  updated_at: string;
+  published_at: string | null;
+};
+
+export type PhotoLicenseType = {
+  id: string;
+  code: string;
+  name_bg: string;
+  name_en: string;
+  summary_bg: string | null;
+  summary_en: string | null;
+  download_variant: "web_license" | "full_resolution";
+  price_standard_eur: number;
+  price_premium_eur: number;
+  print_run_limit: number | null;
+  terms_bg: string;
+  terms_en: string;
+  terms_version: number;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArticlePhoto = {
+  id: string;
+  article_id: string;
+  photo_id: string;
+  usage_type: "featured" | "inline" | "gallery";
+  sort_order: number;
+  created_at: string;
+};
+
+export type PhotoImportJob = {
+  id: string;
+  source: string;
+  source_file_id: string;
+  source_filename: string;
+  status: "queued" | "processing" | "completed" | "failed";
+  photo_id: string | null;
+  error_message: string | null;
+  attempts: number;
+  created_at: string;
+  processed_at: string | null;
+};
+
+export type PhotoLicenseOrder = {
+  id: string;
+  order_code: string;
+  photo_id: string;
+  license_type_id: string;
+  license_code: string;
+  license_version: number;
+  license_terms_snapshot: string;
+  locale: Locale;
+  customer_email: string;
+  customer_name: string | null;
+  company_name: string | null;
+  amount: number;
+  currency: string;
+  status: "pending" | "paid" | "failed" | "refunded";
+  stripe_checkout_session_id: string | null;
+  stripe_payment_intent_id: string | null;
+  stripe_event_id: string | null;
+  download_token: string;
+  download_count: number;
+  last_download_at: string | null;
+  created_at: string;
+  paid_at: string | null;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -812,6 +930,36 @@ export type Database = {
         Row: ArtStudioServiceTranslation;
         Insert: Partial<ArtStudioServiceTranslation> & Pick<ArtStudioServiceTranslation, "service_id" | "locale" | "title">;
         Update: Partial<ArtStudioServiceTranslation>;
+        Relationships: [];
+      };
+      photos: {
+        Row: Photo;
+        Insert: Partial<Photo> & Pick<Photo, "slug" | "title_bg">;
+        Update: Partial<Photo>;
+        Relationships: [];
+      };
+      photo_license_types: {
+        Row: PhotoLicenseType;
+        Insert: Partial<PhotoLicenseType> & Pick<PhotoLicenseType, "code" | "name_bg" | "name_en" | "download_variant" | "price_standard_eur" | "price_premium_eur">;
+        Update: Partial<PhotoLicenseType>;
+        Relationships: [];
+      };
+      article_photos: {
+        Row: ArticlePhoto;
+        Insert: Partial<ArticlePhoto> & Pick<ArticlePhoto, "article_id" | "photo_id">;
+        Update: Partial<ArticlePhoto>;
+        Relationships: [];
+      };
+      photo_import_jobs: {
+        Row: PhotoImportJob;
+        Insert: Partial<PhotoImportJob> & Pick<PhotoImportJob, "source_file_id">;
+        Update: Partial<PhotoImportJob>;
+        Relationships: [];
+      };
+      photo_license_orders: {
+        Row: PhotoLicenseOrder;
+        Insert: Partial<PhotoLicenseOrder> & Pick<PhotoLicenseOrder, "photo_id" | "license_type_id" | "license_code" | "license_version" | "license_terms_snapshot" | "customer_email" | "amount">;
+        Update: Partial<PhotoLicenseOrder>;
         Relationships: [];
       };
       art_studio_product_types: {

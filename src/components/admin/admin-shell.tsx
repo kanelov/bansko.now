@@ -9,6 +9,7 @@ const adminNav: { href: Route; label: string; badge?: "orders" }[] = [
   { href: "/admin/cms", label: "Страници" },
   { href: "/admin/art-studio", label: "Art Studio" },
   { href: "/admin/art-studio/orders", label: "Поръчки", badge: "orders" },
+  { href: "/admin/photos", label: "Фотоархив" },
   { href: "/admin/businesses", label: "Бизнеси" },
   { href: "/admin/categories", label: "Категории" },
   { href: "/admin/media", label: "Медия" },
