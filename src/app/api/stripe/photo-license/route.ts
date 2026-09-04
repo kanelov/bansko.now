@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { sendNotificationEmail } from "@/lib/email";
 import { siteUrl, stripePhotoWebhookSecret } from "@/lib/env";
-import { getStripeClient } from "@/lib/stripe";
+import { constructStripeEvent, getStripeClient, stripeWebhookSecrets } from "@/lib/stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { PhotoLicenseOrder } from "@/lib/types";
 
@@ -16,18 +16,17 @@ export const dynamic = "force-dynamic";
 export async function POST(request: Request) {
   const stripe = getStripeClient();
   const supabase = createSupabaseAdminClient();
-  if (!stripe || !supabase || !stripePhotoWebhookSecret) {
+  const secrets = stripeWebhookSecrets(stripePhotoWebhookSecret);
+  if (!stripe || !supabase || !secrets.length) {
     return NextResponse.json({ error: "Stripe is not configured" }, { status: 503 });
   }
 
   const signature = request.headers.get("stripe-signature");
   if (!signature) return NextResponse.json({ error: "Missing signature" }, { status: 400 });
 
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(await request.text(), signature, stripePhotoWebhookSecret);
-  } catch (error) {
-    console.error("[photo license webhook signature]", error);
+  const event = constructStripeEvent(await request.text(), signature, secrets);
+  if (!event) {
+    console.error("[photo license webhook] signature did not match any configured secret");
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 

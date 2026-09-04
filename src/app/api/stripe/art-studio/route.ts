@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 import { sendNotificationEmail } from "@/lib/email";
 import { siteUrl, stripeWebhookSecret } from "@/lib/env";
-import { getStripeClient } from "@/lib/stripe";
+import { constructStripeEvent, getStripeClient, stripeWebhookSecrets } from "@/lib/stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { ArtStudioOrder } from "@/lib/types";
 
@@ -146,14 +146,13 @@ async function markIncomplete(session: Stripe.Checkout.Session, status: "failed"
 export async function POST(request: Request) {
   const stripe = getStripeClient();
   const signature = request.headers.get("stripe-signature");
-  if (!stripe || !stripeWebhookSecret) return NextResponse.json({ error: "Stripe webhook is not configured" }, { status: 503 });
+  const secrets = stripeWebhookSecrets(stripeWebhookSecret);
+  if (!stripe || !secrets.length) return NextResponse.json({ error: "Stripe webhook is not configured" }, { status: 503 });
   if (!signature) return NextResponse.json({ error: "Missing signature" }, { status: 400 });
 
-  let event: Stripe.Event;
-  try {
-    event = stripe.webhooks.constructEvent(await request.text(), signature, stripeWebhookSecret);
-  } catch (error) {
-    console.error("[art-studio webhook] Invalid signature", error);
+  const event = constructStripeEvent(await request.text(), signature, secrets);
+  if (!event) {
+    console.error("[art-studio webhook] Invalid signature");
     return NextResponse.json({ error: "Invalid signature" }, { status: 400 });
   }
 
