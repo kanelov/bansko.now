@@ -208,8 +208,9 @@ create policy "Admins manage article photos" on public.article_photos
 for all to authenticated using (true) with check (true);
 
 drop policy if exists "Admins read import jobs" on public.photo_import_jobs;
-create policy "Admins read import jobs" on public.photo_import_jobs
-for select to authenticated using (true);
+drop policy if exists "Admins manage import jobs" on public.photo_import_jobs;
+create policy "Admins manage import jobs" on public.photo_import_jobs
+for all to authenticated using (true) with check (true);
 
 drop policy if exists "Admins read license orders" on public.photo_license_orders;
 create policy "Admins read license orders" on public.photo_license_orders
@@ -221,7 +222,7 @@ grant select on public.article_photos to anon, authenticated;
 grant select, insert, update, delete on public.photos to authenticated;
 grant select, insert, update, delete on public.photo_license_types to authenticated;
 grant select, insert, update, delete on public.article_photos to authenticated;
-grant select on public.photo_import_jobs to authenticated;
+grant select, insert, update, delete on public.photo_import_jobs to authenticated;
 grant select on public.photo_license_orders to authenticated;
 revoke all on public.photo_license_orders from anon;
 revoke all on public.photo_import_jobs from anon;
