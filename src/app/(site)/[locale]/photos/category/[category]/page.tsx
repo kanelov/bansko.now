@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { PhotoArchive } from "@/components/public/photo-archive";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
+import { getArtStudioProductTypes } from "@/lib/art-studio";
 import { getSiteSettings } from "@/lib/content";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import { getPhotoFacets, getPublishedPhotos } from "@/lib/photos";
@@ -59,11 +60,14 @@ export default async function PhotoCategoryPage({ params }: { params: Params }) 
   const name = await resolveCategory(category);
   if (!name) notFound();
 
-  const [initial, facets, settings] = await Promise.all([
+  const [initial, facets, settings, productTypes] = await Promise.all([
     getPublishedPhotos(locale, { page: 1, category: name }),
     getPhotoFacets(),
-    getSiteSettings(locale)
+    getSiteSettings(locale),
+    getArtStudioProductTypes({ locale })
   ]);
+  const printType = productTypes.find((type) => type.internal_name === "fine-art-prints");
+  const printBase = printType ? localePath(locale, `/art-studio/${printType.slug}`) : null;
 
   return (
     <div>
@@ -86,7 +90,7 @@ export default async function PhotoCategoryPage({ params }: { params: Params }) 
           </p>
         </header>
         <div className="mt-10">
-          <PhotoArchive locale={locale} initial={initial} facets={facets} lockedFilter={{ category: name }} />
+          <PhotoArchive locale={locale} initial={initial} facets={facets} lockedFilter={{ category: name }} printBase={printBase} />
         </div>
       </main>
       <SiteFooter settings={settings} locale={locale} />

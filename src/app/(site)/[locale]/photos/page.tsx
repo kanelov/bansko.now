@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { PhotoArchive } from "@/components/public/photo-archive";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
+import { getArtStudioProductTypes } from "@/lib/art-studio";
 import { getSiteSettings } from "@/lib/content";
 import { siteUrl } from "@/lib/env";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
@@ -62,11 +63,14 @@ export default async function PhotosPage({ params }: { params: Params }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
   const text = copy[locale as Locale];
-  const [initial, facets, settings] = await Promise.all([
+  const [initial, facets, settings, productTypes] = await Promise.all([
     getPublishedPhotos(locale, { page: 1 }),
     getPhotoFacets(),
-    getSiteSettings(locale)
+    getSiteSettings(locale),
+    getArtStudioProductTypes({ locale })
   ]);
+  const printType = productTypes.find((type) => type.internal_name === "fine-art-prints");
+  const printBase = printType ? localePath(locale, `/art-studio/${printType.slug}`) : null;
 
   const pageUrl = localeUrl(locale, "/photos");
   const collectionSchema = {
@@ -123,7 +127,7 @@ export default async function PhotosPage({ params }: { params: Params }) {
         ) : null}
 
         <div className="mt-10">
-          <PhotoArchive locale={locale} initial={initial} facets={facets} />
+          <PhotoArchive locale={locale} initial={initial} facets={facets} printBase={printBase} />
         </div>
       </main>
       <SiteFooter settings={settings} locale={locale} />

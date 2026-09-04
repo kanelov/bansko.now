@@ -23,12 +23,15 @@ export function PhotoArchive({
   locale,
   initial,
   facets,
-  lockedFilter
+  lockedFilter,
+  printBase
 }: {
   locale: Locale;
   initial: { photos: LocalizedPhotoCard[]; total: number; page: number; pageCount: number };
   facets: Facets;
   lockedFilter?: Partial<Filters>;
+  /** Path of the Art Studio print page; the photo is passed to it as ?photo=<slug>. */
+  printBase?: string | null;
 }) {
   const isEnglish = locale === "en";
   const [photos, setPhotos] = useState(initial.photos);
@@ -122,31 +125,56 @@ export function PhotoArchive({
       </p>
 
       {photos.length ? (
-        <div className="columns-2 gap-3 sm:columns-3 lg:columns-4 [&>*]:mb-3">
+        <ul className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
           {photos.map((photo, index) => (
-            <Link
-              key={photo.id}
-              href={localePath(locale, `/photos/${photo.slug}`) as Route}
-              className="group block break-inside-avoid overflow-hidden rounded-xl border border-stone-200 bg-stone-100 transition hover:border-moss focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-forest"
-              style={photo.dominant_color ? { backgroundColor: photo.dominant_color } : undefined}
-            >
-              {photo.thumb_url ? (
-                // eslint-disable-next-line @next/next/no-img-element -- deliberate: files are served from the R2 CDN
-                <img
-                  src={photo.thumb_url}
-                  alt={photo.alt}
-                  width={photo.width ?? 800}
-                  height={photo.height ?? 600}
-                  loading={index < 4 ? "eager" : "lazy"}
-                  decoding="async"
-                  className="w-full transition duration-500 group-hover:scale-[1.02]"
-                />
-              ) : (
-                <span className="grid aspect-[3/2] place-items-center text-stone-400"><IconGlyph name="image" className="h-6 w-6" /></span>
-              )}
-            </Link>
+            <li key={photo.id} className="flex h-full flex-col overflow-hidden rounded-xl border border-stone-200 bg-white shadow-soft transition hover:border-moss">
+              <Link
+                href={localePath(locale, `/photos/${photo.slug}`) as Route}
+                className="group block"
+                aria-label={photo.title}
+              >
+                <span
+                  className="flex aspect-[3/4] items-center justify-center overflow-hidden bg-stone-100"
+                  style={photo.dominant_color ? { backgroundColor: `${photo.dominant_color}22` } : undefined}
+                >
+                  {photo.thumb_url ? (
+                    // eslint-disable-next-line @next/next/no-img-element -- deliberate: files are served from the R2 CDN
+                    <img
+                      src={photo.thumb_url}
+                      alt={photo.alt}
+                      width={photo.width ?? 800}
+                      height={photo.height ?? 1067}
+                      loading={index < 4 ? "eager" : "lazy"}
+                      decoding="async"
+                      className="max-h-full max-w-full object-contain transition duration-500 group-hover:scale-[1.02]"
+                    />
+                  ) : (
+                    <IconGlyph name="image" className="h-6 w-6 text-stone-400" />
+                  )}
+                </span>
+              </Link>
+              <div className="flex flex-1 flex-col gap-3 p-3">
+                <Link href={localePath(locale, `/photos/${photo.slug}`) as Route} className="font-serif text-base font-semibold leading-snug text-stone-950 hover:text-forest">
+                  {photo.title}
+                </Link>
+                <div className="mt-auto grid gap-2">
+                  <Link
+                    href={localePath(locale, `/photos/${photo.slug}/license`) as Route}
+                    className="inline-flex items-center justify-center rounded-full bg-forest px-3 py-2 text-xs font-semibold text-white transition hover:bg-moss"
+                  >
+                    {isEnglish ? "License" : "Лицензирай"}
+                  </Link>
+                  <Link
+                    href={(printBase ? `${printBase}?photo=${photo.slug}` : localePath(locale, "/art-studio")) as Route}
+                    className="inline-flex items-center justify-center rounded-full border border-stone-300 px-3 py-2 text-xs font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white"
+                  >
+                    {isEnglish ? "Order a print" : "Поръчай принт"}
+                  </Link>
+                </div>
+              </div>
+            </li>
           ))}
-        </div>
+        </ul>
       ) : (
         <p className="rounded-xl border border-stone-200 bg-white p-6 text-sm text-stone-650">
           {isEnglish ? "No photographs match this search yet." : "Няма фотографии за това търсене."}

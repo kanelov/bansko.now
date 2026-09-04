@@ -23,9 +23,22 @@ export const adminNotificationEmail = process.env.ADMIN_NOTIFICATION_EMAIL || nu
 export const emailFrom = process.env.EMAIL_FROM || "Bansko NOW <onboarding@resend.dev>";
 export const supabaseServiceRoleKey = process.env.SUPABASE_SERVICE_ROLE_KEY || null;
 export const stripeSecretKey = process.env.STRIPE_SECRET_KEY || null;
-export const stripeWebhookSecret = process.env.STRIPE_WEBHOOK_SECRET || null;
-/** A second Stripe endpoint (photo licenses) has its own signing secret; falls back to the first. */
-export const stripePhotoWebhookSecret = process.env.STRIPE_PHOTO_WEBHOOK_SECRET || process.env.STRIPE_WEBHOOK_SECRET || null;
+/**
+ * Stripe signs test and live events with different secrets. Each variable may hold one secret,
+ * and the *_TEST variants add the sandbox one, so no comma separated lists are needed.
+ */
+function webhookSecretList(...values: Array<string | undefined>) {
+  const secrets = values.flatMap((value) => String(value || "").split(/[,\s]+/)).filter((secret) => secret.startsWith("whsec_"));
+  return secrets.length ? [...new Set(secrets)].join(",") : null;
+}
+
+export const stripeWebhookSecret = webhookSecretList(process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_WEBHOOK_SECRET_TEST);
+/** The photo license endpoint has its own signing secret; falls back to the Art Studio one. */
+export const stripePhotoWebhookSecret = webhookSecretList(
+  process.env.STRIPE_PHOTO_WEBHOOK_SECRET,
+  process.env.STRIPE_PHOTO_WEBHOOK_SECRET_TEST,
+  process.env.STRIPE_WEBHOOK_SECRET
+);
 export const artGalleryCatalogApiUrl = process.env.ART_GALLERY_CATALOG_API_URL
   || "https://app.kanelov.com/api/public-catalog";
 export const artGalleryReservationApiUrl = process.env.ART_GALLERY_RESERVATION_API_URL
