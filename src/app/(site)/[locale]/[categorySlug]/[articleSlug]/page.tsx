@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { Route } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
 import { ArticleCard } from "@/components/public/article-card";
@@ -26,6 +27,7 @@ import {
 import { siteUrl } from "@/lib/env";
 import { getArticleToc, getFaqItemsFromMarkdown } from "@/lib/markdown-blocks";
 import { getDictionary, isLocale, localePath, localeUrl } from "@/lib/i18n";
+import { getPhotoByCode, photoCodesInContent } from "@/lib/photos";
 import type { Locale } from "@/lib/types";
 
 type Params = Promise<{ locale: string; categorySlug: string; articleSlug: string }>;
@@ -160,6 +162,9 @@ export default async function ArticlePage({ params }: { params: Params }) {
     getPublishedArticleTranslation(article.translation_group_id, alternateLocale)
   ]);
   const image = article.featured_image_url;
+  // When the featured image comes from the photo library, credit it and link to licensing.
+  const libraryCode = photoCodesInContent(article.featured_image_url)[0] ?? null;
+  const libraryPhoto = libraryCode ? await getPhotoByCode(libraryCode, locale) : null;
   const articleUrl = `${siteUrl}${getArticlePath(article)}`;
   const publishedDate = formatDate(article.published_at, locale);
   const updatedDate = formatDate(article.updated_at, locale);
@@ -286,9 +291,17 @@ export default async function ArticlePage({ params }: { params: Params }) {
                 className="aspect-[16/10] w-full rounded-3xl object-cover"
                 priority
               />
-              {article.image_caption || article.photo_credit ? (
+              {article.image_caption || article.photo_credit || libraryPhoto ? (
                 <figcaption className="mt-3 text-sm text-stone-500">
-                  {[article.image_caption, article.photo_credit].filter(Boolean).join(" · ")}
+                  {[article.image_caption, article.photo_credit || (libraryPhoto ? "© Lubo Kanelov" : null)].filter(Boolean).join(" · ")}
+                  {libraryPhoto?.licensing_enabled ? (
+                    <>
+                      {article.image_caption || article.photo_credit ? " · " : ""}
+                      <Link href={localePath(locale, `/photos/${libraryPhoto.slug}`) as Route} className="font-semibold text-forest underline-offset-2 hover:underline">
+                        {locale === "en" ? "License this photograph" : "Лицензирай тази фотография"}
+                      </Link>
+                    </>
+                  ) : null}
                 </figcaption>
               ) : null}
             </figure>

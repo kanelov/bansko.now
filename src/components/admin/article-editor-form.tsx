@@ -2,6 +2,8 @@
 
 import Link from "next/link";
 import { useMemo, useRef, useState } from "react";
+import { ArticlePhotoPicker } from "@/components/admin/article-photo-picker";
+import type { LocalizedPhotoCard } from "@/lib/photos";
 import { useFormStatus } from "react-dom";
 import { publishArticleAction, upsertArticleAction } from "@/app/admin/actions";
 import { ArticleTableOfContents } from "@/components/public/article-table-of-contents";
@@ -332,6 +334,17 @@ export function ArticleEditorForm({
     }));
   }
 
+  // A photo library image is reused, not copied: the article points at the same R2 file.
+  function selectLibraryPhoto(photo: LocalizedPhotoCard) {
+    if (!photo.article_url) return;
+    setDraft((current) => ({
+      ...current,
+      featured_image_url: photo.article_url as string,
+      featured_image_alt: current.featured_image_alt || photo.alt,
+      og_image_url: current.og_image_url || (photo.article_url as string)
+    }));
+  }
+
   function insertIntoContent(before: string, after = "", fallback = "") {
     const textarea = contentRef.current;
     const start = textarea?.selectionStart ?? draft.content.length;
@@ -542,6 +555,7 @@ export function ArticleEditorForm({
               </div>
             </div>
           ) : null}
+          <ArticlePhotoPicker locale={locale} onFeatured={selectLibraryPhoto} onInsert={insertSnippet} />
           <label className="grid gap-2 text-sm font-semibold">
             Source links
             <textarea

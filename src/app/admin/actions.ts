@@ -3,7 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
-import { mediaBucket, publishArticleRecord, revalidateEditorialPaths, revalidatePublicPath, syncTags } from "@/lib/articles-admin";
+import { mediaBucket, publishArticleRecord, revalidateEditorialPaths, revalidatePublicPath, syncArticlePhotos, syncTags } from "@/lib/articles-admin";
 import { createImageVariants } from "@/lib/image-variants";
 import { estimateReadingTime } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
@@ -260,6 +260,13 @@ export async function upsertArticleAction(formData: FormData) {
     if (!id || booleanValue(formData, "tags_dirty")) {
       await syncTags(supabase, result.data.id, stringValue(formData, "tags_input"), locale);
     }
+
+    await syncArticlePhotos(
+      supabase,
+      result.data.id,
+      stringValue(formData, "featured_image_url"),
+      stringValue(formData, "content")
+    );
 
     if (isNewPublish) {
       await publishArticleRecord(supabase, result.data.id);

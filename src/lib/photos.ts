@@ -13,7 +13,7 @@ import type { Locale, Photo, PhotoLicenseType } from "@/lib/types";
 export const photoPageSize = 24;
 
 const listColumns =
-  "id,photo_code,slug,title_bg,title_en,alt_bg,alt_en,location_name,year_taken,season,category,tags,orientation,width,height,thumb_key,dominant_color,is_featured,price_tier";
+  "id,photo_code,slug,title_bg,title_en,alt_bg,alt_en,location_name,year_taken,season,category,tags,orientation,width,height,thumb_key,article_key,dominant_color,is_featured,price_tier";
 
 export type PhotoCard = Pick<
   Photo,
@@ -33,12 +33,13 @@ export type PhotoCard = Pick<
   | "width"
   | "height"
   | "thumb_key"
+  | "article_key"
   | "dominant_color"
   | "is_featured"
   | "price_tier"
 >;
 
-export type LocalizedPhotoCard = PhotoCard & { title: string; alt: string; thumb_url: string | null };
+export type LocalizedPhotoCard = PhotoCard & { title: string; alt: string; thumb_url: string | null; article_url: string | null };
 export type LocalizedPhoto = Photo & {
   title: string;
   description: string | null;
@@ -66,7 +67,8 @@ function localizeCard(photo: PhotoCard, locale: Locale): LocalizedPhotoCard {
     ...photo,
     title,
     alt: (locale === "en" ? photo.alt_en || photo.alt_bg : photo.alt_bg) || title,
-    thumb_url: getPublicPhotoUrl(photo.thumb_key)
+    thumb_url: getPublicPhotoUrl(photo.thumb_key),
+    article_url: getPublicPhotoUrl(photo.article_key)
   };
 }
 
@@ -208,4 +210,34 @@ export async function getRecentPhotoSlugs(limit = 100) {
     .order("published_at", { ascending: false })
     .limit(limit);
   return (data ?? []).map((row) => row.slug as string);
+}
+
+/** Photo behind an article image URL (photos/public/article/BNK-000123.webp). */
+export async function getPhotoByCode(code: string, locale: Locale) {
+  const supabase = createPublicSupabaseClient();
+  if (!supabase) return null;
+  const { data } = await supabase
+    .from("photos")
+    .select("photo_code,slug,title_bg,title_en,is_published,licensing_enabled")
+    .eq("photo_code", code.toUpperCase())
+    .eq("is_published", true)
+    .maybeSingle();
+  if (!data) return null;
+  return {
+    photo_code: data.photo_code as string,
+    slug: data.slug as string,
+    title: ((locale === "en" ? data.title_en || data.title_bg : data.title_bg) as string) || (data.photo_code as string),
+    licensing_enabled: Boolean(data.licensing_enabled)
+  };
+}
+
+/** Photo codes referenced by an article's featured image and body. */
+export function photoCodesInContent(...values: Array<string | null | undefined>) {
+  const codes = new Set<string>();
+  for (const value of values) {
+    for (const match of String(value || "").matchAll(/photos\/public\/(?:article|thumb|preview)\/(BNK-\d{6})\./gi)) {
+      codes.add(match[1].toUpperCase());
+    }
+  }
+  return [...codes];
 }

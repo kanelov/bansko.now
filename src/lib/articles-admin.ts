@@ -2,6 +2,7 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { revalidatePath } from "next/cache";
 import { slugify } from "@/lib/slug";
+import { photoCodesInContent } from "@/lib/photos";
 import type { Database, Locale } from "@/lib/types";
 
 export const mediaBucket = "bansko-media";
@@ -106,4 +107,42 @@ export async function ensureArticleCategoryVisible(supabase: SupabaseClient<Data
   }
 
   await supabase.from("categories").update({ is_visible: true }).eq("id", article.category_id).eq("is_visible", false);
+}
+
+/**
+ * Records which photo library images an article uses. Called after every save: the featured
+ * image and the body are scanned for R2 photo keys and article_photos is brought in line.
+ */
+export async function syncArticlePhotos(
+  supabase: SupabaseClient<Database>,
+  articleId: string,
+  featuredImageUrl: string | null | undefined,
+  content: string | null | undefined
+) {
+  const featuredCodes = photoCodesInContent(featuredImageUrl);
+  const bodyCodes = photoCodesInContent(content).filter((code) => !featuredCodes.includes(code));
+  const codes = [...featuredCodes, ...bodyCodes];
+
+  if (!codes.length) {
+    await supabase.from("article_photos").delete().eq("article_id", articleId);
+    return;
+  }
+
+  const { data: photos } = await supabase.from("photos").select("id,photo_code").in("photo_code", codes);
+  const idByCode = new Map((photos ?? []).map((photo) => [photo.photo_code, photo.id]));
+  const rows = codes
+    .map((code, index) => {
+      const photoId = idByCode.get(code);
+      if (!photoId) return null;
+      return {
+        article_id: articleId,
+        photo_id: photoId,
+        usage_type: featuredCodes.includes(code) ? ("featured" as const) : ("inline" as const),
+        sort_order: index
+      };
+    })
+    .filter((row): row is { article_id: string; photo_id: string; usage_type: "featured" | "inline"; sort_order: number } => Boolean(row));
+
+  await supabase.from("article_photos").delete().eq("article_id", articleId);
+  if (rows.length) await supabase.from("article_photos").insert(rows);
 }
