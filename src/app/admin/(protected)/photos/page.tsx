@@ -1,4 +1,5 @@
 import { deletePhotoAction, updatePhotoAction } from "@/app/admin/photo-actions";
+import { PhotoCsvTools } from "@/components/admin/photo-csv-tools";
 import { PhotoUploader } from "@/components/admin/photo-uploader";
 import { getPublicPhotoUrl, photoPublicUrlConfigured, photoStorageConfigured } from "@/lib/photo-storage";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -66,6 +67,8 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
       ) : null}
 
       <PhotoUploader />
+
+      {photos.length ? <PhotoCsvTools /> : null}
 
       <div className="grid gap-4">
         {photos.map((photo) => {
