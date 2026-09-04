@@ -2,13 +2,12 @@ import "server-only";
 
 import sharp from "sharp";
 import { photoObjectKey, uploadPhoto } from "@/lib/photo-storage";
+import { watermarkImage } from "@/lib/photo-watermark";
 
 /**
  * Turns one finished JPEG into the five files the photo library needs.
  * Runs server side only (admin upload or the Drive import queue), never in a visitor request.
  */
-
-export const watermarkText = "© Лубо Кънелов · bansko.now";
 
 export type PhotoDerivatives = {
   thumb_key: string;
@@ -24,32 +23,12 @@ export type PhotoDerivatives = {
 
 const maxSourceBytes = 80 * 1024 * 1024;
 
-function escapeXml(value: string) {
-  return value.replace(/[<>&'"]/g, (character) =>
-    ({ "<": "&lt;", ">": "&gt;", "&": "&amp;", "'": "&apos;", '"': "&quot;" })[character] as string
-  );
+/** Scales the pre-rendered mark to about a third of the photo width. */
+async function watermarkFor(width: number) {
+  const target = Math.max(320, Math.round(width * 0.34));
+  return sharp(watermarkImage()).resize({ width: target, withoutEnlargement: false }).png().toBuffer();
 }
 
-/** Discreet bottom-right watermark; `strength` controls how visible it is. */
-function watermarkSvg(width: number, height: number, strength: "light" | "strong") {
-  const fontSize = Math.max(14, Math.round(width * (strength === "strong" ? 0.026 : 0.018)));
-  const padding = Math.round(fontSize * 1.1);
-  const opacity = strength === "strong" ? 0.5 : 0.32;
-  return Buffer.from(
-    `<svg width="${width}" height="${height}" xmlns="http://www.w3.org/2000/svg">
-      <text x="${width - padding}" y="${height - padding}" text-anchor="end"
-        font-family="Georgia, 'Times New Roman', serif" font-size="${fontSize}"
-        fill="#ffffff" fill-opacity="${opacity}"
-        stroke="#000000" stroke-opacity="${opacity * 0.5}" stroke-width="${Math.max(1, fontSize * 0.02)}"
-      >${escapeXml(watermarkText)}</text>
-    </svg>`
-  );
-}
-
-/**
- * Creates and uploads every derivative for one photo.
- * Public files are WebP, licensed files are clean JPEG without a watermark.
- */
 export async function createPhotoDerivatives(buffer: Buffer, photoCode: string): Promise<PhotoDerivatives> {
   if (buffer.byteLength > maxSourceBytes) throw new Error("Файлът е над 80 MB.");
 
@@ -96,8 +75,9 @@ export async function createPhotoDerivatives(buffer: Buffer, photoCode: string):
   await step("за статии", keys.article_key, "image/webp", () => resize(1800).webp({ quality: 82, effort: 4 }).toBuffer());
   await step("преглед с воден знак", keys.preview_key, "image/webp", async () => {
     const base = await resize(2000).toBuffer({ resolveWithObject: true });
+    const mark = await watermarkFor(base.info.width);
     return sharp(base.data)
-      .composite([{ input: watermarkSvg(base.info.width, base.info.height, "strong"), gravity: "southeast" }])
+      .composite([{ input: mark, gravity: "southeast" }])
       .webp({ quality: 80, effort: 4 })
       .toBuffer();
   });
