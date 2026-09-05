@@ -21,7 +21,7 @@ export function GalleryCategoryCard({
 
   return (
     <article className="group overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-soft">
-      <Link href={href} className="block">
+      <Link href={href} prefetch={false} className="block">
         <div className="relative aspect-square overflow-hidden bg-stone-100">
           {category.image_url ? (
             <Image

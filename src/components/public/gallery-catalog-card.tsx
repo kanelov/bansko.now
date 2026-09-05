@@ -42,7 +42,7 @@ export function GalleryCatalogCard({
 
   return (
     <article className={`group overflow-hidden rounded-lg border border-stone-200 bg-white shadow-sm transition duration-200 hover:-translate-y-0.5 hover:border-stone-300 hover:shadow-soft ${featured ? "md:grid md:grid-cols-2 lg:col-span-3" : ""}`}>
-      <Link href={href} className="relative block aspect-square overflow-hidden bg-stone-100">
+      <Link href={href} prefetch={false} className="relative block aspect-square overflow-hidden bg-stone-100">
         {image ? (
           <Image
             src={image}
@@ -63,12 +63,12 @@ export function GalleryCatalogCard({
           <span>{availabilityLabel(product, locale)}</span>
         </div>
         <h2 className={`mt-3 font-serif font-semibold leading-tight text-stone-950 ${featured ? "text-4xl" : "text-2xl"}`}>
-          <Link href={href} className="transition hover:text-forest">{product.title}</Link>
+          <Link href={href} prefetch={false} className="transition hover:text-forest">{product.title}</Link>
         </h2>
         {product.short_description ? <p className="mt-3 line-clamp-3 text-sm leading-6 text-stone-650">{product.short_description}</p> : null}
         <div className="mt-6 flex flex-wrap items-center justify-between gap-3 border-t border-stone-200 pt-4">
           <strong className="text-lg text-forest">{product.price === null ? (locale === "en" ? "Price in gallery" : "Цена в галерията") : money(product.price, product.currency, locale)}</strong>
-          <Link href={href} className="inline-flex rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
+          <Link href={href} prefetch={false} className="inline-flex rounded-full bg-forest px-4 py-2 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
             {locale === "en" ? "View and order" : "Виж и поръчай"}
           </Link>
         </div>
