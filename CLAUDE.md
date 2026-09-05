@@ -38,9 +38,9 @@ There are three different projects in the owner's workspace.
 
 - Local path: `/Users/lubokanelov/Documents/GitHub/bansko.now`
 - GitHub: `https://github.com/kanelov/bansko.now.git`
-- Working branch at handoff: `codex/art-studio-commerce-mvp`
-- Handoff HEAD: `fd9e7d0` (`Bypass Vercel optimization for product images`)
-- The branch was clean and synced with `origin/codex/art-studio-commerce-mvp` on 2026-09-01.
+- Working branch at handoff (2026-09-01): `codex/art-studio-commerce-mvp`, HEAD `fd9e7d0` (`Bypass Vercel optimization for product images`).
+- Branch state on 2026-09-05: production had been deployed from `claude/blog-structure` (`a6c484a`, blog structure + photo library). The header menu fix lives on `claude/bansko-header-menu-fix-firtcr`, branched from that tip. Merge it (fast-forward) into `claude/blog-structure` and `main` so the next session starts from one branch. `main` still ends at `0985c6e` (2026-08-21); never use it as the base.
+- Owner-facing change log and planned work: `CHANGELOG.md`. Add an entry there after every change.
 - Production: `https://bansko.now`
 - Vercel project: `bansko-now`
 - Vercel project ID: `prj_RBSY4G7tNRU7Gw7HHV6P16gPf4LZ`
@@ -118,8 +118,8 @@ The source app at `https://app.kanelov.com` returned HTTP 200, but its live `app
 ```bash
 cd /Users/lubokanelov/Documents/GitHub/bansko.now
 git fetch --all --prune
-git switch codex/art-studio-commerce-mvp
-git pull --ff-only origin codex/art-studio-commerce-mvp
+git switch claude/bansko-header-menu-fix-firtcr   # or the newest branch listed in section 3.A
+git pull --ff-only
 pnpm install --frozen-lockfile
 pnpm typecheck
 pnpm lint
@@ -766,7 +766,7 @@ The source request app (`https://app.kanelov.com`) has a Content Hub module („
 - **Categories have `is_visible`.** Public queries (`getCategories`, `getCategoryBySlug`) return visible categories only; pass `{ includeHidden: true }` in the admin. A hidden category page returns 404, is not in the menu or the sitemap. `publishArticleRecord()` and the Content Hub endpoint make the category visible when an article is published into it. Visible categories with zero published articles render with `noindex` and stay out of the sitemap. Only „Банско сега“ (`now`) was visible at handoff; the four published articles were moved into it.
 - **Article URL by category.** `/{categorySlug}/{articleSlug}` redirects permanently to the article's current category path when the category changed. The old `/art-studio/...` article URLs are redirected in `next.config.ts` because the shop route shadows them.
 - **Header menu.** „Статии“ is a built-in dropdown (desktop: CSS hover/focus, mobile: nested `<details>`) listing „Всички статии“ plus visible categories with counts from `getPublishedArticleCounts()`. It is not a `navigation_items` row. Active nav rows at handoff: Art Studio, Бизнеси, Галерия.
-- **Caching.** Home, `/articles`, category and article pages export `revalidate = 900`; admin and Content Hub publishing still call `revalidatePath`. Do not add dynamic APIs (cookies/headers) to public pages or they fall back to per-request rendering. `revalidatePath()` matches the **internal** route, and BG pages render under `/bg/...` because `src/proxy.ts` rewrites the unprefixed URLs, so always revalidate through `revalidateLocalePath()` / `revalidatePublicPath()` in `src/lib/articles-admin.ts`. Calling `revalidatePath("/now")` or `revalidatePath("/")` silently misses the BG pages and the change only appears after the 15 minute window (fixed 2026-09-03).
+- **Caching.** Home, `/articles`, category and article pages export `revalidate = 900`; admin and Content Hub publishing still call `revalidatePath`. Do not add dynamic APIs (cookies/headers) to public pages or they fall back to per-request rendering. `revalidatePath()` matches the **internal** route, and BG pages render under `/bg/...` because `src/proxy.ts` rewrites the unprefixed URLs, so always revalidate through `revalidateLocalePath()` / `revalidatePublicPath()` in `src/lib/articles-admin.ts`. Calling `revalidatePath("/now")` or `revalidatePath("/")` silently misses the BG pages and the change only appears after the 15 minute window (fixed 2026-09-03). The `type: "layout"` form (and any `[param]` pattern) is matched against the **route pattern** `/[locale]/...`, so `revalidatePath("/bg", "layout")` matches nothing; the helpers now turn such calls into `/[locale]/...` automatically and refresh both locales at once (fixed 2026-09-05, the header menu did not refresh after „Запази менюто“).
 - **Light queries.** `getPublishedArticles()` selects `articleListColumns` (no body) unless `{ full: true }`. Search uses `searchPublishedArticles()` (database `ilike`, light rows). Keep it that way; the owner is close to the Supabase egress limit.
 - **Responsive images.** `src/lib/image-variants.ts` (sharp) stores new uploads as `articles/r/<yyyy-mm>/<id>-w480|w960|w1600.webp`; `ResponsiveImage` builds the `srcset` from the `-w1600.webp` name, older single files render unchanged. Used by the admin media upload and the Content Hub endpoint. Do not route these through Vercel image optimization.
 - **No stock photos.** Product type, product and service cards render a colour panel when no image is set instead of Unsplash fallbacks. Real photos are uploaded in the admin.

@@ -7,21 +7,44 @@ import type { Database, Locale } from "@/lib/types";
 
 export const mediaBucket = "bansko-media";
 
+/** Strips a leading locale so the caller can pass `/now`, `/bg/now` or `/en/now` alike. */
+function publicPathWithoutLocale(path: string) {
+  const normalized = path === "/" ? "" : path.startsWith("/") ? path : `/${path}`;
+  return normalized.replace(/^\/(bg|en)(?=\/|$)/, "");
+}
+
 /**
- * Public BG URLs carry no locale prefix (/now), but they render under /bg/now because
- * src/proxy.ts rewrites them. revalidatePath matches the internal route, so a BG path only
- * clears its cache with the prefix; without it a publish waits for the 15 minute ISR window.
+ * Revalidates one localized public path.
+ *
+ * Public pages live under the internal `/[locale]/...` route: BG URLs are rewritten to
+ * `/bg/...` by `src/proxy.ts`, so a concrete path must carry the locale before it reaches
+ * `revalidatePath()`.
+ *
+ * `type: "layout"` (and any `[param]` route pattern) is matched by Next.js against the
+ * route pattern `/[locale]/...`, never against a concrete `/bg/...` path, so such calls
+ * refresh both locales at once. A concrete path is always revalidated as a single page.
  */
 export function revalidateLocalePath(locale: Locale, path = "/", type?: "layout" | "page") {
-  const normalized = path === "/" ? "" : path.startsWith("/") ? path : `/${path}`;
-  const withoutLocale = normalized.replace(/^\/(bg|en)(?=\/|$)/, "");
-  revalidatePath(`/${locale}${withoutLocale}`, type);
+  const withoutLocale = publicPathWithoutLocale(path);
+
+  if (type === "layout" || withoutLocale.includes("[")) {
+    revalidatePath(`/[locale]${withoutLocale}`, type ?? "page");
+    return;
+  }
+
+  revalidatePath(`/${locale}${withoutLocale}`);
 }
 
 /** Same, for a path that exists in both locales. */
 export function revalidatePublicPath(path = "/", type?: "layout" | "page") {
-  revalidateLocalePath("bg", path, type);
-  revalidateLocalePath("en", path, type);
+  if (type === "layout" || publicPathWithoutLocale(path).includes("[")) {
+    // Pattern based revalidation already covers every locale.
+    revalidateLocalePath("bg", path, type);
+    return;
+  }
+
+  revalidateLocalePath("bg", path);
+  revalidateLocalePath("en", path);
 }
 
 export function revalidateEditorialPaths() {

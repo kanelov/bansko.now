@@ -190,6 +190,7 @@ export async function SiteHeader({ locale = "bg", alternateHref }: { locale?: Lo
           )}
         </Link>
 
+        {/* Desktop menu from xl; the "Меню" dropdown covers everything below xl (the icon row is already visible from lg, so the dropdown hides its duplicates there). */}
         <nav className="hidden min-w-0 flex-1 items-center justify-center gap-1 xl:flex" aria-label={dictionary.navigation}>
           <DesktopArticlesMenu locale={locale} data={articlesMenu} />
           {navItems.map((item) => (
@@ -215,7 +216,7 @@ export async function SiteHeader({ locale = "bg", alternateHref }: { locale?: Lo
           <SupportProjectButton settings={settings} locale={locale} />
         </div>
 
-        <details className="group relative lg:hidden">
+        <details className="group relative xl:hidden">
           <summary className="list-none rounded-full border border-stone-300 px-4 py-2 text-sm font-medium text-stone-800">
             {dictionary.menu}
           </summary>
@@ -225,15 +226,17 @@ export async function SiteHeader({ locale = "bg", alternateHref }: { locale?: Lo
               {navItems.map((item) => (
                 <MobileMenuItem key={item.id} item={item} locale={locale} />
               ))}
-              <SiteSearch compact locale={locale} />
+              <div className="lg:hidden">
+                <SiteSearch compact locale={locale} />
+              </div>
               {languageHref ? (
-                <Link href={languageHref as Route} hrefLang={locale === "bg" ? "en" : "bg"} className="group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white">
+                <Link href={languageHref as Route} hrefLang={locale === "bg" ? "en" : "bg"} className="group flex items-center gap-2 rounded-xl px-3 py-2.5 text-sm font-medium text-stone-700 transition hover:bg-forest hover:text-white lg:hidden">
                   <IconGlyph name="globe" className="h-4 w-4 text-forest transition group-hover:text-white" />
                   {dictionary.otherLocaleName}
                 </Link>
               ) : null}
             </nav>
-            <div className="mt-3 flex items-center gap-2 border-t border-stone-200 pt-3">
+            <div className="mt-3 flex items-center gap-2 border-t border-stone-200 pt-3 lg:hidden">
               {socialLinks.map((link) => (
                 <SocialIconLink key={link.id} link={link} locale={locale} />
               ))}
