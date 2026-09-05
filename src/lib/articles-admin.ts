@@ -7,6 +7,13 @@ import type { Database, Locale } from "@/lib/types";
 
 export const mediaBucket = "bansko-media";
 
+/**
+ * App Router path of the public locale segment. Next.js tags every rendered page with its
+ * route pattern *including* the route group, e.g. `_N_T_/(site)/[locale]/layout`, so pattern
+ * based revalidation must use exactly this prefix (see `.next/server/app/bg.meta` after a build).
+ */
+const publicRoutePattern = "/(site)/[locale]";
+
 /** Strips a leading locale so the caller can pass `/now`, `/bg/now` or `/en/now` alike. */
 function publicPathWithoutLocale(path: string) {
   const normalized = path === "/" ? "" : path.startsWith("/") ? path : `/${path}`;
@@ -21,14 +28,14 @@ function publicPathWithoutLocale(path: string) {
  * `revalidatePath()`.
  *
  * `type: "layout"` (and any `[param]` route pattern) is matched by Next.js against the
- * route pattern `/[locale]/...`, never against a concrete `/bg/...` path, so such calls
- * refresh both locales at once. A concrete path is always revalidated as a single page.
+ * route pattern `/(site)/[locale]/...`, never against a concrete `/bg/...` path, so such
+ * calls refresh both locales at once. A concrete path is always revalidated as a single page.
  */
 export function revalidateLocalePath(locale: Locale, path = "/", type?: "layout" | "page") {
   const withoutLocale = publicPathWithoutLocale(path);
 
   if (type === "layout" || withoutLocale.includes("[")) {
-    revalidatePath(`/[locale]${withoutLocale}`, type ?? "page");
+    revalidatePath(`${publicRoutePattern}${withoutLocale}`, type ?? "page");
     return;
   }
 
