@@ -39,7 +39,7 @@ There are three different projects in the owner's workspace.
 - Local path: `/Users/lubokanelov/Documents/GitHub/bansko.now`
 - GitHub: `https://github.com/kanelov/bansko.now.git`
 - Working branch at handoff (2026-09-01): `codex/art-studio-commerce-mvp`, HEAD `fd9e7d0` (`Bypass Vercel optimization for product images`).
-- Branch state on 2026-09-05: production had been deployed from `claude/blog-structure` (`a6c484a`, blog structure + photo library). The header menu fix lives on `claude/bansko-header-menu-fix-firtcr`, branched from that tip. Merge it (fast-forward) into `claude/blog-structure` and `main` so the next session starts from one branch. `main` still ends at `0985c6e` (2026-08-21); never use it as the base.
+- Since 2026-09-05 `main` is the single working branch: it contains the former production branch `claude/blog-structure` (blog structure + photo library) merged with the old `main` (PR #1) plus the header menu fix. Work on `main` from any computer (`git switch main && git pull --ff-only`); commit and push to `main`. `claude/blog-structure`, `claude/bansko-header-menu-fix-firtcr` and the `codex/*` branches are history only, do not base new work on them.
 - Owner-facing change log and planned work: `CHANGELOG.md`. Add an entry there after every change.
 - Production: `https://bansko.now`
 - Vercel project: `bansko-now`
@@ -118,8 +118,8 @@ The source app at `https://app.kanelov.com` returned HTTP 200, but its live `app
 ```bash
 cd /Users/lubokanelov/Documents/GitHub/bansko.now
 git fetch --all --prune
-git switch claude/bansko-header-menu-fix-firtcr   # or the newest branch listed in section 3.A
-git pull --ff-only
+git switch main
+git pull --ff-only origin main
 pnpm install --frozen-lockfile
 pnpm typecheck
 pnpm lint
@@ -695,7 +695,7 @@ Rules:
 - Never discard unrelated owner changes.
 - Never use `git reset --hard` or overwrite production data.
 - Keep Bansko NOW and source app commits separate.
-- Use a feature branch from the latest intended base.
+- Small changes go straight to `main`; use a short-lived feature branch from `main` only for larger work, and merge it back into `main` when done.
 - Review `git diff` and run checks before commit.
 - Push before deploying.
 - Do not deploy the source integration branch while it is behind `main`.
