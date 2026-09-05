@@ -3,7 +3,7 @@
 import { redirect } from "next/navigation";
 import { siteUrl } from "@/lib/env";
 import { localePath } from "@/lib/i18n";
-import { getPhotoBySlug, getPhotoLicenseTypes, photoLicensePrice } from "@/lib/photos";
+import { getPhotoArchiveCopy, getPhotoBySlug, getPhotoLicenseTypes, photoLicensePrice } from "@/lib/photos";
 import { getStripeClient } from "@/lib/stripe";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Locale } from "@/lib/types";
@@ -67,6 +67,7 @@ export async function createPhotoLicenseCheckoutAction(formData: FormData) {
   if (error || !order) return fail("save-failed");
 
   const licenseName = locale === "en" ? license.name_en : license.name_bg;
+  const text = await getPhotoArchiveCopy(locale);
   let checkoutUrl: string | null = null;
   try {
     const session = await stripe.checkout.sessions.create({
@@ -82,7 +83,7 @@ export async function createPhotoLicenseCheckoutAction(formData: FormData) {
             unit_amount: Math.round(amount * 100),
             product_data: {
               name: `${photo.title} · ${licenseName}`,
-              description: `${photo.photo_code} · ${locale === "en" ? "Photograph by Lubo Kanelov" : "Фотография от Лубо Кънелов"}`,
+              description: `${photo.photo_code} · ${text.checkoutDescription}`,
               images: photo.thumb_url ? [photo.thumb_url] : undefined
             }
           }

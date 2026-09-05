@@ -8,7 +8,7 @@ import { SiteHeader } from "@/components/public/site-header";
 import { getArtStudioProductTypes } from "@/lib/art-studio";
 import { getSiteSettings } from "@/lib/content";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
-import { getPhotoFacets, getPublishedPhotos } from "@/lib/photos";
+import { getPhotoArchiveCopy, getPhotoFacets, getPublishedPhotos } from "@/lib/photos";
 
 type Params = Promise<{ locale: string; category: string }>;
 
@@ -59,6 +59,7 @@ export default async function PhotoCategoryPage({ params }: { params: Params }) 
   if (!isLocale(locale)) notFound();
   const name = await resolveCategory(category);
   if (!name) notFound();
+  const text = await getPhotoArchiveCopy(locale);
 
   const [initial, facets, settings, productTypes] = await Promise.all([
     getPublishedPhotos(locale, { page: 1, category: name }),
@@ -76,12 +77,12 @@ export default async function PhotoCategoryPage({ params }: { params: Params }) 
         <nav className="text-sm text-stone-500" aria-label={locale === "en" ? "Breadcrumb" : "Навигация"}>
           <Link href={localePath(locale, "/") as Route}>{locale === "en" ? "Home" : "Начало"}</Link>
           <span className="px-2">/</span>
-          <Link href={localePath(locale, "/photos") as Route}>{locale === "en" ? "Photo Library" : "Фотоархив"}</Link>
+          <Link href={localePath(locale, "/photos") as Route}>{text.eyebrow}</Link>
           <span className="px-2">/</span>
           <span className="text-stone-700">{name}</span>
         </nav>
         <header className="mt-8 max-w-3xl">
-          <p className="text-sm font-semibold uppercase text-moss">{locale === "en" ? "Photo Library" : "Фотоархив"}</p>
+          <p className="text-sm font-semibold uppercase text-moss">{text.eyebrow}</p>
           <h1 className="mt-3 font-serif text-5xl font-semibold leading-tight text-stone-950 sm:text-6xl">{name}</h1>
           <p className="mt-5 text-lg leading-8 text-stone-650">
             {locale === "en"

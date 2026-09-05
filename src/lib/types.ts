@@ -829,6 +829,14 @@ export type PhotoLicenseOrder = {
   paid_at: string | null;
 };
 
+export type PhotoPublicSettings = {
+  id: string;
+  /** Editable texts of the photo archive pages: { bg: {...}, en: {...} } (see photo-copy.ts). */
+  page_copy: Json;
+  created_at: string;
+  updated_at: string;
+};
+
 export type Database = {
   public: {
     Tables: {
@@ -960,6 +968,12 @@ export type Database = {
         Row: PhotoLicenseOrder;
         Insert: Partial<PhotoLicenseOrder> & Pick<PhotoLicenseOrder, "photo_id" | "license_type_id" | "license_code" | "license_version" | "license_terms_snapshot" | "customer_email" | "amount">;
         Update: Partial<PhotoLicenseOrder>;
+        Relationships: [];
+      };
+      photo_public_settings: {
+        Row: PhotoPublicSettings;
+        Insert: Partial<PhotoPublicSettings>;
+        Update: Partial<PhotoPublicSettings>;
         Relationships: [];
       };
       art_studio_product_types: {

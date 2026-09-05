@@ -2,8 +2,9 @@ import "server-only";
 
 import { cache } from "react";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
+import { resolvePhotoArchiveCopy } from "@/lib/photo-copy";
 import { getPublicPhotoUrl } from "@/lib/photo-storage";
-import type { Locale, Photo, PhotoLicenseType } from "@/lib/types";
+import type { Locale, Photo, PhotoLicenseType, PhotoPublicSettings } from "@/lib/types";
 
 /**
  * Read access for the photo library. Public queries only return published photos and
@@ -177,6 +178,22 @@ export async function getPhotoLicenseTypes() {
     .eq("is_active", true)
     .order("sort_order", { ascending: true });
   return (data ?? []) as PhotoLicenseType[];
+}
+
+const fallbackPhotoSettings: PhotoPublicSettings = { id: "fallback", page_copy: {}, created_at: "", updated_at: "" };
+
+/** The single row with the editable archive texts; one tiny query, cached per render. */
+export const getPhotoPublicSettings = cache(async (): Promise<PhotoPublicSettings> => {
+  const supabase = createPublicSupabaseClient();
+  if (!supabase) return fallbackPhotoSettings;
+  const { data, error } = await supabase.from("photo_public_settings").select("*").limit(1).maybeSingle();
+  return error || !data ? fallbackPhotoSettings : (data as PhotoPublicSettings);
+});
+
+/** Archive texts for one locale: admin overrides over the defaults in photo-copy.ts. */
+export async function getPhotoArchiveCopy(locale: Locale) {
+  const settings = await getPhotoPublicSettings();
+  return resolvePhotoArchiveCopy(settings.page_copy, locale);
 }
 
 /** Price for one photo and license: the tier price unless the photo overrides it. */

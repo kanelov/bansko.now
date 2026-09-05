@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useRef, useState } from "react";
+import { photoCopyDefaults } from "@/lib/photo-copy";
 import type { LocalizedPhotoCard } from "@/lib/photos";
 import type { Locale } from "@/lib/types";
 
@@ -49,7 +50,7 @@ export function ArticlePhotoPicker({
     if (!photo.article_url) return "";
     const licenseUrl = `/${locale === "en" ? "en/" : ""}photos/${photo.slug}`;
     const credit = locale === "en" ? "License this photograph" : "Лицензирай тази фотография";
-    return `\n\n![${photo.alt}](${photo.article_url})\n*© Lubo Kanelov · [${credit}](${licenseUrl})*\n`;
+    return `\n\n![${photo.alt}](${photo.article_url})\n*© ${photoCopyDefaults[locale === "en" ? "en" : "bg"].photographerName} · [${credit}](${licenseUrl})*\n`;
   }
 
   if (!opened) {

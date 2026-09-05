@@ -9,7 +9,7 @@ import { getArtStudioProductTypes } from "@/lib/art-studio";
 import { getSiteSettings } from "@/lib/content";
 import { siteUrl } from "@/lib/env";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
-import { getPhotoBySlug, getPhotoLicenseTypes, getRecentPhotoSlugs, getRelatedPhotos, photoLicensePrice } from "@/lib/photos";
+import { getPhotoArchiveCopy, getPhotoBySlug, getPhotoLicenseTypes, getRecentPhotoSlugs, getRelatedPhotos, photoLicensePrice } from "@/lib/photos";
 import type { Locale } from "@/lib/types";
 
 type Params = Promise<{ locale: string; slug: string }>;
@@ -69,6 +69,7 @@ export default async function PhotoPage({ params }: { params: Params }) {
   if (!photo) notFound();
 
   const isEnglish = locale === "en";
+  const text = await getPhotoArchiveCopy(locale);
   const [licenses, related, settings, productTypes] = await Promise.all([
     getPhotoLicenseTypes(),
     getRelatedPhotos(photo, locale),
@@ -96,10 +97,10 @@ export default async function PhotoPage({ params }: { params: Params }) {
     dateCreated: photo.date_taken || undefined,
     contentLocation: photo.location_name ? { "@type": "Place", name: photo.location_name } : undefined,
     keywords: photo.tags?.length ? photo.tags.join(", ") : undefined,
-    creator: { "@type": "Person", name: "Lubo Kanelov" },
-    copyrightHolder: { "@type": "Person", name: "Lubo Kanelov" },
-    copyrightNotice: "© Lubo Kanelov / bansko.now",
-    creditText: "Lubo Kanelov / bansko.now",
+    creator: { "@type": "Person", name: text.photographerName },
+    copyrightHolder: { "@type": "Person", name: text.photographerName },
+    copyrightNotice: text.creditLine,
+    creditText: text.creditLine.replace(/^©\s*/, ""),
     license: localeUrl(locale, "/terms"),
     acquireLicensePage: pageUrl,
     isPartOf: { "@id": `${siteUrl}/#website` },
@@ -110,7 +111,7 @@ export default async function PhotoPage({ params }: { params: Params }) {
     "@type": "BreadcrumbList",
     itemListElement: [
       { "@type": "ListItem", position: 1, name: isEnglish ? "Home" : "Начало", item: localeUrl(locale) },
-      { "@type": "ListItem", position: 2, name: isEnglish ? "Photo Library" : "Фотоархив", item: localeUrl(locale, "/photos") },
+      { "@type": "ListItem", position: 2, name: text.eyebrow, item: localeUrl(locale, "/photos") },
       ...(photo.category
         ? [{ "@type": "ListItem", position: 3, name: photo.category, item: localeUrl(locale, `/photos/category/${encodeURIComponent(photo.category.toLowerCase())}`) }]
         : []),
@@ -125,7 +126,7 @@ export default async function PhotoPage({ params }: { params: Params }) {
         <nav className="text-sm text-stone-500" aria-label={isEnglish ? "Breadcrumb" : "Навигация"}>
           <Link href={localePath(locale, "/") as Route}>{isEnglish ? "Home" : "Начало"}</Link>
           <span className="px-2">/</span>
-          <Link href={localePath(locale, "/photos") as Route}>{isEnglish ? "Photo Library" : "Фотоархив"}</Link>
+          <Link href={localePath(locale, "/photos") as Route}>{text.eyebrow}</Link>
           {photo.category ? (
             <>
               <span className="px-2">/</span>
@@ -157,13 +158,13 @@ export default async function PhotoPage({ params }: { params: Params }) {
 
           <aside className="grid gap-5 lg:col-span-4">
             <header>
-              <p className="text-sm font-semibold uppercase text-moss">{isEnglish ? "Photograph" : "Фотография"} {photo.photo_code}</p>
+              <p className="text-sm font-semibold uppercase text-moss">{text.photographLabel} {photo.photo_code}</p>
               <h1 className="mt-2 font-serif text-4xl font-semibold leading-tight text-stone-950">{photo.title}</h1>
               {photo.description ? <p className="mt-3 text-base leading-7 text-stone-650">{photo.description}</p> : null}
             </header>
 
             <dl className="grid gap-2 rounded-2xl border border-stone-200 bg-white p-4 text-sm">
-              <div className="flex justify-between gap-3"><dt className="text-stone-600">{isEnglish ? "Photographer" : "Фотограф"}</dt><dd className="font-semibold text-stone-900">Лубо Кънелов</dd></div>
+              <div className="flex justify-between gap-3"><dt className="text-stone-600">{isEnglish ? "Photographer" : "Фотограф"}</dt><dd className="font-semibold text-stone-900">{text.photographerName}</dd></div>
               {photo.location_name ? <div className="flex justify-between gap-3"><dt className="text-stone-600">{isEnglish ? "Location" : "Място"}</dt><dd className="font-semibold text-stone-900">{photo.location_name}</dd></div> : null}
               {dateLabel ? <div className="flex justify-between gap-3"><dt className="text-stone-600">{isEnglish ? "Taken" : "Заснета"}</dt><dd className="font-semibold text-stone-900">{dateLabel}</dd></div> : null}
               {photo.width && photo.height ? <div className="flex justify-between gap-3"><dt className="text-stone-600">{isEnglish ? "Size" : "Размер"}</dt><dd className="font-semibold text-stone-900">{photo.width} × {photo.height} px</dd></div> : null}
@@ -171,7 +172,7 @@ export default async function PhotoPage({ params }: { params: Params }) {
 
             {photo.licensing_enabled && licenses.length ? (
               <section className="grid gap-3 rounded-2xl border border-stone-200 bg-white p-5 shadow-soft" aria-labelledby="licence-heading">
-                <h2 id="licence-heading" className="font-serif text-2xl font-semibold text-stone-950">{isEnglish ? "License this photograph" : "Лицензирай тази фотография"}</h2>
+                <h2 id="licence-heading" className="font-serif text-2xl font-semibold text-stone-950">{text.licenseHeading}</h2>
                 {licenses.map((license) => (
                   <div key={license.id} className="grid gap-1 rounded-xl border border-stone-200 p-3">
                     <div className="flex items-baseline justify-between gap-3">
@@ -185,17 +186,17 @@ export default async function PhotoPage({ params }: { params: Params }) {
                   href={localePath(locale, `/photos/${photo.slug}/license`) as Route}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-forest px-6 py-3 text-sm font-semibold text-white transition hover:bg-moss"
                 >
-                  {isEnglish ? "License this photograph" : "Лицензирай"}
+                  {text.licenseButton}
                   <IconGlyph name="arrow-right" className="h-4 w-4" />
                 </Link>
                 <Link
                   href={printHref}
                   className="inline-flex items-center justify-center gap-2 rounded-full border border-stone-300 px-6 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white"
                 >
-                  {isEnglish ? "Order as a print" : "Поръчай като принт"}
+                  {text.printButton}
                 </Link>
                 <p className="text-center text-xs leading-5 text-stone-500">
-                  {isEnglish ? "© Lubo Kanelov. The copyright stays with the photographer." : "© Лубо Кънелов. Авторското право остава у автора."}
+                  {text.copyrightNote}
                 </p>
               </section>
             ) : null}
@@ -212,7 +213,7 @@ export default async function PhotoPage({ params }: { params: Params }) {
 
         {related.length ? (
           <section className="mt-16" aria-labelledby="related-heading">
-            <h2 id="related-heading" className="font-serif text-3xl font-semibold text-stone-950">{isEnglish ? "Related photographs" : "Подобни фотографии"}</h2>
+            <h2 id="related-heading" className="font-serif text-3xl font-semibold text-stone-950">{text.relatedHeading}</h2>
             <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-6">
               {related.map((item) => (
                 <Link key={item.id} href={localePath(locale, `/photos/${item.slug}`) as Route} className="block overflow-hidden rounded-xl border border-stone-200 bg-stone-100 transition hover:border-moss">

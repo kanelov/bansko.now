@@ -1,4 +1,5 @@
 import { deletePhotoAction, updatePhotoAction } from "@/app/admin/photo-actions";
+import { PhotoAdminNav } from "@/components/admin/photo-admin-nav";
 import { PhotoCsvTools } from "@/components/admin/photo-csv-tools";
 import { PhotoUploader } from "@/components/admin/photo-uploader";
 import { getPublicPhotoUrl, photoPublicUrlConfigured, photoStorageConfigured } from "@/lib/photo-storage";
@@ -34,6 +35,14 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
         .order("created_at", { ascending: false })
         .limit(5)
     : { data: [] };
+  // Current license prices, so the price tier labels below never go stale.
+  const { data: licenseTypes } = supabase
+    ? await supabase.from("photo_license_types").select("code,price_standard_eur,price_premium_eur").eq("is_active", true).order("sort_order", { ascending: true })
+    : { data: [] };
+  const tierLabel = (tier: "standard" | "premium") => {
+    const prices = (licenseTypes ?? []).map((row) => Number(tier === "standard" ? row.price_standard_eur : row.price_premium_eur).toFixed(0));
+    return prices.length ? ` (${prices.join(" / ")} EUR)` : "";
+  };
 
   return (
     <div className="grid gap-8">
@@ -43,8 +52,10 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
           <h1 className="mt-2 font-serif text-4xl font-semibold">Фотографии</h1>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
             {photos.length} във архива, {published} публикувани. Публикуваните се виждат на /photos и могат да се прикачат към статии.
+            Текстовете на страниците, името на фотографа и условията и цените на лицензите са в „Текстове и лицензи“.
           </p>
         </div>
+        <PhotoAdminNav />
       </header>
 
       {!photoStorageConfigured() ? (
@@ -177,8 +188,8 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
                   <label className={labelClass}>
                     Ниво на цената
                     <select name="price_tier" defaultValue={photo.price_tier} className={fieldClass}>
-                      <option value="standard">Репортажна (30 / 120 EUR)</option>
-                      <option value="premium">Пейзажна (50 / 250 EUR)</option>
+                      <option value="standard">Репортажна{tierLabel("standard")}</option>
+                      <option value="premium">Пейзажна{tierLabel("premium")}</option>
                     </select>
                   </label>
                   <label className={labelClass}>Собствена цена уеб (EUR)<input name="price_override_web" defaultValue={photo.price_override_web ?? ""} className={fieldClass} placeholder="празно = по нивото" /></label>

@@ -1,5 +1,7 @@
 -- Seed for the two photo license types. The wording stays editable from the admin;
 -- every paid order freezes a snapshot of the text that was shown at purchase time.
+-- Do NOT run this again on production after the texts were edited in the admin
+-- (Фотоархив → „Текстове и лицензи“): the upsert below overwrites them.
 insert into public.photo_license_types
   (code, name_bg, name_en, summary_bg, summary_en, download_variant,
    price_standard_eur, price_premium_eur, print_run_limit, terms_version, sort_order, terms_bg, terms_en)
@@ -8,7 +10,7 @@ values
    'За дигитална употреба: сайт, блог, онлайн издание, социални мрежи и презентации. Без печат за разпространение и без продукти за продажба.',
    'For digital use: website, blog, online publication, social media and presentations. No print distribution and no products for resale.',
    'web_license', 30.00, 50.00, null, 1, 10,
-   'Носител на авторското право: Лубо Кънелов (bansko.now). Авторското право остава изцяло у автора. Плащането дава право на ползване и не прехвърля собственост върху фотографията.
+   'Носител на авторското право: Любо Канелов (bansko.now). Авторското право остава изцяло у автора. Плащането дава право на ползване и не прехвърля собственост върху фотографията.
 
 Лицензът е неизключителен, безсрочен, за целия свят и е поименен: важи само за купувача, посочен в поръчката (едно физическо лице или една фирма).
 
@@ -19,7 +21,7 @@ values
 4. Изрязване и леки корекции на цвят, доколкото не променят съдържанието на фотографията.
 
 ЗАДЪЛЖИТЕЛНО
-5. При редакционна и онлайн публикация се посочва авторство: „© Лубо Кънелов / bansko.now“, освен ако писмено е уговорено друго.
+5. При редакционна и онлайн публикация се посочва авторство: „© Любо Канелов / bansko.now“, освен ако писмено е уговорено друго.
 
 ЗАБРАНЕНО
 6. Печат за разпространение: списания, книги, брошури, плакати, рекламни и печатни материали. За това служи Разширеният лиценз за печат.

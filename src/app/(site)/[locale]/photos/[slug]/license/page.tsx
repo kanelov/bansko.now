@@ -7,7 +7,7 @@ import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getSiteSettings } from "@/lib/content";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
-import { getPhotoBySlug, getPhotoLicenseTypes, photoLicensePrice } from "@/lib/photos";
+import { getPhotoArchiveCopy, getPhotoBySlug, getPhotoLicenseTypes, photoLicensePrice } from "@/lib/photos";
 import type { Locale } from "@/lib/types";
 
 type Params = Promise<{ locale: string; slug: string }>;
@@ -46,7 +46,7 @@ export default async function PhotoLicensePage({ params, searchParams }: { param
   if (!photo || !photo.licensing_enabled) notFound();
 
   const isEnglish = locale === "en";
-  const [licenses, settings] = await Promise.all([getPhotoLicenseTypes(), getSiteSettings(locale)]);
+  const [licenses, settings, text] = await Promise.all([getPhotoLicenseTypes(), getSiteSettings(locale), getPhotoArchiveCopy(locale)]);
   const errorText = query.error ? errors[query.error]?.[locale as Locale] : null;
   const money = (value: number) =>
     new Intl.NumberFormat(isEnglish ? "en-GB" : "bg-BG", { style: "currency", currency: "EUR", maximumFractionDigits: 0 }).format(value);
@@ -56,12 +56,12 @@ export default async function PhotoLicensePage({ params, searchParams }: { param
       <SiteHeader locale={locale} alternateHref={localePath(isEnglish ? "bg" : "en", `/photos/${photo.slug}/license`)} />
       <main className="mx-auto max-w-3xl px-4 pb-20 pt-24 sm:px-6">
         <nav className="text-sm text-stone-500">
-          <Link href={localePath(locale, "/photos") as Route}>{isEnglish ? "Photo Library" : "Фотоархив"}</Link>
+          <Link href={localePath(locale, "/photos") as Route}>{text.eyebrow}</Link>
           <span className="px-2">/</span>
           <Link href={localePath(locale, `/photos/${photo.slug}`) as Route}>{photo.title}</Link>
         </nav>
 
-        <h1 className="mt-8 font-serif text-4xl font-semibold text-stone-950">{isEnglish ? "License this photograph" : "Лицензирай тази фотография"}</h1>
+        <h1 className="mt-8 font-serif text-4xl font-semibold text-stone-950">{text.licensePageTitle}</h1>
         <div className="mt-4 flex items-center gap-4 rounded-2xl border border-stone-200 bg-white p-4">
           {photo.thumb_url ? (
             // eslint-disable-next-line @next/next/no-img-element -- deliberate: files are served from the R2 CDN
@@ -81,7 +81,7 @@ export default async function PhotoLicensePage({ params, searchParams }: { param
           <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
           <fieldset className="grid gap-3">
-            <legend className="font-semibold text-stone-950">{isEnglish ? "Choose a license" : "Избери лиценз"}</legend>
+            <legend className="font-semibold text-stone-950">{text.chooseLicense}</legend>
             {licenses.map((license, index) => (
               <label key={license.id} className="grid cursor-pointer grid-cols-[1.25rem_1fr_auto] items-start gap-3 rounded-xl border border-stone-200 p-4 transition hover:border-moss">
                 <input type="radio" name="license_code" value={license.code} defaultChecked={index === 0} required className="choice-control" />
@@ -101,7 +101,7 @@ export default async function PhotoLicensePage({ params, searchParams }: { param
           </div>
 
           <details className="rounded-xl border border-stone-200 p-4 text-sm">
-            <summary className="cursor-pointer font-semibold text-stone-950">{isEnglish ? "Read the license terms" : "Прочети условията на лиценза"}</summary>
+            <summary className="cursor-pointer font-semibold text-stone-950">{text.readTerms}</summary>
             <div className="mt-3 grid gap-5">
               {licenses.map((license) => (
                 <div key={license.id}>
@@ -115,17 +115,15 @@ export default async function PhotoLicensePage({ params, searchParams }: { param
           <label className="choice-row text-sm leading-6 text-stone-650">
             <input type="checkbox" name="accept_terms" required className="choice-control" />
             <span>
-              {isEnglish
-                ? "I accept the license terms and agree to receive the file immediately, waiving the right of withdrawal."
-                : "Приемам условията на лиценза и се съгласявам да получа файла веднага, с което се отказвам от правото на отказ."}
+              {text.acceptTerms}
             </span>
           </label>
 
           <button className="admin-button admin-button-forest w-full px-6 py-4 text-base font-semibold">
-            {isEnglish ? "Continue to payment" : "Продължи към плащане"}
+            {text.continueButton}
           </button>
           <p className="text-center text-xs leading-5 text-stone-500">
-            {isEnglish ? "Payment is processed by Stripe. The download link arrives by email." : "Плащането минава през Stripe. Линкът за сваляне идва по имейл."}
+            {text.paymentNote}
           </p>
         </form>
       </main>

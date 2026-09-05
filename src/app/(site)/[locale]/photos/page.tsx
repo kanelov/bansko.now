@@ -9,34 +9,12 @@ import { getArtStudioProductTypes } from "@/lib/art-studio";
 import { getSiteSettings } from "@/lib/content";
 import { siteUrl } from "@/lib/env";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
-import { getPhotoFacets, getPublishedPhotos } from "@/lib/photos";
-import type { Locale } from "@/lib/types";
+import { getPhotoArchiveCopy, getPhotoFacets, getPublishedPhotos } from "@/lib/photos";
 
 type Params = Promise<{ locale: string }>;
 
 // The archive is cached; filters and further pages are loaded from /api/photos.
 export const revalidate = 900;
-
-const copy = {
-  bg: {
-    eyebrow: "Фотоархив",
-    title: "Фотоархив Банско и Пирин",
-    lead: "Авторски фотографии от Банско, Пирин и региона. Всяка фотография може да се лицензира за уеб или печат, или да се поръча като принт от Art Studio.",
-    description:
-      "Фотоархив на Банско и Пирин: авторски снимки от планината, града, ските, природата и събитията. Лицензиране за уеб и печат, принтове по поръчка.",
-    categories: "Категории",
-    licence: "Как работи лицензирането"
-  },
-  en: {
-    eyebrow: "Photo Library",
-    title: "Bansko and Pirin Photo Library",
-    lead: "Original photographs of Bansko, Pirin and the region. Every photograph can be licensed for web or print, or ordered as a print from Art Studio.",
-    description:
-      "Photo library of Bansko and Pirin: original images of the mountain, the town, skiing, nature and events. Web and print licensing, made to order prints.",
-    categories: "Categories",
-    licence: "How licensing works"
-  }
-} as const;
 
 export async function generateStaticParams() {
   return [{ locale: "bg" }, { locale: "en" }];
@@ -45,16 +23,16 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const text = copy[locale];
+  const text = await getPhotoArchiveCopy(locale);
   const canonical = localeUrl(locale, "/photos");
   return {
     title: { absolute: `${text.title} | Bansko NOW` },
-    description: text.description,
+    description: text.metaDescription,
     alternates: {
       canonical,
       languages: { bg: localeUrl("bg", "/photos"), en: localeUrl("en", "/photos"), "x-default": localeUrl("bg", "/photos") }
     },
-    openGraph: { type: "website", url: canonical, title: text.title, description: text.description },
+    openGraph: { type: "website", url: canonical, title: text.title, description: text.metaDescription },
     robots: { index: true, follow: true }
   };
 }
@@ -62,7 +40,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 export default async function PhotosPage({ params }: { params: Params }) {
   const { locale } = await params;
   if (!isLocale(locale)) notFound();
-  const text = copy[locale as Locale];
+  const text = await getPhotoArchiveCopy(locale);
   const [initial, facets, settings, productTypes] = await Promise.all([
     getPublishedPhotos(locale, { page: 1 }),
     getPhotoFacets(),
@@ -77,7 +55,7 @@ export default async function PhotosPage({ params }: { params: Params }) {
     "@context": "https://schema.org",
     "@type": "CollectionPage",
     name: text.title,
-    description: text.description,
+    description: text.metaDescription,
     url: pageUrl,
     isPartOf: { "@id": `${siteUrl}/#website` },
     about: ["Bansko", "Pirin", "Bulgaria"],
@@ -113,7 +91,7 @@ export default async function PhotosPage({ params }: { params: Params }) {
         </header>
 
         {facets.categories.length ? (
-          <nav className="mt-8 flex flex-wrap gap-2" aria-label={text.categories}>
+          <nav className="mt-8 flex flex-wrap gap-2" aria-label={text.categoriesLabel}>
             {facets.categories.map((category) => (
               <Link
                 key={category}
