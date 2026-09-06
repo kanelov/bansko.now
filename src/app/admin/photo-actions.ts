@@ -5,6 +5,7 @@ import { redirect } from "next/navigation";
 import { revalidatePublicPath } from "@/lib/articles-admin";
 import { photoTextKeys, resolvePhotoArchiveCopy } from "@/lib/photo-copy";
 import { deletePhoto } from "@/lib/photo-storage";
+import { describePhotoSync, photoSyncColumns, syncPhotosToRequestApp, type SyncablePhoto } from "@/lib/photo-sync";
 import { requireAdmin } from "@/lib/supabase/auth";
 import { slugify } from "@/lib/slug";
 import type { Json, Locale, Photo, PhotoLicenseType } from "@/lib/types";
@@ -65,6 +66,7 @@ export async function updatePhotoAction(formData: FormData) {
     price_override_print: numberOrNull(formData, "price_override_print"),
     licensing_enabled: checkbox(formData, "licensing_enabled"),
     print_enabled: checkbox(formData, "print_enabled"),
+    catalog_sku: value(formData, "catalog_sku", 80).toUpperCase() || null,
     is_featured: checkbox(formData, "is_featured"),
     is_published: isPublished,
     monitoring_status: (["not_submitted", "submitted", "monitoring", "disabled"] as const).includes(
@@ -82,10 +84,14 @@ export async function updatePhotoAction(formData: FormData) {
   const { error } = await supabase.from("photos").update(payload).eq("id", id);
   if (error) redirect(`/admin/photos?error=${encodeURIComponent(error.message)}`);
 
+  // Mirror the row in the request app catalog (published: create/update, unpublished: archive).
+  const { data: saved } = await supabase.from("photos").select(photoSyncColumns).eq("id", id).maybeSingle();
+  const sync = saved ? await syncPhotosToRequestApp([saved as SyncablePhoto]) : null;
+
   revalidatePath("/admin/photos");
   revalidatePublicPath("/photos");
   if (payload.slug) revalidatePublicPath(`/photos/${payload.slug}`);
-  redirect("/admin/photos?saved=1");
+  redirect(sync && !sync.ok ? `/admin/photos?saved=1&sync_error=${encodeURIComponent(sync.error)}` : "/admin/photos?saved=1");
 }
 
 /** Removes a photograph and its files. Blocked while it is used in an article. */
@@ -96,7 +102,7 @@ export async function deletePhotoAction(formData: FormData) {
 
   const { data: photo } = await supabase
     .from("photos")
-    .select("thumb_key,article_key,preview_key,web_license_key,full_resolution_key")
+    .select("thumb_key,article_key,preview_key,web_license_key,full_resolution_key,photo_code,slug,title_bg,alt_bg,description_bg,category,catalog_sku,is_published,print_enabled")
     .eq("id", id)
     .maybeSingle();
 
@@ -109,6 +115,8 @@ export async function deletePhotoAction(formData: FormData) {
   for (const key of [photo?.thumb_key, photo?.article_key, photo?.preview_key, photo?.web_license_key, photo?.full_resolution_key]) {
     if (key) await deletePhoto(key).catch(() => undefined);
   }
+  // The catalog row in the request app is archived, never deleted: requests may reference it.
+  if (photo) await syncPhotosToRequestApp([photo as unknown as SyncablePhoto], { archive: true });
 
   revalidatePath("/admin/photos");
   revalidatePublicPath("/photos");
@@ -215,4 +223,18 @@ export async function savePhotoLicenseTypesAction(formData: FormData) {
 
   revalidatePhotoPages();
   redirect(`${copyPath}?saved=licenses`);
+}
+
+/**
+ * Pushes every photograph to the request app catalog at once: published ones are created or
+ * updated, unpublished ones archived. For the first load and after the CDN address changes.
+ */
+export async function syncAllPhotosAction() {
+  const { supabase } = await requireAdmin();
+  const { data, error } = await supabase.from("photos").select(photoSyncColumns).order("created_at", { ascending: true }).limit(2000);
+  if (error) redirect(`/admin/photos?sync_error=${encodeURIComponent(error.message)}`);
+
+  const result = await syncPhotosToRequestApp((data ?? []) as SyncablePhoto[]);
+  if (!result.ok) redirect(`/admin/photos?sync_error=${encodeURIComponent(result.error)}`);
+  redirect(`/admin/photos?synced=${encodeURIComponent(describePhotoSync(result.summary))}`);
 }

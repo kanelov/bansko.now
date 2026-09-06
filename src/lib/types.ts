@@ -755,6 +755,8 @@ export type Photo = {
   is_featured: boolean;
   licensing_enabled: boolean;
   print_enabled: boolean;
+  /** SKU of the matching product in the request app catalog; null = the photo code is used there. */
+  catalog_sku: string | null;
   monitoring_status: PhotoMonitoringStatus;
   monitoring_reference: string | null;
   created_at: string;

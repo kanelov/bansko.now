@@ -8,6 +8,7 @@ import { sendNotificationEmail } from "@/lib/email";
 import { createArtStudioSourceOrder, getGalleryProductById, getSourceVariantOptions, type ArtStudioSourceOrder } from "@/lib/gallery-catalog";
 import { siteUrl } from "@/lib/env";
 import { localePath } from "@/lib/i18n";
+import { getPhotoBySlug } from "@/lib/photos";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import type { Json, Locale } from "@/lib/types";
 
@@ -221,6 +222,10 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
     selected.gallery_design = { field: isEnglish ? "Gallery design" : "Дизайн от галерията", value: design.id, label: `${design.title} (${design.sku})` };
   }
 
+  // A print ordered from the photo archive travels with its photo code and catalog SKU.
+  const photoSlug = stringValue(formData, "photo_slug", 160);
+  const libraryPhoto = /^[a-z0-9-]{1,160}$/i.test(photoSlug) ? await getPhotoBySlug(photoSlug, locale).catch(() => null) : null;
+
   // Sizes from the request app catalog (when configured for this product type).
   const sourceGroups = config.source_sizes ? sourceGroupsForConfig(config, await getSourceVariantOptions()) : [];
   const sourceActive = sourceGroups.length > 0;
@@ -301,6 +306,9 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
     sku: product?.sku ?? null,
     request: "enquiry",
     gallery_design: galleryDesign,
+    photo: libraryPhoto
+      ? { photo_code: libraryPhoto.photo_code, slug: libraryPhoto.slug, title: libraryPhoto.title, thumb_url: libraryPhoto.thumb_url, catalog_sku: libraryPhoto.catalog_sku }
+      : null,
     offer: offer ? { id: offer.id, label: isEnglish ? offer.label_en || offer.label_bg : offer.label_bg, price: unitPrice, currency } : null
   };
   const selectedOptions: Json = Object.fromEntries(Object.entries(selected).map(([key, item]) => [key, { value: item.value, label: item.label, field: item.field }]));
@@ -352,6 +360,7 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
   // Register the order in the request app (work queue) with a clear "Art Studio" mark.
   const detailLines = [
     `Продукт: ${productLabel}`,
+    libraryPhoto ? `Фотография: ${libraryPhoto.photo_code} · ${libraryPhoto.title} · ${siteUrl}${localePath(locale, `/photos/${libraryPhoto.slug}`)}` : "",
     ...optionRows.map((row) => `${row.label}: ${row.value}`),
     `Количество: ${quantity}`,
     personalizationText ? `Текст върху продукта: ${personalizationText}` : "",
@@ -367,7 +376,8 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
     sourceOrder = await createArtStudioSourceOrder({
       client_request_id: inserted.id,
       order_code: reference,
-      catalog_sku: config.source_sku || defaultSourceSku(productType.internal_name),
+      // A print of an archive photo is booked on the photo's own catalog row (synced from the archive).
+      catalog_sku: libraryPhoto ? libraryPhoto.catalog_sku || libraryPhoto.photo_code : config.source_sku || defaultSourceSku(productType.internal_name),
       variant_id: sourceVariant?.id ?? null,
       locale,
       customer_name: `${firstName} ${lastName}`,
@@ -376,10 +386,15 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
       quantity,
       note: ["Поръчка от bansko.now/art-studio", ...detailLines].join("\n").slice(0, 1200),
       product: {
-        name: galleryDesign ? `Art Studio · ${productLabel} · ${galleryDesign.title}` : `Art Studio · ${productLabel}`,
-        image_url: galleryDesign?.image_url || product?.image_url || productType.image_url || "",
+        name: libraryPhoto
+          ? `Art Studio · ${productLabel} · ${libraryPhoto.photo_code} ${libraryPhoto.title}`
+          : galleryDesign
+            ? `Art Studio · ${productLabel} · ${galleryDesign.title}`
+            : `Art Studio · ${productLabel}`,
+        image_url: libraryPhoto?.thumb_url || galleryDesign?.image_url || product?.image_url || productType.image_url || "",
         gallery_catalog_id: galleryDesign?.catalog_id ?? null,
         gallery_sku: galleryDesign?.sku ?? null,
+        photo_code: libraryPhoto?.photo_code ?? null,
         details: detailLines,
         bansko_order: reference,
         product_type_slug: productType.slug,

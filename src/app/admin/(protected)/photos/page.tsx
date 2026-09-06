@@ -1,12 +1,13 @@
-import { deletePhotoAction, updatePhotoAction } from "@/app/admin/photo-actions";
+import { deletePhotoAction, syncAllPhotosAction, updatePhotoAction } from "@/app/admin/photo-actions";
 import { PhotoAdminNav } from "@/components/admin/photo-admin-nav";
 import { PhotoCsvTools } from "@/components/admin/photo-csv-tools";
 import { PhotoUploader } from "@/components/admin/photo-uploader";
 import { getPublicPhotoUrl, photoPublicUrlConfigured, photoStorageConfigured } from "@/lib/photo-storage";
+import { photoSyncConfigured } from "@/lib/photo-sync";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { Photo } from "@/lib/types";
 
-type SearchParams = Promise<{ saved?: string; deleted?: string; error?: string; q?: string }>;
+type SearchParams = Promise<{ saved?: string; deleted?: string; error?: string; q?: string; synced?: string; sync_error?: string }>;
 
 const fieldClass = "w-full rounded-xl border border-stone-300 bg-white px-3 py-2 text-sm text-stone-950";
 const labelClass = "grid gap-1 text-xs font-semibold text-stone-700";
@@ -55,7 +56,17 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
             Текстовете на страниците, името на фотографа и условията и цените на лицензите са в „Текстове и лицензи“.
           </p>
         </div>
-        <PhotoAdminNav />
+        <div className="flex flex-wrap items-center gap-3">
+          <PhotoAdminNav />
+          <form action={syncAllPhotosAction}>
+            <button className="admin-button admin-button-secondary px-4 py-2 text-sm font-semibold" disabled={!photoSyncConfigured()}>
+              Синхронизирай с каталога на заявките
+            </button>
+          </form>
+        </div>
+        <p className="max-w-3xl text-xs leading-5 text-[var(--admin-muted)]">
+          Всяка публикувана снимка се праща автоматично при „Запази“ към каталога на приложението за заявки (SKU = кодът ѝ или „SKU в каталога“, картинка = малката снимка от CDN-а). Бутонът праща всички наведнъж, за първоначално зареждане или след смяна на адреса на снимките.
+        </p>
       </header>
 
       {!photoStorageConfigured() ? (
@@ -71,6 +82,8 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
       {params.saved ? <p className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm font-semibold text-emerald-900">Записано.</p> : null}
       {params.deleted ? <p className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm font-semibold text-emerald-900">Фотографията е изтрита.</p> : null}
       {params.error ? <p className="rounded-xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">{params.error}</p> : null}
+      {params.synced ? <p className="rounded-xl border border-emerald-300 bg-emerald-100 p-4 text-sm font-semibold text-emerald-900">Каталогът на заявките е синхронизиран: {params.synced}</p> : null}
+      {params.sync_error ? <p className="rounded-xl border border-amber-300 bg-amber-100 p-4 text-sm text-amber-900">Записано е тук, но синхронизацията с каталога на заявките не мина: {params.sync_error}</p> : null}
 
       {failedJobs?.length ? (
         <section className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm text-red-900">
@@ -194,6 +207,7 @@ export default async function AdminPhotosPage({ searchParams }: { searchParams: 
                   </label>
                   <label className={labelClass}>Собствена цена уеб (EUR)<input name="price_override_web" defaultValue={photo.price_override_web ?? ""} className={fieldClass} placeholder="празно = по нивото" /></label>
                   <label className={labelClass}>Собствена цена печат (EUR)<input name="price_override_print" defaultValue={photo.price_override_print ?? ""} className={fieldClass} placeholder="празно = по нивото" /></label>
+                  <label className={labelClass}>SKU в каталога на заявките<input name="catalog_sku" defaultValue={photo.catalog_sku ?? ""} className={fieldClass} placeholder="празно = кодът на снимката" /></label>
                   <label className={labelClass}>
                     Pixsy статус
                     <select name="monitoring_status" defaultValue={photo.monitoring_status} className={fieldClass}>

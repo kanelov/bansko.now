@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState } from "react";
+import { useId, useState, useSyncExternalStore } from "react";
 import { submitArtStudioEnquiryAction } from "@/app/(site)/[locale]/art-studio/actions";
 import {
   displayVariantLabels,
@@ -73,6 +73,14 @@ function ChipGroup({ label, children }: { label: string; children: React.ReactNo
  * (sourceGroups), otherwise from the static form_config. The owner receives the details
  * by email and confirms price and timing; nothing is charged here.
  */
+
+const subscribeToNothing = () => () => {};
+
+function readPhotoSlugFromUrl() {
+  const value = new URLSearchParams(window.location.search).get("photo") || "";
+  return /^[a-z0-9-]{1,160}$/i.test(value) ? value : "";
+}
+
 export function ArtStudioEnquiryForm({
   productType,
   product = null,
@@ -108,6 +116,9 @@ export function ArtStudioEnquiryForm({
   const [selected, setSelected] = useState<Record<string, string>>({});
   const [deliveryMethod, setDeliveryMethod] = useState<"econt_office" | "gallery_pickup">("gallery_pickup");
   const [fileName, setFileName] = useState("");
+  // The photo archive links here with ?photo=<slug>. The page itself stays cached, so the
+  // browser hands the slug to the form instead of the server reading the query string.
+  const photoSlug = useSyncExternalStore(subscribeToNothing, readPhotoSlugFromUrl, () => "");
 
   const activeGroup = sourceGroups.find((group) => group.id === sourceTypeId) ?? sourceGroups[0] ?? null;
   const sizeLabels = activeGroup ? displayVariantLabels(activeGroup) : {};
@@ -130,6 +141,7 @@ export function ArtStudioEnquiryForm({
       <input type="hidden" name="product_type_id" value={productType.id} />
       {product ? <input type="hidden" name="product_id" value={product.id} /> : null}
       {galleryDesign ? <input type="hidden" name="gallery_design_id" value={galleryDesign.id} /> : null}
+      {photoSlug ? <input type="hidden" name="photo_slug" value={photoSlug} /> : null}
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
       <header>
