@@ -187,7 +187,15 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
   const typePath = localePath(locale, `/art-studio/${productType.slug}`);
   const products = productId ? await getArtStudioProducts({ locale, productTypeId: productType.id }) : [];
   const product = productId ? products.find((item) => item.id === productId) ?? null : null;
-  const backPath = product ? localePath(locale, `/art-studio/${productType.slug}/${product.slug}`) : typePath;
+  // A print ordered from the photo archive travels with its photo code and catalog SKU; the "back"
+  // link keeps the photo, so a corrected form still has it.
+  const photoSlug = stringValue(formData, "photo_slug", 160);
+  const photoRequested = /^[a-z0-9-]{1,160}$/i.test(photoSlug);
+  const backPath = product
+    ? localePath(locale, `/art-studio/${productType.slug}/${product.slug}`)
+    : photoRequested
+      ? `${typePath}?photo=${photoSlug}`
+      : typePath;
   const fail: (code: string) => never = (code) => redirect(enquiryResult(locale, { status: "error", code, back: backPath }));
 
   const firstName = stringValue(formData, "first_name", 100);
@@ -222,9 +230,8 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
     selected.gallery_design = { field: isEnglish ? "Gallery design" : "Дизайн от галерията", value: design.id, label: `${design.title} (${design.sku})` };
   }
 
-  // A print ordered from the photo archive travels with its photo code and catalog SKU.
-  const photoSlug = stringValue(formData, "photo_slug", 160);
-  const libraryPhoto = /^[a-z0-9-]{1,160}$/i.test(photoSlug) ? await getPhotoBySlug(photoSlug, locale).catch(() => null) : null;
+  const libraryPhoto = photoRequested ? await getPhotoBySlug(photoSlug, locale).catch(() => null) : null;
+  if (photoRequested && (!libraryPhoto || !libraryPhoto.print_enabled)) fail("photo");
 
   // Sizes from the request app catalog (when configured for this product type).
   const sourceGroups = config.source_sizes ? sourceGroupsForConfig(config, await getSourceVariantOptions()) : [];
@@ -292,7 +299,8 @@ export async function submitArtStudioEnquiryAction(formData: FormData) {
       .upload(path, Buffer.from(await attachment.arrayBuffer()), { contentType: attachment.type, upsert: false });
     if (uploadError) fail("attachment");
     attachmentPath = path;
-  } else if (config.photo_upload === "required") {
+  } else if (config.photo_upload === "required" && !libraryPhoto) {
+    // The archive photo is the print file; nothing else has to be attached.
     fail("attachment");
   }
 

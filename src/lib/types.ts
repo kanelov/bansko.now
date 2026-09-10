@@ -831,6 +831,16 @@ export type PhotoLicenseOrder = {
   paid_at: string | null;
 };
 
+/** Public summary of one archive photo for the Art Studio print form (`GET /api/photos/[slug]`). */
+export type PhotoPrintSummary = {
+  photo_code: string;
+  slug: string;
+  title: string;
+  alt: string;
+  thumb_url: string | null;
+  print_enabled: boolean;
+};
+
 export type PhotoPublicSettings = {
   id: string;
   /** Editable texts of the photo archive pages: { bg: {...}, en: {...} } (see photo-copy.ts). */

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useId, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
 import { submitArtStudioEnquiryAction } from "@/app/(site)/[locale]/art-studio/actions";
 import {
   displayVariantLabels,
@@ -18,7 +18,7 @@ import {
 } from "@/lib/art-studio-forms";
 import type { SelectedGalleryDesign } from "@/lib/art-studio-gallery-types";
 import { localePath } from "@/lib/i18n";
-import type { ArtStudioPublicSettings, Locale, LocalizedArtStudioProduct, LocalizedArtStudioProductType, SourceVariantGroup } from "@/lib/types";
+import type { ArtStudioPublicSettings, Locale, LocalizedArtStudioProduct, LocalizedArtStudioProductType, PhotoPrintSummary, SourceVariantGroup } from "@/lib/types";
 
 const fieldClass =
   "w-full rounded-xl border border-stone-300 bg-white px-4 py-3 text-base text-stone-950 outline-none transition focus:border-forest focus:ring-2 focus:ring-sage";
@@ -58,12 +58,13 @@ function Chip({
   );
 }
 
-function ChipGroup({ label, children }: { label: string; children: React.ReactNode }) {
+function ChipGroup({ label, error, children }: { label: string; error?: string | null; children: React.ReactNode }) {
   const id = useId();
   return (
     <div role="radiogroup" aria-labelledby={id} className="grid gap-2.5">
-      <p id={id} className="text-sm font-semibold text-stone-800">{label}</p>
+      <p id={id} className={`text-sm font-semibold ${error ? "text-red-700" : "text-stone-800"}`}>{label}</p>
       <div className="flex flex-wrap gap-2">{children}</div>
+      {error ? <p role="alert" className="text-sm font-semibold text-red-700">{error}</p> : null}
     </div>
   );
 }
@@ -79,6 +80,29 @@ const subscribeToNothing = () => () => {};
 function readPhotoSlugFromUrl() {
   const value = new URLSearchParams(window.location.search).get("photo") || "";
   return /^[a-z0-9-]{1,160}$/i.test(value) ? value : "";
+}
+
+type LibraryPhotoState = { status: "loading" } | { status: "ready"; photo: PhotoPrintSummary } | { status: "missing" } | { status: "unavailable" };
+
+type FormControl = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+function isFormControl(value: EventTarget | null): value is FormControl {
+  return value instanceof HTMLInputElement || value instanceof HTMLSelectElement || value instanceof HTMLTextAreaElement;
+}
+
+/** What the customer has to do about the control the browser refused to submit. */
+function invalidMessage(control: FormControl, isEnglish: boolean) {
+  if (control.name === "accept_terms") return isEnglish ? "Tick the terms checkbox to send the order." : "Отбележи, че приемаш условията, за да изпратиш поръчката.";
+  if (control.name === "email" && control.validity.typeMismatch) return isEnglish ? "Enter a valid email address." : "Въведи валиден имейл адрес.";
+  if (control instanceof HTMLInputElement && control.type === "radio") {
+    const label = control.closest("[role=radiogroup]")?.querySelector("p")?.textContent?.trim();
+    if (label) return isEnglish ? `Choose an option for "${label}".` : `Избери опция за „${label}“.`;
+    return isEnglish ? "Choose one of the options." : "Избери една от опциите.";
+  }
+  if (control instanceof HTMLInputElement && control.type === "file") return isEnglish ? "Attach your photo or design." : "Прикачи снимката или дизайна си.";
+  const label = control.closest("label")?.childNodes[0]?.textContent?.trim();
+  if (label) return isEnglish ? `Fill in "${label}".` : `Попълни „${label}“.`;
+  return isEnglish ? "Fill in the required fields." : "Попълни задължителните полета.";
 }
 
 export function ArtStudioEnquiryForm({
@@ -119,6 +143,48 @@ export function ArtStudioEnquiryForm({
   // The photo archive links here with ?photo=<slug>. The page itself stays cached, so the
   // browser hands the slug to the form instead of the server reading the query string.
   const photoSlug = useSyncExternalStore(subscribeToNothing, readPhotoSlugFromUrl, () => "");
+  const [libraryPhoto, setLibraryPhoto] = useState<LibraryPhotoState | null>(null);
+  const photoState: LibraryPhotoState | null = photoSlug ? (libraryPhoto ?? { status: "loading" }) : null;
+  // While the photo is known (or still loading) it is the print file: no upload, and the slug travels with the order.
+  const photoChosen = photoState !== null && photoState.status !== "missing";
+
+  useEffect(() => {
+    if (!photoSlug) return;
+    const controller = new AbortController();
+    fetch(`/api/photos/${encodeURIComponent(photoSlug)}?locale=${locale}`, { signal: controller.signal })
+      .then(async (response): Promise<LibraryPhotoState> => {
+        if (response.status === 404) return { status: "missing" };
+        if (!response.ok) return { status: "unavailable" };
+        const data = (await response.json()) as { photo?: PhotoPrintSummary };
+        return data.photo?.print_enabled ? { status: "ready", photo: data.photo } : { status: "missing" };
+      })
+      .catch((): LibraryPhotoState => ({ status: "unavailable" }))
+      .then((next) => {
+        if (!controller.signal.aborted) setLibraryPhoto(next);
+      });
+    return () => controller.abort();
+  }, [photoSlug, locale]);
+
+  // Native validation stops the submit, but the chip radios are visually hidden, so the browser's own
+  // hint can point at nothing (Safari shows none at all). Name the control and bring its group on screen.
+  const formRef = useRef<HTMLFormElement>(null);
+  const [invalid, setInvalid] = useState<{ name: string; message: string; chip: boolean } | null>(null);
+  useEffect(() => {
+    const form = formRef.current;
+    if (!form) return;
+    const handleInvalid = (event: Event) => {
+      const control = event.target;
+      if (!isFormControl(control)) return;
+      const first = form.querySelector("input:invalid, select:invalid, textarea:invalid");
+      if (first && first !== control) return;
+      setInvalid({ name: control.name, message: invalidMessage(control, isEnglish), chip: control instanceof HTMLInputElement && control.type === "radio" });
+      const anchor = control.closest("[role=radiogroup], label, fieldset") ?? control;
+      window.requestAnimationFrame(() => anchor.scrollIntoView({ block: "center", behavior: "smooth" }));
+    };
+    form.addEventListener("invalid", handleInvalid, true);
+    return () => form.removeEventListener("invalid", handleInvalid, true);
+  }, [isEnglish]);
+  const errorFor = (name: string) => (invalid?.name === name ? invalid.message : null);
 
   const activeGroup = sourceGroups.find((group) => group.id === sourceTypeId) ?? sourceGroups[0] ?? null;
   const sizeLabels = activeGroup ? displayVariantLabels(activeGroup) : {};
@@ -136,12 +202,18 @@ export function ArtStudioEnquiryForm({
   }
 
   return (
-    <form id="order" action={submitArtStudioEnquiryAction} className="grid gap-7 rounded-2xl border border-stone-200 bg-white p-5 shadow-soft sm:p-7">
+    <form
+      id="order"
+      ref={formRef}
+      action={submitArtStudioEnquiryAction}
+      onChange={() => setInvalid((current) => (current ? null : current))}
+      className="grid gap-7 rounded-2xl border border-stone-200 bg-white p-5 shadow-soft sm:p-7"
+    >
       <input type="hidden" name="locale" value={locale} />
       <input type="hidden" name="product_type_id" value={productType.id} />
       {product ? <input type="hidden" name="product_id" value={product.id} /> : null}
       {galleryDesign ? <input type="hidden" name="gallery_design_id" value={galleryDesign.id} /> : null}
-      {photoSlug ? <input type="hidden" name="photo_slug" value={photoSlug} /> : null}
+      {photoSlug && photoChosen ? <input type="hidden" name="photo_slug" value={photoSlug} /> : null}
       <input type="text" name="company_website" tabIndex={-1} autoComplete="off" className="hidden" aria-hidden="true" />
 
       <header>
@@ -170,6 +242,34 @@ export function ArtStudioEnquiryForm({
             ) : null}
           </p>
         ) : null}
+        {photoState ? (
+          <p
+            className={`mt-3 flex items-center gap-3 rounded-xl border px-3 py-2 text-sm ${photoState.status === "missing" ? "border-red-200 bg-red-50" : "border-forest/30 bg-sage/30"}`}
+            aria-live="polite"
+          >
+            {photoState.status === "ready" && photoState.photo.thumb_url ? (
+              // eslint-disable-next-line @next/next/no-img-element -- deliberate: no Vercel image optimization traffic
+              <img src={photoState.photo.thumb_url} alt="" width={96} height={96} className="h-14 w-14 shrink-0 rounded-lg border border-stone-200 object-cover" />
+            ) : null}
+            <span className="min-w-0 flex-1">
+              <span className={`block text-xs font-semibold uppercase ${photoState.status === "missing" ? "text-red-700" : "text-moss"}`}>
+                {isEnglish ? "Photo from the archive" : "Снимка от фотоархива"}
+              </span>
+              <span className="block font-semibold text-stone-950">
+                {photoState.status === "ready"
+                  ? `${photoState.photo.photo_code} · ${photoState.photo.title}`
+                  : photoState.status === "loading"
+                    ? isEnglish ? "Loading the photo…" : "Зарежда се…"
+                    : photoState.status === "missing"
+                      ? isEnglish ? "This photo is not available as a print. Choose another one from the archive." : "Тази снимка не се предлага като принт. Избери друга от фотоархива."
+                      : photoSlug}
+              </span>
+            </span>
+            <Link href={localePath(locale, "/photos")} className="shrink-0 text-xs font-semibold text-stone-600 hover:text-stone-900 hover:underline">
+              {isEnglish ? "Choose another" : "Друга снимка"}
+            </Link>
+          </p>
+        ) : null}
       </header>
 
       {offers.length ? (
@@ -195,7 +295,7 @@ export function ArtStudioEnquiryForm({
           {sourceActive && sourceSizes ? (
             <>
               {sourceGroups.length > 1 ? (
-                <ChipGroup label={sourceModelLabel(sourceSizes, locale)}>
+                <ChipGroup label={sourceModelLabel(sourceSizes, locale)} error={errorFor("source_type_id")}>
                   {sourceGroups.map((group) => (
                     <Chip
                       key={group.id}
@@ -217,7 +317,7 @@ export function ArtStudioEnquiryForm({
               {singleVariant ? (
                 <input type="hidden" name="source_variant_id" value={singleVariant.id} />
               ) : activeGroup ? (
-                <ChipGroup label={sourceSizeLabel(sourceSizes, locale)}>
+                <ChipGroup label={sourceSizeLabel(sourceSizes, locale)} error={errorFor("source_variant_id")}>
                   {activeGroup.variants.map((variant) => (
                     <Chip
                       key={variant.id}
@@ -256,7 +356,7 @@ export function ArtStudioEnquiryForm({
               );
             }
             return (
-              <ChipGroup key={field.key} label={fieldLabel(field, locale)}>
+              <ChipGroup key={field.key} label={fieldLabel(field, locale)} error={errorFor(name)}>
                 {options.map((option) => (
                   <Chip
                     key={option.value}
@@ -293,7 +393,7 @@ export function ArtStudioEnquiryForm({
               );
             }
             return (
-              <ChipGroup key={option.id} label={label}>
+              <ChipGroup key={option.id} label={label} error={errorFor(name)}>
                 {option.values.map((value) => (
                   <Chip
                     key={value.value}
@@ -327,7 +427,7 @@ export function ArtStudioEnquiryForm({
             </label>
           ) : null}
         </div>
-        {config.photo_upload !== "none" ? (
+        {config.photo_upload !== "none" && !photoChosen ? (
           <label className="grid gap-2 text-sm font-semibold text-stone-800">
             {photoLabel(config, locale)}
             <input
@@ -405,6 +505,9 @@ export function ArtStudioEnquiryForm({
         </span>
       </label>
 
+      {invalid && !invalid.chip ? (
+        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">{invalid.message}</p>
+      ) : null}
       <button className="admin-button admin-button-forest w-full px-6 py-4 text-base font-semibold">{formCopy?.button || (isEnglish ? "Send the order" : "Изпрати поръчката")}</button>
       <p className="text-center text-xs leading-5 text-stone-500">
         {isEnglish ? "You receive a confirmation email right away and we call or write back to agree the details." : "Получаваш потвърждение по имейл веднага, а ние се обаждаме или пишем, за да уточним детайлите."}
