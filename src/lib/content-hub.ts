@@ -55,6 +55,26 @@ export type ContentHubPayload = {
   schema_type: string;
   author_name: string;
   article_type: string;
+  /** Optional second language published together with the first as one translation pair. */
+  translation: ContentHubTranslation | null;
+};
+
+/** The localized half of a bilingual article: only the fields that differ per language. */
+export type ContentHubTranslation = {
+  locale: Locale;
+  title: string;
+  slug: string;
+  excerpt: string;
+  content: string;
+  tags: string[];
+  featured_image_alt: string;
+  image_caption: string;
+  seo_title: string;
+  seo_description: string;
+  focus_keyword: string;
+  og_title: string;
+  og_description: string;
+  canonical_url: string;
 };
 
 export type ContentHubCategory = {
@@ -121,6 +141,40 @@ function normalizeName(value: string) {
   return value.replace(/\s+/g, " ").trim().toLocaleLowerCase("bg");
 }
 
+/**
+ * Reads the optional second language. Missing, malformed or same-locale translations are
+ * ignored, so a site that sends only Bulgarian keeps working exactly as before.
+ */
+function parseTranslation(value: unknown, primary: Locale): ContentHubTranslation | null {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return null;
+  const raw = value as Record<string, unknown>;
+  const localeValue = text(raw.locale, 5).toLowerCase();
+  const locale: Locale = isLocale(localeValue) ? localeValue : "en";
+  if (locale === primary) return null;
+
+  const title = text(raw.title, 300);
+  const content = String(raw.content ?? "").replace(/\r\n?/g, "\n").trim();
+  const format = text(raw.content_format, 10).toLowerCase() || "markdown";
+  if (!title || content.length < 20 || format !== "markdown") return null;
+
+  return {
+    locale,
+    title,
+    slug: slugify(text(raw.slug, 200)) || slugify(title),
+    excerpt: text(raw.excerpt, 600),
+    content,
+    tags: list(raw.tags, 30, 60),
+    featured_image_alt: text(raw.featured_image_alt, 300),
+    image_caption: text(raw.image_caption, 400),
+    seo_title: text(raw.seo_title, 200),
+    seo_description: text(raw.seo_description, 400),
+    focus_keyword: text(raw.focus_keyword, 120),
+    og_title: text(raw.og_title, 200),
+    og_description: text(raw.og_description, 400),
+    canonical_url: httpUrl(raw.canonical_url)
+  };
+}
+
 export function parseContentHubPayload(input: unknown): ContentHubPayload {
   if (!input || typeof input !== "object" || Array.isArray(input)) {
     throw new ContentHubError(400, "Очаква се JSON обект.");
@@ -172,7 +226,8 @@ export function parseContentHubPayload(input: unknown): ContentHubPayload {
     robots_follow: boolean(raw.robots_follow, true),
     schema_type: schemaTypes.has(schemaType) ? schemaType : "Article",
     author_name: text(raw.author_name, 120),
-    article_type: text(raw.article_type, 40).toLowerCase()
+    article_type: text(raw.article_type, 40).toLowerCase(),
+    translation: parseTranslation(raw.translation, locale)
   };
 }
 
@@ -301,55 +356,72 @@ async function copyFeaturedImage(
   }
 }
 
-export async function publishContentHubArticle(supabase: SupabaseClient<Database>, payload: ContentHubPayload) {
-  const warnings: string[] = [];
-  const category = await resolveCategory(supabase, payload);
+type LocalizedArticleFields = ContentHubTranslation;
 
+/**
+ * Writes one localized article for a Content Hub item. Called once per language; the second
+ * call receives the translation group of the first, so the pair links up for hreflang and the
+ * language switch. Idempotent per (item, locale).
+ */
+async function writeLocalizedArticle(
+  supabase: SupabaseClient<Database>,
+  payload: ContentHubPayload,
+  fields: LocalizedArticleFields,
+  context: {
+    categoryId: string;
+    featuredImageUrl: string;
+    categorySlug: string;
+    now: string;
+    publish: boolean;
+    translationGroupId: string | null;
+  },
+  warnings: string[]
+) {
   const { data: existing, error: existingError } = await supabase
     .from("articles")
-    .select("id, slug, status, published_at")
+    .select("id, slug, status, published_at, translation_group_id")
     .eq("content_hub_item_id", payload.content_hub_item_id)
+    .eq("locale", fields.locale)
     .maybeSingle();
 
   if (existingError) {
     throw new ContentHubError(500, existingError.message);
   }
 
-  const featuredImageUrl = await copyFeaturedImage(supabase, payload, warnings);
-  const now = new Date().toISOString();
-  const publish = payload.status === "published";
-  const baseSlug = payload.slug || `statiya-${payload.content_hub_item_id.slice(0, 8)}`;
+  const groupId = context.translationGroupId || existing?.translation_group_id || randomUUID();
+  const baseSlug = fields.slug || `statiya-${payload.content_hub_item_id.slice(0, 8)}`;
 
   const record: Partial<Article> = {
-    title: payload.title,
-    excerpt: payload.excerpt || null,
-    content: payload.content,
-    category_id: category.id,
-    featured_image_url: featuredImageUrl || null,
-    featured_image_alt: payload.featured_image_alt || payload.title,
-    image_caption: payload.image_caption || null,
-    status: publish ? "published" : "draft",
-    published_at: publish ? existing?.published_at ?? now : null,
+    title: fields.title,
+    excerpt: fields.excerpt || null,
+    content: fields.content,
+    category_id: context.categoryId,
+    featured_image_url: context.featuredImageUrl || null,
+    featured_image_alt: fields.featured_image_alt || fields.title,
+    image_caption: fields.image_caption || null,
+    status: context.publish ? "published" : "draft",
+    published_at: context.publish ? existing?.published_at ?? context.now : null,
     scheduled_at: null,
-    seo_title: payload.seo_title || null,
-    seo_description: payload.seo_description || null,
-    focus_keyword: payload.focus_keyword || null,
-    canonical_url: payload.canonical_url || null,
-    og_title: payload.og_title || null,
-    og_description: payload.og_description || null,
-    og_image_url: payload.og_image_url || featuredImageUrl || null,
+    seo_title: fields.seo_title || null,
+    seo_description: fields.seo_description || null,
+    focus_keyword: fields.focus_keyword || null,
+    canonical_url: fields.canonical_url || null,
+    og_title: fields.og_title || null,
+    og_description: fields.og_description || null,
+    og_image_url: payload.og_image_url || context.featuredImageUrl || null,
     robots_index: payload.robots_index,
     robots_follow: payload.robots_follow,
-    reading_time: estimateReadingTime(payload.content),
+    reading_time: estimateReadingTime(fields.content),
     author_name: payload.author_name || "Любо Канелов",
     source_links: payload.source_links,
     schema_type: payload.schema_type,
-    locale: payload.locale,
+    locale: fields.locale,
+    translation_group_id: groupId,
     show_facebook_cta: true,
     show_art_studio_block: true,
     show_bansko_collection_block: false,
     automation_source: "content_hub",
-    automation_last_imported_at: now,
+    automation_last_imported_at: context.now,
     content_hub_item_id: payload.content_hub_item_id,
     ...(payload.article_type ? { article_type: payload.article_type } : {})
   };
@@ -364,7 +436,7 @@ export async function publishContentHubArticle(supabase: SupabaseClient<Database
       ? await supabase.from("articles").update({ ...record, slug: finalSlug }).eq("id", existing.id).select("id").single()
       : await supabase
           .from("articles")
-          .insert({ ...record, title: payload.title, content: payload.content, slug: finalSlug, translation_group_id: randomUUID() })
+          .insert({ ...record, title: fields.title, content: fields.content, slug: finalSlug })
           .select("id")
           .single();
 
@@ -384,32 +456,103 @@ export async function publishContentHubArticle(supabase: SupabaseClient<Database
     throw new ContentHubError(409, `Няма свободен slug за „${baseSlug}“.`);
   }
 
-  if (publish && category.is_visible === false) {
-    await supabase.from("categories").update({ is_visible: true }).eq("id", category.id);
-    warnings.push(`Категорията „${category.slug}“ беше скрита и вече е видима в менюто.`);
-  }
-
   try {
-    await syncTags(supabase, articleId, payload.tags.join(", "), payload.locale);
+    await syncTags(supabase, articleId, fields.tags.join(", "), fields.locale);
   } catch (error) {
-    warnings.push(`Таговете не са записани: ${error instanceof Error ? error.message : "грешка"}`);
+    warnings.push(`Таговете не са записани (${fields.locale}): ${error instanceof Error ? error.message : "грешка"}`);
   }
 
-  const path = `/${category.slug}/${finalSlug}`;
-  revalidateEditorialPaths();
-  revalidateLocalePath(payload.locale, path);
-  revalidateLocalePath(payload.locale, `/${category.slug}`);
-  revalidatePath("/admin/articles");
+  const path = `/${context.categorySlug}/${finalSlug}`;
+  revalidateLocalePath(fields.locale, path);
+  revalidateLocalePath(fields.locale, `/${context.categorySlug}`);
   if (existing && existing.slug !== finalSlug) {
-    revalidateLocalePath(payload.locale, `/${category.slug}/${existing.slug}`);
+    revalidateLocalePath(fields.locale, `/${context.categorySlug}/${existing.slug}`);
   }
 
   return {
     id: articleId,
     slug: finalSlug,
-    status: record.status,
-    url: localeUrl(payload.locale, path),
+    locale: fields.locale,
+    status: record.status as "published" | "draft",
+    url: localeUrl(fields.locale, path),
     updated: Boolean(existing),
+    translationGroupId: groupId
+  };
+}
+
+export async function publishContentHubArticle(supabase: SupabaseClient<Database>, payload: ContentHubPayload) {
+  const warnings: string[] = [];
+  const category = await resolveCategory(supabase, payload);
+  const featuredImageUrl = await copyFeaturedImage(supabase, payload, warnings);
+  const now = new Date().toISOString();
+  const publish = payload.status === "published";
+  const context = {
+    categoryId: category.id,
+    categorySlug: category.slug,
+    featuredImageUrl,
+    now,
+    publish,
+    translationGroupId: null as string | null
+  };
+
+  const primary = await writeLocalizedArticle(
+    supabase,
+    payload,
+    {
+      locale: payload.locale,
+      title: payload.title,
+      slug: payload.slug,
+      excerpt: payload.excerpt,
+      content: payload.content,
+      tags: payload.tags,
+      featured_image_alt: payload.featured_image_alt,
+      image_caption: payload.image_caption,
+      seo_title: payload.seo_title,
+      seo_description: payload.seo_description,
+      focus_keyword: payload.focus_keyword,
+      og_title: payload.og_title,
+      og_description: payload.og_description,
+      canonical_url: payload.canonical_url
+    },
+    context,
+    warnings
+  );
+
+  // The second language never blocks the first: a failure is reported as a warning.
+  let translation: Awaited<ReturnType<typeof writeLocalizedArticle>> | null = null;
+  if (payload.translation) {
+    try {
+      translation = await writeLocalizedArticle(
+        supabase,
+        payload,
+        payload.translation,
+        { ...context, translationGroupId: primary.translationGroupId },
+        warnings
+      );
+    } catch (error) {
+      warnings.push(
+        `Втората езикова версия не е публикувана: ${error instanceof Error ? error.message : "грешка"}`
+      );
+    }
+  }
+
+  if (publish && category.is_visible === false) {
+    await supabase.from("categories").update({ is_visible: true }).eq("id", category.id);
+    warnings.push(`Категорията „${category.slug}“ беше скрита и вече е видима в менюто.`);
+  }
+
+  revalidateEditorialPaths();
+  revalidatePath("/admin/articles");
+
+  return {
+    id: primary.id,
+    slug: primary.slug,
+    status: primary.status,
+    url: primary.url,
+    updated: primary.updated,
+    translation: translation
+      ? { id: translation.id, slug: translation.slug, locale: translation.locale, url: translation.url, updated: translation.updated }
+      : null,
     warnings
   };
 }
