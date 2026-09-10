@@ -58,13 +58,20 @@ function Chip({
   );
 }
 
+/** Message under the control the browser refused to submit. */
+function FieldMessage({ text }: { text: string | null | undefined }) {
+  return text ? <span role="alert" className="text-sm font-semibold text-orange-700">{text}</span> : null;
+}
+
+const invalidOutline = " rounded-xl outline outline-2 outline-offset-4 outline-orange-400";
+
 function ChipGroup({ label, error, children }: { label: string; error?: string | null; children: React.ReactNode }) {
   const id = useId();
   return (
-    <div role="radiogroup" aria-labelledby={id} className="grid gap-2.5">
-      <p id={id} className={`text-sm font-semibold ${error ? "text-red-700" : "text-stone-800"}`}>{label}</p>
+    <div role="radiogroup" aria-labelledby={id} className={`grid gap-2.5${error ? invalidOutline : ""}`}>
+      <p id={id} className={`text-sm font-semibold ${error ? "text-orange-700" : "text-stone-800"}`}>{label}</p>
       <div className="flex flex-wrap gap-2">{children}</div>
-      {error ? <p role="alert" className="text-sm font-semibold text-red-700">{error}</p> : null}
+      <FieldMessage text={error} />
     </div>
   );
 }
@@ -168,7 +175,7 @@ export function ArtStudioEnquiryForm({
   // Native validation stops the submit, but the chip radios are visually hidden, so the browser's own
   // hint can point at nothing (Safari shows none at all). Name the control and bring its group on screen.
   const formRef = useRef<HTMLFormElement>(null);
-  const [invalid, setInvalid] = useState<{ name: string; message: string; chip: boolean } | null>(null);
+  const [invalid, setInvalid] = useState<{ name: string; message: string } | null>(null);
   useEffect(() => {
     const form = formRef.current;
     if (!form) return;
@@ -177,7 +184,7 @@ export function ArtStudioEnquiryForm({
       if (!isFormControl(control)) return;
       const first = form.querySelector("input:invalid, select:invalid, textarea:invalid");
       if (first && first !== control) return;
-      setInvalid({ name: control.name, message: invalidMessage(control, isEnglish), chip: control instanceof HTMLInputElement && control.type === "radio" });
+      setInvalid({ name: control.name, message: invalidMessage(control, isEnglish) });
       const anchor = control.closest("[role=radiogroup], label, fieldset") ?? control;
       window.requestAnimationFrame(() => anchor.scrollIntoView({ block: "center", behavior: "smooth" }));
     };
@@ -185,6 +192,11 @@ export function ArtStudioEnquiryForm({
     return () => form.removeEventListener("invalid", handleInvalid, true);
   }, [isEnglish]);
   const errorFor = (name: string) => (invalid?.name === name ? invalid.message : null);
+  // The browser focuses the blocking field, so the focus colours are swapped too: the outline stays orange.
+  const fieldClassFor = (name: string) =>
+    invalid?.name === name
+      ? `${fieldClass.replace("focus:border-forest", "focus:border-orange-500").replace("focus:ring-sage", "focus:ring-orange-200")} border-orange-500 ring-2 ring-orange-200`
+      : fieldClass;
 
   const activeGroup = sourceGroups.find((group) => group.id === sourceTypeId) ?? sourceGroups[0] ?? null;
   const sizeLabels = activeGroup ? displayVariantLabels(activeGroup) : {};
@@ -342,7 +354,7 @@ export function ArtStudioEnquiryForm({
               return (
                 <label key={field.key} className="grid gap-2.5 text-sm font-semibold text-stone-800">
                   {fieldLabel(field, locale)}
-                  <select name={name} required={field.required} value={current} onChange={(event) => choose(field.key, event.target.value)} className={fieldClass}>
+                  <select name={name} required={field.required} value={current} onChange={(event) => choose(field.key, event.target.value)} className={fieldClassFor(name)}>
                     <option value="" disabled={field.required}>
                       {isEnglish ? (field.required ? "Choose" : "Not selected") : field.required ? "Избери" : "Без избор"}
                     </option>
@@ -352,6 +364,7 @@ export function ArtStudioEnquiryForm({
                       </option>
                     ))}
                   </select>
+                <FieldMessage text={errorFor(name)} />
                 </label>
               );
             }
@@ -381,7 +394,7 @@ export function ArtStudioEnquiryForm({
               return (
                 <label key={option.id} className="grid gap-2.5 text-sm font-semibold text-stone-800">
                   {label}
-                  <select name={name} required={option.is_required} value={selected[key] ?? ""} onChange={(event) => choose(key, event.target.value)} className={fieldClass}>
+                  <select name={name} required={option.is_required} value={selected[key] ?? ""} onChange={(event) => choose(key, event.target.value)} className={fieldClassFor(name)}>
                     <option value="" disabled={option.is_required}>{chooseLabel}</option>
                     {option.values.map((value) => (
                       <option key={value.value} value={value.value}>
@@ -389,6 +402,7 @@ export function ArtStudioEnquiryForm({
                       </option>
                     ))}
                   </select>
+                <FieldMessage text={errorFor(name)} />
                 </label>
               );
             }
@@ -436,11 +450,12 @@ export function ArtStudioEnquiryForm({
               accept="image/jpeg,image/png,image/webp,image/heic,image/heif,application/pdf"
               required={config.photo_upload === "required"}
               onChange={(event) => setFileName(event.target.files?.[0]?.name || "")}
-              className="block w-full rounded-xl border border-dashed border-stone-300 bg-paper px-4 py-3 text-sm text-stone-700 file:mr-3 file:rounded-full file:border-0 file:bg-forest file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white"
+              className={`block w-full rounded-xl border border-dashed bg-paper px-4 py-3 text-sm text-stone-700 file:mr-3 file:rounded-full file:border-0 file:bg-forest file:px-4 file:py-2 file:text-sm file:font-semibold file:text-white ${invalid?.name === "attachment" ? "border-orange-500 ring-2 ring-orange-200" : "border-stone-300"}`}
             />
             <span className="text-xs font-normal text-stone-500">
               {fileName || (isEnglish ? "JPG, PNG, WebP, HEIC or PDF up to 15 MB." : "JPG, PNG, WebP, HEIC или PDF до 15 MB.")}
             </span>
+            <FieldMessage text={errorFor("attachment")} />
           </label>
         ) : null}
         <label className="grid gap-2 text-sm font-semibold text-stone-800">
@@ -458,10 +473,10 @@ export function ArtStudioEnquiryForm({
       <fieldset className="grid gap-4 border-t border-stone-200 pt-5">
         <legend className="font-semibold text-stone-950">{isEnglish ? "Contact details" : "Данни за контакт"}</legend>
         <div className="grid gap-4 sm:grid-cols-2">
-          <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "First name" : "Име"}<input name="first_name" required autoComplete="given-name" className={fieldClass} /></label>
-          <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "Last name" : "Фамилия"}<input name="last_name" required autoComplete="family-name" className={fieldClass} /></label>
-          <label className="grid gap-2 text-sm font-semibold">Email<input name="email" type="email" required autoComplete="email" className={fieldClass} /></label>
-          <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "Phone" : "Телефон"}<input name="phone" type="tel" required autoComplete="tel" className={fieldClass} /></label>
+          <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "First name" : "Име"}<input name="first_name" required autoComplete="given-name" className={fieldClassFor("first_name")} /><FieldMessage text={errorFor("first_name")} /></label>
+          <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "Last name" : "Фамилия"}<input name="last_name" required autoComplete="family-name" className={fieldClassFor("last_name")} /><FieldMessage text={errorFor("last_name")} /></label>
+          <label className="grid gap-2 text-sm font-semibold">Email<input name="email" type="email" required autoComplete="email" className={fieldClassFor("email")} /><FieldMessage text={errorFor("email")} /></label>
+          <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "Phone" : "Телефон"}<input name="phone" type="tel" required autoComplete="tel" className={fieldClassFor("phone")} /><FieldMessage text={errorFor("phone")} /></label>
         </div>
       </fieldset>
 
@@ -487,26 +502,31 @@ export function ArtStudioEnquiryForm({
         ) : (
           <div className="grid gap-4 sm:grid-cols-2">
             {econtInstructions ? <p className="text-sm text-stone-600 sm:col-span-2">{econtInstructions}</p> : null}
-            <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "City" : "Град"}<input name="delivery_city" required className={fieldClass} /></label>
+            <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "City" : "Град"}<input name="delivery_city" required className={fieldClassFor("delivery_city")} /><FieldMessage text={errorFor("delivery_city")} /></label>
             <label className="grid gap-2 text-sm font-semibold">
               {isEnglish ? "Econt office or locker" : "Офис или автомат на Еконт"}
-              <input name="delivery_office" required className={fieldClass} placeholder={isEnglish ? "Office or locker name / address" : "Име или адрес на офиса или автомата"} />
+              <input name="delivery_office" required className={fieldClassFor("delivery_office")} placeholder={isEnglish ? "Office or locker name / address" : "Име или адрес на офиса или автомата"} />
+              <FieldMessage text={errorFor("delivery_office")} />
             </label>
           </div>
         )}
         <label className="grid gap-2 text-sm font-semibold">{isEnglish ? "Note for pickup or delivery" : "Бележка за получаването"}<textarea name="delivery_notes" rows={2} className={fieldClass} /></label>
       </fieldset>
 
-      <label className="choice-row text-sm leading-6 text-stone-650">
+      <label className={`choice-row text-sm leading-6 text-stone-650${invalid?.name === "accept_terms" ? invalidOutline : ""}`}>
         <input type="checkbox" name="accept_terms" required className="choice-control" />
         <span>
           {isEnglish ? "I accept the" : "Приемам"} <Link href={localePath(locale, "/terms")} className="font-semibold text-forest underline">{isEnglish ? "terms" : "условията"}</Link> {isEnglish ? "and" : "и"}{" "}
           <Link href={localePath(locale, "/privacy")} className="font-semibold text-forest underline">{isEnglish ? "privacy policy" : "политиката за поверителност"}</Link>.
         </span>
       </label>
+      <FieldMessage text={errorFor("accept_terms")} />
 
-      {invalid && !invalid.chip ? (
-        <p role="alert" className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-semibold text-red-800">{invalid.message}</p>
+      {invalid ? (
+        <p className="rounded-xl border border-orange-200 bg-orange-50 px-4 py-3 text-sm font-semibold text-orange-800">
+          {isEnglish ? "The order was not sent yet: " : "Поръчката още не е изпратена: "}
+          {invalid.message}
+        </p>
       ) : null}
       <button className="admin-button admin-button-forest w-full px-6 py-4 text-base font-semibold">{formCopy?.button || (isEnglish ? "Send the order" : "Изпрати поръчката")}</button>
       <p className="text-center text-xs leading-5 text-stone-500">
