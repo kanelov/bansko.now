@@ -743,7 +743,7 @@ Unless the owner gives a newer priority, continue in this order:
 - Do not trade low egress for stale or incorrect public content without discussing the tradeoff.
 - Do not change design globally to fix one component.
 - Do not claim a migration or deployment succeeded without verifying it.
-- Keep the owner-facing admin guide and this handoff document current as the system evolves.
+- Keep the owner-facing admin guide and this handoff document current as the system evolves. `/admin/guide` is written as steps the owner can follow, not as reference notes: when a flow changes (photo library, Art Studio, articles, Content Hub), update the matching `GuideSection` and the „Актуализирано“ date in the same change. The request app has its own built in guide inside the „Статии“ module (`renderContentGuide()` in `app.js`); keep both in sync.
 
 ## 24. Content Hub publish endpoint (2026-09-02)
 
