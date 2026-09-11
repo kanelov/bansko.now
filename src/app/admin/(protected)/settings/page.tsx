@@ -1,4 +1,5 @@
 import { saveSettingsAction } from "@/app/admin/actions";
+import { SettingsNav } from "@/components/admin/settings-nav";
 import { getSiteSettings } from "@/lib/content";
 
 function fieldClass() {
@@ -20,6 +21,9 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
       <div>
         <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Configuration</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Settings</h1>
+        <div className="mt-4">
+          <SettingsNav />
+        </div>
       </div>
       {params.saved ? (
         <div className="max-w-3xl rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">

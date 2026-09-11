@@ -2,7 +2,15 @@ import { notFound } from "next/navigation";
 import { ArticleEditorForm } from "@/components/admin/article-editor-form";
 import Link from "next/link";
 import type { Route } from "next";
-import { getAdminArticleById, getAdminArticleTranslations, getCategories, getMediaItems, getSiteSettings, getTagsForArticle } from "@/lib/content";
+import {
+  getAdminArticleById,
+  getAdminArticleTranslations,
+  getArticleFallbackImages,
+  getCategories,
+  getMediaItems,
+  getSiteSettings,
+  getTagsForArticle
+} from "@/lib/content";
 
 type Params = Promise<{ id: string }>;
 type SearchParams = Promise<{ saved?: string; published?: string; error?: string }>;
@@ -15,12 +23,13 @@ export default async function EditArticlePage({ params, searchParams }: { params
     notFound();
   }
 
-  const [categories, tags, mediaItems, translations, settings] = await Promise.all([
+  const [categories, tags, mediaItems, translations, settings, fallbackImages] = await Promise.all([
     getCategories(article.locale, { includeHidden: true }),
     getTagsForArticle(id),
     getMediaItems(12),
     getAdminArticleTranslations(article.translation_group_id),
-    getSiteSettings(article.locale)
+    getSiteSettings(article.locale),
+    getArticleFallbackImages()
   ]);
   const bgArticle = translations.find((item) => item.locale === "bg");
   const enArticle = translations.find((item) => item.locale === "en");
@@ -66,7 +75,7 @@ export default async function EditArticlePage({ params, searchParams }: { params
           {query.error}
         </div>
       ) : null}
-      <ArticleEditorForm key={id} article={{ ...article, tags }} categories={categories} mediaItems={mediaItems} locale={article.locale} translationGroupId={article.translation_group_id} settings={settings} />
+      <ArticleEditorForm key={id} article={{ ...article, tags }} categories={categories} mediaItems={mediaItems} fallbackImages={fallbackImages} locale={article.locale} translationGroupId={article.translation_group_id} settings={settings} />
     </div>
   );
 }

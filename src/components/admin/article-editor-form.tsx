@@ -13,11 +13,12 @@ import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SEOChecklist } from "@/components/admin/seo-checklist";
 import { ContentDocumentTools } from "@/components/admin/content-document-tools";
 import { fallbackSettings } from "@/lib/defaults";
+import { pickFallbackImage } from "@/lib/fallback-images";
 import { articleDocumentFields, type ContentDocumentMetadata, type ContentDocumentValue } from "@/lib/content-transfer";
 import { getArticleToc } from "@/lib/markdown-blocks";
 import { getSeoScore } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
-import type { ArticleStatus, ArticleWithCategory, Category, Locale, MediaItem, SiteSettings } from "@/lib/types";
+import type { ArticleFallbackImage, ArticleStatus, ArticleWithCategory, Category, Locale, MediaItem, SiteSettings } from "@/lib/types";
 
 type Tab = "content" | "seo" | "images" | "settings" | "preview";
 
@@ -289,6 +290,7 @@ export function ArticleEditorForm({
   article,
   categories,
   mediaItems = [],
+  fallbackImages = [],
   locale = article?.locale || "bg",
   translationGroupId = article?.translation_group_id || "",
   settings = fallbackSettings
@@ -296,6 +298,8 @@ export function ArticleEditorForm({
   article?: ArticleWithCategory | null;
   categories: Category[];
   mediaItems?: MediaItem[];
+  /** The default image pool; the editor previews which one the public page would use. */
+  fallbackImages?: ArticleFallbackImage[];
   locale?: Locale;
   translationGroupId?: string;
   settings?: SiteSettings;
@@ -315,6 +319,25 @@ export function ArticleEditorForm({
       featured_image_alt: draft.featured_image_alt
     }),
     [article, draft]
+  );
+  // Same matcher as the public pages, so the preview shows the picture readers would actually see.
+  const predictedFallback = useMemo(
+    () =>
+      draft.featured_image_url || !fallbackImages.length
+        ? null
+        : pickFallbackImage(fallbackImages, {
+            id: article?.id,
+            slug: draft.slug,
+            locale,
+            title: draft.title,
+            excerpt: draft.excerpt,
+            seo_title: draft.seo_title,
+            seo_description: draft.seo_description,
+            content: draft.content,
+            categoryName: categories.find((category) => category.id === draft.category_id)?.name,
+            tags: draft.tags_input.split(",").map((tag) => tag.trim()).filter(Boolean)
+          }),
+    [article?.id, categories, draft, fallbackImages, locale]
   );
   const documentValues = useMemo<Record<string, ContentDocumentValue>>(
     () => Object.fromEntries(serializedDraftFields.map((field) => [field, draft[field]])),
@@ -666,6 +689,19 @@ export function ArticleEditorForm({
                 />
                 <p className="p-3 text-xs leading-5 text-stone-600">
                   {draft.featured_image_alt || "Добави alt text, за да бъде изображението полезно за SEO и достъпност."}
+                </p>
+              </div>
+            ) : predictedFallback ? (
+              <div className="overflow-hidden rounded-2xl bg-stone-100">
+                {/* eslint-disable-next-line @next/next/no-img-element -- deliberate: admin preview */}
+                <img src={predictedFallback.image_url} alt={predictedFallback.title} className="aspect-[4/3] w-full object-cover opacity-90" />
+                <p className="p-3 text-xs leading-5 text-stone-600">
+                  Без собствена снимка статията ще излезе с „{predictedFallback.title}“ – снимка по подразбиране, избрана по думите в заглавието и
+                  текста. Сложи своя снимка, за да я замениш, или промени{" "}
+                  <Link href="/admin/settings/fallback-images" className="font-semibold text-forest underline underline-offset-4">
+                    снимките по подразбиране
+                  </Link>
+                  .
                 </p>
               </div>
             ) : (

@@ -1,5 +1,7 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
+import { fallbackImageAlt, pickFallbackImage } from "@/lib/fallback-images";
 import { localePath } from "@/lib/i18n";
 import {
   categoryDefinitions,
@@ -11,6 +13,7 @@ import {
 import type {
   ArtStudioService,
   ArtStudioServiceTranslation,
+  ArticleFallbackImage,
   ArticleWithCategory,
   Category,
   CategoryTranslation,
@@ -343,6 +346,47 @@ export function getArticleCategory(article: ArticleWithCategory) {
   return article.category ?? article.categories ?? null;
 }
 
+/** The active default images, one small query per render (cached with React `cache`). */
+export const getArticleFallbackImages = cache(async (): Promise<ArticleFallbackImage[]> => {
+  const supabase = createPublicSupabaseClient();
+  if (!supabase) return [];
+
+  const { data } = await supabase
+    .from("article_fallback_images")
+    .select("id,image_url,title,title_en,keywords,sort_order,is_active,created_at,updated_at")
+    .eq("is_active", true)
+    .order("sort_order", { ascending: true })
+    .order("created_at", { ascending: true });
+
+  return (data ?? []) as ArticleFallbackImage[];
+});
+
+/**
+ * Fills the featured image of an article that has none from the default pool. The choice is
+ * made here, at read time, so it never touches the stored record: a custom picture always wins.
+ */
+async function withFallbackImages<T extends ArticleWithCategory | null>(articles: T[]): Promise<T[]> {
+  if (!articles.some((article) => article && !article.featured_image_url)) return articles;
+  const images = await getArticleFallbackImages();
+  if (!images.length) return articles;
+
+  return articles.map((article) => {
+    if (!article || article.featured_image_url) return article;
+    const image = pickFallbackImage(images, {
+      ...article,
+      categoryName: getArticleCategory(article)?.name,
+      tags: article.tags?.map((tag) => tag.name)
+    });
+    if (!image) return article;
+    return {
+      ...article,
+      featured_image_url: image.image_url,
+      featured_image_alt: article.featured_image_alt || fallbackImageAlt(image, article.locale),
+      featured_image_is_fallback: true
+    };
+  });
+}
+
 export function getArticlePath(article: ArticleWithCategory) {
   const category = getArticleCategory(article);
   return localePath(article.locale, `/${category?.slug || "articles"}/${article.slug}`);
@@ -615,7 +659,7 @@ export async function getPublishedArticles(options?: {
     articles = articles.filter((article) => getArticleCategory(article)?.slug === options.categorySlug);
   }
 
-  return articles;
+  return withFallbackImages(articles);
 }
 
 /** Search in the database (title, excerpt, body) and return light rows only. */
@@ -639,10 +683,11 @@ export async function searchPublishedArticles(query: string, locale: Locale = "b
   const localizedCategories = await getCategories(locale, { includeHidden: true });
   const categoriesById = new Map(localizedCategories.map((category) => [category.id, category]));
 
-  return ((data ?? []) as unknown as ArticleWithCategory[]).map((article) => {
+  const results = ((data ?? []) as unknown as ArticleWithCategory[]).map((article) => {
     const category = article.category_id ? categoriesById.get(article.category_id) ?? getArticleCategory(article) : null;
     return { ...normalizeArticle({ ...article, content: "" }), category, categories: category };
   });
+  return withFallbackImages(results);
 }
 
 export async function getAllAdminArticles(): Promise<ArticleWithCategory[]> {
@@ -714,7 +759,8 @@ export async function getArticleBySlug(slug: string, locale: Locale = "bg"): Pro
 
   const article = normalizeArticle(data as unknown as ArticleWithCategory);
   const category = article.category_id ? await getCategoryBySlug(getArticleCategory(article)?.slug || "", locale) : null;
-  return { ...article, category, categories: category };
+  const [result] = await withFallbackImages([{ ...article, category, categories: category }]);
+  return result;
 }
 
 export async function getPublishedArticleTranslation(
@@ -743,7 +789,8 @@ export async function getPublishedArticleTranslation(
   const article = normalizeArticle(data as unknown as ArticleWithCategory);
   const categorySlug = getArticleCategory(article)?.slug;
   const category = categorySlug ? await getCategoryBySlug(categorySlug, locale) : null;
-  return { ...article, category, categories: category };
+  const [result] = await withFallbackImages([{ ...article, category, categories: category }]);
+  return result;
 }
 
 export async function getRelatedArticles(article: ArticleWithCategory, limit = 3) {

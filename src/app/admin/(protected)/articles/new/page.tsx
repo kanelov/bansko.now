@@ -1,5 +1,5 @@
 import { ArticleEditorForm } from "@/components/admin/article-editor-form";
-import { getCategories, getMediaItems, getSiteSettings } from "@/lib/content";
+import { getArticleFallbackImages, getCategories, getMediaItems, getSiteSettings } from "@/lib/content";
 import { isLocale } from "@/lib/i18n";
 
 type SearchParams = Promise<{ error?: string; locale?: string; translation_group_id?: string }>;
@@ -7,7 +7,12 @@ type SearchParams = Promise<{ error?: string; locale?: string; translation_group
 export default async function NewArticlePage({ searchParams }: { searchParams: SearchParams }) {
   const query = await searchParams;
   const locale = query.locale && isLocale(query.locale) ? query.locale : "bg";
-  const [categories, mediaItems, settings] = await Promise.all([getCategories(locale, { includeHidden: true }), getMediaItems(12), getSiteSettings(locale)]);
+  const [categories, mediaItems, settings, fallbackImages] = await Promise.all([
+    getCategories(locale, { includeHidden: true }),
+    getMediaItems(12),
+    getSiteSettings(locale),
+    getArticleFallbackImages()
+  ]);
 
   return (
     <div className="grid gap-8">
@@ -20,7 +25,7 @@ export default async function NewArticlePage({ searchParams }: { searchParams: S
           {query.error}
         </div>
       ) : null}
-      <ArticleEditorForm categories={categories} mediaItems={mediaItems} locale={locale} translationGroupId={query.translation_group_id || ""} settings={settings} />
+      <ArticleEditorForm categories={categories} mediaItems={mediaItems} fallbackImages={fallbackImages} locale={locale} translationGroupId={query.translation_group_id || ""} settings={settings} />
     </div>
   );
 }
