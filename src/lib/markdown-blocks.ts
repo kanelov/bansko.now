@@ -5,7 +5,8 @@ export type MarkdownBlock =
   | { type: "callout"; content: string }
   | { type: "faq"; content: string }
   | { type: "video"; content: string }
-  | { type: "button"; content: string };
+  | { type: "button"; content: string }
+  | { type: "block"; content: string };
 
 export type GalleryImage = {
   src: string;
@@ -32,7 +33,7 @@ export type TocItem = {
 export type MarkdownTextColor = "stone" | "forest" | "moss" | "clay" | "ink" | "white";
 
 const blockPattern = /^[ \t]*:::\s*([a-z]+)[ \t]*\r?\n([\s\S]*?)\r?\n[ \t]*:::[ \t]*(?=\r?\n|$)/gm;
-const supportedBlocks = new Set(["text", "gallery", "callout", "faq", "video", "button"]);
+const supportedBlocks = new Set(["text", "gallery", "callout", "faq", "video", "button", "block"]);
 const textColors = new Set<MarkdownTextColor>(["stone", "forest", "moss", "clay", "ink", "white"]);
 
 export function splitMarkdownBlocks(content: string): MarkdownBlock[] {
@@ -51,7 +52,7 @@ export function splitMarkdownBlocks(content: string): MarkdownBlock[] {
     }
 
     if (supportedBlocks.has(type)) {
-      blocks.push({ type: type as "text" | "gallery" | "callout" | "faq" | "video" | "button", content: match[2].trim() });
+      blocks.push({ type: type as "text" | "gallery" | "callout" | "faq" | "video" | "button" | "block", content: match[2].trim() });
     } else {
       blocks.push({ type: "markdown", content: match[0] });
     }
@@ -161,6 +162,23 @@ export function parseButtonBlock(content: string): MarkdownButton | null {
   }
 
   return { label, url, style };
+}
+
+/**
+ * `:::block` places one of the HTML blocks from /admin/blocks inside the text:
+ *   :::block
+ *   key: art_studio
+ *   :::
+ * The key alone on the first line works too. Returns the normalized key or an empty string.
+ */
+export function parseBlockReference(content: string) {
+  const firstLine = content
+    .split("\n")
+    .map((line) => line.trim())
+    .find(Boolean);
+  if (!firstLine) return "";
+  const raw = firstLine.replace(/^(key|блок|block)\s*:\s*/i, "");
+  return raw.trim().toLowerCase().replace(/[^a-z0-9_]+/g, "_").replace(/^_+|_+$/g, "");
 }
 
 export function getHeadingId(text: string) {

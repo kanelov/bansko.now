@@ -819,6 +819,7 @@ export function ArticleEditorForm({
               <MarkdownRenderer
                 content={draft.content || (draft.locale === "en" ? "## Subheading\n\nThe article content will appear here." : "## Подзаглавие\n\nТекстът на статията ще се покаже тук.")}
                 locale={draft.locale}
+                htmlBlocks={Object.fromEntries(blockPreviews.map((block) => [block.key, block.html[draft.locale]]))}
               />
             </div>
           </article>

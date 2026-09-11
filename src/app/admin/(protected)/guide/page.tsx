@@ -93,6 +93,13 @@ https://.../short-video.mp4
 :::`
   },
   {
+    title: "Блок от „Блокове“ на избрано място",
+    explanation: "Поставя един от HTML блоковете (Art Studio, Bansko Collection, Facebook общност или твой къстъм блок) точно там, където са трите реда. Ключът е този от страницата „Блокове“.",
+    example: `:::block
+key: art_studio
+:::`
+  },
+  {
     title: "Въпроси и отговори (FAQ)",
     explanation: "Всеки въпрос е H3. Блокът се показва като акордеон и добавя FAQ структурирани данни за SEO.",
     example: `:::faq
@@ -552,25 +559,67 @@ status: draft`}</CodeBlock>
           </p>
         </GuideSection>
 
-        <GuideSection number="15" title="Блокове под статията (HTML)">
+        <GuideSection number="15" title="Блокове в статиите: стандартни и къстъм (HTML)">
           <GuideSummary>
-            <p>Трите блока – Art Studio, Bansko Collection и Facebook общност – вече са парчета HTML в „Блокове“ (страничното меню), на български и английски.</p>
-            <p>Кажи ми как да изглежда даден блок и ти давам кода; поставяш го в полето, натискаш „Запази блока“ и прегледът отдолу показва резултата.</p>
-            <p>Кой блок излиза под коя статия се решава от ключовете в настройките на статията, както досега.</p>
+            <p>Блок = парче HTML в „Блокове“ (страничното меню), на български и английски, с преглед под полето.</p>
+            <p>В статия влиза по два начина: <strong>под статията</strong> (с ключовете в настройките ѝ) или <strong>на избрано място в текста</strong> с трите реда <code>:::block</code> / <code>key: …</code> / <code>:::</code>.</p>
+            <p>Къстъм блок: „Блокове“ → „Нов блок“ → име, HTML (кажи ми как да изглежда – давам кода) → „Добави блока“ → слагаш го в избраните статии с <code>:::block</code>, или от „Къде излиза“ го правиш общ за всички.</p>
           </GuideSummary>
-          <p>
-            Блоковете стоят под всяка статия и на главните страници: Art Studio и Bansko Collection на началната и на категорийните страници, Facebook общността и на страниците „За нас“, „Контакти“, „Статии“, Art Studio и при бизнесите. Ако направиш нов блок без ключ в статията, той излиза под всяка статия, докато е активен.
+
+          <h3 className="mt-2 font-semibold text-stone-950">А. Как се слага блок под статия</h3>
+          <ol className="mt-3 grid list-decimal gap-2 pl-5">
+            <li>Отвори статията в редактора и избери таб „Settings“.</li>
+            <li>Отметни „Блок „Art Studio“ под статията“, „Блок „Bansko Collection“ под статията“ или „Блок „Facebook общност“ под статията“ – по един ключ за всеки от трите стандартни блока. Нова статия има включен само Facebook.</li>
+            <li>Запази. В таб „Preview“ блоковете се виждат точно както на сайта. Редът им е този от „Блокове“ (полето „Ред“).</li>
+          </ol>
+          <p className="mt-3">
+            Тези три ключа са полета на самата статия (<code>show_art_studio_block</code>, <code>show_bansko_collection_block</code>, <code>show_facebook_cta</code>). Кой ключ управлява кой блок се задава в „Блокове“ → „Къде излиза“. Там има и „Под всяка статия“ (общ блок, без отметка) и „Само където е сложен в текста с :::block“ (за къстъм блокове, които искаш в избрани статии).
           </p>
-          <p>
-            HTML-ът използва готови класове, за да е в стила на сайта: <code>article-block</code> (с вариант <code>--cream</code>, <code>--forest</code>, <code>--dark</code> или <code>--sage</code>), <code>article-block__eyebrow</code>, <code>article-block__title</code>, <code>article-block__text</code>, <code>article-block__split</code> (две колони), <code>article-block__tiles</code> + <code>article-block__tile</code> (плочки с икона, всяка е линк), <code>article-block__actions</code> + <code>article-block__button</code> (<code>--primary</code>, <code>--light</code>, <code>--ghost</code>), <code>article-block__chips</code> + <code>article-block__chip</code>. Списъкът с обяснения е и в самата страница „Блокове“.
+
+          <h3 className="mt-6 font-semibold text-stone-950">Б. Как се слага блок на избрано място в текста</h3>
+          <ol className="mt-3 grid list-decimal gap-2 pl-5">
+            <li>В „Блокове“ виж ключа на блока (под името му пише „ключ“; например <code>art_studio</code>, <code>collection</code>, <code>facebook</code> или твоят).</li>
+            <li>В текста на статията, на отделен ред там, където искаш блока, напиши трите реда:</li>
+          </ol>
+          <CodeBlock>{`:::block
+key: art_studio
+:::`}</CodeBlock>
+          <p className="mt-3">
+            Работи в българската и английската версия – блокът сам взима езика на статията. Ако същият блок е включен и с ключ под статията, ще излезе два пъти; тогава махни отметката в „Settings“. Един блок може да се сложи в текста колкото пъти искаш. Това важи само за Bansko NOW: за WordPress сайтовете от Content Hub оградите се махат и остава само редът с ключа, така че там не го ползвай.
           </p>
-          <p>
-            Три маркера се заменят при показване: <code>{`{{path:/art-studio}}`}</code> става адресът за текущия език (на английската страница <code>/en/art-studio</code>), <code>{`{{icon:shirt}}`}</code> става икона (същите имена като иконите на менюто: shirt, image, mug-hot, church, palette, bag-shopping, facebook, mountain, heart, users, newspaper, store…), а <code>{`{{facebook_group_url}}`}</code> е адресът на групата от „Меню и хедър“.
+
+          <h3 className="mt-6 font-semibold text-stone-950">В. Как се прави къстъм блок</h3>
+          <ol className="mt-3 grid list-decimal gap-2 pl-5">
+            <li>Кажи ми в чата как да изглежда: цветове (светъл, зелен, тъмен), заглавие, текст, какви бутони или плочки с икони и накъде да водят. Получаваш готов HTML за български и английски.</li>
+            <li>„Блокове“ → най-долу „Нов блок“: име (например „Абонамент за бюлетина“), ключ по желание (иначе се прави от името: латиница, долни черти), ред.</li>
+            <li>Постави HTML-а в „HTML на български“ и „HTML на английски“ и натисни „Добави блока“. Прегледът под него показва българската версия така, както е на сайта.</li>
+            <li>„Къде излиза“ решава как влиза в статиите: <strong>„Само където е сложен в текста с :::block“</strong> (по подразбиране за нов блок – ти избираш статиите и мястото), <strong>„Под всяка статия“</strong> (общ блок, като Facebook) или под статията при отметнат някой от трите ключа в „Settings“ на статията.</li>
+            <li>Промяна по-късно: редактираш HTML-а на същото място и „Запази блока“ – сменя се във всички статии наведнъж. „Изтрий“ го маха навсякъде; при стандартните бутонът е „Върни стандартния“.</li>
+          </ol>
+          <p className="mt-3">Минимален къстъм блок, който можеш да промениш сам (текстовете и адреса):</p>
+          <CodeBlock>{`<section class="article-block article-block--sage">
+  <p class="article-block__eyebrow">Бюлетин</p>
+  <h2 class="article-block__title">Новините от Банско веднъж седмично</h2>
+  <p class="article-block__text">Кратко, без спам, само най-важното за седмицата.</p>
+  <div class="article-block__actions">
+    <a class="article-block__button article-block__button--primary" href="{{path:/contact}}">{{icon:newspaper}}Абонирай се</a>
+    <a class="article-block__button article-block__button--ghost" href="{{path:/articles}}">Всички статии</a>
+  </div>
+</section>`}</CodeBlock>
+          <p className="mt-3">
+            Готовите класове държат стила на сайта: <code>article-block</code> (вариант <code>--cream</code>, <code>--forest</code>, <code>--dark</code>, <code>--sage</code>), <code>article-block__eyebrow</code>, <code>article-block__title</code>, <code>article-block__text</code>, <code>article-block__split</code> (две колони), <code>article-block__tiles</code> + <code>article-block__tile</code> (плочки с икона, всяка е линк), <code>article-block__actions</code> + <code>article-block__button</code> (<code>--primary</code>, <code>--light</code>, <code>--ghost</code>), <code>article-block__chips</code> + <code>article-block__chip</code>. Маркери: <code>{`{{path:/art-studio}}`}</code> (адрес за текущия език), <code>{`{{icon:shirt}}`}</code> (икона: shirt, image, mug-hot, church, palette, bag-shopping, facebook, mountain, heart, users, newspaper, store…), <code>{`{{facebook_group_url}}`}</code>.
           </p>
+
+          <h3 className="mt-6 font-semibold text-stone-950">Г. Къде излизат стандартните блокове извън статиите</h3>
+          <p className="mt-3">
+            Art Studio и Bansko Collection – на началната и на категорийните страници; Facebook общността – и на „За нас“, „Контакти“, „Статии“, Art Studio и при бизнесите. Промяна на блока се отразява навсякъде.
+          </p>
+
           <GuideDetails>
             <p><strong>Таблица:</strong> <code>article_blocks</code> (ключ, име, HTML BG, HTML EN, активен, ред, кой ключ в статията го включва). Трите стандартни блока са и в кода (<code>src/lib/article-blocks.ts</code>): ако за даден ключ няма запис, се показва стандартният; „Върни стандартния“ изтрива записа и връща кода.</p>
+            <p><strong>В текста:</strong> <code>:::block</code> е обикновен блок на статията (<code>src/lib/markdown-blocks.ts</code>, <code>parseBlockReference</code>); рендерерът получава готовия HTML по ключ (<code>htmlBlocks</code>) и го поставя на място. Непознат ключ не показва нищо.</p>
             <p><strong>Сигурност:</strong> при запис и при показване се премахват <code>&lt;script&gt;</code>, вградени рамки, формуляри и <code>on…=</code> атрибути. Само админът може да пише; публично се четат само активните.</p>
-            <p><strong>Къде се рисува:</strong> <code>ArticleBlocks</code> под статията (спазва ключовете <code>show_art_studio_block</code>, <code>show_bansko_collection_block</code>, <code>show_facebook_cta</code>), <code>SiteBlock</code> по ключ на останалите страници. Стиловете са в края на <code>src/app/globals.css</code>. Старите текстови полета за блоковете в „Настройки“ са премахнати; техните текстове са пренесени в HTML-а.</p>
+            <p><strong>Къде се рисува:</strong> <code>ArticleBlocks</code> под статията (спазва ключовете), <code>SiteBlock</code> по ключ на останалите страници, <code>MarkdownRenderer</code> за <code>:::block</code>. Стиловете са в края на <code>src/app/globals.css</code>. Старите текстови полета в „Настройки“ са премахнати; техните текстове са пренесени в HTML-а.</p>
             <p><strong>Кеш:</strong> запис на блок обновява началната, списъците, категориите и всички статии веднага.</p>
           </GuideDetails>
         </GuideSection>

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { revalidateEditorialPaths, revalidatePublicPath } from "@/lib/articles-admin";
-import { defaultArticleBlocks, isArticleToggleKey, sanitizeBlockHtml } from "@/lib/article-blocks";
+import { defaultArticleBlocks, isArticleToggleKey, manualBlockPlacement, sanitizeBlockHtml } from "@/lib/article-blocks";
 import { slugify } from "@/lib/slug";
 import { requireAdmin } from "@/lib/supabase/auth";
 
@@ -45,7 +45,7 @@ export async function saveArticleBlockAction(formData: FormData) {
     html_en: sanitizeBlockHtml(value(formData, "html_en", 40000)),
     is_active: formData.get("is_active") === "on",
     sort_order: Number.isFinite(sortOrder) ? sortOrder : 0,
-    article_toggle: isArticleToggleKey(toggle) ? toggle : null
+    article_toggle: isArticleToggleKey(toggle) || toggle === manualBlockPlacement ? toggle : null
   };
 
   const { error } = await supabase.from("article_blocks").upsert(payload, { onConflict: "key" });

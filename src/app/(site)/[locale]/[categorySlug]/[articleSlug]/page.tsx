@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
 import { ArticleBlocks } from "@/components/public/article-blocks";
+import { getArticleBlocks, renderArticleBlock } from "@/lib/article-blocks";
 import { ArticleCard } from "@/components/public/article-card";
 import { ArticleShareActions } from "@/components/public/article-share-actions";
 import { ArticleTableOfContents } from "@/components/public/article-table-of-contents";
@@ -160,6 +161,10 @@ export default async function ArticlePage({ params }: { params: Params }) {
     getPublishedArticleTranslation(article.translation_group_id, alternateLocale)
   ]);
   const image = article.featured_image_url;
+  // HTML blocks the text may place with :::block (see /admin/blocks).
+  const htmlBlocks = Object.fromEntries(
+    (await getArticleBlocks()).map((block) => [block.key, renderArticleBlock(block, locale, { facebook_group_url: settings.facebook_group_url })])
+  );
   // When the featured image comes from the photo library, credit it and link to licensing.
   const libraryCode = photoCodesInContent(article.featured_image_url)[0] ?? null;
   const libraryPhoto = libraryCode ? await getPhotoByCode(libraryCode, locale) : null;
@@ -308,7 +313,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
 
           <div className="mt-12">
             <ArticleTableOfContents items={tocItems} locale={locale} />
-            <MarkdownRenderer content={article.content} locale={locale} />
+            <MarkdownRenderer content={article.content} locale={locale} htmlBlocks={htmlBlocks} />
             <SourceLinks links={article.source_links} locale={locale} />
           </div>
 

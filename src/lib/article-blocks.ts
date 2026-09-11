@@ -20,6 +20,9 @@ import type { ArticleBlock, Locale } from "@/lib/types";
 export const articleToggleKeys = ["show_art_studio_block", "show_bansko_collection_block", "show_facebook_cta"] as const;
 export type ArticleToggleKey = (typeof articleToggleKeys)[number];
 
+/** `article_toggle` value for a block that appears only where `:::block` places it in the text. */
+export const manualBlockPlacement = "manual";
+
 export function isArticleToggleKey(value: unknown): value is ArticleToggleKey {
   return typeof value === "string" && (articleToggleKeys as readonly string[]).includes(value);
 }

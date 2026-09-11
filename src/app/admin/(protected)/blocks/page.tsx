@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { deleteArticleBlockAction, saveArticleBlockAction } from "@/app/admin/block-actions";
-import { articleToggleKeys, defaultArticleBlocks, mergeWithDefaultBlocks, renderArticleBlock } from "@/lib/article-blocks";
+import { articleToggleKeys, defaultArticleBlocks, manualBlockPlacement, mergeWithDefaultBlocks, renderArticleBlock } from "@/lib/article-blocks";
 import { getSiteSettings } from "@/lib/content";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { ArticleBlock } from "@/lib/types";
@@ -12,10 +12,23 @@ const codeClass = "w-full rounded-xl border border-[var(--admin-line)] bg-white 
 const labelClass = "grid gap-1 text-xs font-semibold text-stone-700";
 
 const toggleLabels: Record<(typeof articleToggleKeys)[number], string> = {
-  show_art_studio_block: "Ключ „Art Studio“ в статията",
-  show_bansko_collection_block: "Ключ „Bansko Collection“ в статията",
-  show_facebook_cta: "Ключ „Facebook общност“ в статията"
+  show_art_studio_block: "Под статията, когато е отметнат „Art Studio“",
+  show_bansko_collection_block: "Под статията, когато е отметнат „Bansko Collection“",
+  show_facebook_cta: "Под статията, когато е отметнат „Facebook общност“"
 };
+
+/** The "where does it appear" select, shared by the edit forms and the new block form. */
+function PlacementSelect({ value }: { value: string | null }) {
+  return (
+    <select name="article_toggle" defaultValue={value || ""} className={fieldClass}>
+      <option value={manualBlockPlacement}>Само където е сложен в текста с :::block</option>
+      <option value="">Под всяка статия</option>
+      {articleToggleKeys.map((key) => (
+        <option key={key} value={key}>{toggleLabels[key]}</option>
+      ))}
+    </select>
+  );
+}
 
 const classHelp: [string, string][] = [
   ["article-block", "рамката на блока: заоблена, с отстъп и сянка; добави --cream (светъл), --forest (зелен, бял текст), --dark (тъмен, бял текст) или --sage"],
@@ -57,9 +70,11 @@ export default async function ArticleBlocksAdminPage({ searchParams }: { searchP
         <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Статии и страници</p>
         <h1 className="font-serif text-4xl font-semibold">Блокове под статията</h1>
         <p className="max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
-          Всеки блок е парче HTML на български и английски. Показва се под статиите (според ключовете в настройките на всяка статия) и на
-          главните страници: Art Studio и Bansko Collection са на началната и категорийните страници, Facebook общността е почти навсякъде.
-          Пишеш HTML с готовите класове отдолу, за да изглежда като останалата част от сайта; кажи ми какво искаш и ще ти дам кода.
+          Всеки блок е парче HTML на български и английски. Влиза в статия по два начина: под статията (според „Къде излиза“ – с отметка в
+          настройките на статията или под всяка статия) или на избрано място в текста с трите реда <code>:::block</code>,{" "}
+          <code>key: име_на_блока</code>, <code>:::</code>. Стандартните са и на главните страници. Пишеш HTML с готовите класове отдолу, за да
+          изглежда като останалата част от сайта; кажи ми какво искаш и ще ти дам кода. Стъпките са в{" "}
+          <Link href="/admin/guide" className="font-semibold text-forest underline underline-offset-4">Инструкции</Link>, раздел 15.
         </p>
       </div>
 
@@ -78,6 +93,9 @@ export default async function ArticleBlocksAdminPage({ searchParams }: { searchP
                   ключ <code>{block.key}</code>
                   {stored ? "" : " · стандартен блок от кода, още не е променян"}
                   {block.is_active ? "" : " · изключен"}
+                </p>
+                <p className="mt-1 text-xs text-[var(--admin-muted)]">
+                  В текста на статия: <code>{`:::block`}</code> <code>{`key: ${block.key}`}</code> <code>{`:::`}</code> (три реда)
                 </p>
               </div>
               {stored ? (
@@ -98,13 +116,8 @@ export default async function ArticleBlocksAdminPage({ searchParams }: { searchP
                   <input name="title" defaultValue={block.title} className={fieldClass} required />
                 </label>
                 <label className={labelClass}>
-                  Кой ключ в статията го включва
-                  <select name="article_toggle" defaultValue={block.article_toggle || ""} className={fieldClass}>
-                    <option value="">Няма – показва се под всяка статия</option>
-                    {articleToggleKeys.map((key) => (
-                      <option key={key} value={key}>{toggleLabels[key]}</option>
-                    ))}
-                  </select>
+                  Къде излиза
+                  <PlacementSelect value={block.article_toggle} />
                 </label>
                 <label className={labelClass}>
                   Ред
@@ -147,10 +160,11 @@ export default async function ArticleBlocksAdminPage({ searchParams }: { searchP
       <section className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-6">
         <h2 className="font-serif text-2xl font-semibold">Нов блок</h2>
         <p className="text-sm leading-6 text-[var(--admin-muted)]">
-          Блок без ключ в статията се показва под всяка статия, докато е активен. Ключът се прави сам от името (латиница, долни черти).
+          Ключът се прави сам от името (латиница, долни черти). Нов блок по подразбиране излиза само където го сложиш в текста на статия с
+          трите реда <code>:::block</code> / <code>key: …</code> / <code>:::</code>; от „Къде излиза“ може да стане общ за всички статии.
         </p>
         <form action={saveArticleBlockAction} className="grid gap-4">
-          <div className="grid gap-3 md:grid-cols-[1fr_1fr_120px]">
+          <div className="grid gap-3 md:grid-cols-[1fr_1fr_1fr_120px]">
             <label className={labelClass}>
               Име
               <input name="title" className={fieldClass} placeholder="Например: Абонамент за бюлетина" required />
@@ -158,6 +172,10 @@ export default async function ArticleBlocksAdminPage({ searchParams }: { searchP
             <label className={labelClass}>
               Ключ (по желание)
               <input name="key" className={fieldClass} placeholder="newsletter" />
+            </label>
+            <label className={labelClass}>
+              Къде излиза
+              <PlacementSelect value={manualBlockPlacement} />
             </label>
             <label className={labelClass}>
               Ред
