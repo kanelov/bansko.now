@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { createFallbackImageAction, deleteFallbackImageAction, updateFallbackImageAction } from "@/app/admin/fallback-image-actions";
-import { SettingsNav } from "@/components/admin/settings-nav";
 import { getMediaItems } from "@/lib/content";
 import { scoreFallbackImages } from "@/lib/fallback-images";
 import { getPublishedPhotos } from "@/lib/photos";
@@ -50,9 +49,8 @@ export default async function FallbackImagesPage({ searchParams }: { searchParam
   return (
     <div className="grid gap-8">
       <div className="grid gap-4">
-        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Настройки</p>
+        <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Статии</p>
         <h1 className="font-serif text-4xl font-semibold">Снимки по подразбиране за статии</h1>
-        <SettingsNav />
         <p className="max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
           Когато една статия няма собствена снимка, сайтът показва една от тези. Изборът е по ключовите думи: думите на всяка снимка се
           сравняват със заглавието, категорията, таговете, резюмето и текста на статията и печели най-близката. Ако нищо не съвпада,

@@ -1,4 +1,5 @@
 import { ArticleEditorForm } from "@/components/admin/article-editor-form";
+import { getArticleBlockPreviews } from "@/lib/article-blocks";
 import { getArticleFallbackImages, getCategories, getMediaItems, getSiteSettings } from "@/lib/content";
 import { isLocale } from "@/lib/i18n";
 
@@ -13,6 +14,7 @@ export default async function NewArticlePage({ searchParams }: { searchParams: S
     getSiteSettings(locale),
     getArticleFallbackImages()
   ]);
+  const blockPreviews = await getArticleBlockPreviews({ facebook_group_url: settings.facebook_group_url });
 
   return (
     <div className="grid gap-8">
@@ -25,7 +27,7 @@ export default async function NewArticlePage({ searchParams }: { searchParams: S
           {query.error}
         </div>
       ) : null}
-      <ArticleEditorForm categories={categories} mediaItems={mediaItems} fallbackImages={fallbackImages} locale={locale} translationGroupId={query.translation_group_id || ""} settings={settings} />
+      <ArticleEditorForm categories={categories} mediaItems={mediaItems} fallbackImages={fallbackImages} blockPreviews={blockPreviews} locale={locale} translationGroupId={query.translation_group_id || ""} settings={settings} />
     </div>
   );
 }

@@ -2,12 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound, permanentRedirect } from "next/navigation";
-import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
+import { ArticleBlocks } from "@/components/public/article-blocks";
 import { ArticleCard } from "@/components/public/article-card";
 import { ArticleShareActions } from "@/components/public/article-share-actions";
 import { ArticleTableOfContents } from "@/components/public/article-table-of-contents";
-import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
-import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { ResponsiveImage } from "@/components/public/responsive-image";
 import { ScrollToTopButton } from "@/components/public/scroll-to-top-button";
@@ -315,9 +313,7 @@ export default async function ArticlePage({ params }: { params: Params }) {
           </div>
 
           <div className="mt-14 grid gap-8">
-            {article.show_art_studio_block ? <ArtStudioNativeBlock locale={locale} settings={settings} /> : null}
-            {article.show_bansko_collection_block ? <BanskoCollectionBlock locale={locale} settings={settings} /> : null}
-            {article.show_facebook_cta ? <FacebookGroupCTA settings={settings} locale={locale} /> : null}
+            <ArticleBlocks article={article} locale={locale} settings={settings} />
           </div>
         </article>
 

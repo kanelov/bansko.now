@@ -115,6 +115,29 @@ function CodeBlock({ children }: { children: string }) {
   );
 }
 
+/** The short version at the top of a section: what it is and what the owner does, in a few lines. */
+function GuideSummary({ children }: { children: ReactNode }) {
+  return (
+    <div className="mb-4 rounded-2xl border border-sage bg-sage/30 p-4 text-stone-800">
+      <p className="text-xs font-semibold uppercase text-forest">Накратко</p>
+      <div className="mt-2 grid gap-1.5">{children}</div>
+    </div>
+  );
+}
+
+/** The long version: folders, storage paths, tables and the exact order of things, collapsed by default. */
+function GuideDetails({ title = "Подробно: папки, пътища и таблици", children }: { title?: string; children: ReactNode }) {
+  return (
+    <details className="group/details mt-5 rounded-2xl border border-stone-200 bg-stone-50 p-4">
+      <summary className="cursor-pointer list-none text-sm font-semibold text-stone-950">
+        <span aria-hidden="true" className="mr-2 inline-block text-moss transition group-open/details:rotate-90">▸</span>
+        {title}
+      </summary>
+      <div className="mt-3 grid gap-3 text-sm leading-6 text-stone-700">{children}</div>
+    </details>
+  );
+}
+
 function GuideSection({
   number,
   title,
@@ -161,7 +184,7 @@ export default function AdminGuidePage() {
         <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--admin-muted)]">
           Практично описание на функциите в сайта. Документът е част от проекта и трябва да се допълва при всяка нова възможност или промяна в работния процес.
         </p>
-        <p className="mt-3 text-xs font-semibold uppercase text-stone-500">Актуализирано: 11 септември 2026</p>
+        <p className="mt-3 text-xs font-semibold uppercase text-stone-500">Актуализирано: 11 септември 2026 (блокове, снимки по подразбиране, процес)</p>
       </header>
 
       <nav aria-label="Бързи действия" className="flex flex-wrap gap-3">
@@ -247,16 +270,22 @@ export default function AdminGuidePage() {
           </ul>
                   <h3 className="mt-6 font-semibold text-stone-950">Снимки по подразбиране за статии без снимка</h3>
           <p className="mt-3">
-            Статия без собствена снимка не остава празна: сайтът показва една от снимките в „Настройки“ → „Снимки по подразбиране“. Там качваш няколко свои снимки (например дрон кадър на центъра, дрон кадър на планината, залез над Пирин, утро по улиците), всяка с описание и ключови думи. За всяка статия без снимка се избира най-близката: думите на снимката се сравняват със заглавието, категорията, таговете, резюмето и текста. Ако нищо не съвпада, снимките се редуват, за да не се повтаря една и съща в списъка.
+            Статия без собствена снимка не остава празна: сайтът показва една от снимките в „Снимки по подразбиране“ (страничното меню). Там качваш няколко свои снимки (например дрон кадър на центъра, дрон кадър на планината, залез над Пирин, утро по улиците), всяка с описание и ключови думи. За всяка статия без снимка се избира най-близката: думите на снимката се сравняват със заглавието, категорията, таговете, резюмето и текста. Ако нищо не съвпада, снимките се редуват, за да не се повтаря една и съща в списъка.
           </p>
           <ol className="mt-4 grid list-decimal gap-2 pl-5">
             <li>Качи снимката в „Медия“ или във „Фотоархив“ (снимка от фотоархива носи и надписа „© фотограф“ под статията).</li>
-            <li>В „Снимки по подразбиране“ напиши описание (то е и alt текстът), английско описание за <code>/en</code> и ключови думи със запетая, на български и английски. Думи с общ корен се разпознават („планина“ хваща „планината“ и „планински“). Не слагай „Банско“ на всяка снимка – то е във всяка статия.</li>
+            <li>В „Снимки по подразбиране“ напиши описание (то е и alt текстът), английско описание за <code>/en</code> и ключови думи със запетая, на български и английски и с имената на двете азбуки (Тодорка, Todorka). Думи с общ корен се разпознават („планина“ хваща „планината“ и „планински“). Дума, сложена на всички снимки, тежи по-малко, така че „Банско“ не пречи, но и не помага.</li>
             <li>Избери снимката от решетката или постави адрес и натисни „Добави снимка“. С „Провери избора“ виждаш коя снимка би излязла за примерно заглавие и защо.</li>
           </ol>
           <p className="mt-3">
             Нищо не се записва в статията: в редактора, таб „Images“, се вижда коя снимка по подразбиране ще излезе, а собствена снимка я измества веднага. Смениш ли снимка тук, се сменя във всички статии, които я ползват. Снимките по подразбиране не влизат в картата на сайта, за да не се брои една и съща картинка като съдържание на много страници.
           </p>
+          <GuideDetails>
+            <p><strong>Таблица:</strong> <code>article_fallback_images</code> (адрес на снимката, описание BG/EN, ключови думи, ред, активна). Публично се четат само активните.</p>
+            <p><strong>Коя снимка се закача:</strong> адресът, който избереш. От фотоархива това е файлът „за статии“ – <code>photos/public/article/&lt;код&gt;.webp</code>, до 1800 px по дългата страна, без воден знак. От „Медия“ – самият качен файл (нови качвания са в три размера, вж. по-долу). Оригиналът никога не е публичен.</p>
+            <p><strong>Кога се избира:</strong> при показване на страницата (списъци, търсене, статия, езиков двойник), не при запис. Функцията е <code>pickFallbackImage()</code> в <code>src/lib/fallback-images.ts</code>: точки за всяка ключова дума според къде се среща (заглавие 4, категория 3, тагове 3, резюме 2, SEO 1, текст 1), разделени на броя снимки, които споделят думата. Без съвпадение – равномерно редуване по номера на статията.</p>
+            <p><strong>Къде не се ползва:</strong> картата на сайта (sitemap) пропуска снимките по подразбиране; OG изображението и схемата за Google ги ползват.</p>
+          </GuideDetails>
 </GuideSection>
 
         <GuideSection number="06" title="Страници, Art Studio и категории">
@@ -443,6 +472,12 @@ status: draft`}</CodeBlock>
         </GuideSection>
 
         <GuideSection number="13" title="Фотоархив: пълният път на една снимка">
+          <GuideSummary>
+            <p>1. Качваш оригинала в „Фотоархив“ → браузърът го праща директно в Cloudflare R2, сървърът прави 5 файла и създава чернова.</p>
+            <p>2. Попълваш заглавие, описание, alt, тагове, цена (или масово през CSV) и публикуваш.</p>
+            <p>3. Публично се виждат само умалените: 800 px в решетката, 2000 px с воден знак на страницата на снимката, 1800 px в статии.</p>
+            <p>4. Оригиналът стои в Google Drive при теб, а копие в пълна резолюция – в частната част на R2, откъдето го получава само платен лиценз.</p>
+          </GuideSummary>
           <p>
             Оригиналите остават в Google Drive. Сайтът пази обработените файлове в Cloudflare R2, отделно от „Медия“. Пътят е: качване → автоматична обработка → попълване и публикуване → използване в статия, лиценз или принт.
           </p>
@@ -476,6 +511,20 @@ status: draft`}</CodeBlock>
             <li>Жълто предупреждение най-горе значи, че липсват настройките за хранилището или адресът, от който се раздават снимките.</li>
             <li>Поръчка, която остава „чака плащане“, значи че Stripe не е стигнал до сайта. Провери адреса <code>https://bansko.now/api/stripe/photo-license</code> в Stripe и дали тайната му е от същия режим като ключа: тестова тайна с тестов ключ, жива с жив.</li>
           </ul>
+          <GuideDetails>
+            <p><strong>Хранилище:</strong> Cloudflare R2, bucket от <code>R2_BUCKET_NAME</code>; публичният адрес е <code>PHOTO_PUBLIC_BASE_URL</code> (r2.dev поддомейн). Оригиналът се качва временно с подписан адрес (<code>/api/admin/photos/upload-url</code>), <code>/api/admin/photos/process</code> го чете обратно, прави файловете и изтрива временния оригинал.</p>
+            <p><strong>Петте файла за всяка снимка (код <code>BNK-000001</code>):</strong></p>
+            <ul className="grid list-disc gap-1 pl-5">
+              <li><code>photos/public/thumb/&lt;код&gt;.webp</code> – 800 px, решетката на <code>/photos</code> и избора в админа (публичен)</li>
+              <li><code>photos/public/article/&lt;код&gt;.webp</code> – 1800 px, за статии и снимки по подразбиране (публичен, без воден знак)</li>
+              <li><code>photos/public/preview/&lt;код&gt;.webp</code> – 2000 px с воден знак „© Lubo Kanelov“, страницата на снимката (публичен)</li>
+              <li><code>photos/private/web/&lt;код&gt;.jpg</code> – 3000 px, уеб лиценз (частен, само през платен линк за 30 минути)</li>
+              <li><code>photos/private/full/&lt;код&gt;.jpg</code> – пълна резолюция, разширен лиценз за печат (частен)</li>
+            </ul>
+            <p><strong>Таблици в Supabase:</strong> <code>photos</code> (текстове BG/EN, локация, тагове, цена, статус, ключовете на петте файла), <code>photo_license_types</code> (двата лиценза с цени и условия), <code>photo_license_orders</code> (покупки), <code>article_photos</code> (коя снимка в коя статия), <code>photo_import_jobs</code> (грешки при качване), <code>photo_public_settings</code> (текстовете на страниците).</p>
+            <p><strong>Снимки в статии от „Медия“ (не от фотоархива):</strong> Supabase Storage, bucket <code>bansko-media</code>; новите качвания стават три файла <code>articles/r/&lt;гггг-мм&gt;/&lt;id&gt;-w480.webp</code>, <code>-w960.webp</code>, <code>-w1600.webp</code>, а снимка от Content Hub се копира в <code>articles/content-hub/&lt;id&gt;.&lt;разширение&gt;</code>. Снимките на клиенти от формата за поръчка са в частния bucket <code>art-studio-orders/&lt;гггг-мм&gt;/&lt;поръчка&gt;/</code>.</p>
+            <p><strong>Каталогът на заявките:</strong> всяка публикувана снимка има ред в каталога на app.kanelov.com (SKU = кодът на снимката или зададеното „SKU в каталога на заявките“), само с адреса на миниатюрата – файл не се копира.</p>
+          </GuideDetails>
         </GuideSection>
 
         <GuideSection number="14" title="Статии от Content Hub">
@@ -501,6 +550,44 @@ status: draft`}</CodeBlock>
           <p className="mt-3">
             Ако автоматизацията не е върнала английски текст, се публикува само българската статия и нищо не се губи. Английската може да се добави по-късно от приложението и повторното публикуване я създава. Само Bansko NOW работи двуезично — статиите за другите сайтове остават само на български.
           </p>
+        </GuideSection>
+
+        <GuideSection number="15" title="Блокове под статията (HTML)">
+          <GuideSummary>
+            <p>Трите блока – Art Studio, Bansko Collection и Facebook общност – вече са парчета HTML в „Блокове“ (страничното меню), на български и английски.</p>
+            <p>Кажи ми как да изглежда даден блок и ти давам кода; поставяш го в полето, натискаш „Запази блока“ и прегледът отдолу показва резултата.</p>
+            <p>Кой блок излиза под коя статия се решава от ключовете в настройките на статията, както досега.</p>
+          </GuideSummary>
+          <p>
+            Блоковете стоят под всяка статия и на главните страници: Art Studio и Bansko Collection на началната и на категорийните страници, Facebook общността и на страниците „За нас“, „Контакти“, „Статии“, Art Studio и при бизнесите. Ако направиш нов блок без ключ в статията, той излиза под всяка статия, докато е активен.
+          </p>
+          <p>
+            HTML-ът използва готови класове, за да е в стила на сайта: <code>article-block</code> (с вариант <code>--cream</code>, <code>--forest</code>, <code>--dark</code> или <code>--sage</code>), <code>article-block__eyebrow</code>, <code>article-block__title</code>, <code>article-block__text</code>, <code>article-block__split</code> (две колони), <code>article-block__tiles</code> + <code>article-block__tile</code> (плочки с икона, всяка е линк), <code>article-block__actions</code> + <code>article-block__button</code> (<code>--primary</code>, <code>--light</code>, <code>--ghost</code>), <code>article-block__chips</code> + <code>article-block__chip</code>. Списъкът с обяснения е и в самата страница „Блокове“.
+          </p>
+          <p>
+            Три маркера се заменят при показване: <code>{`{{path:/art-studio}}`}</code> става адресът за текущия език (на английската страница <code>/en/art-studio</code>), <code>{`{{icon:shirt}}`}</code> става икона (същите имена като иконите на менюто: shirt, image, mug-hot, church, palette, bag-shopping, facebook, mountain, heart, users, newspaper, store…), а <code>{`{{facebook_group_url}}`}</code> е адресът на групата от „Меню и хедър“.
+          </p>
+          <GuideDetails>
+            <p><strong>Таблица:</strong> <code>article_blocks</code> (ключ, име, HTML BG, HTML EN, активен, ред, кой ключ в статията го включва). Трите стандартни блока са и в кода (<code>src/lib/article-blocks.ts</code>): ако за даден ключ няма запис, се показва стандартният; „Върни стандартния“ изтрива записа и връща кода.</p>
+            <p><strong>Сигурност:</strong> при запис и при показване се премахват <code>&lt;script&gt;</code>, вградени рамки, формуляри и <code>on…=</code> атрибути. Само админът може да пише; публично се четат само активните.</p>
+            <p><strong>Къде се рисува:</strong> <code>ArticleBlocks</code> под статията (спазва ключовете <code>show_art_studio_block</code>, <code>show_bansko_collection_block</code>, <code>show_facebook_cta</code>), <code>SiteBlock</code> по ключ на останалите страници. Стиловете са в края на <code>src/app/globals.css</code>. Старите текстови полета за блоковете в „Настройки“ са премахнати; техните текстове са пренесени в HTML-а.</p>
+            <p><strong>Кеш:</strong> запис на блок обновява началната, списъците, категориите и всички статии веднага.</p>
+          </GuideDetails>
+        </GuideSection>
+
+        <GuideSection number="16" title="Как работим по промени">
+          <GuideSummary>
+            <p>Ти описваш какво искаш в чата → аз проверявам как работи сега → правя промяната и я качвам → тя излиза на живо сама → описвам я тук и в дневника.</p>
+          </GuideSummary>
+          <ol className="mt-2 grid list-decimal gap-2 pl-5">
+            <li><strong>Заявка.</strong> Пишеш с обикновени думи какво искаш да се промени или добави. Ако нещо не е ясно, питам преди да пипам.</li>
+            <li><strong>Проверка.</strong> Преглеждам кода и базата, за да надградя това, което вече работи, а не да правя втора система. Ако има таблица за промяна – правя малка добавка, никога не преправям цялата база.</li>
+            <li><strong>Промяна и проверки.</strong> Пиша кода, прилагам миграцията в базата на Bansko NOW (проект <code>rzjyawjdhcedddydmfge</code>), пускам проверките (типове, стил, пълен build) и тест на живо, където има смисъл. Тестови поръчки и плащания се правят само с твое съгласие и се изтриват след това.</li>
+            <li><strong>Качване.</strong> Записвам промяната (commit) и я пращам в GitHub, клон <code>main</code>. Vercel я публикува сам за 1–2 минути – и за bansko.now, и за app.kanelov.com. Нищо не се деплойва на ръка.</li>
+            <li><strong>Описание.</strong> Всяка промяна се записва на три места: тук в „Инструкции“ (кратко „Накратко“ + „Подробно“ с папки, пътища и таблици), в <code>CHANGELOG.md</code> (дневникът за теб) и в <code>CLAUDE.md</code> (техническият контекст за следващата сесия). Приложението за заявки има свой бутон „Как работи“ в модула „Статии“ по същото правило.</li>
+            <li><strong>Тайни.</strong> Ключове и пароли никога не минават през чата или документите – само през Vercel или файл на твоя компютър, който изтриваш след това.</li>
+            <li><strong>Твоята част.</strong> Накрая ти казвам какво остава за теб: да качиш снимки, да сложиш ключ, да натиснеш бутон в Google Sheets. Докато не го направиш, всичко работи както преди.</li>
+          </ol>
         </GuideSection>
       </div>
     </div>

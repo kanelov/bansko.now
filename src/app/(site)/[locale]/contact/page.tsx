@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { submitContactMessageAction } from "@/app/(site)/[locale]/businesses/actions";
-import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
+import { SiteBlock } from "@/components/public/site-block";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getEditablePageBySlug, getSiteSettings } from "@/lib/content";
@@ -105,7 +105,7 @@ export default async function ContactPage({ searchParams, params }: { searchPara
           </button>
         </form>
 
-        <FacebookGroupCTA settings={settings} locale={locale} />
+        <SiteBlock name="facebook" locale={locale} settings={settings} />
       </main>
       <SiteFooter settings={settings} locale={locale} />
     </div>

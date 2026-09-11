@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { ArticleEditorForm } from "@/components/admin/article-editor-form";
 import Link from "next/link";
 import type { Route } from "next";
+import { getArticleBlockPreviews } from "@/lib/article-blocks";
 import {
   getAdminArticleById,
   getAdminArticleTranslations,
@@ -31,6 +32,7 @@ export default async function EditArticlePage({ params, searchParams }: { params
     getSiteSettings(article.locale),
     getArticleFallbackImages()
   ]);
+  const blockPreviews = await getArticleBlockPreviews({ facebook_group_url: settings.facebook_group_url });
   const bgArticle = translations.find((item) => item.locale === "bg");
   const enArticle = translations.find((item) => item.locale === "en");
 
@@ -75,7 +77,7 @@ export default async function EditArticlePage({ params, searchParams }: { params
           {query.error}
         </div>
       ) : null}
-      <ArticleEditorForm key={id} article={{ ...article, tags }} categories={categories} mediaItems={mediaItems} fallbackImages={fallbackImages} locale={article.locale} translationGroupId={article.translation_group_id} settings={settings} />
+      <ArticleEditorForm key={id} article={{ ...article, tags }} categories={categories} mediaItems={mediaItems} fallbackImages={fallbackImages} blockPreviews={blockPreviews} locale={article.locale} translationGroupId={article.translation_group_id} settings={settings} />
     </div>
   );
 }

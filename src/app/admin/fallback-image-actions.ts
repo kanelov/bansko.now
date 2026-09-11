@@ -7,7 +7,7 @@ import { parseFallbackKeywords } from "@/lib/fallback-images";
 import { requireAdmin } from "@/lib/supabase/auth";
 import type { ArticleFallbackImage } from "@/lib/types";
 
-const adminPath = "/admin/settings/fallback-images";
+const adminPath = "/admin/fallback-images";
 
 function value(formData: FormData, key: string, maxLength = 300) {
   const raw = formData.get(key);

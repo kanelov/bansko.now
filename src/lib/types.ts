@@ -110,6 +110,20 @@ export type ArticleWithCategory = Article & {
   featured_image_is_fallback?: boolean;
 };
 
+/** One HTML block under the articles / on the main pages (`article_blocks`). */
+export type ArticleBlock = {
+  id: string;
+  key: string;
+  title: string;
+  html_bg: string;
+  html_en: string;
+  is_active: boolean;
+  sort_order: number;
+  article_toggle: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 /** One default article image with the keywords that select it (`article_fallback_images`). */
 export type ArticleFallbackImage = {
   id: string;
@@ -1007,6 +1021,12 @@ export type Database = {
         Row: ArticleFallbackImage;
         Insert: Partial<ArticleFallbackImage> & Pick<ArticleFallbackImage, "image_url" | "title">;
         Update: Partial<ArticleFallbackImage>;
+        Relationships: [];
+      };
+      article_blocks: {
+        Row: ArticleBlock;
+        Insert: Partial<ArticleBlock> & Pick<ArticleBlock, "key" | "title">;
+        Update: Partial<ArticleBlock>;
         Relationships: [];
       };
       art_studio_product_types: {

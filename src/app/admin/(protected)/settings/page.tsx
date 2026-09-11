@@ -1,5 +1,4 @@
 import { saveSettingsAction } from "@/app/admin/actions";
-import { SettingsNav } from "@/components/admin/settings-nav";
 import { getSiteSettings } from "@/lib/content";
 
 function fieldClass() {
@@ -21,9 +20,9 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
       <div>
         <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Configuration</p>
         <h1 className="mt-2 font-serif text-4xl font-semibold">Settings</h1>
-        <div className="mt-4">
-          <SettingsNav />
-        </div>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--admin-muted)]">
+          Блоковете под статията и снимките по подразбиране имат свои страници в страничното меню: „Блокове“ и „Снимки по подразбиране“.
+        </p>
       </div>
       {params.saved ? (
         <div className="max-w-3xl rounded-2xl border border-sage/40 bg-sage/15 p-4 text-sm font-semibold text-stone-50">
@@ -53,46 +52,6 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
           </label>
         </section>
 
-        <section className="grid gap-5 border-t border-[var(--admin-line)] pt-6">
-          <div>
-            <h2 className="font-serif text-2xl font-semibold">Блокове под статията</h2>
-            <p className="mt-2 text-sm leading-6 text-[var(--admin-muted)]">
-              Тук редактираш общите български текстове. Във всяка статия от Settings избираш кои блокове да се покажат.
-              Картите с конкретните Art Studio услуги се управляват от „Страници“ → „Art Studio“.
-            </p>
-          </div>
-          <div className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-4">
-            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Facebook общност</p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <input name="facebook_cta_eyebrow" defaultValue={settings.facebook_cta_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
-              <input name="facebook_cta_title" defaultValue={settings.facebook_cta_title || ""} className={fieldClass()} placeholder="Заглавие" />
-            </div>
-            <textarea name="facebook_cta_text" defaultValue={settings.facebook_cta_text || ""} className={fieldClass()} rows={3} placeholder="Текст" />
-            <input name="facebook_cta_button_label" defaultValue={settings.facebook_cta_button_label || ""} className={fieldClass()} placeholder="Текст на бутона" />
-          </div>
-          <div className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-4">
-            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Art Studio</p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <input name="art_studio_block_eyebrow" defaultValue={settings.art_studio_block_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
-              <input name="art_studio_block_title" defaultValue={settings.art_studio_block_title || ""} className={fieldClass()} placeholder="Заглавие" />
-            </div>
-            <textarea name="art_studio_block_text" defaultValue={settings.art_studio_block_text || ""} className={fieldClass()} rows={3} placeholder="Текст" />
-            <input name="art_studio_block_button_label" defaultValue={settings.art_studio_block_button_label || ""} className={fieldClass()} placeholder="Текст на бутона" />
-          </div>
-          <div className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-4">
-            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Bansko Collection</p>
-            <div className="grid gap-4 md:grid-cols-2">
-              <input name="collection_block_eyebrow" defaultValue={settings.collection_block_eyebrow || ""} className={fieldClass()} placeholder="Малък надпис" />
-              <input name="collection_block_title" defaultValue={settings.collection_block_title || ""} className={fieldClass()} placeholder="Заглавие" />
-            </div>
-            <textarea name="collection_block_text" defaultValue={settings.collection_block_text || ""} className={fieldClass()} rows={3} placeholder="Текст" />
-            <input name="collection_block_button_label" defaultValue={settings.collection_block_button_label || ""} className={fieldClass()} placeholder="Текст на бутона" />
-            <label className="grid gap-2 text-sm font-semibold">
-              Продуктови етикети, по един на ред
-              <textarea name="collection_items" defaultValue={textAreaValue(settings.collection_items)} className={fieldClass()} rows={4} />
-            </label>
-          </div>
-        </section>
 
         <section className="grid gap-5 border-t border-[var(--admin-line)] pt-6">
           <div>
@@ -107,28 +66,6 @@ export default async function AdminSettingsPage({ searchParams }: { searchParams
             Hero image alt
             <input name="hero_image_alt_en" defaultValue={englishSettings.hero_image_alt || ""} className={fieldClass()} />
           </label>
-          <div className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-black/10 p-4">
-            <p className="text-sm font-semibold uppercase text-[var(--admin-muted)]">Article blocks</p>
-            <div className="grid gap-3 md:grid-cols-2">
-              <input name="facebook_cta_eyebrow_en" defaultValue={englishSettings.facebook_cta_eyebrow || ""} className={fieldClass()} placeholder="Community eyebrow" />
-              <input name="facebook_cta_title_en" defaultValue={englishSettings.facebook_cta_title || ""} className={fieldClass()} placeholder="Community title" />
-            </div>
-            <textarea name="facebook_cta_text_en" defaultValue={englishSettings.facebook_cta_text || ""} className={fieldClass()} rows={3} placeholder="Community text" />
-            <input name="facebook_cta_button_label_en" defaultValue={englishSettings.facebook_cta_button_label || ""} className={fieldClass()} placeholder="Community button" />
-            <div className="grid gap-3 md:grid-cols-2">
-              <input name="art_studio_block_eyebrow_en" defaultValue={englishSettings.art_studio_block_eyebrow || ""} className={fieldClass()} placeholder="Art Studio eyebrow" />
-              <input name="art_studio_block_title_en" defaultValue={englishSettings.art_studio_block_title || ""} className={fieldClass()} placeholder="Art Studio title" />
-            </div>
-            <textarea name="art_studio_block_text_en" defaultValue={englishSettings.art_studio_block_text || ""} className={fieldClass()} rows={3} placeholder="Art Studio text" />
-            <input name="art_studio_block_button_label_en" defaultValue={englishSettings.art_studio_block_button_label || ""} className={fieldClass()} placeholder="Art Studio button" />
-            <div className="grid gap-3 md:grid-cols-2">
-              <input name="collection_block_eyebrow_en" defaultValue={englishSettings.collection_block_eyebrow || ""} className={fieldClass()} placeholder="Collection eyebrow" />
-              <input name="collection_block_title_en" defaultValue={englishSettings.collection_block_title || ""} className={fieldClass()} placeholder="Collection title" />
-            </div>
-            <textarea name="collection_block_text_en" defaultValue={englishSettings.collection_block_text || ""} className={fieldClass()} rows={3} placeholder="Collection text" />
-            <input name="collection_block_button_label_en" defaultValue={englishSettings.collection_block_button_label || ""} className={fieldClass()} placeholder="Collection button" />
-            <textarea name="collection_items_en" defaultValue={textAreaValue(englishSettings.collection_items)} className={fieldClass()} rows={4} placeholder="Collection items, one per line" />
-          </div>
         </section>
 
         <section className="grid gap-5 border-t border-[var(--admin-line)] pt-6">
