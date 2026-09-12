@@ -36,7 +36,7 @@ There are three different projects in the owner's workspace.
 
 ### A. Bansko NOW - this repository
 
-- Local path: `/Users/lubokanelov/Documents/GitHub/bansko.now`
+- Local path: `/Users/lubokanelov/Developer/GitHub/bansko.now`
 - GitHub: `https://github.com/kanelov/bansko.now.git`
 - Working branch at handoff (2026-09-01): `codex/art-studio-commerce-mvp`, HEAD `fd9e7d0` (`Bypass Vercel optimization for product images`).
 - Since 2026-09-05 `main` is the single working branch: it contains the former production branch `claude/blog-structure` (blog structure + photo library) merged with the old `main` (PR #1) plus the header menu fix. Work on `main` from any computer (`git switch main && git pull --ff-only`); commit and push to `main`. `claude/blog-structure`, `claude/bansko-header-menu-fix-firtcr` and the `codex/*` branches are history only, do not base new work on them.
@@ -77,8 +77,8 @@ Important branch state observed on 2026-09-01:
 Suggested source checkout:
 
 ```bash
-git clone https://github.com/kanelov/-.git ~/Documents/GitHub/stokova-razpiska-zaqavka
-cd ~/Documents/GitHub/stokova-razpiska-zaqavka
+git clone https://github.com/kanelov/-.git ~/Developer/GitHub/stokova-razpiska-zaqavka
+cd ~/Developer/GitHub/stokova-razpiska-zaqavka
 git fetch --all --prune
 git switch main
 git pull --ff-only origin main
@@ -90,7 +90,7 @@ Use the commits as references. Do not blindly cherry-pick all three over a newer
 
 ### C. Kanelov Art - unrelated unless explicitly requested
 
-- Local path: `/Users/lubokanelov/Documents/GitHub/kanelov-art`
+- Local path: `/Users/lubokanelov/Developer/GitHub/kanelov-art`
 - This is an AI product-generation/WooCommerce/Etsy pipeline.
 - It is not the request/kiosk source application.
 - Do not edit it for Bansko NOW tasks unless the owner explicitly asks.
@@ -116,7 +116,7 @@ The source app at `https://app.kanelov.com` returned HTTP 200, but its live `app
 ## 5. Local start for Bansko NOW
 
 ```bash
-cd /Users/lubokanelov/Documents/GitHub/bansko.now
+cd /Users/lubokanelov/Developer/GitHub/bansko.now
 git fetch --all --prune
 git switch main
 git pull --ff-only origin main
