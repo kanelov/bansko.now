@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { GalleryCatalogCard } from "@/components/public/gallery-catalog-card";
 import { GalleryCategoryCard } from "@/components/public/gallery-category-card";
+import { GallerySearchForm } from "@/components/public/gallery-search-form";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getSiteSettings } from "@/lib/content";
@@ -15,21 +16,33 @@ import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
 type Params = Promise<{ locale: string; categorySlug: string }>;
-type SearchParams = Promise<{ page?: string }>;
+type SearchParams = Promise<{ page?: string; q?: string }>;
 
 function positiveInteger(value: string | undefined) {
   const parsed = Number.parseInt(value || "", 10);
   return Number.isInteger(parsed) && parsed > 0 ? parsed : 1;
 }
 
-function categoryPath(locale: Locale, slug: string, page = 1) {
-  const path = localePath(locale, `/art-studio/gallery/category/${slug}`);
-  return `${path}${page > 1 ? `?page=${page}` : ""}` as Route;
+function searchTerm(value: string | undefined) {
+  return String(value || "").trim().slice(0, 200);
 }
 
-function categoryUrl(locale: Locale, slug: string, page = 1) {
+function categorySuffix(page: number, search: string) {
+  const params = new URLSearchParams();
+  if (search) params.set("q", search);
+  if (page > 1) params.set("page", String(page));
+  const query = params.toString();
+  return query ? `?${query}` : "";
+}
+
+function categoryPath(locale: Locale, slug: string, page = 1, search = "") {
+  const path = localePath(locale, `/art-studio/gallery/category/${slug}`);
+  return `${path}${categorySuffix(page, search)}` as Route;
+}
+
+function categoryUrl(locale: Locale, slug: string, page = 1, search = "") {
   const url = localeUrl(locale, `/art-studio/gallery/category/${slug}`);
-  return `${url}${page > 1 ? `?page=${page}` : ""}`;
+  return `${url}${categorySuffix(page, search)}`;
 }
 
 function paginationItems(current: number, total: number) {
@@ -64,12 +77,15 @@ export async function generateMetadata({
   const category = categories.find((item) => item.slug === categorySlug);
   if (!category) return {};
   const page = positiveInteger(query.page);
+  const search = searchTerm(query.q);
   const canonical = categoryUrl(locale, category.slug, page);
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
   const alternate = category.translations.find(
     (translation) => translation.locale === alternateLocale && translation.name && translation.slug
   );
-  const titleBase = category.seo_title || category.name;
+  const titleBase = search
+    ? `${locale === "en" ? "Search" : "Търсене"}: ${search} · ${category.seo_title || category.name}`
+    : category.seo_title || category.name;
   const title = page > 1
     ? `${titleBase} · ${locale === "en" ? "Page" : "Страница"} ${page}`
     : titleBase;
@@ -99,7 +115,8 @@ export async function generateMetadata({
       description,
       images: category.image_url ? [category.image_url] : undefined
     },
-    robots: { index: category.product_count > 0, follow: true }
+    // Страница с търсене не се индексира: каноничният адрес сочи чистата категория.
+    robots: { index: !search && category.product_count > 0, follow: true }
   };
 }
 
@@ -117,15 +134,18 @@ export default async function GalleryCategoryPage({
   if (!category) notFound();
 
   const requestedPage = positiveInteger(query.page);
+  const search = searchTerm(query.q);
   const children = categories.filter((item) => item.parent_id === category.id);
-  const shouldLoadProducts = children.length === 0 || category.direct_product_count > 0;
+  // При търсене гледаме и подкатегориите — човекът търси платно, не дърво от категории.
+  const shouldLoadProducts = Boolean(search) || children.length === 0 || category.direct_product_count > 0;
   const [catalog, settings] = await Promise.all([
     shouldLoadProducts
       ? getLocalizedGalleryCatalog(locale, {
           page: requestedPage,
           pageSize: 24,
           categorySlug: category.slug,
-          directOnly: children.length > 0
+          query: search || null,
+          directOnly: children.length > 0 && !search
         })
       : Promise.resolve({
           generatedAt: "",
@@ -147,9 +167,10 @@ export default async function GalleryCategoryPage({
     (translation) => translation.locale === alternateLocale && translation.name && translation.slug
   );
   const alternateHref = alternate
-    ? categoryPath(alternateLocale, alternate.slug, page)
+    ? categoryPath(alternateLocale, alternate.slug, page, search)
     : null;
   const currentUrl = categoryUrl(locale, category.slug, page);
+  const searchAction = categoryPath(locale, category.slug);
   const listItems = [
     ...children.map((item) => ({
       name: item.name,
@@ -223,7 +244,14 @@ export default async function GalleryCategoryPage({
         </section>
 
         <div className="mx-auto max-w-7xl px-4 py-12 sm:px-6 lg:px-8">
-          {children.length ? (
+          <GallerySearchForm
+            locale={locale}
+            action={searchAction}
+            value={search}
+            resultCount={search ? totalCount : null}
+          />
+
+          {children.length && !search ? (
             <section className="mb-14">
               <h2 className="mb-6 font-serif text-3xl font-semibold text-stone-950">
                 {isEnglish ? "Subcategories" : "Подкатегории"}
@@ -245,7 +273,9 @@ export default async function GalleryCategoryPage({
             <section>
               <div className="mb-6 flex flex-wrap items-center justify-between gap-3 text-sm text-stone-600">
                 <h2 className="font-serif text-3xl font-semibold text-stone-950">
-                  {isEnglish ? "Products" : "Продукти"}
+                  {search
+                    ? isEnglish ? "Found" : "Намерени"
+                    : isEnglish ? "Products" : "Продукти"}
                 </h2>
                 <p>{isEnglish ? `${totalCount} products` : `${totalCount} продукта`}</p>
               </div>
@@ -263,31 +293,38 @@ export default async function GalleryCategoryPage({
               {pageCount > 1 ? (
                 <nav className="mt-12 flex flex-wrap items-center justify-center gap-2 border-t border-stone-200 pt-8" aria-label={isEnglish ? "Catalogue pages" : "Страници на каталога"}>
                   {page > 1 ? (
-                    <Link href={categoryPath(locale, category.slug, page - 1)} rel="prev" className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
+                    <Link href={categoryPath(locale, category.slug, page - 1, search)} rel="prev" className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
                       {isEnglish ? "Previous" : "Назад"}
                     </Link>
                   ) : null}
                   {pageNumbers.map((pageNumber, index) => (
                     <span key={pageNumber} className="contents">
                       {index > 0 && pageNumber - pageNumbers[index - 1] > 1 ? <span className="px-1 text-stone-400" aria-hidden="true">…</span> : null}
-                      <Link href={categoryPath(locale, category.slug, pageNumber)} aria-current={pageNumber === page ? "page" : undefined} className={`grid h-10 min-w-10 place-items-center rounded-full border px-3 text-sm font-semibold transition ${pageNumber === page ? "border-forest bg-forest text-white" : "border-stone-300 bg-white text-forest hover:border-forest hover:bg-forest hover:text-white"}`}>
+                      <Link href={categoryPath(locale, category.slug, pageNumber, search)} aria-current={pageNumber === page ? "page" : undefined} className={`grid h-10 min-w-10 place-items-center rounded-full border px-3 text-sm font-semibold transition ${pageNumber === page ? "border-forest bg-forest text-white" : "border-stone-300 bg-white text-forest hover:border-forest hover:bg-forest hover:text-white"}`}>
                         {pageNumber}
                       </Link>
                     </span>
                   ))}
                   {page < pageCount ? (
-                    <Link href={categoryPath(locale, category.slug, page + 1)} rel="next" className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
+                    <Link href={categoryPath(locale, category.slug, page + 1, search)} rel="next" className="rounded-full border border-stone-300 bg-white px-4 py-2 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
                       {isEnglish ? "Next" : "Напред"}
                     </Link>
                   ) : null}
                 </nav>
               ) : null}
             </section>
-          ) : children.length ? null : (
+          ) : children.length && !search ? null : (
             <section className="border-y border-stone-200 py-16 text-center">
               <h2 className="font-serif text-3xl font-semibold text-stone-950">
                 {isEnglish ? "No products found" : "Няма намерени продукти"}
               </h2>
+              {search ? (
+                <p className="mx-auto mt-3 max-w-xl text-stone-650">
+                  {isEnglish
+                    ? "Try a shorter word or the product code, for example SA71."
+                    : "Опитай с по-къса дума или с кода на продукта, например SA71."}
+                </p>
+              ) : null}
             </section>
           )}
         </div>
