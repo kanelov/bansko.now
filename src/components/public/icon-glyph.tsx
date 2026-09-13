@@ -151,6 +151,21 @@ export function normalizeIconName(iconName: string | null | undefined) {
   return null;
 }
 
+/** The same icon as a plain SVG string, for HTML that is injected (the article blocks). */
+export function iconSvgMarkup(name: string | null | undefined, className = "") {
+  const normalized = normalizeIconName(name);
+  if (!normalized) {
+    return "";
+  }
+
+  const [width, height, , , pathData] = iconDefinitions[normalized].icon;
+  const paths = Array.isArray(pathData) ? pathData : [pathData];
+  const classAttribute = className ? ` class="${className}"` : "";
+  return `<svg aria-hidden="true" viewBox="0 0 ${width} ${height}"${classAttribute} fill="currentColor" focusable="false">${paths
+    .map((path) => `<path d="${path}"></path>`)
+    .join("")}</svg>`;
+}
+
 export function IconGlyph({ name, className = "h-4 w-4" }: { name?: string | null; className?: string }) {
   const normalized = normalizeIconName(name);
 

@@ -2,11 +2,9 @@ import Link from "next/link";
 import type { Route } from "next";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
-import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
 import { BusinessSpotlightBlock } from "@/components/public/business-spotlight-block";
 import { CategoryCard } from "@/components/public/category-card";
-import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
+import { SiteBlock } from "@/components/public/site-block";
 import { FeaturedArticle } from "@/components/public/featured-article";
 import { LatestArticles } from "@/components/public/latest-articles";
 import { SiteFooter } from "@/components/public/site-footer";
@@ -233,9 +231,9 @@ export default async function HomePage({ params }: { params: Params }) {
             </section>
           ) : null}
 
-          <ArtStudioNativeBlock locale={locale} settings={settings} />
-          <BanskoCollectionBlock locale={locale} settings={settings} />
-          <FacebookGroupCTA settings={settings} locale={locale} />
+          <SiteBlock name="art_studio" locale={locale} settings={settings} />
+          <SiteBlock name="collection" locale={locale} settings={settings} />
+          <SiteBlock name="facebook" locale={locale} settings={settings} />
 
           <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-soft sm:p-10">
             <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-center">

@@ -13,6 +13,8 @@ const adminNav: { href: Route; label: string; badge?: "orders" }[] = [
   { href: "/admin/businesses", label: "Бизнеси" },
   { href: "/admin/categories", label: "Категории" },
   { href: "/admin/media", label: "Медия" },
+  { href: "/admin/fallback-images", label: "Снимки по подразбиране" },
+  { href: "/admin/blocks", label: "Блокове" },
   { href: "/admin/navigation", label: "Меню и хедър" },
   { href: "/admin/settings", label: "Настройки" },
   { href: "/admin/guide", label: "Инструкции" }

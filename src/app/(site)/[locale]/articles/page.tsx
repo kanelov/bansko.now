@@ -3,7 +3,7 @@ import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { ArticleCard } from "@/components/public/article-card";
-import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
+import { SiteBlock } from "@/components/public/site-block";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { siteUrl } from "@/lib/env";
@@ -97,7 +97,7 @@ export default async function ArticlesPage({ params }: { params: Params }) {
         ) : (
           <p className="text-lg text-stone-650">{locale === "en" ? "No articles yet." : "Още няма публикувани статии."}</p>
         )}
-        <FacebookGroupCTA settings={settings} locale={locale} />
+        <SiteBlock name="facebook" locale={locale} settings={settings} />
       </main>
       <SiteFooter settings={settings} locale={locale} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }} />

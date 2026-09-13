@@ -106,6 +106,35 @@ export type ArticleWithCategory = Article & {
   category?: Category | null;
   categories?: Category | null;
   tags?: Tag[];
+  /** True when `featured_image_url` was filled from the default image pool at render time. */
+  featured_image_is_fallback?: boolean;
+};
+
+/** One HTML block under the articles / on the main pages (`article_blocks`). */
+export type ArticleBlock = {
+  id: string;
+  key: string;
+  title: string;
+  html_bg: string;
+  html_en: string;
+  is_active: boolean;
+  sort_order: number;
+  article_toggle: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+/** One default article image with the keywords that select it (`article_fallback_images`). */
+export type ArticleFallbackImage = {
+  id: string;
+  image_url: string;
+  title: string;
+  title_en: string | null;
+  keywords: string[];
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
 };
 
 export type SiteSettings = {
@@ -986,6 +1015,18 @@ export type Database = {
         Row: PhotoPublicSettings;
         Insert: Partial<PhotoPublicSettings>;
         Update: Partial<PhotoPublicSettings>;
+        Relationships: [];
+      };
+      article_fallback_images: {
+        Row: ArticleFallbackImage;
+        Insert: Partial<ArticleFallbackImage> & Pick<ArticleFallbackImage, "image_url" | "title">;
+        Update: Partial<ArticleFallbackImage>;
+        Relationships: [];
+      };
+      article_blocks: {
+        Row: ArticleBlock;
+        Insert: Partial<ArticleBlock> & Pick<ArticleBlock, "key" | "title">;
+        Update: Partial<ArticleBlock>;
         Relationships: [];
       };
       art_studio_product_types: {

@@ -9,6 +9,7 @@ import {
   parseGalleryImages,
   parseTextBlockOptions,
   parseVideoBlock,
+  parseBlockReference,
   splitMarkdownBlocks,
   type MarkdownTextColor
 } from "@/lib/markdown-blocks";
@@ -118,7 +119,16 @@ function MarkdownBlock({ content, textColor = "stone" }: { content: string; text
   );
 }
 
-export function MarkdownRenderer({ content, locale = "bg" }: { content: string; locale?: Locale }) {
+export function MarkdownRenderer({
+  content,
+  locale = "bg",
+  htmlBlocks = {}
+}: {
+  content: string;
+  locale?: Locale;
+  /** Rendered HTML blocks by key (see /admin/blocks), for `:::block` references inside the text. */
+  htmlBlocks?: Record<string, string>;
+}) {
   const blocks = splitMarkdownBlocks(content);
 
   return (
@@ -167,6 +177,12 @@ export function MarkdownRenderer({ content, locale = "bg" }: { content: string; 
               </div>
             </section>
           );
+        }
+
+        if (block.type === "block") {
+          const html = htmlBlocks[parseBlockReference(block.content)];
+
+          return html ? <div key={`block-${index}`} className="site-block not-prose mt-10" dangerouslySetInnerHTML={{ __html: html }} /> : null;
         }
 
         if (block.type === "video") {

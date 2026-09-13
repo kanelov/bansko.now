@@ -2,10 +2,9 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import type { Route } from "next";
 import { notFound } from "next/navigation";
-import { ArtStudioNativeBlock } from "@/components/public/art-studio-native-block";
 import { ArticleCard } from "@/components/public/article-card";
 import { CategoryCard } from "@/components/public/category-card";
-import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
+import { SiteBlock } from "@/components/public/site-block";
 import { FeaturedArticle } from "@/components/public/featured-article";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
@@ -177,8 +176,8 @@ export default async function CategoryPage({ params }: { params: Params }) {
           </section>
         ) : null}
 
-        <ArtStudioNativeBlock locale={locale} settings={settings} />
-        <FacebookGroupCTA settings={settings} locale={locale} />
+        <SiteBlock name="art_studio" locale={locale} settings={settings} />
+        <SiteBlock name="facebook" locale={locale} settings={settings} />
       </main>
       <SiteFooter settings={settings} locale={locale} />
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(collectionSchema) }} />

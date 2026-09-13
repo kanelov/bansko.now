@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BusinessMedia } from "@/components/public/business-media";
-import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
+import { SiteBlock } from "@/components/public/site-block";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
 import { getDirectionsUrl, parseBusinessFaqs } from "@/lib/business-public";
@@ -169,7 +169,7 @@ export default async function BusinessProfilePage({ params }: { params: Params }
             </section>
           ) : null}
 
-          <FacebookGroupCTA settings={settings} locale={locale} />
+          <SiteBlock name="facebook" locale={locale} settings={settings} />
         </div>
       </main>
       <SiteFooter settings={settings} locale={locale} />

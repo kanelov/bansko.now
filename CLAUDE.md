@@ -36,7 +36,7 @@ There are three different projects in the owner's workspace.
 
 ### A. Bansko NOW - this repository
 
-- Local path: `/Users/lubokanelov/Documents/GitHub/bansko.now`
+- Local path: `/Users/lubokanelov/Developer/GitHub/bansko.now`
 - GitHub: `https://github.com/kanelov/bansko.now.git`
 - Working branch at handoff (2026-09-01): `codex/art-studio-commerce-mvp`, HEAD `fd9e7d0` (`Bypass Vercel optimization for product images`).
 - Since 2026-09-05 `main` is the single working branch: it contains the former production branch `claude/blog-structure` (blog structure + photo library) merged with the old `main` (PR #1) plus the header menu fix. Work on `main` from any computer (`git switch main && git pull --ff-only`); commit and push to `main`. `claude/blog-structure`, `claude/bansko-header-menu-fix-firtcr` and the `codex/*` branches are history only, do not base new work on them.
@@ -77,8 +77,8 @@ Important branch state observed on 2026-09-01:
 Suggested source checkout:
 
 ```bash
-git clone https://github.com/kanelov/-.git ~/Documents/GitHub/stokova-razpiska-zaqavka
-cd ~/Documents/GitHub/stokova-razpiska-zaqavka
+git clone https://github.com/kanelov/-.git ~/Developer/GitHub/stokova-razpiska-zaqavka
+cd ~/Developer/GitHub/stokova-razpiska-zaqavka
 git fetch --all --prune
 git switch main
 git pull --ff-only origin main
@@ -90,7 +90,7 @@ Use the commits as references. Do not blindly cherry-pick all three over a newer
 
 ### C. Kanelov Art - unrelated unless explicitly requested
 
-- Local path: `/Users/lubokanelov/Documents/GitHub/kanelov-art`
+- Local path: `/Users/lubokanelov/Developer/GitHub/kanelov-art`
 - This is an AI product-generation/WooCommerce/Etsy pipeline.
 - It is not the request/kiosk source application.
 - Do not edit it for Bansko NOW tasks unless the owner explicitly asks.
@@ -116,7 +116,7 @@ The source app at `https://app.kanelov.com` returned HTTP 200, but its live `app
 ## 5. Local start for Bansko NOW
 
 ```bash
-cd /Users/lubokanelov/Documents/GitHub/bansko.now
+cd /Users/lubokanelov/Developer/GitHub/bansko.now
 git fetch --all --prune
 git switch main
 git pull --ff-only origin main
@@ -242,6 +242,7 @@ Main admin areas:
 - CMS/editable pages.
 - Businesses.
 - Native Art Studio admin.
+- Default article images („Снимки по подразбиране“) and HTML blocks („Блокове“), both top-level sidebar entries since 2026-09-11 because the owner wants Settings kept small.
 - Site guide/instructions.
 
 When adding an admin feature:
@@ -743,7 +744,7 @@ Unless the owner gives a newer priority, continue in this order:
 - Do not trade low egress for stale or incorrect public content without discussing the tradeoff.
 - Do not change design globally to fix one component.
 - Do not claim a migration or deployment succeeded without verifying it.
-- Keep the owner-facing admin guide and this handoff document current as the system evolves.
+- Keep the owner-facing admin guide and this handoff document current as the system evolves. `/admin/guide` is written as steps the owner can follow, not as reference notes: when a flow changes (photo library, Art Studio, articles, Content Hub), update the matching `GuideSection` and the „Актуализирано“ date in the same change. The request app has its own built in guide inside the „Статии“ module (`renderContentGuide()` in `app.js`); keep both in sync. Since 2026-09-11 every section that describes a flow carries a `GuideSummary` („Накратко“: what it is and what the owner does) and a collapsed `GuideDetails` („Подробно“: folders, storage keys, buckets, tables, functions). The owner explicitly asked for this level of detail so he can find where files live without reading code; keep both parts current and log the change in `CHANGELOG.md` and here (three places, every change).
 
 ## 24. Content Hub publish endpoint (2026-09-02)
 
@@ -759,6 +760,7 @@ The source request app (`https://app.kanelov.com`) has a Content Hub module („
 - Fields written: title, slug, excerpt, content, category, featured image + alt + caption, seo_title, seo_description, focus_keyword, canonical_url, og_*, robots_*, reading_time, author_name, source_links, schema_type, locale, `automation_source = 'content_hub'`, `automation_last_imported_at`, `content_hub_item_id`. Status `published` (published_at kept on re-publish) or `draft`.
 - After writing it revalidates the editorial paths, the article path, the category path and `/admin/articles`.
 - Migration: `supabase/content-hub-publish.sql` must be applied to project `rzjyawjdhcedddydmfge` before the first publish.
+- **Bilingual publish (2026-09-10).** The payload accepts an optional `translation` object (the other language: title, slug, excerpt, content, tags, alt, caption, seo/og fields, canonical). `publishContentHubArticle` writes each language through `writeLocalizedArticle()`; both records share one `translation_group_id`, so the language switch, hreflang and the sitemap pair up. The unique index is now `(content_hub_item_id, locale)` (`supabase/content-hub-bilingual.sql`, applied 2026-09-10), so one item owns one article per language. A missing or malformed translation is ignored and only the first language is published; a failure on the second language is returned as a warning and never blocks the first. The response carries `translation: { id, slug, locale, url, updated }` when a pair was written.
 - Testing without a real publish: `GET` with the secret returns categories; `POST` with an unknown category returns 422 without writing. A real test writes a `status: draft` article that must be deleted afterwards from `/admin/articles`.
 
 ## 25. Blog structure, caching and images (2026-09-02)
@@ -770,6 +772,8 @@ The source request app (`https://app.kanelov.com`) has a Content Hub module („
 - **Light queries.** `getPublishedArticles()` selects `articleListColumns` (no body) unless `{ full: true }`. Search uses `searchPublishedArticles()` (database `ilike`, light rows). Keep it that way; the owner is close to the Supabase egress limit.
 - **Responsive images.** `src/lib/image-variants.ts` (sharp) stores new uploads as `articles/r/<yyyy-mm>/<id>-w480|w960|w1600.webp`; `ResponsiveImage` builds the `srcset` from the `-w1600.webp` name, older single files render unchanged. Used by the admin media upload and the Content Hub endpoint. Do not route these through Vercel image optimization.
 - **No stock photos.** Product type, product and service cards render a colour panel when no image is set instead of Unsplash fallbacks. Real photos are uploaded in the admin.
+- **Article blocks as HTML (2026-09-11).** The blocks under articles and on the main pages (`art_studio`, `collection`, `facebook`, plus custom keys) are HTML per language in `article_blocks` (`supabase/article-blocks.sql`, RLS active-public / authenticated-manage), edited in `/admin/blocks` (`src/app/admin/block-actions.ts`). `src/lib/article-blocks.ts` holds the three defaults in code (`defaultArticleBlocks`; a missing row falls back to the default, deleting a row restores it), `sanitizeBlockHtml()` (strips script/iframe/object/embed/form controls and `on*=` handlers, neutralizes `javascript:`), `renderArticleBlock()` with the tokens `{{path:/x}}` → `localePath`, `{{icon:name}}` → `iconSvgMarkup()` from `icon-glyph.tsx`, `{{facebook_group_url}}`, and `getArticleBlocks()` (React `cache`, public client, active only). Rendering: `ArticleBlocks` (article page, honours `show_art_studio_block` / `show_bansko_collection_block` / `show_facebook_cta` through `article_toggle`; `article_toggle = null` shows under every article, `article_toggle = 'manual'` (`manualBlockPlacement`, default for new blocks) only where the text places it), the Markdown block `:::block` + `key: <key>` (`parseBlockReference` in `markdown-blocks.ts`; `MarkdownRenderer` takes `htmlBlocks` = key → rendered HTML for the locale, supplied by the article page and by the editor preview) and `SiteBlock name=…` on home, category, articles, about, contact, art-studio and business pages. Stable CSS vocabulary `.article-block*` at the end of `globals.css` (variants `--cream/--forest/--dark/--sage`, `__tiles/__tile`, `__actions/__button--primary|light|ghost`, `__chips/__chip`, `__split`). The old `FacebookGroupCTA`, `BanskoCollectionBlock`, `ArtStudioNativeBlock` components and the block text fields in `/admin/settings` (`site_settings_translations.*_cta_* / *_block_* / collection_items`, columns kept, no longer written) are gone. The editor preview receives `blockPreviews` from `getArticleBlockPreviews()`.
+- **Default article images (2026-09-11).** `article_fallback_images` (`supabase/article-fallback-images.sql`, RLS: active rows public, authenticated manage) holds the owner's pool of default pictures with `keywords`. `withFallbackImages()` in `src/lib/content.ts` fills `featured_image_url`/`featured_image_alt` at read time (marks `featured_image_is_fallback`) in `getPublishedArticles`, `searchPublishedArticles`, `getArticleBySlug` and `getPublishedArticleTranslation`; the matcher is the pure `src/lib/fallback-images.ts` (`pickFallbackImage`: keyword stems against title/category/tags/excerpt/seo/content, shared keywords weigh less, no match → stable spread by article id). Never persist the choice on the article. The sitemap skips fallback images; OG and JSON-LD use them. Admin: `/admin/fallback-images` (sidebar entry „Снимки по подразбиране“; `src/app/admin/fallback-image-actions.ts`, pick tiles from media + photo archive, „Провери избора“ test); the editor previews the choice with the same function. `fallbackHeroImage` (Unsplash) stays only as the last resort when the pool is empty.
 - **Security headers** (nosniff, SAMEORIGIN, referrer policy, permissions policy) are set in `next.config.ts`.
 - **Art Studio page** (`/art-studio`) is a static-content page with Store, FAQPage and BreadcrumbList schema; hero/eyebrow/excerpt/content/CTA still come from the editable page `art-studio` when set.
 

@@ -531,20 +531,8 @@ export async function saveSettingsAction(formData: FormData) {
     site_settings_id: result.data.id,
     locale,
     site_description: stringValue(formData, `site_description${suffix}`),
-    hero_image_alt: stringValue(formData, `hero_image_alt${suffix}`),
-    facebook_cta_eyebrow: stringValue(formData, `facebook_cta_eyebrow${suffix}`),
-    facebook_cta_title: stringValue(formData, `facebook_cta_title${suffix}`),
-    facebook_cta_text: stringValue(formData, `facebook_cta_text${suffix}`),
-    facebook_cta_button_label: stringValue(formData, `facebook_cta_button_label${suffix}`),
-    art_studio_block_eyebrow: stringValue(formData, `art_studio_block_eyebrow${suffix}`),
-    art_studio_block_title: stringValue(formData, `art_studio_block_title${suffix}`),
-    art_studio_block_text: stringValue(formData, `art_studio_block_text${suffix}`),
-    art_studio_block_button_label: stringValue(formData, `art_studio_block_button_label${suffix}`),
-    collection_block_eyebrow: stringValue(formData, `collection_block_eyebrow${suffix}`),
-    collection_block_title: stringValue(formData, `collection_block_title${suffix}`),
-    collection_block_text: stringValue(formData, `collection_block_text${suffix}`),
-    collection_block_button_label: stringValue(formData, `collection_block_button_label${suffix}`),
-    collection_items: jsonLines(formData, `collection_items${suffix}`)
+    hero_image_alt: stringValue(formData, `hero_image_alt${suffix}`)
+    // The texts of the blocks under the article moved to /admin/blocks (article_blocks) on 2026-09-11.
   });
 
   const { error: translationError } = await supabase

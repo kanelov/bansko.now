@@ -7,17 +7,17 @@ import type { LocalizedPhotoCard } from "@/lib/photos";
 import { useFormStatus } from "react-dom";
 import { publishArticleAction, upsertArticleAction } from "@/app/admin/actions";
 import { ArticleTableOfContents } from "@/components/public/article-table-of-contents";
-import { BanskoCollectionBlock } from "@/components/public/bansko-collection-block";
-import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { SEOChecklist } from "@/components/admin/seo-checklist";
 import { ContentDocumentTools } from "@/components/admin/content-document-tools";
 import { fallbackSettings } from "@/lib/defaults";
+import type { ArticleBlockPreview } from "@/lib/article-blocks";
+import { pickFallbackImage } from "@/lib/fallback-images";
 import { articleDocumentFields, type ContentDocumentMetadata, type ContentDocumentValue } from "@/lib/content-transfer";
 import { getArticleToc } from "@/lib/markdown-blocks";
 import { getSeoScore } from "@/lib/seo";
 import { slugify } from "@/lib/slug";
-import type { ArticleStatus, ArticleWithCategory, Category, Locale, MediaItem, SiteSettings } from "@/lib/types";
+import type { ArticleFallbackImage, ArticleStatus, ArticleWithCategory, Category, Locale, MediaItem, SiteSettings } from "@/lib/types";
 
 type Tab = "content" | "seo" | "images" | "settings" | "preview";
 
@@ -65,29 +65,6 @@ function dateInput(value: string | null | undefined) {
 
 function lines(value: unknown) {
   return Array.isArray(value) ? value.filter(Boolean).join("\n") : "";
-}
-
-function ArtStudioPreviewBlock({ locale, settings }: { locale: Locale; settings: SiteSettings }) {
-  const services = locale === "en"
-    ? ["Fine Art printing", "Canvas printing", "Visual storytelling"]
-    : ["Fine Art печат", "Canvas печат", "Визуално представяне"];
-
-  return (
-    <section className="rounded-3xl border border-stone-200 bg-[#f7f2e8] p-6 shadow-soft">
-      <p className="text-sm font-semibold uppercase text-moss">{settings.art_studio_block_eyebrow}</p>
-      <h2 className="mt-3 font-serif text-3xl font-semibold text-stone-950">{settings.art_studio_block_title}</h2>
-      <p className="mt-4 text-base leading-7 text-stone-650">
-        {settings.art_studio_block_text}
-      </p>
-      <div className="mt-5 grid gap-3 sm:grid-cols-3">
-        {services.map((service) => (
-          <div key={service} className="rounded-2xl bg-white p-4 text-sm font-semibold text-stone-800 shadow-soft">
-            {service}
-          </div>
-        ))}
-      </div>
-    </section>
-  );
 }
 
 function initialDraft(article?: ArticleWithCategory | null, locale: Locale = "bg", translationGroupId = ""): Draft {
@@ -289,6 +266,8 @@ export function ArticleEditorForm({
   article,
   categories,
   mediaItems = [],
+  fallbackImages = [],
+  blockPreviews = [],
   locale = article?.locale || "bg",
   translationGroupId = article?.translation_group_id || "",
   settings = fallbackSettings
@@ -296,6 +275,10 @@ export function ArticleEditorForm({
   article?: ArticleWithCategory | null;
   categories: Category[];
   mediaItems?: MediaItem[];
+  /** The default image pool; the editor previews which one the public page would use. */
+  fallbackImages?: ArticleFallbackImage[];
+  /** The HTML blocks under the article, rendered for both languages, for the preview tab. */
+  blockPreviews?: ArticleBlockPreview[];
   locale?: Locale;
   translationGroupId?: string;
   settings?: SiteSettings;
@@ -315,6 +298,25 @@ export function ArticleEditorForm({
       featured_image_alt: draft.featured_image_alt
     }),
     [article, draft]
+  );
+  // Same matcher as the public pages, so the preview shows the picture readers would actually see.
+  const predictedFallback = useMemo(
+    () =>
+      draft.featured_image_url || !fallbackImages.length
+        ? null
+        : pickFallbackImage(fallbackImages, {
+            id: article?.id,
+            slug: draft.slug,
+            locale,
+            title: draft.title,
+            excerpt: draft.excerpt,
+            seo_title: draft.seo_title,
+            seo_description: draft.seo_description,
+            content: draft.content,
+            categoryName: categories.find((category) => category.id === draft.category_id)?.name,
+            tags: draft.tags_input.split(",").map((tag) => tag.trim()).filter(Boolean)
+          }),
+    [article?.id, categories, draft, fallbackImages, locale]
   );
   const documentValues = useMemo<Record<string, ContentDocumentValue>>(
     () => Object.fromEntries(serializedDraftFields.map((field) => [field, draft[field]])),
@@ -668,6 +670,19 @@ export function ArticleEditorForm({
                   {draft.featured_image_alt || "Добави alt text, за да бъде изображението полезно за SEO и достъпност."}
                 </p>
               </div>
+            ) : predictedFallback ? (
+              <div className="overflow-hidden rounded-2xl bg-stone-100">
+                {/* eslint-disable-next-line @next/next/no-img-element -- deliberate: admin preview */}
+                <img src={predictedFallback.image_url} alt={predictedFallback.title} className="aspect-[4/3] w-full object-cover opacity-90" />
+                <p className="p-3 text-xs leading-5 text-stone-600">
+                  Без собствена снимка статията ще излезе с „{predictedFallback.title}“ – снимка по подразбиране, избрана по думите в заглавието и
+                  текста. Сложи своя снимка, за да я замениш, или промени{" "}
+                  <Link href="/admin/fallback-images" className="font-semibold text-forest underline underline-offset-4">
+                    снимките по подразбиране
+                  </Link>
+                  .
+                </p>
+              </div>
             ) : (
               <div className="grid min-h-64 place-items-center rounded-2xl bg-stone-100 p-6 text-center text-sm text-stone-500">
                 Избери featured image от media библиотеката или постави URL ръчно.
@@ -768,9 +783,9 @@ export function ArticleEditorForm({
             {[
               ["is_featured", "Is featured"],
               ["is_homepage_highlight", "Show on homepage"],
-              ["show_facebook_cta", "Show Facebook Group CTA"],
-              ["show_art_studio_block", "Show Art Studio block"],
-              ["show_bansko_collection_block", "Show Bansko Collection block"]
+              ["show_facebook_cta", "Блок „Facebook общност“ под статията"],
+              ["show_art_studio_block", "Блок „Art Studio“ под статията"],
+              ["show_bansko_collection_block", "Блок „Bansko Collection“ под статията"]
             ].map(([name, label]) => (
               <label key={name} className="flex items-center gap-2 rounded-xl bg-stone-50 p-3">
                 <input
@@ -804,13 +819,16 @@ export function ArticleEditorForm({
               <MarkdownRenderer
                 content={draft.content || (draft.locale === "en" ? "## Subheading\n\nThe article content will appear here." : "## Подзаглавие\n\nТекстът на статията ще се покаже тук.")}
                 locale={draft.locale}
+                htmlBlocks={Object.fromEntries(blockPreviews.map((block) => [block.key, block.html[draft.locale]]))}
               />
             </div>
           </article>
           <SEOChecklist article={seoArticle} />
-          {draft.show_art_studio_block ? <ArtStudioPreviewBlock locale={draft.locale} settings={settings} /> : null}
-          {draft.show_bansko_collection_block ? <BanskoCollectionBlock locale={draft.locale} settings={settings} /> : null}
-          {draft.show_facebook_cta ? <FacebookGroupCTA settings={settings} locale={draft.locale} /> : null}
+          {blockPreviews
+            .filter((block) => !block.toggle || draft[block.toggle])
+            .map((block) => (
+              <div key={block.key} className="site-block" dangerouslySetInnerHTML={{ __html: block.html[draft.locale] }} />
+            ))}
         </section>
       ) : null}
 

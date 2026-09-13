@@ -4,7 +4,7 @@ import type { Route } from "next";
 import { notFound } from "next/navigation";
 import { ArtStudioProductTypeCard } from "@/components/public/art-studio-product-type-card";
 import { ArtStudioServiceCard } from "@/components/public/art-studio-service-card";
-import { FacebookGroupCTA } from "@/components/public/facebook-group-cta";
+import { SiteBlock } from "@/components/public/site-block";
 import { IconGlyph } from "@/components/public/icon-glyph";
 import { MarkdownRenderer } from "@/components/public/markdown-renderer";
 import { resolveArtStudioLandingCopy, resolveArtStudioLandingLinks, resolveArtStudioLandingSections } from "@/lib/art-studio-copy";
@@ -317,7 +317,7 @@ export default async function ArtStudioPage({ params }: { params: Params }) {
             </section>
           ) : null}
 
-          {sections.facebook ? <FacebookGroupCTA settings={settings} locale={locale} /> : null}
+          {sections.facebook ? <SiteBlock name="facebook" locale={locale} settings={settings} /> : null}
         </div>
       </main>
       <SiteFooter settings={settings} locale={locale} />
