@@ -1,4 +1,5 @@
 import type { MetadataRoute } from "next";
+import { isComingSoonEnabled } from "@/lib/coming-soon";
 import { getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getArticlePath, getCategories, getPublishedArticleCounts, getPublishedArticles } from "@/lib/content";
@@ -32,6 +33,12 @@ import { getPhotoFacets, getPhotoSitemapEntries } from "@/lib/photos";
 import { getPublicPhotoUrl } from "@/lib/photo-storage";
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  /* При заключен сайт картата е празна: иначе би подала на Google шест хиляди
+     адреса, които връщат само поканата. */
+  if (isComingSoonEnabled()) {
+    return [];
+  }
+
   const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts, photoFeed, photoFacets] = await Promise.all([
     getCategories("bg"),
     getCategories("en"),
