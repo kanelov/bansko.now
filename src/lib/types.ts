@@ -665,6 +665,9 @@ export type Business = {
   robots_index: boolean;
   robots_follow: boolean;
   schema_type: string | null;
+  category_id?: string | null;
+  phone?: string | null;
+  email_public?: string | null;
   created_at: string;
   updated_at: string;
 };
@@ -707,6 +710,64 @@ export type BusinessWithRelations = Business & {
   business_contacts?: BusinessContact[] | null;
   requested_plan?: BusinessListingPlan | null;
   active_plan?: BusinessListingPlan | null;
+};
+
+/* Business Platform (docs/business-platform.md, CLAUDE.md раздел 28) */
+
+export type BusinessMemberRole = "owner" | "staff";
+
+export type BusinessMember = {
+  id: string;
+  business_id: string;
+  user_id: string | null;
+  role: BusinessMemberRole;
+  invited_email: string | null;
+  invited_by: string | null;
+  invited_at: string | null;
+  accepted_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessPlatformStatus = "listing" | "active" | "suspended";
+export type BusinessOpenOverride = "auto" | "open" | "closed";
+
+export type BusinessPlatformSettings = {
+  business_id: string;
+  platform_status: BusinessPlatformStatus;
+  plan: string;
+  open_override: BusinessOpenOverride;
+  content_version: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessModuleKey = "menu" | "hours" | "displays" | "print" | "promotions" | "analytics" | "custom_domain";
+
+export type BusinessModule = {
+  business_id: string;
+  module: BusinessModuleKey;
+  enabled: boolean;
+  settings: Json;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessCategory = {
+  id: string;
+  slug: string;
+  icon_name: string | null;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessCategoryTranslation = {
+  id: string;
+  category_id: string;
+  locale: Locale;
+  name: string;
 };
 
 export type BusinessDirectorySettings = {
@@ -1123,6 +1184,36 @@ export type Database = {
         Row: ContactMessage;
         Insert: Partial<ContactMessage> & Pick<ContactMessage, "name" | "email" | "message">;
         Update: Partial<ContactMessage>;
+        Relationships: [];
+      };
+      business_members: {
+        Row: BusinessMember;
+        Insert: Partial<BusinessMember> & Pick<BusinessMember, "business_id">;
+        Update: Partial<BusinessMember>;
+        Relationships: [];
+      };
+      business_platform_settings: {
+        Row: BusinessPlatformSettings;
+        Insert: Partial<BusinessPlatformSettings> & Pick<BusinessPlatformSettings, "business_id">;
+        Update: Partial<BusinessPlatformSettings>;
+        Relationships: [];
+      };
+      business_modules: {
+        Row: BusinessModule;
+        Insert: Partial<BusinessModule> & Pick<BusinessModule, "business_id" | "module">;
+        Update: Partial<BusinessModule>;
+        Relationships: [];
+      };
+      business_categories: {
+        Row: BusinessCategory;
+        Insert: Partial<BusinessCategory> & Pick<BusinessCategory, "slug">;
+        Update: Partial<BusinessCategory>;
+        Relationships: [];
+      };
+      business_category_translations: {
+        Row: BusinessCategoryTranslation;
+        Insert: Partial<BusinessCategoryTranslation> & Pick<BusinessCategoryTranslation, "category_id" | "locale" | "name">;
+        Update: Partial<BusinessCategoryTranslation>;
         Relationships: [];
       };
     };

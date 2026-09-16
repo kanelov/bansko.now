@@ -6,11 +6,33 @@ import type { Database } from "@/lib/types";
 
 /**
  * Пътища, които работят и при заключен сайт: админът, за да може собственикът да
- * влиза и да пише; /api, защото оттам минава връзката с приложението за заявки и
- * заключването би спряло каталога и поръчките; самата покана; и файловете, които
- * търсачката чете, за да разбере, че сайтът е затворен.
+ * влиза и да пише; бизнес порталът и екраните на телевизорите (кафето работи
+ * независимо от това дали сайтът е отворен); /api, защото оттам минава връзката с
+ * приложението за заявки и заключването би спряло каталога и поръчките; самата
+ * покана; шрифтовете; и файловете, които търсачката чете, за да разбере, че сайтът
+ * е затворен.
  */
-const openWhileClosed = ["/admin", "/api", "/coming-soon", "/robots.txt", "/sitemap.xml", "/icon.svg"];
+const openWhileClosed = [
+  "/admin",
+  "/business",
+  "/display",
+  "/api",
+  "/coming-soon",
+  "/fonts",
+  "/robots.txt",
+  "/sitemap.xml",
+  "/icon.svg"
+];
+
+/** Адреси без език в пътя: не се пренаписват към /bg. */
+const localeFree = ["/en", "/api", "/business", "/display", "/fonts", "/coming-soon", "/sitemap.xml", "/robots.txt", "/icon.svg"];
+
+/** Сесията на Supabase се опреснява само там, където има вход. */
+const sessionPaths = ["/admin", "/business"];
+
+function matchesPath(pathname: string, paths: string[]) {
+  return paths.some((path) => pathname === path || pathname.startsWith(`${path}/`));
+}
 
 /**
  * Заключването е тук, а не в страниците, защото трябва да спре изчертаването
@@ -23,7 +45,7 @@ async function comingSoonRewrite(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
-  if (openWhileClosed.some((path) => pathname === path || pathname.startsWith(`${path}/`))) {
+  if (matchesPath(pathname, openWhileClosed)) {
     return null;
   }
 
@@ -56,16 +78,8 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url, 308);
   }
 
-  if (!pathname.startsWith("/admin")) {
-    if (
-      pathname === "/en" ||
-      pathname.startsWith("/en/") ||
-      pathname.startsWith("/api") ||
-      pathname === "/coming-soon" ||
-      pathname === "/sitemap.xml" ||
-      pathname === "/robots.txt" ||
-      pathname === "/icon.svg"
-    ) {
+  if (!matchesPath(pathname, sessionPaths)) {
+    if (matchesPath(pathname, localeFree)) {
       return NextResponse.next({ request });
     }
 
@@ -103,6 +117,7 @@ export async function proxy(request: NextRequest) {
 export const config = {
   matcher: [
     "/admin/:path*",
-    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico)$).*)"
+    "/business/:path*",
+    "/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|woff2|woff|ttf|mp4|webm)$).*)"
   ]
 };
