@@ -249,14 +249,16 @@ export async function getMenuItemForEdit(supabase: Client, businessId: string, i
   };
 }
 
-export async function getMenuCategoryOptions(supabase: Client, businessId: string) {
+export type MenuCategoryOption = { id: string; name: string; isActive: boolean };
+
+export async function getMenuCategoryOptions(supabase: Client, businessId: string): Promise<MenuCategoryOption[]> {
   const [{ data: categories }, { data: translations }] = await Promise.all([
-    supabase.from("business_menu_categories").select("id, sort_order").eq("business_id", businessId).order("sort_order"),
+    supabase.from("business_menu_categories").select("id, sort_order, is_active").eq("business_id", businessId).order("sort_order"),
     supabase.from("business_menu_category_translations").select("category_id, locale, name").eq("business_id", businessId).eq("locale", "bg")
   ]);
 
   const names = new Map((translations ?? []).map((row) => [row.category_id, row.name]));
-  return (categories ?? []).map((category) => ({ id: category.id, name: names.get(category.id) ?? "Без име" }));
+  return (categories ?? []).map((category) => ({ id: category.id, name: names.get(category.id) ?? "Без име", isActive: category.is_active }));
 }
 
 /**

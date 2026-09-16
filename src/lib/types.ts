@@ -876,6 +876,31 @@ export type BusinessHourException = {
   updated_at: string;
 };
 
+export type BusinessDisplayTemplate = "menu_only" | "menu_image" | "menu_video";
+export type BusinessDisplayTheme = "dark" | "light";
+
+export type BusinessDisplay = {
+  id: string;
+  business_id: string;
+  name: string;
+  token: string;
+  template: BusinessDisplayTemplate;
+  theme: BusinessDisplayTheme;
+  media_id: string | null;
+  show_descriptions: boolean;
+  is_active: boolean;
+  last_seen_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessDisplayCategory = {
+  display_id: string;
+  category_id: string;
+  business_id: string;
+  sort_order: number;
+};
+
 export type BusinessDirectorySettings = {
   id: string;
   intro_title: string | null;
@@ -1376,9 +1401,24 @@ export type Database = {
         Update: Partial<BusinessHourException>;
         Relationships: [];
       };
+      business_displays: {
+        Row: BusinessDisplay;
+        Insert: Partial<BusinessDisplay> & Pick<BusinessDisplay, "business_id" | "name" | "token">;
+        Update: Partial<BusinessDisplay>;
+        Relationships: [];
+      };
+      business_display_categories: {
+        Row: BusinessDisplayCategory;
+        Insert: BusinessDisplayCategory;
+        Update: Partial<BusinessDisplayCategory>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      display_by_token: { Args: { p_token: string }; Returns: Json };
+      display_version: { Args: { p_token: string }; Returns: string | null };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };

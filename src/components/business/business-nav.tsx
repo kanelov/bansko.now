@@ -12,7 +12,7 @@ const items: { href: string; label: string; ready: boolean }[] = [
   { href: "/business", label: "Табло", ready: true },
   { href: "/business/menu", label: "Меню", ready: true },
   { href: "/business/hours", label: "Часове", ready: true },
-  { href: "/business/displays", label: "Екрани", ready: false },
+  { href: "/business/displays", label: "Екрани", ready: true },
   { href: "/business/print", label: "Печат", ready: false },
   { href: "/business/guide", label: "Помощ", ready: true }
 ];

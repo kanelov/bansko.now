@@ -3,6 +3,7 @@ import { setOpenOverrideAction } from "@/app/business/actions";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
 import Link from "next/link";
 import { getPortalBusiness, moduleLabels } from "@/lib/business-platform/business";
+import { listDisplays } from "@/lib/business-platform/displays";
 import { getOpeningStatus } from "@/lib/business-platform/hours";
 import type { BusinessModuleKey, BusinessOpenOverride } from "@/lib/types";
 
@@ -18,7 +19,7 @@ const openOptions: { value: BusinessOpenOverride; label: string; hint: string }[
 
 /* Кои модули вече имат страница в портала. Останалите се показват като „предстои“,
    за да се вижда какво идва, без да води към празно място. */
-const moduleLinks: Partial<Record<BusinessModuleKey, string>> = { menu: "/business/menu", hours: "/business/hours" };
+const moduleLinks: Partial<Record<BusinessModuleKey, string>> = { menu: "/business/menu", hours: "/business/hours", displays: "/business/displays" };
 
 const platformStatusLabels = {
   listing: "Визитка в каталога",
@@ -33,9 +34,10 @@ export default async function BusinessDashboardPage({
 }) {
   const { saved, error } = await searchParams;
   const { supabase, business } = await requireBusinessOwner();
-  const [portal, opening] = await Promise.all([
+  const [portal, opening, displays] = await Promise.all([
     getPortalBusiness(supabase, business.businessId),
-    getOpeningStatus(supabase, business.businessId, "bg")
+    getOpeningStatus(supabase, business.businessId, "bg"),
+    listDisplays(supabase, business.businessId)
   ]);
 
   if (!portal) {
@@ -120,6 +122,32 @@ export default async function BusinessDashboardPage({
           })}
         </form>
       </section>
+
+      {portal.modules.displays ? (
+        <section className="rounded-3xl border border-[var(--stone)] bg-white p-5 sm:p-6">
+          <div className="flex flex-wrap items-baseline justify-between gap-2">
+            <h2 className="font-display text-xl font-semibold">Екрани</h2>
+            <Link href="/business/displays" className="text-sm font-semibold text-forest underline-offset-4 hover:underline">
+              Настрой →
+            </Link>
+          </div>
+          {displays.length === 0 ? (
+            <p className="mt-2 text-sm text-stone-650">Още няма екрани. Създай първия в „Екрани“ и въведи адреса му в телевизора.</p>
+          ) : (
+            <ul className="mt-3 grid gap-2 sm:grid-cols-2">
+              {displays.map((display) => (
+                <li key={display.id} className="flex items-center justify-between rounded-2xl border border-[var(--stone)] bg-paper px-4 py-3 text-sm">
+                  <span className="font-semibold">{display.name}</span>
+                  <span className={display.is_active && display.online ? "flex items-center gap-2 text-xs font-semibold text-forest" : "flex items-center gap-2 text-xs font-semibold text-stone-650"}>
+                    <span aria-hidden className={display.is_active && display.online ? "h-2 w-2 rounded-full bg-moss" : "h-2 w-2 rounded-full bg-clay"} />
+                    {!display.is_active ? "изключен" : display.online ? "онлайн" : "офлайн"}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </section>
+      ) : null}
 
       <section className="rounded-3xl border border-[var(--stone)] bg-white p-5 sm:p-6">
         <h2 className="font-display text-xl font-semibold">Модули</h2>

@@ -1,0 +1,277 @@
+/*
+ * Стилът на телевизора. Нарочно без Tailwind 4: браузърът на Samsung Tizen е
+ * Chromium 85/94 и не знае @property, color-mix() и @layer. Тук има само grid,
+ * flex, clamp() и vh - размерите са спрямо височината на екрана, така че Full HD
+ * и 4K изглеждат еднакво. Без aspect-ratio, inset, :has(), container queries.
+ */
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
+
+body.display {
+  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  background: #14201a;
+  cursor: none;
+}
+
+.display-root--dark {
+  background: #14201a;
+  color: #f4efe6;
+}
+
+.display-root--light {
+  background: #f6f2ea;
+  color: #1d2b22;
+}
+
+.display-root {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+}
+
+.display-menu {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 3vh 3.5vh;
+  display: flex;
+  flex-direction: column;
+}
+
+.display-root--media .display-menu {
+  flex: 0 0 70%;
+  max-width: 70%;
+}
+
+.display-media {
+  position: relative;
+  flex: 0 0 30%;
+  max-width: 30%;
+  overflow: hidden;
+  background: #000;
+}
+
+.display-media img,
+.display-media video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.display-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  flex: 0 0 auto;
+  margin-bottom: 2vh;
+}
+
+.display-title {
+  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  font-size: clamp(20px, 4.2vh, 64px);
+  font-weight: 600;
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.display-status {
+  font-size: clamp(12px, 2vh, 30px);
+  opacity: 0.75;
+}
+
+.display-columns {
+  display: flex;
+  flex: 1 1 auto;
+  min-height: 0;
+}
+
+.display-column {
+  flex: 1 1 0;
+  min-width: 0;
+  padding-right: 3vh;
+}
+
+.display-column:last-child {
+  padding-right: 0;
+}
+
+.display-category {
+  margin-bottom: 2.4vh;
+}
+
+.display-category__name {
+  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  font-size: clamp(16px, 3vh, 48px);
+  font-weight: 600;
+  margin: 0 0 0.8vh;
+  padding-bottom: 0.6vh;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+}
+
+.display-item {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  padding: 0.55vh 0;
+  font-size: clamp(13px, 2.15vh, 34px);
+  line-height: 1.25;
+}
+
+.display-item__name {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-right: 2vh;
+}
+
+.display-item__alt {
+  opacity: 0.6;
+  font-weight: 400;
+}
+
+.display-item__desc {
+  display: block;
+  font-size: 0.72em;
+  opacity: 0.65;
+  margin-top: 0.2vh;
+}
+
+.display-item__price {
+  flex: 0 0 auto;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.display-item__variants {
+  flex: 0 0 auto;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.display-item__variant-name {
+  font-weight: 400;
+  opacity: 0.65;
+  margin-left: 0.6em;
+}
+
+.display-item--sold .display-item__name,
+.display-item--sold .display-item__price,
+.display-item--sold .display-item__variants {
+  text-decoration: line-through;
+  opacity: 0.45;
+}
+
+.display-item__sold {
+  display: inline-block;
+  margin-left: 0.6em;
+  padding: 0.1em 0.5em;
+  border-radius: 999px;
+  background: #b2543a;
+  color: #fff;
+  font-size: 0.6em;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  text-decoration: none;
+  opacity: 1;
+}
+
+/* Таблица от варианти: всички артикули в категорията имат едни и същи размери */
+.display-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: clamp(13px, 2.15vh, 34px);
+}
+
+.display-table th,
+.display-table td {
+  padding: 0.5vh 0;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.display-table th:first-child,
+.display-table td:first-child {
+  text-align: left;
+  white-space: normal;
+  width: 100%;
+  padding-right: 2vh;
+}
+
+.display-table th {
+  font-size: 0.7em;
+  font-weight: 500;
+  opacity: 0.6;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  padding-left: 2vh;
+}
+
+.display-table td {
+  font-weight: 600;
+  padding-left: 2vh;
+}
+
+.display-table td:first-child {
+  font-weight: 400;
+}
+
+.display-table tr.display-item--sold td {
+  text-decoration: line-through;
+  opacity: 0.45;
+}
+
+.display-foot {
+  flex: 0 0 auto;
+  margin-top: 1vh;
+  font-size: clamp(10px, 1.5vh, 22px);
+  opacity: 0.45;
+  display: flex;
+  justify-content: space-between;
+}
+
+.display-empty {
+  margin: auto;
+  text-align: center;
+  font-size: clamp(16px, 3vh, 48px);
+  opacity: 0.7;
+}
+
+/* Точката „офлайн“: след 3 неуспешни проверки, в ъгъла, без текст */
+.display-offline {
+  position: absolute;
+  right: 1.2vh;
+  bottom: 1.2vh;
+  width: 1.2vh;
+  height: 1.2vh;
+  border-radius: 50%;
+  background: #b2543a;
+  display: none;
+}
+
+.display-root.is-offline .display-offline {
+  display: block;
+}
+
+/* Не се събира: страницата го знае и го казва на прегледа в портала */
+.display-root.is-overflow .display-menu {
+  outline: 0.4vh solid #b2543a;
+  outline-offset: -0.4vh;
+}
