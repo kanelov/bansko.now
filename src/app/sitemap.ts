@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { isComingSoonEnabled } from "@/lib/coming-soon";
 import { getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
+import { getBusinessIdsWithPublicMenu } from "@/lib/business-platform/menu";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getArticlePath, getCategories, getPublishedArticleCounts, getPublishedArticles } from "@/lib/content";
 import { getGallerySitemapProducts, getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
@@ -39,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
-  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts, photoFeed, photoFacets] = await Promise.all([
+  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts, photoFeed, photoFacets, businessesWithMenu] = await Promise.all([
     getCategories("bg"),
     getCategories("en"),
     getPublishedArticles({ limit: 500, locale: "bg" }),
@@ -56,7 +57,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPublishedArticleCounts("bg"),
     getPublishedArticleCounts("en"),
     getPhotoSitemapEntries(),
-    getPhotoFacets()
+    getPhotoFacets(),
+    getBusinessIdsWithPublicMenu()
   ]);
   const now = new Date();
   const staticRoutes = ["/", "/articles", "/places", "/places/map", "/places/submit", "/art-studio", "/art-studio/gallery", "/photos", "/about", "/contact", "/privacy", "/terms"];
@@ -111,6 +113,21 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates
     }];
     if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
+
+    /* QR менюто е самостоятелна страница за търсачките: „меню на …“ се търси. */
+    if (businessesWithMenu.has(business.id)) {
+      const bgMenuPath = `${bgPath}/menu`;
+      const enMenuPath = `${enPath}/menu`;
+      entries.push({
+        url: localeUrl("bg", bgMenuPath),
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.6,
+        alternates: english ? languageAlternates(bgMenuPath, enMenuPath) : undefined
+      });
+      if (english) entries.push({ ...entries[entries.length - 1], url: localeUrl("en", enMenuPath) });
+    }
+
     return entries;
   });
   const artStudioTypeEntries = bgProductTypes.flatMap((productType) => {

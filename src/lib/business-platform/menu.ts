@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { businessMediaUrls, type BusinessMediaUrls } from "@/lib/business-platform/media";
+import { createPublicSupabaseClient } from "@/lib/supabase/public";
 import type {
   BusinessMedia,
   BusinessMenuAvailability,
@@ -256,4 +257,20 @@ export async function getMenuCategoryOptions(supabase: Client, businessId: strin
 
   const names = new Map((translations ?? []).map((row) => [row.category_id, row.name]));
   return (categories ?? []).map((category) => ({ id: category.id, name: names.get(category.id) ?? "Без име" }));
+}
+
+/**
+ * Кои бизнеси имат публично меню - за картата на сайта. Проверка „включен ли е
+ * модулът“ няма и тук: политиките пускат само активното на активен бизнес с
+ * включено меню, така че празен резултат е самият отговор.
+ */
+export async function getBusinessIdsWithPublicMenu(): Promise<Set<string>> {
+  const supabase = createPublicSupabaseClient();
+
+  if (!supabase) {
+    return new Set();
+  }
+
+  const { data } = await supabase.from("business_menu_items").select("business_id").limit(2000);
+  return new Set((data ?? []).map((row) => row.business_id));
 }
