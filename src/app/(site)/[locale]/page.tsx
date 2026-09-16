@@ -122,7 +122,7 @@ function quickLinks(locale: Locale, categories: Category[]) {
     id: "businesses",
     title: dictionary.localBusinesses,
     text: dictionary.businessesIntro,
-    href: "/businesses"
+    href: "/places"
   });
 
   return links.slice(0, 4);

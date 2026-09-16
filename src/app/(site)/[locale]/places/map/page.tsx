@@ -14,7 +14,7 @@ type Params = Promise<{ locale: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const path = "/businesses/map";
+  const path = "/places/map";
   return {
     title: { absolute: locale === "en" ? "Bansko business map | Bansko NOW" : "Карта на бизнесите в Банско | Bansko NOW" },
     description: locale === "en" ? "An illustrated map of local businesses, places and services in Bansko." : "Илюстрирана карта с местни бизнеси, места и услуги в Банско.",
@@ -33,7 +33,7 @@ export default async function BusinessMapPage({ params }: { params: Params }) {
 
   return (
     <div>
-      <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", "/businesses/map")} />
+      <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", "/places/map")} />
       <main className="mx-auto grid max-w-7xl gap-10 px-4 py-16 sm:px-6 lg:px-8">
         <header className="flex flex-wrap items-end justify-between gap-6">
           <div>
@@ -43,7 +43,7 @@ export default async function BusinessMapPage({ params }: { params: Params }) {
               {locale === "en" ? "Discover businesses on a beautiful map of the town and open directions in Google Maps." : "Откривай бизнеси върху красива карта на града и отваряй упътване в Google Maps."}
             </p>
           </div>
-          <Link href={localePath(locale, "/businesses") as Route} className="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
+          <Link href={localePath(locale, "/places") as Route} className="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
             {locale === "en" ? "Back to directory" : "Към каталога"}
           </Link>
         </header>

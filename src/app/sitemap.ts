@@ -1,6 +1,7 @@
 import type { MetadataRoute } from "next";
 import { isComingSoonEnabled } from "@/lib/coming-soon";
 import { getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
+import { getBusinessIdsWithPublicMenu } from "@/lib/business-platform/public-business";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getArticlePath, getCategories, getPublishedArticleCounts, getPublishedArticles } from "@/lib/content";
 import { getGallerySitemapProducts, getLocalizedGalleryCategories } from "@/lib/gallery-catalog";
@@ -39,7 +40,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
-  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts, photoFeed, photoFacets] = await Promise.all([
+  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts, photoFeed, photoFacets, businessesWithMenu] = await Promise.all([
     getCategories("bg"),
     getCategories("en"),
     getPublishedArticles({ limit: 500, locale: "bg" }),
@@ -56,10 +57,11 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPublishedArticleCounts("bg"),
     getPublishedArticleCounts("en"),
     getPhotoSitemapEntries(),
-    getPhotoFacets()
+    getPhotoFacets(),
+    getBusinessIdsWithPublicMenu()
   ]);
   const now = new Date();
-  const staticRoutes = ["/", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/art-studio", "/art-studio/gallery", "/photos", "/about", "/contact", "/privacy", "/terms"];
+  const staticRoutes = ["/", "/articles", "/places", "/places/map", "/places/submit", "/art-studio", "/art-studio/gallery", "/photos", "/about", "/contact", "/privacy", "/terms"];
   const enCategoryById = new Map(enCategories.map((category) => [category.id, category]));
   const articleByGroup = new Map<string, { bg?: (typeof bgArticles)[number]; en?: (typeof enArticles)[number] }>();
   const enBusinessById = new Map(enBusinesses.map((business) => [business.id, business]));
@@ -100,8 +102,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
   const businessEntries = bgBusinesses.flatMap((business) => {
     const english = enBusinessById.get(business.id);
-    const bgPath = `/businesses/${business.slug}`;
-    const enPath = english ? `/businesses/${english.slug}` : bgPath;
+    const bgPath = `/places/${business.slug}`;
+    const enPath = english ? `/places/${english.slug}` : bgPath;
     const alternates = english ? languageAlternates(bgPath, enPath) : undefined;
     const entries: SitemapEntry[] = [{
       url: localeUrl("bg", bgPath),
@@ -111,6 +113,22 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       alternates
     }];
     if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
+
+    /* QR менюто е самостоятелна страница за търсачките: нея хората търсят. */
+    if (businessesWithMenu.has(business.id)) {
+      const bgMenuPath = `${bgPath}/menu`;
+      const enMenuPath = `${enPath}/menu`;
+      const menuAlternates = english ? languageAlternates(bgMenuPath, enMenuPath) : undefined;
+      entries.push({
+        url: localeUrl("bg", bgMenuPath),
+        lastModified: now,
+        changeFrequency: "weekly",
+        priority: 0.6,
+        alternates: menuAlternates
+      });
+      if (english) entries.push({ ...entries[entries.length - 1], url: localeUrl("en", enMenuPath) });
+    }
+
     return entries;
   });
   const artStudioTypeEntries = bgProductTypes.flatMap((productType) => {

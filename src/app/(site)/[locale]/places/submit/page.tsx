@@ -13,7 +13,7 @@ type Params = Promise<{ locale: string }>;
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale } = await params;
   if (!isLocale(locale)) return {};
-  const path = "/businesses/submit";
+  const path = "/places/submit";
   return {
     title: { absolute: locale === "en" ? "List your business | Bansko NOW" : "Добави бизнес | Bansko NOW" },
     description: locale === "en" ? "Submit a local business for inclusion in the Bansko NOW directory." : "Изпрати местен бизнес за включване в Bansko NOW Business Directory.",
@@ -34,7 +34,7 @@ export default async function SubmitBusinessPage({ searchParams, params }: { sea
 
   return (
     <div>
-      <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", "/businesses/submit")} />
+      <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", "/places/submit")} />
       <main className="mx-auto grid w-full max-w-5xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
         <header className="mx-auto w-full max-w-4xl text-center sm:text-left">
           <p className="text-sm font-semibold uppercase text-moss">{locale === "en" ? "List a business" : "Добави бизнес"}</p>

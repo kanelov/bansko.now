@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { submitContactMessageAction } from "@/app/(site)/[locale]/businesses/actions";
+import { submitContactMessageAction } from "@/app/(site)/[locale]/places/actions";
 import { SiteBlock } from "@/components/public/site-block";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";

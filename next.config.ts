@@ -18,6 +18,18 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Каталогът на бизнесите се казва /places от 16.09.2026 (Business Platform).
+      // Старите адреси са живели само при заключен сайт, но линковете отвън остават валидни.
+      {
+        source: "/businesses/:path*",
+        destination: "/places/:path*",
+        permanent: true
+      },
+      {
+        source: "/en/businesses/:path*",
+        destination: "/en/places/:path*",
+        permanent: true
+      },
       // Articles that used to live under the "art-studio" blog category (shadowed by the shop route).
       {
         source: "/art-studio/izkustvo-ritama-dzhaza-galeriya-art-ideya",

@@ -1,14 +1,25 @@
+import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import type { Route } from "next";
+import { BusinessHoursList, BusinessOpenBadge } from "@/components/public/business-hours";
 import { BusinessMedia } from "@/components/public/business-media";
+import { BusinessMenuExcerpt } from "@/components/public/business-menu";
 import { SiteBlock } from "@/components/public/site-block";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
+import { sofiaDate, openingHoursSpecification } from "@/lib/business-platform/hours";
+import { getPublicBusinessPlatform } from "@/lib/business-platform/public-business";
 import { getDirectionsUrl, parseBusinessFaqs } from "@/lib/business-public";
 import { getApprovedBusinessTranslation, getBusinessBySlug } from "@/lib/businesses";
 import { getSiteSettings } from "@/lib/content";
 import { getDictionary, isLocale, localePath, localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
+
+/* Профилът се изчертава наготово и се опреснява на 15 минути; всеки запис в
+   портала или в админа го презарежда веднага, за да не се пита базата при всяко
+   отваряне. */
+export const revalidate = 900;
 
 type Params = Promise<{ locale: string; slug: string }>;
 
@@ -23,11 +34,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
   const translation = await getApprovedBusinessTranslation(business.id, alternateLocale);
-  const canonical = business.canonical_url || localeUrl(locale, `/businesses/${business.slug}`);
+  const canonical = business.canonical_url || localeUrl(locale, `/places/${business.slug}`);
   const languages: Record<string, string> = { [locale]: canonical };
   if (translation) {
-    languages[alternateLocale] = localeUrl(alternateLocale, `/businesses/${translation.slug}`);
-    languages["x-default"] = locale === "bg" ? canonical : localeUrl("bg", `/businesses/${translation.slug}`);
+    languages[alternateLocale] = localeUrl(alternateLocale, `/places/${translation.slug}`);
+    languages["x-default"] = locale === "bg" ? canonical : localeUrl("bg", `/places/${translation.slug}`);
   } else if (locale === "bg") {
     languages["x-default"] = canonical;
   }
@@ -61,8 +72,13 @@ export default async function BusinessProfilePage({ params }: { params: Params }
 
   const faqs = parseBusinessFaqs(business.faqs);
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
-  const translation = await getApprovedBusinessTranslation(business.id, alternateLocale);
-  const businessUrl = localeUrl(locale, `/businesses/${business.slug}`);
+  const [translation, platform] = await Promise.all([
+    getApprovedBusinessTranslation(business.id, alternateLocale),
+    getPublicBusinessPlatform(business.id, locale)
+  ]);
+  const businessUrl = localeUrl(locale, `/places/${business.slug}`);
+  const menuUrl = `${businessUrl}/menu`;
+  const menuCategories = platform?.menu.categories.filter((category) => category.items.length > 0) ?? [];
   const schema = {
     "@context": "https://schema.org",
     "@type": business.schema_type || "LocalBusiness",
@@ -72,7 +88,9 @@ export default async function BusinessProfilePage({ params }: { params: Params }
     address: business.address,
     url: businessUrl,
     inLanguage: locale === "en" ? "en" : "bg",
-    telephone: undefined,
+    telephone: business.phone || undefined,
+    openingHoursSpecification: platform?.hasHours ? openingHoursSpecification(platform.hours.week) : undefined,
+    hasMenu: platform?.hasMenu ? menuUrl : undefined,
     geo:
       typeof business.latitude === "number" && typeof business.longitude === "number"
         ? {
@@ -96,7 +114,7 @@ export default async function BusinessProfilePage({ params }: { params: Params }
 
   return (
     <div>
-      <SiteHeader locale={locale} alternateHref={translation ? localePath(alternateLocale, `/businesses/${translation.slug}`) : null} />
+      <SiteHeader locale={locale} alternateHref={translation ? localePath(alternateLocale, `/places/${translation.slug}`) : null} />
       <main>
         <section className="relative min-h-[58vh] overflow-hidden bg-forest text-white">
           {business.images?.[0] ? (
@@ -107,6 +125,11 @@ export default async function BusinessProfilePage({ params }: { params: Params }
             <p className="text-sm font-semibold uppercase">{business.category}</p>
             <h1 className="mt-3 max-w-4xl font-serif text-5xl font-semibold sm:text-6xl">{business.name}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-100">{business.address}</p>
+            {platform ? (
+              <div className="mt-4">
+                <BusinessOpenBadge state={platform.openState} locale={locale} tone="dark" />
+              </div>
+            ) : null}
             <div className="mt-6 flex flex-wrap gap-3">
               <a href={getDirectionsUrl(business)} target="_blank" rel="noopener noreferrer" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-forest transition hover:bg-stone-100">
                 {dictionary.directions}
@@ -124,6 +147,20 @@ export default async function BusinessProfilePage({ params }: { params: Params }
           {business.description ? (
             <section className="text-xl leading-9 text-stone-700">
               <p>{business.description}</p>
+            </section>
+          ) : null}
+
+          {menuCategories.length ? (
+            <section>
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                <p className="text-sm font-semibold uppercase text-moss">{locale === "en" ? "Menu" : "Меню"}</p>
+                <Link href={localePath(locale, `/places/${business.slug}/menu`) as Route} className="text-sm font-semibold text-forest underline underline-offset-4">
+                  {locale === "en" ? "See the whole menu" : "Виж цялото меню"}
+                </Link>
+              </div>
+              <div className="mt-4">
+                <BusinessMenuExcerpt categories={menuCategories} locale={locale} />
+              </div>
             </section>
           ) : null}
 
@@ -166,6 +203,12 @@ export default async function BusinessProfilePage({ params }: { params: Params }
                   </details>
                 ))}
               </div>
+            </section>
+          ) : null}
+
+          {platform?.hasHours ? (
+            <section>
+              <BusinessHoursList hours={platform.hours} locale={locale} today={sofiaDate(new Date())} />
             </section>
           ) : null}
 

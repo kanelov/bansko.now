@@ -41,7 +41,7 @@ export async function SiteFooter({ settings, locale = "bg" }: { settings: SiteSe
           <div className="mt-4 grid gap-2 text-sm text-stone-100">
             <Link href={localePath(locale, "/about") as Route}>{dictionary.about}</Link>
             <Link href={localePath(locale, "/contact") as Route}>{dictionary.contact}</Link>
-            <Link href={localePath(locale, "/businesses") as Route}>{dictionary.localBusinesses}</Link>
+            <Link href={localePath(locale, "/places") as Route}>{dictionary.localBusinesses}</Link>
             <Link href={localePath(locale, "/art-studio") as Route}>Art Studio</Link>
             <Link href={localePath(locale, "/bansko-collection") as Route}>Bansko Collection</Link>
           </div>

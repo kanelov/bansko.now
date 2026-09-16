@@ -11,7 +11,7 @@
 > | 1 · Tenant схема, права, категории като данни | готово | 2026-09-16 | 3 миграции; тестов бизнес „Old Town Coffee“ активиран |
 > | 2 · Скелет на портала `/business` | готово | 2026-09-16 | вход, избор, табло с „Отворено/Затворено“, шрифтове, proxy; тестов собственик без админ права |
 > | 3 · Модул меню (категории, артикули, варианти, медия) | готово | 2026-09-16 | `getBusinessMenu()`, варианти с правило за цената в базата, снимки през R2, 14 проверки |
-> | 4 · QR меню, `/places`, часове | предстои | | |
+> | 4 · QR меню, `/places`, часове | готово | 2026-09-16 | `/places/<адрес>/menu` без клиентски JavaScript, QR код в портала, работно време с изключения, откъс от менюто в профила, 308 редиректи от `/businesses` |
 > | 5 · Екрани `/display/<token>` | предстои | | |
 > | 6 · Печат | предстои | | |
 > | 7 · Втвърдяване и помощ в портала | предстои | | |
@@ -294,7 +294,7 @@ flowchart LR
 
 ### След пилота (само за да не блокираме себе си)
 
-- `business_hours(business_id, weekday 0–6, opens, closes, is_closed)` unique `(business_id, weekday, opens)`; `business_hour_exceptions(business_id, date, opens, closes, is_closed, note)`.
+- ~~`business_hours`~~ **влезе в стъпка 4 (16.09.2026)**, с една поправка спрямо плана: редът е интервал, в който е отворено (ISO дни 1–7, два реда = две смени), а ден без ред е затворен — така отпада колоната `is_closed` и няма два начина да опишеш затворен ден. `business_hour_exceptions(business_id, date, opens, closes, is_closed, note)` е както е описано, с unique `(business_id, date)`.
 - `business_promotions(id, business_id, price_cents null, media_id, starts_at, ends_at, is_active, sort_order)` + `_translations(title, description)` и **`business_promotion_channels(promotion_id, channel` check (`profile`, `menu`, `display`)`, display_id null)`** — „веднъж създадена, показана на избрани места“, включително на конкретен телевизор. Промоция, насочена към екран, замества медията в неговия слот.
 - `business_menu_item_options(item_id, …)` — добавки с надценка.
 - `business_events_daily(business_id, day, event_type, count)` — аналитика без тежка таблица.

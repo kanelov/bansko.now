@@ -11,6 +11,7 @@ import {
   finalizeBusinessImage
 } from "@/lib/business-platform/media";
 import { parsePriceToCents } from "@/lib/business-platform/money";
+import { revalidateBusinessPublicPages } from "@/lib/business-platform/public-business";
 import type { BusinessMenuAvailability } from "@/lib/types";
 
 /**
@@ -58,6 +59,12 @@ function withError(path: string, code: string) {
 }
 
 type OwnerClient = Awaited<ReturnType<typeof requireBusinessOwner>>["supabase"];
+
+/** Порталът и публичните страници наведнъж: промяната се вижда веднага. */
+async function refreshMenu(supabase: OwnerClient, businessId: string) {
+  revalidatePath(menuPath);
+  await revalidateBusinessPublicPages(supabase, businessId);
+}
 
 /** Новият ред отива най-отдолу: най-големият sort_order + 10. */
 async function nextCategorySortOrder(supabase: OwnerClient, businessId: string) {
@@ -152,7 +159,7 @@ export async function saveMenuCategoryAction(formData: FormData) {
     await supabase.from("business_menu_category_translations").delete().eq("category_id", categoryId).eq("locale", "en");
   }
 
-  revalidatePath(menuPath);
+  await refreshMenu(supabase, business.businessId);
   redirect(`${menuPath}?saved=category`);
 }
 
@@ -183,7 +190,7 @@ export async function deleteMenuCategoryAction(formData: FormData) {
     }
   }
 
-  revalidatePath(menuPath);
+  await refreshMenu(supabase, business.businessId);
   redirect(`${menuPath}?saved=deleted`);
 }
 
@@ -203,7 +210,7 @@ export async function moveMenuCategoryAction(formData: FormData) {
     await supabase.from("business_menu_categories").update({ sort_order: sortOrder }).eq("id", rowId).eq("business_id", business.businessId);
   });
 
-  revalidatePath(menuPath);
+  await refreshMenu(supabase, business.businessId);
   redirect(menuPath);
 }
 
@@ -409,7 +416,7 @@ export async function saveMenuItemAction(formData: FormData) {
     }
   }
 
-  revalidatePath(menuPath);
+  await refreshMenu(supabase, business.businessId);
   redirect(`${menuPath}?saved=item`);
 }
 
@@ -428,7 +435,7 @@ export async function deleteMenuItemAction(formData: FormData) {
     await deleteBusinessMedia(supabase, business.businessId, item.media_id).catch(() => undefined);
   }
 
-  revalidatePath(menuPath);
+  await refreshMenu(supabase, business.businessId);
   redirect(`${menuPath}?saved=deleted`);
 }
 
@@ -441,7 +448,7 @@ export async function setMenuItemAvailabilityAction(formData: FormData) {
     await supabase.from("business_menu_items").update({ availability }).eq("id", id).eq("business_id", business.businessId);
   }
 
-  revalidatePath(menuPath);
+  await refreshMenu(supabase, business.businessId);
   redirect(`${menuPath}#item-${id}`);
 }
 
@@ -454,7 +461,7 @@ export async function setMenuItemVisibilityAction(formData: FormData) {
     await supabase.from("business_menu_items").update({ is_active: isActive }).eq("id", id).eq("business_id", business.businessId);
   }
 
-  revalidatePath(menuPath);
+  await refreshMenu(supabase, business.businessId);
   redirect(`${menuPath}#item-${id}`);
 }
 
@@ -478,7 +485,7 @@ export async function moveMenuItemAction(formData: FormData) {
     await supabase.from("business_menu_items").update({ sort_order: sortOrder }).eq("id", rowId).eq("business_id", business.businessId);
   });
 
-  revalidatePath(menuPath);
+  await refreshMenu(supabase, business.businessId);
   redirect(`${menuPath}#item-${id}`);
 }
 
