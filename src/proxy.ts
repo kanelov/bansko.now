@@ -35,6 +35,12 @@ function matchesPath(pathname: string, paths: string[]) {
 }
 
 /**
+ * QR менюто на заведение работи и при заключен сайт: гостът го сканира на
+ * масата, независимо дали Bansko NOW вече е отворен. Профилът остава заключен.
+ */
+const qrMenuPattern = /^\/(?:en\/)?places\/[^/]+\/menu\/?$/;
+
+/**
  * Заключването е тук, а не в страниците, защото трябва да спре изчертаването
  * изобщо. Наслагване върху сайта не върши работа: Google пак вижда цялото
  * съдържание, а любопитен посетител го стига с две кликвания.
@@ -45,7 +51,7 @@ async function comingSoonRewrite(request: NextRequest) {
   }
 
   const { pathname } = request.nextUrl;
-  if (matchesPath(pathname, openWhileClosed)) {
+  if (matchesPath(pathname, openWhileClosed) || qrMenuPattern.test(pathname)) {
     return null;
   }
 

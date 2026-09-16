@@ -96,7 +96,7 @@ async function uploadBusinessImages(formData: FormData, slug: string) {
 
 export async function submitBusinessAction(formData: FormData) {
   const locale = formLocale(formData);
-  const submitPath = localePath(locale, "/businesses/submit");
+  const submitPath = localePath(locale, "/places/submit");
   const supabase = await createSupabaseServerClient();
 
   if (!supabase) {

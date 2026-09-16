@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { currentBusinessCookie, currentBusinessCookieOptions, getBusinessSession, requireBusinessOwner } from "@/lib/business-platform/auth";
+import { revalidateBusinessPublic } from "@/lib/business-platform/revalidate";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { BusinessOpenOverride } from "@/lib/types";
 
@@ -97,6 +98,7 @@ export async function setOpenOverrideAction(formData: FormData) {
     redirect("/business?error=save");
   }
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath("/business");
   redirect("/business?saved=open");
 }

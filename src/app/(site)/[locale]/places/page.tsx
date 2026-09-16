@@ -18,7 +18,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
   return {
     title: { absolute: `${dictionary.businessesTitle} | Bansko NOW` },
     description: dictionary.businessesIntro,
-    alternates: { canonical: localeUrl(locale, "/businesses"), languages: { bg: localeUrl("bg", "/businesses"), en: localeUrl("en", "/businesses"), "x-default": localeUrl("bg", "/businesses") } }
+    alternates: { canonical: localeUrl(locale, "/places"), languages: { bg: localeUrl("bg", "/places"), en: localeUrl("en", "/places"), "x-default": localeUrl("bg", "/places") } }
   };
 }
 
@@ -34,7 +34,7 @@ export default async function BusinessesPage({ params }: { params: Params }) {
 
   return (
     <div>
-      <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", "/businesses")} />
+      <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", "/places")} />
       <main className="mx-auto grid max-w-7xl gap-12 px-4 py-16 sm:px-6 lg:px-8">
         <header className="grid gap-6 lg:grid-cols-[1.2fr_0.8fr] lg:items-end">
           <div>
@@ -47,10 +47,10 @@ export default async function BusinessesPage({ params }: { params: Params }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-3 lg:justify-end">
-            <Link href={localePath(locale, "/businesses/map") as Route} className="rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
+            <Link href={localePath(locale, "/places/map") as Route} className="rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
               {locale === "en" ? "View the map" : "Виж картата"}
             </Link>
-            <Link href={localePath(locale, "/businesses/submit") as Route} className="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
+            <Link href={localePath(locale, "/places/submit") as Route} className="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
               {dictionary.submitBusiness}
             </Link>
           </div>

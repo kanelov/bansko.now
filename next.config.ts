@@ -18,6 +18,11 @@ const nextConfig: NextConfig = {
   },
   async redirects() {
     return [
+      // Каталогът на бизнесите живее на /places (Business Platform, 2026-09-16).
+      { source: "/businesses", destination: "/places", permanent: true },
+      { source: "/businesses/:path*", destination: "/places/:path*", permanent: true },
+      { source: "/en/businesses", destination: "/en/places", permanent: true },
+      { source: "/en/businesses/:path*", destination: "/en/places/:path*", permanent: true },
       // Articles that used to live under the "art-studio" blog category (shadowed by the shop route).
       {
         source: "/art-studio/izkustvo-ritama-dzhaza-galeriya-art-ideya",

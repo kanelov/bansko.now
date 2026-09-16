@@ -59,7 +59,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     getPhotoFacets()
   ]);
   const now = new Date();
-  const staticRoutes = ["/", "/articles", "/businesses", "/businesses/map", "/businesses/submit", "/art-studio", "/art-studio/gallery", "/photos", "/about", "/contact", "/privacy", "/terms"];
+  const staticRoutes = ["/", "/articles", "/places", "/places/map", "/places/submit", "/art-studio", "/art-studio/gallery", "/photos", "/about", "/contact", "/privacy", "/terms"];
   const enCategoryById = new Map(enCategories.map((category) => [category.id, category]));
   const articleByGroup = new Map<string, { bg?: (typeof bgArticles)[number]; en?: (typeof enArticles)[number] }>();
   const enBusinessById = new Map(enBusinesses.map((business) => [business.id, business]));
@@ -100,8 +100,8 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   });
   const businessEntries = bgBusinesses.flatMap((business) => {
     const english = enBusinessById.get(business.id);
-    const bgPath = `/businesses/${business.slug}`;
-    const enPath = english ? `/businesses/${english.slug}` : bgPath;
+    const bgPath = `/places/${business.slug}`;
+    const enPath = english ? `/places/${english.slug}` : bgPath;
     const alternates = english ? languageAlternates(bgPath, enPath) : undefined;
     const entries: SitemapEntry[] = [{
       url: localeUrl("bg", bgPath),

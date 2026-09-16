@@ -51,7 +51,7 @@ export function BusinessNav({ variant }: { variant: "side" | "bottom" }) {
   return (
     <nav
       aria-label="Портал"
-      className="fixed inset-x-0 bottom-0 z-20 border-t border-[var(--stone)] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
+      className="print:hidden fixed inset-x-0 bottom-0 z-20 border-t border-[var(--stone)] bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur lg:hidden"
     >
       <ul className="mx-auto grid max-w-4xl grid-cols-5">
         {items.map((item) => (

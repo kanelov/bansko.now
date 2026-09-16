@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { submitBusinessAction } from "@/app/(site)/[locale]/businesses/actions";
+import { submitBusinessAction } from "@/app/(site)/[locale]/places/actions";
 import { annualPlanDescriptions, getBusinessTierLabel } from "@/lib/business-plan-labels";
 import { businessCategories, businessFeatures, businessServices } from "@/lib/business-public";
 import type { BusinessDirectorySettings, BusinessListingPlan, Locale } from "@/lib/types";

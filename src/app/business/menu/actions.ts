@@ -11,6 +11,7 @@ import {
   finalizeBusinessImage
 } from "@/lib/business-platform/media";
 import { parsePriceToCents } from "@/lib/business-platform/money";
+import { revalidateBusinessPublic } from "@/lib/business-platform/revalidate";
 import type { BusinessMenuAvailability } from "@/lib/types";
 
 /**
@@ -152,6 +153,7 @@ export async function saveMenuCategoryAction(formData: FormData) {
     await supabase.from("business_menu_category_translations").delete().eq("category_id", categoryId).eq("locale", "en");
   }
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath(menuPath);
   redirect(`${menuPath}?saved=category`);
 }
@@ -183,6 +185,7 @@ export async function deleteMenuCategoryAction(formData: FormData) {
     }
   }
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath(menuPath);
   redirect(`${menuPath}?saved=deleted`);
 }
@@ -203,6 +206,7 @@ export async function moveMenuCategoryAction(formData: FormData) {
     await supabase.from("business_menu_categories").update({ sort_order: sortOrder }).eq("id", rowId).eq("business_id", business.businessId);
   });
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath(menuPath);
   redirect(menuPath);
 }
@@ -409,6 +413,7 @@ export async function saveMenuItemAction(formData: FormData) {
     }
   }
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath(menuPath);
   redirect(`${menuPath}?saved=item`);
 }
@@ -428,6 +433,7 @@ export async function deleteMenuItemAction(formData: FormData) {
     await deleteBusinessMedia(supabase, business.businessId, item.media_id).catch(() => undefined);
   }
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath(menuPath);
   redirect(`${menuPath}?saved=deleted`);
 }
@@ -441,6 +447,7 @@ export async function setMenuItemAvailabilityAction(formData: FormData) {
     await supabase.from("business_menu_items").update({ availability }).eq("id", id).eq("business_id", business.businessId);
   }
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath(menuPath);
   redirect(`${menuPath}#item-${id}`);
 }
@@ -454,6 +461,7 @@ export async function setMenuItemVisibilityAction(formData: FormData) {
     await supabase.from("business_menu_items").update({ is_active: isActive }).eq("id", id).eq("business_id", business.businessId);
   }
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath(menuPath);
   redirect(`${menuPath}#item-${id}`);
 }
@@ -478,6 +486,7 @@ export async function moveMenuItemAction(formData: FormData) {
     await supabase.from("business_menu_items").update({ sort_order: sortOrder }).eq("id", rowId).eq("business_id", business.businessId);
   });
 
+  await revalidateBusinessPublic(supabase, business.businessId);
   revalidatePath(menuPath);
   redirect(`${menuPath}#item-${id}`);
 }
@@ -536,6 +545,7 @@ export async function deleteMenuImageAction(input: { id: string }): Promise<{ ok
 
   try {
     await deleteBusinessMedia(supabase, business.businessId, input.id);
+    await revalidateBusinessPublic(supabase, business.businessId);
     return { ok: true };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Изтриването не успя." };

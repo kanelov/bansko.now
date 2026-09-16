@@ -90,8 +90,8 @@ function contactMessageStatusValue(value: string | null): "new" | "read" | "arch
 
 function revalidateBusinessPaths() {
   revalidatePublicPath("/");
-  revalidatePublicPath("/businesses");
-  revalidatePublicPath("/businesses/map");
+  revalidatePublicPath("/places");
+  revalidatePublicPath("/places/map");
   revalidatePath("/sitemap.xml");
   revalidatePath("/admin/businesses");
 }
@@ -313,9 +313,9 @@ export async function updateBusinessAction(formData: FormData) {
   }
 
   revalidateBusinessPaths();
-  revalidateLocalePath("bg", `/businesses/${payload.slug}`);
+  revalidateLocalePath("bg", `/places/${payload.slug}`);
   if (stringValue(formData, "slug_en")) {
-    revalidateLocalePath("en", `/businesses/${stringValue(formData, "slug_en")}`);
+    revalidateLocalePath("en", `/places/${stringValue(formData, "slug_en")}`);
   }
   redirect("/admin/businesses?saved=1");
 }

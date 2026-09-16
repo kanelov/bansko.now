@@ -44,9 +44,14 @@ export default async function BusinessMenuPage({
             Нова категория
           </Link>
           {menu.categories.length > 0 ? (
-            <Link href="/business/menu/items/new" className={portalUi.secondaryButton}>
-              Нов артикул
-            </Link>
+            <>
+              <Link href="/business/menu/items/new" className={portalUi.secondaryButton}>
+                Нов артикул
+              </Link>
+              <Link href="/business/menu/qr" className={portalUi.secondaryButton}>
+                QR код
+              </Link>
+            </>
           ) : null}
         </div>
       </header>

@@ -20,14 +20,14 @@ export function BusinessShell({
 }) {
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[240px_minmax(0,1fr)]">
-      <aside className="hidden border-r border-[var(--stone)] bg-white/60 px-5 py-6 lg:block">
+      <aside className="print:hidden hidden border-r border-[var(--stone)] bg-white/60 px-5 py-6 lg:block">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">Bansko NOW</p>
         <p className="font-display mt-1 text-lg font-semibold text-forest">Бизнес</p>
         <BusinessNav variant="side" />
       </aside>
 
       <div className="flex min-h-screen flex-col">
-        <header className="sticky top-0 z-20 border-b border-[var(--stone)] bg-paper/90 backdrop-blur">
+        <header className="print:hidden sticky top-0 z-20 border-b border-[var(--stone)] bg-paper/90 backdrop-blur">
           <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-moss lg:hidden">Bansko NOW · Бизнес</p>

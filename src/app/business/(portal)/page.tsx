@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { setOpenOverrideAction } from "@/app/business/actions";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
+import Link from "next/link";
 import { getPortalBusiness, moduleLabels } from "@/lib/business-platform/business";
+import { getOpeningStatus } from "@/lib/business-platform/hours";
 import type { BusinessModuleKey, BusinessOpenOverride } from "@/lib/types";
 
 export const metadata: Metadata = {
@@ -16,7 +18,7 @@ const openOptions: { value: BusinessOpenOverride; label: string; hint: string }[
 
 /* Кои модули вече имат страница в портала. Останалите се показват като „предстои“,
    за да се вижда какво идва, без да води към празно място. */
-const moduleLinks: Partial<Record<BusinessModuleKey, string>> = { menu: "/business/menu" };
+const moduleLinks: Partial<Record<BusinessModuleKey, string>> = { menu: "/business/menu", hours: "/business/hours" };
 
 const platformStatusLabels = {
   listing: "Визитка в каталога",
@@ -31,7 +33,10 @@ export default async function BusinessDashboardPage({
 }) {
   const { saved, error } = await searchParams;
   const { supabase, business } = await requireBusinessOwner();
-  const portal = await getPortalBusiness(supabase, business.businessId);
+  const [portal, opening] = await Promise.all([
+    getPortalBusiness(supabase, business.businessId),
+    getOpeningStatus(supabase, business.businessId, "bg")
+  ]);
 
   if (!portal) {
     return (
@@ -70,8 +75,25 @@ export default async function BusinessDashboardPage({
           </span>
         </div>
         <p className="mt-2 text-sm text-stone-650">
-          Това виждат гостите на QR менюто и на профила. Автоматичният режим следва работното време.
+          Това виждат гостите на QR менюто и на профила. Автоматичният режим следва{" "}
+          <Link href="/business/hours" className="font-semibold text-forest underline-offset-4 hover:underline">
+            работното време
+          </Link>
+          .
         </p>
+        {opening.label ? (
+          <p className="mt-3 text-sm">
+            Сега: <strong>{opening.label}</strong>
+          </p>
+        ) : (
+          <p className="mt-3 text-sm text-stone-650">
+            Още няма въведено работно време —{" "}
+            <Link href="/business/hours" className="font-semibold text-forest underline-offset-4 hover:underline">
+              въведи го
+            </Link>
+            , за да пише „Отворено до…“.
+          </p>
+        )}
 
         <form action={setOpenOverrideAction} className="mt-4 grid gap-2 sm:grid-cols-3">
           <input type="hidden" name="business_id" value={portal.id} />

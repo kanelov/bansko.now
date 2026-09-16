@@ -92,7 +92,7 @@ export function getEffectiveBusinessTier(business: Pick<Business, "listing_tier"
 }
 
 export function getBusinessPath(business: Pick<Business, "slug">, locale: Locale = "bg") {
-  return localePath(locale, `/businesses/${business.slug}`);
+  return localePath(locale, `/places/${business.slug}`);
 }
 
 export function getDirectionsUrl(business: Pick<Business, "latitude" | "longitude" | "address" | "name">) {

@@ -854,6 +854,28 @@ export type BusinessMenuItemVariantTranslation = {
   name: string;
 };
 
+export type BusinessHour = {
+  id: string;
+  business_id: string;
+  weekday: number;
+  opens: string;
+  closes: string;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessHourException = {
+  id: string;
+  business_id: string;
+  date: string;
+  opens: string | null;
+  closes: string | null;
+  is_closed: boolean;
+  note: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
 export type BusinessDirectorySettings = {
   id: string;
   intro_title: string | null;
@@ -1340,6 +1362,18 @@ export type Database = {
         Row: BusinessMenuItemVariantTranslation;
         Insert: Partial<BusinessMenuItemVariantTranslation> & Pick<BusinessMenuItemVariantTranslation, "variant_id" | "business_id" | "locale" | "name">;
         Update: Partial<BusinessMenuItemVariantTranslation>;
+        Relationships: [];
+      };
+      business_hours: {
+        Row: BusinessHour;
+        Insert: Partial<BusinessHour> & Pick<BusinessHour, "business_id" | "weekday" | "opens" | "closes">;
+        Update: Partial<BusinessHour>;
+        Relationships: [];
+      };
+      business_hour_exceptions: {
+        Row: BusinessHourException;
+        Insert: Partial<BusinessHourException> & Pick<BusinessHourException, "business_id" | "date">;
+        Update: Partial<BusinessHourException>;
         Relationships: [];
       };
     };

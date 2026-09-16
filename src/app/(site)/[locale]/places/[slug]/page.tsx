@@ -9,6 +9,14 @@ import { getApprovedBusinessTranslation, getBusinessBySlug } from "@/lib/busines
 import { getSiteSettings } from "@/lib/content";
 import { getDictionary, isLocale, localePath, localeUrl } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
+import type { Route } from "next";
+import Link from "next/link";
+import "@/styles/fonts.css";
+import { BusinessMenuList } from "@/components/public/business-menu-list";
+import { OpeningStatusPill } from "@/components/public/opening-status-pill";
+import { getOpeningStatus, openingHoursSpecification } from "@/lib/business-platform/hours";
+import { getBusinessMenu } from "@/lib/business-platform/menu";
+import { createPublicSupabaseClient } from "@/lib/supabase/public";
 
 type Params = Promise<{ locale: string; slug: string }>;
 
@@ -23,11 +31,11 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
 
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
   const translation = await getApprovedBusinessTranslation(business.id, alternateLocale);
-  const canonical = business.canonical_url || localeUrl(locale, `/businesses/${business.slug}`);
+  const canonical = business.canonical_url || localeUrl(locale, `/places/${business.slug}`);
   const languages: Record<string, string> = { [locale]: canonical };
   if (translation) {
-    languages[alternateLocale] = localeUrl(alternateLocale, `/businesses/${translation.slug}`);
-    languages["x-default"] = locale === "bg" ? canonical : localeUrl("bg", `/businesses/${translation.slug}`);
+    languages[alternateLocale] = localeUrl(alternateLocale, `/places/${translation.slug}`);
+    languages["x-default"] = locale === "bg" ? canonical : localeUrl("bg", `/places/${translation.slug}`);
   } else if (locale === "bg") {
     languages["x-default"] = canonical;
   }
@@ -62,7 +70,15 @@ export default async function BusinessProfilePage({ params }: { params: Params }
   const faqs = parseBusinessFaqs(business.faqs);
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
   const translation = await getApprovedBusinessTranslation(business.id, alternateLocale);
-  const businessUrl = localeUrl(locale, `/businesses/${business.slug}`);
+  const businessUrl = localeUrl(locale, `/places/${business.slug}`);
+
+  /* Платформата: меню и „отворено сега“ идват от същите таблици като портала. */
+  const publicClient = createPublicSupabaseClient();
+  const [menu, opening] = publicClient
+    ? await Promise.all([getBusinessMenu(publicClient, business.id, { locale }), getOpeningStatus(publicClient, business.id, locale)])
+    : [null, null];
+  const hasMenu = Boolean(menu && menu.categories.length > 0);
+  const menuHref = localePath(locale, `/places/${business.slug}/menu`);
   const schema = {
     "@context": "https://schema.org",
     "@type": business.schema_type || "LocalBusiness",
@@ -72,7 +88,33 @@ export default async function BusinessProfilePage({ params }: { params: Params }
     address: business.address,
     url: businessUrl,
     inLanguage: locale === "en" ? "en" : "bg",
-    telephone: undefined,
+    telephone: business.phone || undefined,
+    openingHoursSpecification: opening && opening.hours.length ? openingHoursSpecification(opening.hours) : undefined,
+    hasMenu:
+      hasMenu && menu
+        ? {
+            "@type": "Menu",
+            url: localeUrl(locale, `/places/${business.slug}/menu`),
+            hasMenuSection: menu.categories.map((category) => ({
+              "@type": "MenuSection",
+              name: category.name,
+              hasMenuItem: category.items.map((item) => ({
+                "@type": "MenuItem",
+                name: item.name,
+                description: item.description ?? undefined,
+                offers:
+                  item.priceCents !== null
+                    ? { "@type": "Offer", price: (item.priceCents / 100).toFixed(2), priceCurrency: "EUR" }
+                    : item.variants.map((variant) => ({
+                        "@type": "Offer",
+                        name: variant.name,
+                        price: (variant.priceCents / 100).toFixed(2),
+                        priceCurrency: "EUR"
+                      }))
+              }))
+            }))
+          }
+        : undefined,
     geo:
       typeof business.latitude === "number" && typeof business.longitude === "number"
         ? {
@@ -96,7 +138,7 @@ export default async function BusinessProfilePage({ params }: { params: Params }
 
   return (
     <div>
-      <SiteHeader locale={locale} alternateHref={translation ? localePath(alternateLocale, `/businesses/${translation.slug}`) : null} />
+      <SiteHeader locale={locale} alternateHref={translation ? localePath(alternateLocale, `/places/${translation.slug}`) : null} />
       <main>
         <section className="relative min-h-[58vh] overflow-hidden bg-forest text-white">
           {business.images?.[0] ? (
@@ -107,10 +149,25 @@ export default async function BusinessProfilePage({ params }: { params: Params }
             <p className="text-sm font-semibold uppercase">{business.category}</p>
             <h1 className="mt-3 max-w-4xl font-serif text-5xl font-semibold sm:text-6xl">{business.name}</h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-stone-100">{business.address}</p>
+            {opening ? (
+              <div className="mt-4">
+                <OpeningStatusPill status={opening.status} label={opening.label} tone="dark" />
+              </div>
+            ) : null}
             <div className="mt-6 flex flex-wrap gap-3">
               <a href={getDirectionsUrl(business)} target="_blank" rel="noopener noreferrer" className="rounded-full bg-white px-5 py-3 text-sm font-semibold text-forest transition hover:bg-stone-100">
                 {dictionary.directions}
               </a>
+              {hasMenu ? (
+                <Link href={menuHref as Route} className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                  {locale === "en" ? "Menu" : "Меню"}
+                </Link>
+              ) : null}
+              {business.phone ? (
+                <a href={`tel:${business.phone.replace(/\s+/g, "")}`} className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
+                  {locale === "en" ? "Call" : "Обади се"}
+                </a>
+              ) : null}
               {business.website_url ? (
                 <a href={business.website_url} target="_blank" rel="noopener noreferrer" className="rounded-full border border-white/70 px-5 py-3 text-sm font-semibold text-white transition hover:bg-white/10">
                   Website
@@ -124,6 +181,26 @@ export default async function BusinessProfilePage({ params }: { params: Params }
           {business.description ? (
             <section className="text-xl leading-9 text-stone-700">
               <p>{business.description}</p>
+            </section>
+          ) : null}
+
+          {hasMenu && menu ? (
+            <section>
+              <div className="flex flex-wrap items-baseline justify-between gap-3">
+                <p className="text-sm font-semibold uppercase text-moss">{locale === "en" ? "Menu" : "Меню"}</p>
+                <Link href={menuHref as Route} className="text-sm font-semibold text-forest">
+                  {locale === "en" ? "Full menu →" : "Цялото меню →"}
+                </Link>
+              </div>
+              <div className="mt-4">
+                <BusinessMenuList
+                  menu={{ ...menu, categories: menu.categories.slice(0, 3) }}
+                  locale={locale}
+                  maxItemsPerCategory={4}
+                  showImages={false}
+                  anchorPrefix="profile-menu"
+                />
+              </div>
             </section>
           ) : null}
 
