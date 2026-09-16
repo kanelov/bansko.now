@@ -117,6 +117,16 @@ export async function objectExists(key: string) {
   return response.ok;
 }
 
+/** Размер и тип на качен обект, без да се тегли (проверка след подписан PUT от браузъра). */
+export async function headObject(key: string) {
+  const response = await client().fetch(objectUrl(key), { method: "HEAD" });
+  if (!response.ok) return null;
+  return {
+    bytes: Number(response.headers.get("content-length") || 0),
+    contentType: response.headers.get("content-type") || ""
+  };
+}
+
 /**
  * Temporary GET URL for a purchased file. Generated on demand and never stored,
  * so a leaked link stops working after `expiresInSeconds`.

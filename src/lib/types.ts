@@ -770,6 +770,90 @@ export type BusinessCategoryTranslation = {
   name: string;
 };
 
+export type BusinessMediaType = "image" | "video";
+export type BusinessMediaKind = "cover" | "gallery" | "item" | "display" | "print_background" | "logo";
+
+export type BusinessMedia = {
+  id: string;
+  business_id: string;
+  media_type: BusinessMediaType;
+  kind: BusinessMediaKind;
+  original_key: string;
+  variant_keys: Json;
+  mime_type: string;
+  bytes: number | null;
+  width: number | null;
+  height: number | null;
+  duration_seconds: number | null;
+  alt: string | null;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessMenuCategory = {
+  id: string;
+  business_id: string;
+  sort_order: number;
+  is_active: boolean;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessMenuCategoryTranslation = {
+  id: string;
+  category_id: string;
+  business_id: string;
+  locale: Locale;
+  name: string;
+  description: string | null;
+};
+
+export type BusinessMenuAvailability = "available" | "sold_out";
+
+export type BusinessMenuItem = {
+  id: string;
+  business_id: string;
+  category_id: string;
+  price_cents: number | null;
+  availability: BusinessMenuAvailability;
+  is_active: boolean;
+  sort_order: number;
+  media_id: string | null;
+  tags: string[];
+  allergens: string[];
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessMenuItemTranslation = {
+  id: string;
+  item_id: string;
+  business_id: string;
+  locale: Locale;
+  name: string;
+  description: string | null;
+};
+
+export type BusinessMenuItemVariant = {
+  id: string;
+  item_id: string;
+  business_id: string;
+  price_cents: number;
+  is_active: boolean;
+  sort_order: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type BusinessMenuItemVariantTranslation = {
+  id: string;
+  variant_id: string;
+  business_id: string;
+  locale: Locale;
+  name: string;
+};
+
 export type BusinessDirectorySettings = {
   id: string;
   intro_title: string | null;
@@ -1214,6 +1298,48 @@ export type Database = {
         Row: BusinessCategoryTranslation;
         Insert: Partial<BusinessCategoryTranslation> & Pick<BusinessCategoryTranslation, "category_id" | "locale" | "name">;
         Update: Partial<BusinessCategoryTranslation>;
+        Relationships: [];
+      };
+      business_media: {
+        Row: BusinessMedia;
+        Insert: Partial<BusinessMedia> & Pick<BusinessMedia, "business_id" | "media_type" | "kind" | "original_key" | "mime_type">;
+        Update: Partial<BusinessMedia>;
+        Relationships: [];
+      };
+      business_menu_categories: {
+        Row: BusinessMenuCategory;
+        Insert: Partial<BusinessMenuCategory> & Pick<BusinessMenuCategory, "business_id">;
+        Update: Partial<BusinessMenuCategory>;
+        Relationships: [];
+      };
+      business_menu_category_translations: {
+        Row: BusinessMenuCategoryTranslation;
+        Insert: Partial<BusinessMenuCategoryTranslation> & Pick<BusinessMenuCategoryTranslation, "category_id" | "business_id" | "locale" | "name">;
+        Update: Partial<BusinessMenuCategoryTranslation>;
+        Relationships: [];
+      };
+      business_menu_items: {
+        Row: BusinessMenuItem;
+        Insert: Partial<BusinessMenuItem> & Pick<BusinessMenuItem, "business_id" | "category_id">;
+        Update: Partial<BusinessMenuItem>;
+        Relationships: [];
+      };
+      business_menu_item_translations: {
+        Row: BusinessMenuItemTranslation;
+        Insert: Partial<BusinessMenuItemTranslation> & Pick<BusinessMenuItemTranslation, "item_id" | "business_id" | "locale" | "name">;
+        Update: Partial<BusinessMenuItemTranslation>;
+        Relationships: [];
+      };
+      business_menu_item_variants: {
+        Row: BusinessMenuItemVariant;
+        Insert: Partial<BusinessMenuItemVariant> & Pick<BusinessMenuItemVariant, "item_id" | "business_id" | "price_cents">;
+        Update: Partial<BusinessMenuItemVariant>;
+        Relationships: [];
+      };
+      business_menu_item_variant_translations: {
+        Row: BusinessMenuItemVariantTranslation;
+        Insert: Partial<BusinessMenuItemVariantTranslation> & Pick<BusinessMenuItemVariantTranslation, "variant_id" | "business_id" | "locale" | "name">;
+        Update: Partial<BusinessMenuItemVariantTranslation>;
         Relationships: [];
       };
     };

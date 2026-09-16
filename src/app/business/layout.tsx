@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "../globals.css";
 import "@/styles/fonts.css";
+import "@/styles/portal.css";
 
 /* Порталът е за собствениците на бизнеси: не се индексира и няма нищо общо с
    езиковите адреси на сайта. Собствен root layout, както админът. */
@@ -18,7 +19,7 @@ export const metadata: Metadata = {
 
 export default function BusinessRootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="bg">
+    <html lang="bg" className="portal">
       <body className="font-portal bg-paper text-[var(--ink)] antialiased">{children}</body>
     </html>
   );
