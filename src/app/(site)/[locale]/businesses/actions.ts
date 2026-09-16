@@ -7,6 +7,7 @@ import { getBusinessDirectorySettings } from "@/lib/businesses";
 import { sendNotificationEmail } from "@/lib/email";
 import { siteUrl } from "@/lib/env";
 import { slugify } from "@/lib/slug";
+import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { isLocale, localePath } from "@/lib/i18n";
 
@@ -55,7 +56,9 @@ function jsonFaqs(formData: FormData) {
 }
 
 async function uploadBusinessImages(formData: FormData, slug: string) {
-  const supabase = await createSupabaseServerClient();
+  // Качването минава през service role: bucket-ът вече не приема анонимни
+  // записи, а типът и размерът на файла са проверени тук, на сървъра.
+  const supabase = createSupabaseAdminClient();
 
   if (!supabase) {
     throw new Error("Supabase is not configured.");
