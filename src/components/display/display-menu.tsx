@@ -20,8 +20,10 @@ function ItemName({ item, showDescriptions }: { item: MenuItem; showDescriptions
 
   return (
     <span className="display-item__name">
-      {name.bg}
-      {name.en ? <span className="display-item__alt"> · {name.en}</span> : null}
+      <span className="display-item__label">
+        {name.bg}
+        {name.en ? <span className="display-item__alt"> · {name.en}</span> : null}
+      </span>
       {sold ? <span className="display-item__sold">свърши</span> : null}
       {showDescriptions && item.description ? <span className="display-item__desc">{item.description}</span> : null}
     </span>

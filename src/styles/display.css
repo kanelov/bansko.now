@@ -173,7 +173,8 @@ body.display {
   margin-left: 0.6em;
 }
 
-.display-item--sold .display-item__name,
+.display-item--sold .display-item__label,
+.display-item--sold .display-item__desc,
 .display-item--sold .display-item__price,
 .display-item--sold .display-item__variants {
   text-decoration: line-through;
@@ -237,7 +238,7 @@ body.display {
   font-weight: 400;
 }
 
-.display-table tr.display-item--sold td {
+.display-table tr.display-item--sold td + td {
   text-decoration: line-through;
   opacity: 0.45;
 }

@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { currentBusinessCookie, currentBusinessCookieOptions, getBusinessSession, requireBusinessOwner } from "@/lib/business-platform/auth";
 import { revalidateBusinessPublic } from "@/lib/business-platform/revalidate";
+import { isLoginAllowed } from "@/lib/login-rate-limit";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { BusinessOpenOverride } from "@/lib/types";
 
@@ -25,6 +26,10 @@ export async function businessSignInAction(formData: FormData) {
 
   if (!email || !password) {
     redirect("/business/login?error=missing-fields");
+  }
+
+  if (!(await isLoginAllowed(email))) {
+    redirect("/business/login?error=too-many");
   }
 
   const { error } = await supabase.auth.signInWithPassword({ email, password });

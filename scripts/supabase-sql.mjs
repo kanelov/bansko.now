@@ -14,6 +14,7 @@
  *   node scripts/supabase-sql.mjs --migration <име> --file supabase/migrations/<файл>.sql
  *   node scripts/supabase-sql.mjs --auth-config                 (чете настройките на Auth)
  *   node scripts/supabase-sql.mjs --auth-config disable_signup=true
+ *   node scripts/supabase-sql.mjs --advisors                    (съветникът по сигурността)
  *
  * С --migration заявката се записва и в историята на миграциите, със същото
  * <име> като файла (без датата отпред), както го прави apply_migration.
@@ -69,7 +70,7 @@ if (process.argv.includes("--auth-config")) {
 
   if (change && change.includes("=")) {
     const [key, raw] = change.split("=");
-    const value = raw === "true" ? true : raw === "false" ? false : raw;
+    const value = raw === "true" ? true : raw === "false" ? false : /^\d+$/.test(raw) ? Number(raw) : raw;
     await call("/config/auth", "PATCH", { [key]: value });
     console.log(`Записано: ${key} = ${raw}`);
   }
@@ -77,6 +78,16 @@ if (process.argv.includes("--auth-config")) {
   const config = await call("/config/auth", "GET");
   /* Само безопасните за показване настройки - никакви ключове и тайни. */
   console.log(JSON.stringify({ disable_signup: config.disable_signup, password_min_length: config.password_min_length, password_hibp_enabled: config.password_hibp_enabled }, null, 2));
+  process.exit(0);
+}
+
+if (process.argv.includes("--advisors")) {
+  /* Съветникът по сигурността: само име, ниво и за какво се отнася. */
+  const report = await call("/advisors/security", "GET");
+  for (const lint of report.lints ?? []) {
+    console.log(`${lint.level}  ${lint.name}  ${lint.detail ?? ""}`);
+  }
+  console.log(`Общо: ${(report.lints ?? []).length}`);
   process.exit(0);
 }
 

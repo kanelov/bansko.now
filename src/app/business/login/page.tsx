@@ -11,6 +11,7 @@ export const metadata: Metadata = {
 const errorMessages: Record<string, string> = {
   "invalid-login": "Неуспешен вход. Провери имейла и паролата.",
   "missing-fields": "Въведи имейл и парола.",
+  "too-many": "Твърде много опити. Изчакай 15 минути и опитай пак, или пиши на Bansko NOW за нова парола.",
   "missing-env": "Порталът не е свързан с базата. Пиши на Bansko NOW.",
   "no-business": "Този акаунт не е свързан с бизнес. Достъпът се дава от Bansko NOW.",
   "not-owner": "Този акаунт няма права на собственик. Пиши на Bansko NOW."

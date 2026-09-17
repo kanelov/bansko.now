@@ -3,6 +3,7 @@
 import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+import { isLoginAllowed } from "@/lib/login-rate-limit";
 import { mediaBucket, publishArticleRecord, revalidateEditorialPaths, revalidatePublicPath, syncArticlePhotos, syncTags } from "@/lib/articles-admin";
 import { createImageVariants } from "@/lib/image-variants";
 import { estimateReadingTime } from "@/lib/seo";
@@ -142,6 +143,10 @@ export async function signInAction(formData: FormData) {
 
   if (!email || !password) {
     redirect("/admin/login?error=missing-fields");
+  }
+
+  if (!(await isLoginAllowed(email))) {
+    redirect("/admin/login?error=too-many");
   }
 
   const { data, error } = await supabase.auth.signInWithPassword({ email, password });

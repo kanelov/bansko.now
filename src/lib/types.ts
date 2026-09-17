@@ -1418,6 +1418,7 @@ export type Database = {
     Functions: {
       display_by_token: { Args: { p_token: string }; Returns: Json };
       display_version: { Args: { p_token: string }; Returns: string | null };
+      register_login_attempt: { Args: { p_email_hash: string; p_ip_hash: string }; Returns: boolean };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;

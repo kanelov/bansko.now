@@ -16,7 +16,9 @@ export default async function AdminLoginPage({
   const { error } = await searchParams;
   const configured = isSupabaseConfigured();
   const errorMessage =
-    error === "not-admin"
+    error === "too-many"
+      ? "Твърде много опити за вход. Изчакай 15 минути и опитай пак."
+      : error === "not-admin"
       ? "Този потребител няма admin права. Добави `role: admin` в Supabase app metadata."
       : "Неуспешен вход. Провери имейла, паролата и Supabase настройките.";
 
