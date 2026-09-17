@@ -24,11 +24,11 @@ export async function isLoginAllowed(email: string): Promise<boolean> {
     return true;
   }
 
-  const requestHeaders = await headers();
-  const forwarded = requestHeaders.get("x-forwarded-for") ?? "";
-  const ip = forwarded.split(",")[0]?.trim() || requestHeaders.get("x-real-ip") || "unknown";
-
   try {
+    const requestHeaders = await headers();
+    const forwarded = requestHeaders.get("x-forwarded-for") ?? "";
+    const ip = forwarded.split(",")[0]?.trim() || requestHeaders.get("x-real-ip") || "unknown";
+
     const { data, error } = await supabase.rpc("register_login_attempt", {
       p_email_hash: fingerprint("email", email.trim().toLowerCase()),
       p_ip_hash: fingerprint("ip", ip)
