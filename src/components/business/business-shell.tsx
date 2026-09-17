@@ -42,6 +42,12 @@ export function BusinessShell({
                   Смени
                 </Link>
               ) : null}
+              <Link
+                href="/business/account"
+                className="rounded-full border border-[var(--stone)] bg-white px-3 py-1.5 text-xs font-semibold transition hover:border-forest"
+              >
+                Парола
+              </Link>
               <form action={businessSignOutAction}>
                 <button className="rounded-full border border-[var(--stone)] bg-white px-3 py-1.5 text-xs font-semibold transition hover:border-forest">
                   Изход

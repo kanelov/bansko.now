@@ -22,8 +22,6 @@ import {
   businessTierLabels,
   getBusinessTierLabel
 } from "@/lib/business-plan-labels";
-import { BusinessVideoUploader } from "@/components/admin/business-video-uploader";
-import { listBusinessVideosForAdmin } from "@/lib/business-platform/displays";
 import { emailFrom, resendApiKey } from "@/lib/env";
 
 type SearchParams = Promise<{ saved?: string; approved?: string; deleted?: string; error?: string }>;
@@ -55,14 +53,13 @@ function formatDate(value: string | null) {
 }
 
 export default async function AdminBusinessesPage({ searchParams }: { searchParams: SearchParams }) {
-  const [params, businesses, translations, plans, settings, messages, videosByBusiness] = await Promise.all([
+  const [params, businesses, translations, plans, settings, messages] = await Promise.all([
     searchParams,
     getAdminBusinesses(),
     getAdminBusinessTranslations(),
     getBusinessListingPlans({ includeInactive: true }),
     getBusinessDirectorySettings(),
-    getContactMessages(),
-    listBusinessVideosForAdmin()
+    getContactMessages()
   ]);
   const englishTranslationsByBusinessId = new Map(translations.filter((item) => item.locale === "en").map((item) => [item.business_id, item]));
   const annualPlans = plans.filter((plan) => plan.period_months === 12);
@@ -319,9 +316,6 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                       </form>
                     </details>
                   </aside>
-                </div>
-                <div className="mt-4">
-                  <BusinessVideoUploader businessId={business.id} initial={videosByBusiness.get(business.id) ?? []} />
                 </div>
               </details>
             ))}

@@ -193,6 +193,14 @@ export default async function BusinessGuidePage() {
       </section>
 
       <p className="text-sm text-stone-650">
+        Акаунтът ти е създаден от Bansko NOW с временна парола – смени я от{" "}
+        <Link href="/business/account" className="font-semibold text-forest underline underline-offset-4">
+          „Парола“
+        </Link>{" "}
+        горе вдясно. Забравиш ли я, пиши ни и получаваш нова.
+      </p>
+
+      <p className="text-sm text-stone-650">
         Нещо не работи или липсва? Пиши на Bansko NOW:{" "}
         <a href="mailto:mail@kanelov.com" className="font-semibold text-forest underline underline-offset-4">
           mail@kanelov.com

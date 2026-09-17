@@ -102,3 +102,26 @@ export async function setOpenOverrideAction(formData: FormData) {
   revalidatePath("/business");
   redirect("/business?saved=open");
 }
+
+/** Собственикът сменя временната парола със своя. Текстът на паролата не се чете никъде освен тук. */
+export async function changeBusinessPasswordAction(formData: FormData) {
+  const { supabase } = await requireBusinessOwner();
+  const password = formData.get("password");
+  const repeat = formData.get("password_repeat");
+
+  if (typeof password !== "string" || password.length < 10) {
+    redirect("/business/account?error=short");
+  }
+
+  if (password !== repeat) {
+    redirect("/business/account?error=mismatch");
+  }
+
+  const { error } = await supabase.auth.updateUser({ password });
+
+  if (error) {
+    redirect("/business/account?error=save");
+  }
+
+  redirect("/business/account?saved=1");
+}
