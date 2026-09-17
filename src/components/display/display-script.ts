@@ -5,7 +5,8 @@
  * Какво прави: на 60 s пита /api/display/<token>/version; при различна версия
  * презарежда; след 3 неуспешни проверки показва точка „офлайн“ (менюто остава);
  * веднъж на нощ в 04:00 презарежда за памет, но само ако последната проверка е
- * минала; мери дали менюто се събира и го казва на прегледа в портала.
+ * минала; уголемява текста, докато менюто още се събира, и казва на прегледа в
+ * портала, ако не се събира изобщо.
  * С ?preview=1 не проверява и не презарежда.
  */
 export const displayScript = `
@@ -33,10 +34,30 @@ export const displayScript = `
     }
   }
 
-  measure();
-  window.addEventListener('resize', measure);
-  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(measure); }
-  setTimeout(measure, 1500);
+  function overflows() {
+    var menu = document.getElementById('display-menu');
+    return menu ? menu.scrollHeight > menu.clientHeight + 2 : false;
+  }
+
+  /* Уголемява текста на стъпки, докато менюто още се събира (най-много 1.9 пъти). */
+  function fit() {
+    var scale = 1;
+    root.style.setProperty('--display-scale', '1');
+    if (!overflows()) {
+      while (scale < 1.9) {
+        var next = Math.round((scale + 0.05) * 100) / 100;
+        root.style.setProperty('--display-scale', String(next));
+        if (overflows()) { root.style.setProperty('--display-scale', String(scale)); break; }
+        scale = next;
+      }
+    }
+    measure();
+  }
+
+  fit();
+  window.addEventListener('resize', fit);
+  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fit); }
+  setTimeout(fit, 1500);
 
   if (preview || !token) return;
 

@@ -93,10 +93,14 @@ body.display {
   opacity: 0.75;
 }
 
+/* Размерът на текста идва оттук и всичко вътре е в em. Скриптът вдига
+   --display-scale, докато менюто още се събира: кратко меню се чете от
+   другия край на заведението, дълго остава на основния размер. */
 .display-columns {
   display: flex;
   flex: 1 1 auto;
   min-height: 0;
+  font-size: calc(2.15vh * var(--display-scale, 1));
 }
 
 .display-column {
@@ -110,15 +114,15 @@ body.display {
 }
 
 .display-category {
-  margin-bottom: 2.4vh;
+  margin-bottom: 1.1em;
 }
 
 .display-category__name {
   font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
-  font-size: clamp(16px, 3vh, 48px);
+  font-size: 1.4em;
   font-weight: 600;
-  margin: 0 0 0.8vh;
-  padding-bottom: 0.6vh;
+  margin: 0 0 0.3em;
+  padding-bottom: 0.2em;
   border-bottom: 1px solid rgba(128, 128, 128, 0.35);
 }
 
@@ -126,8 +130,8 @@ body.display {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  padding: 0.55vh 0;
-  font-size: clamp(13px, 2.15vh, 34px);
+  padding: 0.26em 0;
+  font-size: 1em;
   line-height: 1.25;
 }
 
@@ -196,12 +200,12 @@ body.display {
 .display-table {
   width: 100%;
   border-collapse: collapse;
-  font-size: clamp(13px, 2.15vh, 34px);
+  font-size: 1em;
 }
 
 .display-table th,
 .display-table td {
-  padding: 0.5vh 0;
+  padding: 0.24em 0;
   text-align: right;
   font-variant-numeric: tabular-nums;
   white-space: nowrap;

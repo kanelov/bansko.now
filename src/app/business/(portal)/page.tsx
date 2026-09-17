@@ -19,7 +19,7 @@ const openOptions: { value: BusinessOpenOverride; label: string; hint: string }[
 
 /* Кои модули вече имат страница в портала. Останалите се показват като „предстои“,
    за да се вижда какво идва, без да води към празно място. */
-const moduleLinks: Partial<Record<BusinessModuleKey, string>> = { menu: "/business/menu", hours: "/business/hours", displays: "/business/displays" };
+const moduleLinks: Partial<Record<BusinessModuleKey, string>> = { menu: "/business/menu", hours: "/business/hours", displays: "/business/displays", print: "/business/print" };
 
 const platformStatusLabels = {
   listing: "Визитка в каталога",

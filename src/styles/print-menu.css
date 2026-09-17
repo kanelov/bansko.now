@@ -1,0 +1,330 @@
+/*
+ * Менюто за печат. Дизайнът е HTML/CSS върху фон-снимка; файлът е PDF от същата
+ * страница („Запази като PDF“ в диалога за печат). Размерите са в милиметри.
+ * Размерът на листа (@page) идва от самата страница, защото зависи от избора.
+ * print-color-adjust: exact пази фона, дори отметката „Background graphics“ да
+ * е махната. Шрифтовете са вградените Playfair Display + Inter (fonts.css) -
+ * Chromium ги влага в PDF-а и печатницата вижда същото.
+ */
+
+.print-stage {
+  min-height: 100vh;
+  background: #d9d5cc;
+  padding: 24px 16px 64px;
+}
+
+.print-toolbar {
+  max-width: 900px;
+  margin: 0 auto 20px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.print-toolbar p {
+  margin: 0;
+  color: #5f5a50;
+  max-width: 560px;
+}
+
+.print-sheet {
+  position: relative;
+  margin: 0 auto;
+  width: var(--sheet-width);
+  min-height: var(--sheet-height);
+  box-shadow: 0 18px 45px rgba(38, 31, 22, 0.25);
+  overflow: hidden;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
+  font-size: 9.5pt;
+  line-height: 1.35;
+}
+
+.print-sheet--light {
+  background: #fbf8f2;
+  color: #1d2b22;
+}
+
+.print-sheet--dark {
+  background: #14201a;
+  color: #f4efe6;
+}
+
+/* Фонът е position: fixed при печат, за да се повтаря на всяка страница. */
+.print-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.print-veil {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+
+.print-sheet--light .print-veil {
+  background: rgba(251, 248, 242, 0.86);
+}
+
+.print-sheet--dark .print-veil {
+  background: rgba(16, 24, 19, 0.78);
+}
+
+.print-content {
+  position: relative;
+  padding: calc(14mm + var(--sheet-bleed)) calc(13mm + var(--sheet-bleed));
+}
+
+.print-sheet--narrow .print-content {
+  padding: calc(10mm + var(--sheet-bleed)) calc(8mm + var(--sheet-bleed));
+}
+
+.print-head {
+  text-align: center;
+  margin-bottom: 8mm;
+}
+
+.print-eyebrow {
+  font-size: 7.5pt;
+  font-weight: 600;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  opacity: 0.7;
+  margin: 0 0 2mm;
+}
+
+.print-title {
+  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  font-size: 30pt;
+  font-weight: 600;
+  line-height: 1.1;
+  margin: 0;
+}
+
+.print-sheet--narrow .print-title {
+  font-size: 20pt;
+}
+
+.print-sheet--large .print-title {
+  font-size: 42pt;
+}
+
+.print-sheet--large {
+  font-size: 12pt;
+}
+
+.print-rule {
+  width: 18mm;
+  height: 0.4mm;
+  margin: 4mm auto 0;
+  background: currentColor;
+  opacity: 0.5;
+}
+
+.print-columns {
+  column-count: var(--sheet-columns);
+  column-gap: 9mm;
+}
+
+.print-category {
+  break-inside: avoid;
+  page-break-inside: avoid;
+  margin: 0 0 6.5mm;
+}
+
+.print-category__name {
+  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  font-size: 1.55em;
+  font-weight: 600;
+  margin: 0 0 1mm;
+  padding-bottom: 1.2mm;
+  border-bottom: 0.25mm solid rgba(128, 128, 128, 0.55);
+}
+
+.print-category__alt {
+  font-family: "Inter Variable", Inter, system-ui, sans-serif;
+  font-size: 0.5em;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.65;
+  margin-left: 0.6em;
+}
+
+.print-category__note {
+  margin: 1mm 0 0;
+  font-size: 0.85em;
+  opacity: 0.7;
+}
+
+.print-item {
+  display: flex;
+  align-items: baseline;
+  padding: 1.15mm 0;
+  break-inside: avoid;
+}
+
+.print-item__text {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.print-item__name {
+  font-weight: 600;
+}
+
+.print-item__alt {
+  display: block;
+  font-size: 0.85em;
+  font-style: italic;
+  opacity: 0.7;
+}
+
+.print-item__desc {
+  display: block;
+  font-size: 0.85em;
+  opacity: 0.75;
+}
+
+/* Точките между името и цената: класическото меню */
+.print-item__dots {
+  flex: 1 0 4mm;
+  margin: 0 1.5mm;
+  border-bottom: 0.25mm dotted currentColor;
+  opacity: 0.4;
+  transform: translateY(-1mm);
+}
+
+.print-item__price {
+  flex: 0 0 auto;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.print-item__variant {
+  font-weight: 400;
+  opacity: 0.7;
+  margin-right: 0.35em;
+}
+
+.print-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.print-table th,
+.print-table td {
+  padding: 1.1mm 0 1.1mm 3mm;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  vertical-align: baseline;
+}
+
+.print-table th {
+  font-size: 0.72em;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.65;
+}
+
+.print-table td {
+  font-weight: 600;
+}
+
+.print-table th:first-child,
+.print-table td:first-child {
+  width: 100%;
+  padding-left: 0;
+  text-align: left;
+  white-space: normal;
+  font-weight: 400;
+}
+
+.print-foot {
+  margin-top: 6mm;
+  padding-top: 4mm;
+  border-top: 0.25mm solid rgba(128, 128, 128, 0.55);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6mm;
+  font-size: 0.85em;
+  break-inside: avoid;
+}
+
+.print-foot p {
+  margin: 0 0 0.6mm;
+}
+
+.print-foot__name {
+  font-weight: 600;
+}
+
+.print-foot__muted {
+  opacity: 0.7;
+}
+
+.print-qr {
+  flex: 0 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 3mm;
+  text-align: right;
+}
+
+.print-qr__code {
+  width: 19mm;
+  height: 19mm;
+  padding: 1mm;
+  background: #fff;
+  border-radius: 1mm;
+}
+
+.print-qr__code svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+@media print {
+  html,
+  body {
+    background: #fff !important;
+  }
+
+  .print-stage {
+    min-height: 0;
+    padding: 0;
+    background: none;
+  }
+
+  .print-toolbar {
+    display: none;
+  }
+
+  .print-sheet {
+    margin: 0;
+    box-shadow: none;
+    overflow: visible;
+  }
+
+  /* Повтаря фона на всяка печатна страница, когато менюто е по-дълго от един лист. */
+  .print-background,
+  .print-veil {
+    position: fixed;
+    height: 100vh;
+  }
+}
