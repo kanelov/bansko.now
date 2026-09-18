@@ -1,6 +1,7 @@
 import "server-only";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import { hasAdminRole } from "@/lib/supabase/auth";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { BusinessMemberRole } from "@/lib/types";
 
@@ -20,6 +21,8 @@ export type BusinessMembership = {
   role: BusinessMemberRole;
   name: string;
   slug: string;
+  /** Админът на Bansko NOW гледа портала на чужд бизнес (поддръжка), без да е негов собственик. */
+  viaAdmin?: boolean;
 };
 
 type ServerClient = NonNullable<Awaited<ReturnType<typeof createSupabaseServerClient>>>;
@@ -27,6 +30,8 @@ type ServerClient = NonNullable<Awaited<ReturnType<typeof createSupabaseServerCl
 export type BusinessSession = {
   supabase: ServerClient;
   userId: string;
+  /** Акаунтът е админ на Bansko NOW: един и същ вход (и парола) за админа и за портала. */
+  isAdmin: boolean;
   memberships: BusinessMembership[];
 };
 
@@ -49,7 +54,38 @@ export async function getBusinessSession(): Promise<BusinessSession | null> {
     return null;
   }
 
-  return { supabase, userId, memberships: await loadMemberships(supabase, userId) };
+  const isAdmin = hasAdminRole(claims);
+  const memberships = await loadMemberships(supabase, userId);
+
+  return { supabase, userId, isAdmin, memberships: isAdmin ? await withPlatformBusinesses(supabase, memberships) : memberships };
+}
+
+/**
+ * Админът вижда портала на всеки бизнес, който е на платформата - за да помогне
+ * на собственик или да провери нещо, без да се добавя като собственик навсякъде.
+ * RLS и пазачите на колони така или иначе го пускат през is_admin().
+ */
+async function withPlatformBusinesses(supabase: ServerClient, memberships: BusinessMembership[]): Promise<BusinessMembership[]> {
+  const { data: settings } = await supabase.from("business_platform_settings").select("business_id");
+  const known = new Set(memberships.map((membership) => membership.businessId));
+  const missing = (settings ?? []).map((row) => row.business_id).filter((id) => !known.has(id));
+
+  if (missing.length === 0) {
+    return memberships;
+  }
+
+  const { data: businesses } = await supabase.from("businesses").select("id, name, slug").in("id", missing).order("name");
+
+  return [
+    ...memberships,
+    ...(businesses ?? []).map((business) => ({
+      businessId: business.id,
+      role: "owner" as const,
+      name: business.name,
+      slug: business.slug,
+      viaAdmin: true
+    }))
+  ];
 }
 
 async function loadMemberships(supabase: ServerClient, userId: string): Promise<BusinessMembership[]> {

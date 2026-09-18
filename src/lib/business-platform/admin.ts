@@ -38,6 +38,25 @@ export type PlatformBusiness = {
   videos: AdminBusinessVideo[];
 };
 
+export type PlatformCategoryOption = { id: string; name: string };
+
+/** Категориите на бизнесите (данни, не код) за формата „Нов бизнес“. */
+export async function getPlatformCategoryOptions(): Promise<PlatformCategoryOption[]> {
+  const supabase = await createSupabaseServerClient();
+
+  if (!supabase) {
+    return [];
+  }
+
+  const [{ data: categories }, { data: names }] = await Promise.all([
+    supabase.from("business_categories").select("id, sort_order").eq("is_active", true).order("sort_order"),
+    supabase.from("business_category_translations").select("category_id, name").eq("locale", "bg")
+  ]);
+
+  const nameById = new Map((names ?? []).map((row) => [row.category_id, row.name]));
+  return (categories ?? []).flatMap((category) => (nameById.has(category.id) ? [{ id: category.id, name: nameById.get(category.id) as string }] : []));
+}
+
 export async function getPlatformBusinesses(): Promise<PlatformBusiness[]> {
   const supabase = await createSupabaseServerClient();
 

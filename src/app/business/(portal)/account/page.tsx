@@ -16,7 +16,7 @@ const errorMessages: Record<string, string> = {
 /** Акаунтът идва от Bansko NOW с временна парола; тук собственикът слага своя. */
 export default async function BusinessAccountPage({ searchParams }: { searchParams: Promise<{ saved?: string; error?: string }> }) {
   const { saved, error } = await searchParams;
-  await requireBusinessOwner();
+  const { isAdmin } = await requireBusinessOwner();
 
   return (
     <div className="grid gap-6">
@@ -28,9 +28,16 @@ export default async function BusinessAccountPage({ searchParams }: { searchPara
         </p>
       </header>
 
+      {isAdmin ? (
+        <div className={portalUi.alert} role="note">
+          <strong>Влязъл си с админ акаунта на Bansko NOW.</strong> Акаунтът е един, затова и паролата е една: смяната тук сменя и
+          входа в админа (<code>/admin</code>). Собствениците на заведения имат свои отделни акаунти и техните пароли не пипат твоята.
+        </div>
+      ) : null}
+
       {saved ? (
         <div className={portalUi.notice} role="status">
-          Паролата е сменена.
+          Паролата е сменена{isAdmin ? " – важи и за входа в админа" : ""}.
         </div>
       ) : null}
       {error ? (

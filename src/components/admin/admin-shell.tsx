@@ -53,11 +53,14 @@ export async function AdminShell({ children }: { children: React.ReactNode }) {
             </Link>
           ))}
         </nav>
-        <form action={signOutAction} className="absolute bottom-6 left-6 right-6">
-          <button className="admin-button admin-button-secondary w-full px-4 py-2 text-sm font-semibold">
-            Изход
-          </button>
-        </form>
+        <div className="absolute bottom-6 left-6 right-6 grid gap-2">
+          <Link href="/admin/account" className="admin-button admin-button-secondary w-full px-4 py-2 text-center text-sm font-semibold">
+            Парола
+          </Link>
+          <form action={signOutAction}>
+            <button className="admin-button admin-button-secondary w-full px-4 py-2 text-sm font-semibold">Изход</button>
+          </form>
+        </div>
       </aside>
       <div className="lg:pl-64">
         <header className="flex items-center justify-between gap-3 border-b border-[var(--admin-line)] bg-[var(--admin-bg)] px-4 py-4 sm:px-6 lg:px-8">

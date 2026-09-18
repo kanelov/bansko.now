@@ -1,8 +1,14 @@
 import Link from "next/link";
-import { removeBusinessMemberAction, saveBusinessModulesAction, savePlatformSettingsAction } from "@/app/admin/platform-actions";
+import {
+  createPlatformBusinessAction,
+  openBusinessPortalAction,
+  removeBusinessMemberAction,
+  saveBusinessModulesAction,
+  savePlatformSettingsAction
+} from "@/app/admin/platform-actions";
 import { BusinessVideoUploader } from "@/components/admin/business-video-uploader";
 import { AddOwnerForm, ResetPasswordForm } from "@/components/admin/platform-owner-forms";
-import { getPlatformBusinesses, manageableModules, platformStatusOptions } from "@/lib/business-platform/admin";
+import { getPlatformBusinesses, getPlatformCategoryOptions, manageableModules, platformStatusOptions } from "@/lib/business-platform/admin";
 import { siteUrl } from "@/lib/env";
 
 type SearchParams = Promise<{ saved?: string; error?: string }>;
@@ -10,7 +16,8 @@ type SearchParams = Promise<{ saved?: string; error?: string }>;
 const savedMessages: Record<string, string> = {
   status: "Статусът на платформата е записан.",
   modules: "Модулите са записани.",
-  member: "Собственикът е премахнат от бизнеса."
+  member: "Собственикът е премахнат от бизнеса.",
+  created: "Бизнесът е създаден като чернова. Довърши профила и го одобри в „Бизнеси“, после тук го направи „Активна“ и добави собственик."
 };
 
 const statusBadge: Record<string, string> = {
@@ -23,7 +30,7 @@ const panelClass = "grid gap-3 rounded-2xl border border-[var(--admin-line)] bg-
 
 /** Админ „Бизнес платформа“: кой бизнес е на платформата, с кои модули и с кои собственици. */
 export default async function AdminPlatformPage({ searchParams }: { searchParams: SearchParams }) {
-  const [{ saved, error }, businesses] = await Promise.all([searchParams, getPlatformBusinesses()]);
+  const [{ saved, error }, businesses, categories] = await Promise.all([searchParams, getPlatformBusinesses(), getPlatformCategoryOptions()]);
 
   return (
     <div className="grid gap-8">
@@ -44,6 +51,41 @@ export default async function AdminPlatformPage({ searchParams }: { searchParams
         <div className="rounded-2xl border border-emerald-300 bg-emerald-100 p-4 text-sm font-semibold text-emerald-950">{savedMessages[saved] ?? "Записано."}</div>
       ) : null}
       {error ? <div className="rounded-2xl border border-red-300 bg-red-100 p-4 text-sm font-semibold text-red-900">{error === "invalid" ? "Невалидни данни." : error}</div> : null}
+
+      <details className="rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
+        <summary className="cursor-pointer list-none">
+          <span className="admin-button admin-button-primary inline-block px-5 py-2.5 text-sm font-semibold">+ Нов бизнес</span>
+        </summary>
+        <form action={createPlatformBusinessAction} className="mt-5 grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-white p-5 text-stone-950 lg:grid-cols-3">
+          <label className="grid gap-1 text-xs font-semibold text-stone-700">
+            Име
+            <input name="name" required maxLength={120} placeholder="Кафе „Под липата“" className="rounded-xl border border-[var(--admin-line)] bg-white px-3 py-2 text-sm" />
+          </label>
+          <label className="grid gap-1 text-xs font-semibold text-stone-700">
+            Категория
+            <select name="category_id" required defaultValue="" className="rounded-xl border border-[var(--admin-line)] bg-white px-3 py-2 text-sm">
+              <option value="" disabled>
+                Избери…
+              </option>
+              {categories.map((category) => (
+                <option key={category.id} value={category.id}>
+                  {category.name}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="grid gap-1 text-xs font-semibold text-stone-700">
+            Адрес
+            <input name="address" required maxLength={200} placeholder="ул. „Пирин“ 1, Банско" className="rounded-xl border border-[var(--admin-line)] bg-white px-3 py-2 text-sm" />
+          </label>
+          <p className="text-xs text-[var(--admin-muted)] lg:col-span-3">
+            Създава чернова с български профил. Описанието, снимките, картата и одобрението са в „Бизнеси“; статусът, модулите и собственикът – тук, по-долу.
+          </p>
+          <div className="lg:col-span-3">
+            <button className="admin-button admin-button-primary px-5 py-2.5 text-sm font-semibold">Създай бизнеса</button>
+          </div>
+        </form>
+      </details>
 
       <div className="grid gap-4">
         {businesses.map((business) => {
@@ -159,6 +201,14 @@ export default async function AdminPlatformPage({ searchParams }: { searchParams
                     </ul>
                   ) : (
                     <p className="text-sm text-[var(--admin-muted)]">Собственикът още не е създал екран.</p>
+                  )}
+                  {business.platformStatus ? (
+                    <form action={openBusinessPortalAction}>
+                      <input type="hidden" name="business_id" value={business.id} />
+                      <button className="admin-button admin-button-secondary px-4 py-2 text-sm font-semibold">Отвори портала му (като админ)</button>
+                    </form>
+                  ) : (
+                    <p className="text-xs text-[var(--admin-muted)]">Порталът се отваря, след като запазиш статус на платформата.</p>
                   )}
                   <div className="flex flex-wrap gap-3 text-xs font-semibold">
                     <a href={`${siteUrl}/places/${business.slug}`} target="_blank" rel="noopener noreferrer" className="text-forest underline underline-offset-4">

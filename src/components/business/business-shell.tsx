@@ -31,7 +31,10 @@ export function BusinessShell({
           <div className="mx-auto flex max-w-4xl items-center justify-between gap-3 px-4 py-3 sm:px-6">
             <div className="min-w-0">
               <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-moss lg:hidden">Bansko NOW · Бизнес</p>
-              <p className="truncate text-sm font-semibold">{business.name}</p>
+              <p className="truncate text-sm font-semibold">
+                {business.name}
+                {business.viaAdmin ? <span className="ml-2 rounded-full bg-clay/15 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.1em] text-clay">като админ</span> : null}
+              </p>
             </div>
             <div className="flex items-center gap-2">
               {memberships.length > 1 ? (
