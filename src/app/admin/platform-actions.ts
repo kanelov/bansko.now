@@ -200,18 +200,30 @@ export async function addBusinessOwnerAction(_previous: OwnerActionState, formDa
   }
 
   const now = new Date().toISOString();
-  const { error } = await supabase.from("business_members").upsert(
-    {
-      business_id: businessId,
-      user_id: userId,
-      role: "owner",
-      invited_email: email,
-      invited_by: (claims as { sub?: string }).sub ?? null,
-      invited_at: now,
-      accepted_at: now
-    },
-    { onConflict: "business_id,user_id" }
-  );
+  /* Уникалният индекс (business_id, user_id) е частичен (where user_id is not null),
+     а ON CONFLICT не може да го ползва - затова първо проверка, после запис. */
+  const { data: existing, error: lookupError } = await supabase
+    .from("business_members")
+    .select("id")
+    .eq("business_id", businessId)
+    .eq("user_id", userId)
+    .maybeSingle();
+
+  if (lookupError) {
+    return { ok: false, message: lookupError.message };
+  }
+
+  const { error } = existing
+    ? await supabase.from("business_members").update({ role: "owner", invited_email: email, accepted_at: now }).eq("id", existing.id)
+    : await supabase.from("business_members").insert({
+        business_id: businessId,
+        user_id: userId,
+        role: "owner",
+        invited_email: email,
+        invited_by: (claims as { sub?: string }).sub ?? null,
+        invited_at: now,
+        accepted_at: now
+      });
 
   if (error) {
     return { ok: false, message: error.message };
