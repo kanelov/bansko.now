@@ -6,6 +6,7 @@ import {
   setMenuItemVisibilityAction
 } from "@/app/business/menu/actions";
 import { portalUi } from "@/components/business/ui";
+import { IconGlyph } from "@/components/public/icon-glyph";
 import type { BusinessMenu, MenuCategory, MenuItem } from "@/lib/business-platform/menu";
 import { formatPrice } from "@/lib/business-platform/money";
 
@@ -32,6 +33,7 @@ function CategoryCard({ businessId, category, first, last }: { businessId: strin
       <header className="flex flex-wrap items-start justify-between gap-3">
         <div className="min-w-0">
           <h2 id={`category-${category.id}`} className={portalUi.h2 + " flex flex-wrap items-center gap-2"}>
+            <IconGlyph name={category.icon} className="h-5 w-5 flex-none text-[#8b6b4b]" />
             {category.name}
             {!category.isActive ? <span className={portalUi.badge + " bg-stone-200 text-stone-700"}>скрита</span> : null}
           </h2>
@@ -57,6 +59,7 @@ function CategoryCard({ businessId, category, first, last }: { businessId: strin
               key={item.id}
               businessId={businessId}
               categoryId={category.id}
+              icon={category.icon}
               item={item}
               first={index === 0}
               last={index === category.items.length - 1}
@@ -73,10 +76,12 @@ function ItemRow({
   categoryId,
   item,
   first,
-  last
+  last,
+  icon
 }: {
   businessId: string;
   categoryId: string;
+  icon: string;
   item: MenuItem;
   first: boolean;
   last: boolean;
@@ -85,11 +90,14 @@ function ItemRow({
 
   return (
     <li id={`item-${item.id}`} className="grid gap-3 rounded-2xl border border-[var(--stone)] bg-paper p-3 sm:grid-cols-[56px_minmax(0,1fr)_auto] sm:items-center">
-      <div className="h-14 w-14 overflow-hidden rounded-xl border border-[var(--stone)] bg-white">
+      {/* Без снимка квадратът показва иконката на категорията, за да не стои празен. */}
+      <div className="flex h-14 w-14 items-center justify-center overflow-hidden rounded-xl border border-[var(--stone)] bg-white text-[#8b6b4b]/70">
         {item.media?.w480 ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={item.media.w480} alt="" className="h-full w-full object-cover" loading="lazy" />
-        ) : null}
+        ) : (
+          <IconGlyph name={icon} className="h-6 w-6" />
+        )}
       </div>
 
       <div className="min-w-0">
