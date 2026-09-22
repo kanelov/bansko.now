@@ -122,11 +122,11 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
           aria-label={labels.menu}
           className="sticky top-0 z-10 mt-5 border-b border-[var(--paper-line)] bg-[var(--paper-bar)] text-[var(--paper-ink)] shadow-[0_4px_14px_rgba(0,0,0,0.08)]"
         >
-          <div className="mx-auto flex max-w-2xl items-center py-2.5 pl-4 sm:pl-6">
+          <div className="mx-auto flex max-w-2xl items-center py-2.5 pl-4 sm:pl-6 md:items-start">
             {alternate ? (
               <>
                 <span
-                  className="flex flex-none items-center rounded-full border border-[var(--paper-line)] p-0.5 text-[11px] font-bold uppercase tracking-[0.12em]"
+                  className="flex flex-none items-center rounded-full border border-[var(--paper-line)] p-0.5 text-[11px] font-bold uppercase tracking-[0.12em] md:mt-0.5"
                   aria-label={locale === "en" ? "Language" : "Език"}
                 >
                   {(["bg", "en"] as Locale[]).map((option) =>
@@ -146,12 +146,13 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
                     )
                   )}
                 </span>
-                {menu.categories.length > 1 ? <span className="ml-2.5 h-5 w-px flex-none bg-[var(--paper-line)]" aria-hidden /> : null}
+                {menu.categories.length > 1 ? <span className="ml-2.5 h-5 w-px flex-none bg-[var(--paper-line)] md:mt-1" aria-hidden /> : null}
               </>
             ) : null}
             {menu.categories.length > 1 ? (
               <div
-                className={`flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-0.5 pr-4 [scrollbar-width:none] sm:pr-6 [&::-webkit-scrollbar]:hidden ${alternate ? "pl-2.5" : ""}`}
+                /* На телефон категориите се плъзгат в един ред; на широк екран се пренасят и се виждат всички. */
+                className={`flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-0.5 pr-4 [scrollbar-width:none] sm:pr-6 md:flex-wrap md:overflow-visible [&::-webkit-scrollbar]:hidden ${alternate ? "pl-2.5" : ""}`}
               >
                 {menu.categories.map((category) => (
                   <a

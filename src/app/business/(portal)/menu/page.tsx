@@ -51,6 +51,9 @@ export default async function BusinessMenuPage({
               <Link href="/business/menu/qr" className={portalUi.secondaryButton}>
                 QR код
               </Link>
+              <Link href={`/places/${business.slug}/menu`} target="_blank" rel="noopener" className={portalUi.secondaryButton}>
+                Виж менюто
+              </Link>
             </>
           ) : null}
         </div>
