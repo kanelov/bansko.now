@@ -25,12 +25,17 @@ export function BusinessMenuList({
   const soldOutLabel = locale === "en" ? "sold out" : "свърши";
 
   return (
-    <div className="grid gap-9">
-      {menu.categories.map((category) => {
+    <div className="grid">
+      {menu.categories.map((category, index) => {
         const items = maxItemsPerCategory ? category.items.slice(0, maxItemsPerCategory) : category.items;
 
         return (
-          <section key={category.id} id={`${anchorPrefix}-${category.id}`} className="scroll-mt-32">
+          <section key={category.id} id={`${anchorPrefix}-${category.id}`} className="scroll-mt-20">
+            {index > 0 ? (
+              <div className="paper-divider" aria-hidden>
+                <span className="paper-rule__dot" />
+              </div>
+            ) : null}
             <PaperCategoryHead icon={category.icon} name={category.name} />
             {category.description ? <p className="paper-category__note text-sm">{category.description}</p> : null}
 

@@ -885,6 +885,8 @@ export type BusinessDisplay = {
   business_id: string;
   name: string;
   token: string;
+  /** Къс код за bansko.now/tv/<code>; null само за редове отпреди миграцията. */
+  short_code: string | null;
   template: BusinessDisplayTemplate;
   theme: BusinessDisplayTheme;
   media_id: string | null;
@@ -1418,6 +1420,7 @@ export type Database = {
     Views: Record<string, never>;
     Functions: {
       display_by_token: { Args: { p_token: string }; Returns: Json };
+      display_token_by_code: { Args: { p_code: string }; Returns: string | null };
       display_version: { Args: { p_token: string }; Returns: string | null };
       register_login_attempt: { Args: { p_email_hash: string; p_ip_hash: string }; Returns: boolean };
     };

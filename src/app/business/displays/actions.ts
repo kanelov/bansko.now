@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
-import { generateDisplayToken } from "@/lib/business-platform/displays";
+import { generateDisplayToken, generateShortCode } from "@/lib/business-platform/displays";
 import {
   businessMediaConfigured,
   businessMediaUrls,
@@ -95,7 +95,7 @@ export async function saveDisplayAction(formData: FormData) {
   } else {
     const { data, error } = await supabase
       .from("business_displays")
-      .insert({ ...values, business_id: business.businessId, token: generateDisplayToken() })
+      .insert({ ...values, business_id: business.businessId, token: generateDisplayToken(), short_code: generateShortCode() })
       .select("id")
       .single();
     if (error || !data) redirect(withError(formPath, "save"));
@@ -145,7 +145,7 @@ export async function regenerateDisplayTokenAction(formData: FormData) {
 
   const { error } = await supabase
     .from("business_displays")
-    .update({ token: generateDisplayToken() })
+    .update({ token: generateDisplayToken(), short_code: generateShortCode() })
     .eq("id", id)
     .eq("business_id", business.businessId);
   if (error) redirect(withError(`${displaysPath}/${id}`, "save"));

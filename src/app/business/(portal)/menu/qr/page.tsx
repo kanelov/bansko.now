@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import QRCode from "qrcode";
 import { PrintButton } from "@/components/business/print-button";
 import { portalUi } from "@/components/business/ui";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
+import { qrPngDataUrl, qrSvg } from "@/lib/business-platform/qr";
 import { siteUrl } from "@/lib/env";
 
 export const metadata: Metadata = {
@@ -15,7 +15,8 @@ export default async function MenuQrPage() {
   const { business } = await requireBusinessOwner();
   const menuUrl = `${siteUrl}/places/${business.slug}/menu`;
   const qrTarget = `${menuUrl}?src=qr`;
-  const png = await QRCode.toDataURL(qrTarget, { width: 1024, margin: 2, color: { dark: "#171611", light: "#ffffff" } });
+  const [png, svg] = [await qrPngDataUrl(qrTarget, 1024), qrSvg(qrTarget, { light: null })];
+  const svgHref = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 
   return (
     <div className="grid gap-6">
@@ -23,7 +24,7 @@ export default async function MenuQrPage() {
         <p className={portalUi.eyebrow}>Меню</p>
         <h1 className={portalUi.h1}>QR код за менюто</h1>
         <p className="mt-2 max-w-xl text-sm text-stone-650">
-          Гостът го сканира с телефона и вижда менюто с актуалните цени. Кодът не се сменя — каквото промениш в „Меню“, е вътре.
+          Гостът го сканира с телефона и вижда менюто с актуалните цени. Кодът не се сменя — каквото промениш в „Меню“, е вътре. Зеленият код с листото се чете като всеки друг; за печатница вземи SVG-то.
         </p>
       </header>
 
@@ -39,6 +40,9 @@ export default async function MenuQrPage() {
         <div className="flex flex-wrap justify-center gap-2 print:hidden">
           <a href={png} download={`qr-menu-${business.slug}.png`} className={portalUi.primaryButton}>
             Свали PNG
+          </a>
+          <a href={svgHref} download={`qr-menu-${business.slug}.svg`} className={portalUi.secondaryButton}>
+            Свали SVG (за печатница)
           </a>
           <PrintButton className={portalUi.secondaryButton}>Печатай лист</PrintButton>
           <Link href={menuUrl} target="_blank" rel="noopener" className={portalUi.secondaryButton}>

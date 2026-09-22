@@ -16,6 +16,7 @@ const openWhileClosed = [
   "/admin",
   "/business",
   "/display",
+  "/tv",
   "/api",
   "/coming-soon",
   "/fonts",
@@ -25,7 +26,7 @@ const openWhileClosed = [
 ];
 
 /** Адреси без език в пътя: не се пренаписват към /bg. */
-const localeFree = ["/en", "/api", "/business", "/display", "/fonts", "/coming-soon", "/sitemap.xml", "/robots.txt", "/icon.svg"];
+const localeFree = ["/en", "/api", "/business", "/display", "/tv", "/fonts", "/coming-soon", "/sitemap.xml", "/robots.txt", "/icon.svg"];
 
 /** Сесията на Supabase се опреснява само там, където има вход. */
 const sessionPaths = ["/admin", "/business"];

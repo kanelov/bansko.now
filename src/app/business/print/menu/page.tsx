@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import QRCode from "qrcode";
 import "@/styles/menu-paper.css";
 import "@/styles/print-menu.css";
 import { PrintButton } from "@/components/business/print-button";
@@ -8,6 +7,7 @@ import { PaperCategoryHead, PaperMenuHead } from "@/components/public/paper-menu
 import { portalUi } from "@/components/business/ui";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
 import { getPortalBusiness } from "@/lib/business-platform/business";
+import { qrSvg } from "@/lib/business-platform/qr";
 import { variantColumnsFor } from "@/lib/business-platform/display-layout";
 import { businessMediaUrls } from "@/lib/business-platform/media";
 import { getBusinessMenu, type MenuCategory, type MenuItem } from "@/lib/business-platform/menu";
@@ -152,7 +152,7 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
   const bgSlug = translations.data?.find((row) => row.locale === "bg")?.slug ?? business.slug;
   const enSlug = translations.data?.find((row) => row.locale === "en")?.slug ?? null;
   const menuPath = options.language === "en" && enSlug ? `/en/places/${enSlug}/menu` : `/places/${bgSlug}/menu`;
-  const qrSvg = options.qr ? await QRCode.toString(`${siteUrl}${menuPath}?src=print`, { type: "svg", margin: 0, errorCorrectionLevel: "M" }) : null;
+  const qrMarkup = options.qr ? qrSvg(`${siteUrl}${menuPath}?src=print`, { margin: 0, light: null, dark: "#183b2a" }) : null;
 
   const labels =
     options.language === "en"
@@ -230,10 +230,10 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
               {portal?.phone ? <p>{portal.phone}</p> : null}
               <p className="print-foot__muted">{labels.prices}</p>
             </div>
-            {qrSvg ? (
+            {qrMarkup ? (
               <div className="print-qr">
                 <span className="print-foot__muted">{labels.scan}</span>
-                <span className="print-qr__code" dangerouslySetInnerHTML={{ __html: qrSvg }} />
+                <span className="print-qr__code" dangerouslySetInnerHTML={{ __html: qrMarkup }} />
               </div>
             ) : null}
           </footer>

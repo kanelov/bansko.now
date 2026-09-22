@@ -110,8 +110,12 @@ body.display {
   padding-right: 0;
 }
 
+.display-root {
+  --paper-heading-font: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+}
+
 .display-category {
-  margin-bottom: 1.2em;
+  margin-bottom: 2.1em;
 }
 
 .display-category .paper-category__head {

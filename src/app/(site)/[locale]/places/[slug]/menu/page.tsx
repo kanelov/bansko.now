@@ -87,27 +87,36 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
         </div>
       </div>
 
+      {/* Лепкавата лента е нарочно в друг цвят от хартията: тъмнозелена, с езика най-отпред. */}
       {menu.categories.length > 1 || alternate ? (
-        <nav
-          aria-label={labels.menu}
-          className="sticky top-0 z-10 mt-5 border-b border-[var(--paper-hair)] backdrop-blur"
-          style={{ background: "rgba(244, 238, 226, 0.94)" }}
-        >
-          <div className="mx-auto flex max-w-2xl gap-2 overflow-x-auto px-4 py-2.5 sm:px-6">
+        <nav aria-label={labels.menu} className="sticky top-0 z-10 mt-5 bg-forest text-white shadow-[0_6px_18px_rgba(24,59,42,0.25)]">
+          <div className="mx-auto flex max-w-2xl items-center gap-2 overflow-x-auto px-4 py-2.5 sm:px-6">
             {alternate ? (
-              <Link
-                href={localePath(alternateLocale, `/places/${alternate.slug}/menu`)}
-                hrefLang={alternateLocale}
-                className="flex-none rounded-full border border-[var(--paper-accent)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--paper-accent)]"
-              >
-                {labels.switch}
-              </Link>
+              <span className="flex flex-none items-center rounded-full border border-white/40 p-0.5 text-[11px] font-bold uppercase tracking-[0.12em]" aria-label={locale === "en" ? "Language" : "Език"}>
+                {(["bg", "en"] as Locale[]).map((option) =>
+                  option === locale ? (
+                    <span key={option} className="rounded-full bg-white px-2.5 py-1 text-forest" aria-current="true">
+                      {option.toUpperCase()}
+                    </span>
+                  ) : (
+                    <Link
+                      key={option}
+                      href={localePath(option, `/places/${alternate.slug}/menu`)}
+                      hrefLang={option}
+                      className="rounded-full px-2.5 py-1 text-white/85 hover:text-white"
+                    >
+                      {option.toUpperCase()}
+                    </Link>
+                  )
+                )}
+              </span>
             ) : null}
+            {alternate ? <span className="mx-1 h-5 w-px flex-none bg-white/30" aria-hidden /> : null}
             {menu.categories.map((category) => (
               <a
                 key={category.id}
                 href={`#menu-${category.id}`}
-                className="flex-none rounded-full border border-[var(--paper-line)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--paper-ink)]"
+                className="flex-none rounded-full border border-white/35 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white hover:bg-white hover:text-forest"
               >
                 {category.name}
               </a>

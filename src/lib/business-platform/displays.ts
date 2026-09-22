@@ -37,6 +37,27 @@ export function displayUrl(token: string) {
   return `${siteUrl}/display/${token}`;
 }
 
+/* 5 знака без объркващи (0/O, 1/l/I): ~28 милиона комбинации, лесни за писане с дистанционно. */
+const shortCodeAlphabet = "abcdefghjkmnpqrstuvwxyz23456789";
+
+export function generateShortCode() {
+  const bytes = randomBytes(5);
+  return Array.from(bytes, (byte) => shortCodeAlphabet[byte % shortCodeAlphabet.length]).join("");
+}
+
+/** Късият адрес за телевизора, без https:// - така се показва и така се пише на телевизора. */
+export function shortDisplayAddress(code: string) {
+  return `${siteUrl.replace(/^https?:\/\//, "")}/tv/${code}`;
+}
+
+/** Токенът по къс код (за /tv/<code>). null = няма такъв / спрян / модулът е изключен. */
+export async function getDisplayTokenByCode(code: string): Promise<string | null> {
+  const supabase = createPublicSupabaseClient();
+  if (!supabase || !/^[a-z0-9]{4,12}$/i.test(code)) return null;
+  const { data } = await supabase.rpc("display_token_by_code", { p_code: code.toLowerCase() });
+  return typeof data === "string" && data ? data : null;
+}
+
 /** Екранът е „онлайн“, когато е питал за версията през последните 3 минути. */
 export function isDisplayOnline(lastSeenAt: string | null, now = Date.now()) {
   return Boolean(lastSeenAt) && now - new Date(lastSeenAt as string).getTime() < 3 * 60 * 1000;

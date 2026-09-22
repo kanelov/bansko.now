@@ -4,7 +4,7 @@ import { ConfirmButton } from "@/components/business/confirm-button";
 import { DisplayMediaField } from "@/components/business/display-media-field";
 import { DisplayPreview } from "@/components/business/display-preview";
 import { portalUi } from "@/components/business/ui";
-import { displayThemes, displayUrl, type DisplayForEdit, type DisplayMediaOption } from "@/lib/business-platform/displays";
+import { displayThemes, displayUrl, shortDisplayAddress, type DisplayForEdit, type DisplayMediaOption } from "@/lib/business-platform/displays";
 import type { MenuCategoryOption } from "@/lib/business-platform/menu";
 
 const errorMessages: Record<string, string> = {
@@ -73,11 +73,14 @@ export function DisplayForm({
 
           <div className="mt-5 grid gap-2 rounded-2xl border border-[var(--stone)] bg-paper px-4 py-3 text-sm">
             <p className="font-semibold">Адрес за телевизора</p>
-            <p className="break-all font-mono text-xs text-forest">{url}</p>
+            {display.short_code ? (
+              <p className="font-mono text-lg font-semibold tracking-wide text-forest">{shortDisplayAddress(display.short_code)}</p>
+            ) : null}
             <p className={portalUi.hint}>
-              Въвежда се веднъж в браузъра на телевизора (Samsung: „URL Launcher“; други: Android TV stick с kiosk браузър). В
-              „Помощ“ има стъпки.
+              Пише се веднъж в браузъра на телевизора (Samsung: „URL Launcher“; други: Android TV stick с kiosk браузър), с
+              малки букви. Телевизорът сам минава на дългия таен адрес по-долу. В „Помощ“ има стъпки.
             </p>
+            <p className="break-all font-mono text-[11px] text-stone-500">{url}</p>
             <div className="flex flex-wrap gap-2 pt-1">
               <a href={url} target="_blank" rel="noopener noreferrer" className={portalUi.smallButton}>
                 Отвори на цял екран
@@ -85,7 +88,7 @@ export function DisplayForm({
               <form action={regenerateDisplayTokenAction}>
                 <input type="hidden" name="business_id" value={businessId} />
                 <input type="hidden" name="id" value={display.id} />
-                <ConfirmButton message="Да сменя ли адреса? Старият спира веднага и трябва да въведеш новия в телевизора." className={portalUi.smallButton}>
+                <ConfirmButton message="Да сменя ли адреса? И късият, и дългият стават нови; старите спират веднага и трябва да въведеш новия в телевизора." className={portalUi.smallButton}>
                   Смени адреса
                 </ConfirmButton>
               </form>
