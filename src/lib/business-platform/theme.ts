@@ -34,6 +34,8 @@ export type BusinessTheme = {
   ornament: ThemeOrnament;
   /** business_media.id от вида 'logo'. */
   logo_media_id: string | null;
+  /** Иконката в средата на QR кода (Font Awesome име от qrIconGroups). */
+  qr_icon: string;
 };
 
 export type ThemeTokens = {
@@ -153,6 +155,20 @@ export const themeOrnaments: { value: ThemeOrnament; label: string }[] = [
   { value: "none", label: "Без орнамент" }
 ];
 
+/* Иконката в средата на QR кода: по типа на бизнеса. Групите са за списъка в портала. */
+export const qrIconGroups: { label: string; icons: { value: string; label: string }[] }[] = [
+  { label: "Общи", icons: [{ value: "leaf", label: "Листо (по подразбиране)" }, { value: "star", label: "Звезда" }, { value: "heart", label: "Сърце" }, { value: "store", label: "Магазин" }] },
+  { label: "Храна и напитки", icons: [{ value: "mug-saucer", label: "Кафе" }, { value: "utensils", label: "Ресторант" }, { value: "kitchen-set", label: "Кухня / готвене" }, { value: "pizza-slice", label: "Пица" }, { value: "burger", label: "Бургери" }, { value: "bread-slice", label: "Пекарна" }, { value: "cake-candles", label: "Сладкарница" }, { value: "ice-cream", label: "Сладолед" }, { value: "beer-mug-empty", label: "Бар / бира" }, { value: "wine-glass", label: "Вино" }, { value: "martini-glass-citrus", label: "Коктейл бар" }, { value: "champagne-glasses", label: "Клуб / събития" }, { value: "fire", label: "Скара / камина" }] },
+  { label: "Зима и планина", icons: [{ value: "person-skiing", label: "Ски" }, { value: "person-snowboarding", label: "Сноуборд" }, { value: "person-skiing-nordic", label: "Ски бягане" }, { value: "cable-car", label: "Лифт / кабинка" }, { value: "sleigh", label: "Шейни" }, { value: "snowflake", label: "Зима" }, { value: "mountain-sun", label: "Планина" }, { value: "mountain", label: "Връх" }, { value: "person-hiking", label: "Преходи" }, { value: "tree", label: "Гора / природа" }] },
+  { label: "Спорт и уелнес", icons: [{ value: "person-biking", label: "Колоездене" }, { value: "bicycle", label: "Велосипеди под наем" }, { value: "horse", label: "Езда" }, { value: "person-swimming", label: "Басейн" }, { value: "hot-tub-person", label: "Спа / джакузи" }, { value: "spa", label: "Масаж / уелнес" }, { value: "dumbbell", label: "Фитнес" }, { value: "umbrella-beach", label: "Почивка" }] },
+  { label: "Настаняване", icons: [{ value: "hotel", label: "Хотел" }, { value: "bed", label: "Стаи / нощувки" }, { value: "house", label: "Къща за гости" }, { value: "key", label: "Имоти / наеми" }] },
+  { label: "Красота и здраве", icons: [{ value: "scissors", label: "Фризьорски салон" }, { value: "hand-sparkles", label: "Маникюр / козметика" }, { value: "tooth", label: "Зъболекар" }, { value: "user-doctor", label: "Лекар" }, { value: "pills", label: "Аптека" }, { value: "paw", label: "Ветеринар / зоомагазин" }] },
+  { label: "Магазини", icons: [{ value: "bag-shopping", label: "Бутик" }, { value: "shirt", label: "Дрехи" }, { value: "gem", label: "Бижута" }, { value: "gift", label: "Подаръци / сувенири" }, { value: "seedling", label: "Био / зеленчуци" }, { value: "book-open", label: "Книжарница" }] },
+  { label: "Култура и забавления", icons: [{ value: "palette", label: "Арт / галерия" }, { value: "camera", label: "Фотограф" }, { value: "masks-theater", label: "Театър / култура" }, { value: "music", label: "Музика" }, { value: "gamepad", label: "Игри / забавления" }, { value: "child", label: "За деца" }, { value: "ticket", label: "Билети / атракции" }, { value: "graduation-cap", label: "Обучение" }] },
+  { label: "Транспорт и услуги", icons: [{ value: "car", label: "Рент-а-кар" }, { value: "taxi", label: "Такси" }, { value: "van-shuttle", label: "Трансфер" }, { value: "bus", label: "Автобус / екскурзии" }, { value: "motorcycle", label: "Мото / ATV" }, { value: "suitcase-rolling", label: "Туристическа агенция" }, { value: "wrench", label: "Сервиз" }, { value: "truck-fast", label: "Доставки" }, { value: "spray-can-sparkles", label: "Почистване" }] }
+];
+const qrIconIds = qrIconGroups.flatMap((group) => group.icons.map((icon) => icon.value));
+
 const presetIds = Object.keys(themePresets) as ThemePresetId[];
 const headingFontIds: HeadingFont[] = ["georgia", "playfair", "lora", "inter", "montserrat"];
 const bodyFontIds: BodyFont[] = ["inter", "montserrat", "lora"];
@@ -173,7 +189,8 @@ export const defaultTheme: BusinessTheme = {
   body_font: "inter",
   grain: true,
   ornament: "leaf",
-  logo_media_id: null
+  logo_media_id: null,
+  qr_icon: "leaf"
 };
 
 function oneOf<T extends string>(value: unknown, allowed: readonly T[], fallback: T): T {
@@ -202,7 +219,8 @@ export function resolveTheme(raw: unknown): BusinessTheme {
     body_font: oneOf(source.body_font, bodyFontIds, preset.body_font),
     grain: typeof source.grain === "boolean" ? source.grain : preset.grain,
     ornament: oneOf(source.ornament, ornamentIds, defaultTheme.ornament),
-    logo_media_id: typeof source.logo_media_id === "string" && uuidPattern.test(source.logo_media_id) ? source.logo_media_id.toLowerCase() : null
+    logo_media_id: typeof source.logo_media_id === "string" && uuidPattern.test(source.logo_media_id) ? source.logo_media_id.toLowerCase() : null,
+    qr_icon: oneOf(source.qr_icon, qrIconIds, defaultTheme.qr_icon)
   };
 }
 
@@ -218,7 +236,8 @@ export function serializeTheme(theme: BusinessTheme): Record<string, unknown> {
     body_font: clean.body_font,
     grain: clean.grain,
     ornament: clean.ornament,
-    logo_media_id: clean.logo_media_id
+    logo_media_id: clean.logo_media_id,
+    qr_icon: clean.qr_icon
   };
 }
 

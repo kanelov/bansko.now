@@ -155,7 +155,7 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
   const enSlug = translations.data?.find((row) => row.locale === "en")?.slug ?? null;
   const menuPath = options.language === "en" && enSlug ? `/en/places/${enSlug}/menu` : `/places/${bgSlug}/menu`;
   /* QR кодът в цвета на темата (акцент или текст), винаги достатъчно тъмен на бяло. */
-  const qrMarkup = options.qr ? qrSvg(`${siteUrl}${menuPath}?src=print`, { margin: 0, light: null, dark: qrColorFor(branding.theme) }) : null;
+  const qrMarkup = options.qr ? qrSvg(`${siteUrl}${menuPath}?src=print`, { margin: 0, light: null, dark: qrColorFor(branding.theme), icon: branding.theme.qr_icon }) : null;
   const logoSrc = branding.logo?.w960 ?? branding.logo?.original ?? null;
 
   const labels =

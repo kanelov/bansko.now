@@ -54,7 +54,8 @@ export async function saveBrandingAction(formData: FormData) {
     body_font: stringValue(formData, "body_font") || undefined,
     grain: boolValue(formData, "grain"),
     ornament: stringValue(formData, "ornament"),
-    logo_media_id: stringValue(formData, "logo_media_id") || null
+    logo_media_id: stringValue(formData, "logo_media_id") || null,
+    qr_icon: stringValue(formData, "qr_icon")
   });
 
   /* Ръчни цветове, които не се четат (тъмен фон с тъмен текст, блед акцент), не се записват. */

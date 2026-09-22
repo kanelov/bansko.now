@@ -19,7 +19,8 @@ export default async function MenuQrPage() {
   /* Цветът на кода следва темата на бизнеса (акцентът, ако е достатъчно тъмен на бяло). */
   const { theme } = await getBusinessTheme(supabase, business.businessId);
   const dark = qrColorFor(theme);
-  const [png, svg] = [await qrPngDataUrl(qrTarget, 1024, { dark }), qrSvg(qrTarget, { light: null, dark })];
+  const icon = theme.qr_icon;
+  const [png, svg] = [await qrPngDataUrl(qrTarget, 1024, { dark, icon }), qrSvg(qrTarget, { light: null, dark, icon })];
   const svgHref = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 
   return (

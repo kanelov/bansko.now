@@ -15,6 +15,7 @@ import {
   resolvedTokens,
   themeClassName,
   themeOrnaments,
+  qrIconGroups,
   themePresetList,
   themePresets,
   themeStyle,
@@ -249,7 +250,47 @@ export function BrandingForm({
           </p>
         </fieldset>
 
-        {/* 5. Хартия */}
+        {/* 5. Иконка в QR кода */}
+        <fieldset className={portalUi.card + " grid gap-4"}>
+          <legend className="sr-only">Иконка в QR кода</legend>
+          <div>
+            <h2 className={portalUi.h2}>Иконка в QR кода</h2>
+            <p className="mt-1 text-sm text-stone-650">
+              Малката иконка в средата на QR кода: чаша за кафене, ножица за фризьорски салон, ски за ски училище. Кодът се чете еднакво добре с всяка.
+            </p>
+          </div>
+          <label className={portalUi.label}>
+            <span>Иконка</span>
+            <select id="brand-qr-icon" name="qr_icon" defaultValue={theme.qr_icon} className={portalUi.input}>
+              {qrIconGroups.map((group) => (
+                <optgroup key={group.label} label={group.label}>
+                  {group.icons.map((icon) => (
+                    <option key={icon.value} value={icon.value}>
+                      {icon.label}
+                    </option>
+                  ))}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+          <div className="flex flex-wrap gap-2 text-forest" aria-hidden>
+            {qrIconGroups.flatMap((group) => group.icons).map((icon) => (
+              <span
+                key={icon.value}
+                title={icon.label}
+                className={
+                  "inline-flex h-9 w-9 items-center justify-center rounded-full border bg-white " +
+                  (icon.value === theme.qr_icon ? "border-forest ring-2 ring-forest/30" : "border-[var(--stone)]")
+                }
+              >
+                <IconGlyph name={icon.value} className="h-4 w-4" />
+              </span>
+            ))}
+          </div>
+          <p className={portalUi.hint}>Сегашната е с рамка. Промяната се вижда в „QR код“ след „Запази бранда“.</p>
+        </fieldset>
+
+        {/* 6. Хартия */}
         <div className={portalUi.card + " grid gap-3"}>
           <label className="flex items-start gap-3 text-sm">
             <input
@@ -269,7 +310,7 @@ export function BrandingForm({
           </label>
         </div>
 
-        {/* 6. Запис */}
+        {/* 7. Запис */}
         <div className="flex flex-wrap items-center gap-3">
           <button className={portalUi.primaryButton}>Запази бранда</button>
           <span className={portalUi.hint}>

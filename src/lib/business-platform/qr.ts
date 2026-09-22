@@ -13,8 +13,9 @@ export type QrStyle = {
   dark?: string;
   /** Фон под кода (null = прозрачен). */
   light?: string | null;
-  /** Листото в средата. */
+  /** Иконка в средата (Font Awesome име, регистрирано в icon-glyph.tsx); листо по подразбиране. */
   logo?: boolean;
+  icon?: string;
   /** Тихо поле в модули. */
   margin?: number;
 };
@@ -39,6 +40,8 @@ function finderEye(x: number, y: number, dark: string, light: string | null) {
 
 export function qrSvg(text: string, style: QrStyle = {}) {
   const { dark, light, logo, margin } = { ...defaults, ...style };
+  /* Непозната иконка не чупи кода: пада на листото. */
+  const iconMarkup = (style.icon && iconSvgMarkup(style.icon)) || iconSvgMarkup("leaf");
   const code = QRCode.create(text, { errorCorrectionLevel: logo ? "H" : "M" });
   const size = code.modules.size;
   const total = size + margin * 2;
@@ -65,7 +68,7 @@ export function qrSvg(text: string, style: QrStyle = {}) {
   parts.push(finderEye(margin, margin + size - 7, dark, light));
 
   if (logo) {
-    const leaf = iconSvgMarkup("leaf").replace("<svg ", `<svg x="${center - logoRadius * 0.55}" y="${center - logoRadius * 0.55}" width="${logoRadius * 1.1}" height="${logoRadius * 1.1}" color="${dark}" `);
+    const leaf = iconMarkup.replace("<svg ", `<svg x="${center - logoRadius * 0.55}" y="${center - logoRadius * 0.55}" width="${logoRadius * 1.1}" height="${logoRadius * 1.1}" color="${dark}" `);
     parts.push(`<circle cx="${center}" cy="${center}" r="${logoRadius}" fill="${light ?? "#ffffff"}"/>`);
     parts.push(`<circle cx="${center}" cy="${center}" r="${logoRadius - 0.35}" fill="none" stroke="${dark}" stroke-width="0.35"/>`);
     parts.push(leaf);
