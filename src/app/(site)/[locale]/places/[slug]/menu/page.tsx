@@ -7,7 +7,7 @@ import { BusinessMenuList } from "@/components/public/business-menu-list";
 import { OpeningStatusPill } from "@/components/public/opening-status-pill";
 import { PaperMenuHead } from "@/components/public/paper-menu";
 import { getOpeningStatus } from "@/lib/business-platform/hours";
-import { getBusinessMenu } from "@/lib/business-platform/menu";
+import { getBusinessIdsWithPublicMenu, getBusinessMenu } from "@/lib/business-platform/menu";
 import { getApprovedBusinessTranslation, getBusinessBySlug } from "@/lib/businesses";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
@@ -21,6 +21,21 @@ import type { Locale } from "@/lib/types";
 export const revalidate = 900;
 
 type Params = Promise<{ locale: string; slug: string }>;
+
+/**
+ * Менютата се построяват при деплой (и на 15 минути после), за да е смяната на
+ * езика и първото отваряне от QR кода мигновени от CDN-а, без рендер и без
+ * заявки към базата за всеки гост. Нов бизнес се рендерира при първото
+ * отваряне (dynamicParams е включен по подразбиране).
+ */
+export async function generateStaticParams() {
+  const supabase = createPublicSupabaseClient();
+  if (!supabase) return [];
+  const ids = await getBusinessIdsWithPublicMenu();
+  if (ids.size === 0) return [];
+  const { data } = await supabase.from("business_translations").select("business_id, locale, slug").in("business_id", [...ids]);
+  return (data ?? []).filter((row) => isLocale(row.locale)).map((row) => ({ locale: row.locale, slug: row.slug }));
+}
 
 export async function generateMetadata({ params }: { params: Params }): Promise<Metadata> {
   const { locale, slug } = await params;
@@ -79,6 +94,8 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
 
   return (
     <div className="paper font-portal min-h-screen">
+      {/* Скокът към категория е мигновен: глобалният smooth scroll би влачил през цялото меню. */}
+      <style>{"html{scroll-behavior:auto}"}</style>
       {/* Горе стои само лентата с категориите (и EN); заглавието е в самото меню, като на хартия. */}
       <div className="mx-auto max-w-2xl px-4 pt-8 sm:px-6">
         <PaperMenuHead title={business.name} subtitle={labels.menu} className="qr-head" />
@@ -90,7 +107,7 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
       {/* Лепкавата лента е нарочно в друг цвят от хартията: тъмнозелена, с езика най-отпред. */}
       {menu.categories.length > 1 || alternate ? (
         <nav aria-label={labels.menu} className="sticky top-0 z-10 mt-5 bg-forest text-white shadow-[0_6px_18px_rgba(24,59,42,0.25)]">
-          <div className="mx-auto flex max-w-2xl items-center gap-2 overflow-x-auto px-4 py-2.5 sm:px-6">
+          <div className="mx-auto flex max-w-2xl items-center gap-2 overflow-x-auto px-4 py-2.5 [scrollbar-width:none] sm:px-6 [&::-webkit-scrollbar]:hidden">
             {alternate ? (
               <span className="flex flex-none items-center rounded-full border border-white/40 p-0.5 text-[11px] font-bold uppercase tracking-[0.12em]" aria-label={locale === "en" ? "Language" : "Език"}>
                 {(["bg", "en"] as Locale[]).map((option) =>
@@ -99,14 +116,14 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
                       {option.toUpperCase()}
                     </span>
                   ) : (
-                    <Link
+                    <a
                       key={option}
                       href={localePath(option, `/places/${alternate.slug}/menu`)}
                       hrefLang={option}
                       className="rounded-full px-2.5 py-1 text-white/85 hover:text-white"
                     >
                       {option.toUpperCase()}
-                    </Link>
+                    </a>
                   )
                 )}
               </span>
