@@ -1,10 +1,12 @@
 /*
  * Подредбата на телевизора. Видът на заглавието, категориите и редовете идва от
- * menu-paper.css (общ с QR менюто и печата); тук са само екранът, колоните и
- * размерите. Нарочно без Tailwind 4: браузърът на Samsung Tizen е Chromium
- * 85/94 и не знае @property, color-mix() и @layer. Само grid, flex, clamp() и
- * vh - размерите са спрямо височината на екрана, така че Full HD и 4K изглеждат
- * еднакво. Без aspect-ratio, inset, :has(), container queries.
+ * menu-paper.css (общ с QR менюто и печата), а цветовете и шрифтовете - от
+ * темата на бизнеса (inline променливи на .display-root, theme.ts); тук са
+ * само екранът, колоните и размерите. Нарочно без Tailwind 4: браузърът на
+ * Samsung Tizen е Chromium 85/94 и не знае @property, color-mix() и @layer.
+ * Само grid, flex, clamp() и vh - размерите са спрямо височината на екрана,
+ * така че Full HD и 4K изглеждат еднакво. Без aspect-ratio, inset, :has(),
+ * container queries.
  */
 
 html,
@@ -82,6 +84,12 @@ body.display {
   height: 2.6vh;
 }
 
+/* Логото на бизнеса вместо листото: спрямо височината на екрана, като всичко тук. */
+.display-head .paper-ornament__logo {
+  height: 6vh;
+  max-width: 40vh;
+}
+
 .display-status {
   display: block;
   margin-top: 0.9vh;
@@ -104,14 +112,11 @@ body.display {
   flex: 1 1 0;
   min-width: 0;
   padding-right: 3.5vh;
+  padding-bottom: 0.5em;
 }
 
 .display-column:last-child {
   padding-right: 0;
-}
-
-.display-root {
-  --paper-heading-font: "Playfair Display Variable", "Playfair Display", Georgia, serif;
 }
 
 .display-category {

@@ -738,6 +738,8 @@ export type BusinessPlatformSettings = {
   plan: string;
   open_override: BusinessOpenOverride;
   content_version: number;
+  /** Темата на бизнеса (src/lib/business-platform/theme.ts); чете се само през resolveTheme(). */
+  branding: Json;
   created_at: string;
   updated_at: string;
 };

@@ -13,6 +13,7 @@ import { businessMediaUrls } from "@/lib/business-platform/media";
 import { getBusinessMenu, type MenuCategory, type MenuItem } from "@/lib/business-platform/menu";
 import { formatPrice } from "@/lib/business-platform/money";
 import { parsePrintOptions, printColumnCount, sheetDimensions, type PrintLanguage } from "@/lib/business-platform/print";
+import { getBusinessTheme, qrColorFor, themeClassName, themeStyle } from "@/lib/business-platform/theme";
 import { siteUrl } from "@/lib/env";
 
 /**
@@ -125,7 +126,7 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
   const options = parsePrintOptions(await searchParams);
   const { supabase, business } = await requireBusinessOwner();
 
-  const [portal, menu, translations, background] = await Promise.all([
+  const [portal, menu, translations, background, branding] = await Promise.all([
     getPortalBusiness(supabase, business.businessId),
     getBusinessMenu(supabase, business.businessId, {
       locale: options.language === "en" ? "en" : "bg",
@@ -140,7 +141,8 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
           .eq("id", options.backgroundId)
           .eq("media_type", "image")
           .maybeSingle()
-      : Promise.resolve({ data: null })
+      : Promise.resolve({ data: null }),
+    getBusinessTheme(supabase, business.businessId)
   ]);
 
   const categories = menu.categories.filter((category) => category.items.length > 0);
@@ -152,7 +154,9 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
   const bgSlug = translations.data?.find((row) => row.locale === "bg")?.slug ?? business.slug;
   const enSlug = translations.data?.find((row) => row.locale === "en")?.slug ?? null;
   const menuPath = options.language === "en" && enSlug ? `/en/places/${enSlug}/menu` : `/places/${bgSlug}/menu`;
-  const qrMarkup = options.qr ? qrSvg(`${siteUrl}${menuPath}?src=print`, { margin: 0, light: null, dark: "#183b2a" }) : null;
+  /* QR кодът в цвета на темата (акцент или текст), винаги достатъчно тъмен на бяло. */
+  const qrMarkup = options.qr ? qrSvg(`${siteUrl}${menuPath}?src=print`, { margin: 0, light: null, dark: qrColorFor(branding.theme) }) : null;
+  const logoSrc = branding.logo?.w960 ?? branding.logo?.original ?? null;
 
   const labels =
     options.language === "en"
@@ -161,10 +165,11 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
         ? { menu: "Меню · Menu", prices: "Цените са в евро с ДДС · Prices in euro, VAT included.", scan: "Актуално меню · Current menu", empty: "Менюто е празно." }
         : { menu: "Меню", prices: "Цените са в евро с включен ДДС.", scan: "Актуално меню", empty: "Менюто е празно." };
 
+  /* Темата на бизнеса дава цветовете и шрифтовете; „тъмен стил“ взима тъмния ѝ вариант. */
+  const dark = options.style === "dark";
   const sheetClass = [
     "print-sheet",
-    "paper",
-    options.style === "dark" ? "paper--dark" : "",
+    themeClassName(branding.theme, { dark }),
     sheet.width < 130 ? "print-sheet--narrow" : "",
     sheet.width >= 290 ? "print-sheet--large" : ""
   ]
@@ -195,6 +200,7 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
         className={sheetClass}
         style={
           {
+            ...themeStyle(branding.theme, { dark }),
             "--sheet-width": `${sheet.width}mm`,
             "--sheet-height": `${sheet.height}mm`,
             "--sheet-bleed": `${sheet.bleed}mm`,
@@ -211,7 +217,13 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
         ) : null}
 
         <div className="print-content">
-          <PaperMenuHead className="print-head" title={portal?.name ?? business.name} subtitle={labels.menu} />
+          <PaperMenuHead
+            className="print-head"
+            title={portal?.name ?? business.name}
+            subtitle={labels.menu}
+            ornament={branding.theme.ornament}
+            logo={logoSrc ? { src: logoSrc, alt: branding.logoAlt ?? portal?.name ?? business.name } : null}
+          />
 
           {categories.length === 0 ? (
             <p style={{ textAlign: "center" }}>{labels.empty}</p>

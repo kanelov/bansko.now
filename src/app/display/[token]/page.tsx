@@ -6,6 +6,7 @@ import { layoutDisplay } from "@/lib/business-platform/display-layout";
 import { getDisplayByToken } from "@/lib/business-platform/displays";
 import { getOpeningStatus } from "@/lib/business-platform/hours";
 import { getBusinessMenu } from "@/lib/business-platform/menu";
+import { themeClassName, themeStyle } from "@/lib/business-platform/theme";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
 
 /**
@@ -44,16 +45,26 @@ export default async function DisplayPage({ params, searchParams }: { params: Pa
 
   const withMedia = display.template !== "menu_only" && display.media !== null;
   const layout = layoutDisplay(categories, { showDescriptions: display.showDescriptions, maxColumns: withMedia ? 2 : 3 });
-  const rootClass = ["display-root", "paper", display.theme === "dark" ? "paper--dark" : "", withMedia ? "display-root--media" : ""].filter(Boolean).join(" ");
+  /* Темата на бизнеса (цветове, шрифтове, зърно) идва с екрана от display_by_token;
+     tv: true сменя Georgia с вградения Playfair, защото телевизорът няма Georgia. */
+  const dark = display.theme === "dark";
+  const rootClass = ["display-root", themeClassName(display.brand, { dark }), withMedia ? "display-root--media" : ""].filter(Boolean).join(" ");
+  const rootStyle = themeStyle(display.brand, { dark, tv: true });
+  const logoSrc = display.logo?.w960 ?? display.logo?.w480 ?? display.logo?.original ?? null;
   const isPreview = preview === "1";
 
   return (
     <>
       {isPreview ? null : <meta httpEquiv="refresh" content="21600" />}
-      <div id="display-root" className={rootClass} data-token={token} data-version={display.version} data-preview={isPreview ? "1" : "0"}>
+      <div id="display-root" className={rootClass} style={rootStyle} data-token={token} data-version={display.version} data-preview={isPreview ? "1" : "0"}>
         <div id="display-menu" className="display-menu">
           <div className="display-head">
-            <PaperMenuHead title={display.businessName} subtitle="Меню" />
+            <PaperMenuHead
+              title={display.businessName}
+              subtitle="Меню"
+              ornament={display.brand.ornament}
+              logo={logoSrc ? { src: logoSrc, alt: display.logoAlt ?? display.businessName } : null}
+            />
             {opening.label ? <span className="display-status">{opening.label}</span> : null}
           </div>
 

@@ -4,8 +4,9 @@
  * милиметрите. Файлът е PDF от същата страница („Запази като PDF“ в диалога за
  * печат). Размерът на листа (@page) идва от самата страница, защото зависи от
  * избора. print-color-adjust: exact пази хартиения фон, дори отметката
- * „Background graphics“ да е махната. Шрифтовете са вградените Playfair Display
- * + Inter (fonts.css) - Chromium ги влага в PDF-а и печатницата вижда същото.
+ * „Background graphics“ да е махната. Цветовете и шрифтовете идват от темата
+ * на бизнеса (inline променливи на .print-sheet, theme.ts); шрифтовете са
+ * вградените от fonts.css - Chromium ги влага в PDF-а и печатницата вижда същото.
  */
 
 .print-stage {
@@ -40,7 +41,7 @@
   overflow: hidden;
   -webkit-print-color-adjust: exact;
   print-color-adjust: exact;
-  font-family: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
+  font-family: var(--paper-body-font);
   font-size: 9.5pt;
   line-height: 1.35;
 }
@@ -59,17 +60,19 @@
   object-fit: cover;
 }
 
+/* Воалът над снимката е в цвета на хартията от темата, полупрозрачен чрез opacity. */
 .print-veil {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(244, 238, 226, 0.86);
+  background: var(--paper-bg);
+  opacity: 0.86;
 }
 
 .paper--dark .print-veil {
-  background: rgba(34, 27, 21, 0.8);
+  opacity: 0.8;
 }
 
 .print-content {
@@ -88,6 +91,16 @@
 .print-head .paper-ornament__icon {
   width: 7mm;
   height: 7mm;
+}
+
+.print-head .paper-ornament__logo {
+  height: 18mm;
+  max-width: 70mm;
+}
+
+.print-sheet--narrow .print-head .paper-ornament__logo {
+  height: 12mm;
+  max-width: 50mm;
 }
 
 .print-head .paper-title {

@@ -4,6 +4,7 @@ import { PrintButton } from "@/components/business/print-button";
 import { portalUi } from "@/components/business/ui";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
 import { qrPngDataUrl, qrSvg } from "@/lib/business-platform/qr";
+import { getBusinessTheme, qrColorFor } from "@/lib/business-platform/theme";
 import { siteUrl } from "@/lib/env";
 
 export const metadata: Metadata = {
@@ -12,10 +13,13 @@ export const metadata: Metadata = {
 
 /** QR кодът сочи към българското меню; страницата има превключвател към английски. */
 export default async function MenuQrPage() {
-  const { business } = await requireBusinessOwner();
+  const { supabase, business } = await requireBusinessOwner();
   const menuUrl = `${siteUrl}/places/${business.slug}/menu`;
   const qrTarget = `${menuUrl}?src=qr`;
-  const [png, svg] = [await qrPngDataUrl(qrTarget, 1024), qrSvg(qrTarget, { light: null })];
+  /* Цветът на кода следва темата на бизнеса (акцентът, ако е достатъчно тъмен на бяло). */
+  const { theme } = await getBusinessTheme(supabase, business.businessId);
+  const dark = qrColorFor(theme);
+  const [png, svg] = [await qrPngDataUrl(qrTarget, 1024, { dark }), qrSvg(qrTarget, { light: null, dark })];
   const svgHref = `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
 
   return (
@@ -24,7 +28,7 @@ export default async function MenuQrPage() {
         <p className={portalUi.eyebrow}>Меню</p>
         <h1 className={portalUi.h1}>QR код за менюто</h1>
         <p className="mt-2 max-w-xl text-sm text-stone-650">
-          Гостът го сканира с телефона и вижда менюто с актуалните цени. Кодът не се сменя — каквото промениш в „Меню“, е вътре. Зеленият код с листото се чете като всеки друг; за печатница вземи SVG-то.
+          Гостът го сканира с телефона и вижда менюто с актуалните цени. Кодът не се сменя — каквото промениш в „Меню“, е вътре. Цветът му е от темата на бизнеса („Брандиране“), а кодът с листото се чете като всеки друг; за печатница вземи SVG-то.
         </p>
       </header>
 

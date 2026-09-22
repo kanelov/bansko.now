@@ -153,6 +153,14 @@ export default async function BusinessDashboardPage({
         <h2 className="font-display text-xl font-semibold">Модули</h2>
         <p className="mt-2 text-sm text-stone-650">Кое е включено за този бизнес. Включването и изключването е от Bansko NOW.</p>
 
+        <p className="mt-2 text-sm text-stone-650">
+          Лого, цветове и шрифтове за QR менюто, екраните и печата се задават в{" "}
+          <Link href="/business/branding" className="font-semibold text-forest underline-offset-4 hover:underline">
+            „Бранд“
+          </Link>
+          .
+        </p>
+
         {enabledModules.length === 0 ? (
           <p className="mt-4 text-sm">Още няма включени модули.</p>
         ) : (

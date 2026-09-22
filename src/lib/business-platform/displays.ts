@@ -2,6 +2,7 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { businessMediaUrls, type BusinessMediaUrls } from "@/lib/business-platform/media";
+import { resolveTheme, type BusinessTheme } from "@/lib/business-platform/theme";
 import { siteUrl } from "@/lib/env";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
@@ -173,6 +174,11 @@ export type PublicDisplay = {
   version: string;
   categoryIds: string[];
   media: { mediaType: BusinessMediaType; alt: string | null; urls: BusinessMediaUrls } | null;
+  /** Темата на бизнеса (цветове, шрифтове, орнамент) - обща за QR менюто, телевизора и печата. */
+  brand: BusinessTheme;
+  /** Логото от темата (business_media от вида 'logo'), ако е избрано и съществува. */
+  logo: BusinessMediaUrls | null;
+  logoAlt: string | null;
 };
 
 type DisplayPayload = {
@@ -187,6 +193,8 @@ type DisplayPayload = {
   content_version: number;
   category_ids: string[];
   media: { media_type: BusinessMediaType; original_key: string; variant_keys: Json; alt: string | null } | null;
+  branding?: Json;
+  logo?: { original_key: string; variant_keys: Json; alt: string | null } | null;
 };
 
 export function displayVersionString(contentVersion: number, updatedAt: string) {
@@ -220,7 +228,10 @@ export async function getDisplayByToken(token: string): Promise<PublicDisplay | 
     categoryIds: Array.isArray(payload.category_ids) ? payload.category_ids : [],
     media: payload.media
       ? { mediaType: payload.media.media_type, alt: payload.media.alt, urls: businessMediaUrls({ original_key: payload.media.original_key, variant_keys: payload.media.variant_keys }) }
-      : null
+      : null,
+    brand: resolveTheme(payload.branding),
+    logo: payload.logo ? businessMediaUrls({ original_key: payload.logo.original_key, variant_keys: payload.logo.variant_keys }) : null,
+    logoAlt: payload.logo?.alt ?? null
   };
 }
 

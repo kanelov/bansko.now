@@ -8,9 +8,15 @@
  */
 
 .paper {
+  /* Стойностите тук са подразбирането („Хартия“). Темата на бизнеса
+     (src/lib/business-platform/theme.ts, themeStyle()) ги презаписва като
+     inline style на същия елемент - inline побеждава класа. */
   /* Заглавията: шрифтът на заглавията на Bansko NOW (Georgia); телевизорът няма
      Georgia и там display.css слага вградения Playfair Display на първо място. */
   --paper-heading-font: Georgia, "Playfair Display Variable", "Playfair Display", "Times New Roman", serif;
+  /* Голямото заглавие с разредени главни букви и подзаглавието. */
+  --paper-title-font: "Playfair Display Variable", "Playfair Display", Georgia, "Times New Roman", serif;
+  --paper-body-font: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
   --paper-bg: #f4eee2;
   --paper-ink: #2a2319;
   --paper-muted: #6f6355;
@@ -18,9 +24,16 @@
   --paper-line: rgba(90, 70, 50, 0.34);
   --paper-hair: rgba(90, 70, 50, 0.14);
   --paper-badge: #b2543a;
+  /* Залепената лента в QR менюто: малко по-светла от хартията. */
+  --paper-bar: #f8f3ea;
+  /* Текст върху акцента (активният език, „Обади се“); темата слага фона/текста си, ако бялото не се чете. */
+  --paper-on-accent: #ffffff;
+  /* Зърното на хартията; темата слага none, когато е изключено. */
+  --paper-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.27 0 0 0 0 0.18 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
   background-color: var(--paper-bg);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.27 0 0 0 0 0.18 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-image: var(--paper-grain, url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.27 0 0 0 0 0.18 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E"));
   color: var(--paper-ink);
+  font-family: var(--paper-body-font);
 }
 
 .paper--dark {
@@ -30,6 +43,9 @@
   --paper-accent: #c9a57f;
   --paper-line: rgba(235, 215, 185, 0.34);
   --paper-hair: rgba(235, 215, 185, 0.14);
+  --paper-bar: #2a221b;
+  /* Светъл кехлибарен акцент: бялото не се чете върху него, тъмният фон - да. */
+  --paper-on-accent: #221b15;
 }
 
 /* Заглавие: орнамент, името с разредени главни букви, линия с точка по средата */
@@ -49,8 +65,18 @@
   vertical-align: top;
 }
 
+/* Логото на бизнеса вместо листото: височина в em, за да расте с изгледа. */
+.paper-ornament__logo {
+  display: inline-block;
+  height: 3.2em;
+  width: auto;
+  max-width: 14em;
+  object-fit: contain;
+  vertical-align: top;
+}
+
 .paper-title {
-  font-family: "Playfair Display Variable", "Playfair Display", Georgia, "Times New Roman", serif;
+  font-family: var(--paper-title-font);
   font-weight: 500;
   letter-spacing: 0.22em;
   text-transform: uppercase;
@@ -83,7 +109,7 @@
 }
 
 .paper-subtitle {
-  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  font-family: var(--paper-title-font);
   font-weight: 400;
   font-size: 0.7em;
   letter-spacing: 0.4em;
@@ -287,4 +313,9 @@
 .qr-head .paper-ornament__icon {
   width: 1.4rem;
   height: 1.4rem;
+}
+
+.qr-head .paper-ornament__logo {
+  height: 3.5rem;
+  max-width: 70vw;
 }

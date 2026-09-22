@@ -8,6 +8,7 @@ import { OpeningStatusPill } from "@/components/public/opening-status-pill";
 import { PaperMenuHead } from "@/components/public/paper-menu";
 import { getOpeningStatus } from "@/lib/business-platform/hours";
 import { getBusinessIdsWithPublicMenu, getBusinessMenu } from "@/lib/business-platform/menu";
+import { getBusinessTheme, themeClassName, themeStyle } from "@/lib/business-platform/theme";
 import { getApprovedBusinessTranslation, getBusinessBySlug } from "@/lib/businesses";
 import { isLocale, localePath, localeUrl } from "@/lib/i18n";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
@@ -76,10 +77,11 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
   const supabase = createPublicSupabaseClient();
   if (!business || !supabase) notFound();
 
-  const [menu, opening, alternate] = await Promise.all([
+  const [menu, opening, alternate, branding] = await Promise.all([
     getBusinessMenu(supabase, business.id, { locale }),
     getOpeningStatus(supabase, business.id, locale),
-    getApprovedBusinessTranslation(business.id, locale === "bg" ? "en" : "bg")
+    getApprovedBusinessTranslation(business.id, locale === "bg" ? "en" : "bg"),
+    getBusinessTheme(supabase, business.id)
   ]);
 
   /* Бизнес без публикувано меню няма тънка страница. */
@@ -87,57 +89,81 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
 
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
   const profileHref = localePath(locale, `/places/${business.slug}`);
+  /* Темата на бизнеса важи само тук, на телевизора и на печата - не и за профила в Bansko NOW. */
+  const { theme, logo, logoAlt } = branding;
+  const logoSrc = logo?.w480 ?? logo?.w960 ?? logo?.original ?? null;
   const labels =
     locale === "en"
       ? { menu: "Menu", profile: "About the place", call: "Call", directions: "Directions", powered: "Menu by Bansko NOW", switch: "BG" }
       : { menu: "Меню", profile: "За мястото", call: "Обади се", directions: "Упътване", powered: "Меню от Bansko NOW", switch: "EN" };
 
   return (
-    <div className="paper font-portal min-h-screen">
+    <div className={`${themeClassName(theme)} min-h-screen`} style={themeStyle(theme)}>
       {/* Скокът към категория е мигновен: глобалният smooth scroll би влачил през цялото меню. */}
       <style>{"html{scroll-behavior:auto}"}</style>
       {/* Горе стои само лентата с категориите (и EN); заглавието е в самото меню, като на хартия. */}
       <div className="mx-auto max-w-2xl px-4 pt-8 sm:px-6">
-        <PaperMenuHead title={business.name} subtitle={labels.menu} className="qr-head" />
+        <PaperMenuHead
+          title={business.name}
+          subtitle={labels.menu}
+          className="qr-head"
+          ornament={theme.ornament}
+          logo={logoSrc ? { src: logoSrc, alt: logoAlt ?? business.name } : null}
+        />
         <div className="mt-3 flex justify-center">
-          <OpeningStatusPill status={opening.status} label={opening.label} />
+          <OpeningStatusPill status={opening.status} label={opening.label} tone="paper" />
         </div>
       </div>
 
-      {/* Лепкавата лента е нарочно в друг цвят от хартията: тъмнозелена, с езика най-отпред. */}
+      {/* Лепкавата лента е в тон с хартията (--paper-bar), не в крещящ цвят. Езикът стои
+          неподвижно вляво; само категориите се плъзгат хоризонтално в своя контейнер. */}
       {menu.categories.length > 1 || alternate ? (
-        <nav aria-label={labels.menu} className="sticky top-0 z-10 mt-5 bg-forest text-white shadow-[0_6px_18px_rgba(24,59,42,0.25)]">
-          <div className="mx-auto flex max-w-2xl items-center gap-2 overflow-x-auto px-4 py-2.5 [scrollbar-width:none] sm:px-6 [&::-webkit-scrollbar]:hidden">
+        <nav
+          aria-label={labels.menu}
+          className="sticky top-0 z-10 mt-5 border-b border-[var(--paper-line)] bg-[var(--paper-bar)] text-[var(--paper-ink)] shadow-[0_4px_14px_rgba(0,0,0,0.08)]"
+        >
+          <div className="mx-auto flex max-w-2xl items-center py-2.5 pl-4 sm:pl-6">
             {alternate ? (
-              <span className="flex flex-none items-center rounded-full border border-white/40 p-0.5 text-[11px] font-bold uppercase tracking-[0.12em]" aria-label={locale === "en" ? "Language" : "Език"}>
-                {(["bg", "en"] as Locale[]).map((option) =>
-                  option === locale ? (
-                    <span key={option} className="rounded-full bg-white px-2.5 py-1 text-forest" aria-current="true">
-                      {option.toUpperCase()}
-                    </span>
-                  ) : (
-                    <a
-                      key={option}
-                      href={localePath(option, `/places/${alternate.slug}/menu`)}
-                      hrefLang={option}
-                      className="rounded-full px-2.5 py-1 text-white/85 hover:text-white"
-                    >
-                      {option.toUpperCase()}
-                    </a>
-                  )
-                )}
-              </span>
+              <>
+                <span
+                  className="flex flex-none items-center rounded-full border border-[var(--paper-line)] p-0.5 text-[11px] font-bold uppercase tracking-[0.12em]"
+                  aria-label={locale === "en" ? "Language" : "Език"}
+                >
+                  {(["bg", "en"] as Locale[]).map((option) =>
+                    option === locale ? (
+                      <span key={option} className="rounded-full bg-[var(--paper-accent)] px-2.5 py-1 text-[var(--paper-on-accent)]" aria-current="true">
+                        {option.toUpperCase()}
+                      </span>
+                    ) : (
+                      <a
+                        key={option}
+                        href={localePath(option, `/places/${alternate.slug}/menu`)}
+                        hrefLang={option}
+                        className="rounded-full px-2.5 py-1 text-[var(--paper-ink)] hover:text-[var(--paper-accent)] focus-visible:text-[var(--paper-accent)] focus-visible:outline-none"
+                      >
+                        {option.toUpperCase()}
+                      </a>
+                    )
+                  )}
+                </span>
+                {menu.categories.length > 1 ? <span className="ml-2.5 h-5 w-px flex-none bg-[var(--paper-line)]" aria-hidden /> : null}
+              </>
             ) : null}
-            {alternate ? <span className="mx-1 h-5 w-px flex-none bg-white/30" aria-hidden /> : null}
-            {menu.categories.map((category) => (
-              <a
-                key={category.id}
-                href={`#menu-${category.id}`}
-                className="flex-none rounded-full border border-white/35 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-white hover:bg-white hover:text-forest"
+            {menu.categories.length > 1 ? (
+              <div
+                className={`flex min-w-0 flex-1 items-center gap-2 overflow-x-auto py-0.5 pr-4 [scrollbar-width:none] sm:pr-6 [&::-webkit-scrollbar]:hidden ${alternate ? "pl-2.5" : ""}`}
               >
-                {category.name}
-              </a>
-            ))}
+                {menu.categories.map((category) => (
+                  <a
+                    key={category.id}
+                    href={`#menu-${category.id}`}
+                    className="flex-none rounded-full border border-[var(--paper-line)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--paper-ink)] hover:border-[var(--paper-accent)] focus-visible:border-[var(--paper-accent)] focus-visible:outline-none"
+                  >
+                    {category.name}
+                  </a>
+                ))}
+              </div>
+            ) : null}
           </div>
         </nav>
       ) : null}
@@ -155,7 +181,7 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
           <p>{business.address}</p>
           <div className="mt-3 flex flex-wrap justify-center gap-2">
             {business.phone ? (
-              <a href={`tel:${business.phone.replace(/\s+/g, "")}`} className="rounded-full bg-[var(--paper-accent)] px-4 py-2 text-xs font-semibold text-white">
+              <a href={`tel:${business.phone.replace(/\s+/g, "")}`} className="rounded-full bg-[var(--paper-accent)] px-4 py-2 text-xs font-semibold text-[var(--paper-on-accent)]">
                 {labels.call}
               </a>
             ) : null}
