@@ -10,6 +10,7 @@ import {
   deleteBusinessMedia,
   finalizeBusinessImage
 } from "@/lib/business-platform/media";
+import { menuCategoryIconOptions } from "@/lib/business-platform/menu-icons";
 import { parsePriceToCents } from "@/lib/business-platform/money";
 import { revalidateBusinessPublic } from "@/lib/business-platform/revalidate";
 import type { BusinessMenuAvailability } from "@/lib/types";
@@ -96,6 +97,8 @@ export async function saveMenuCategoryAction(formData: FormData) {
   const descriptionBg = stringValue(formData, "description_bg").slice(0, 300);
   const descriptionEn = stringValue(formData, "description_en").slice(0, 300);
   const isActive = boolValue(formData, "is_active");
+  const iconValue = stringValue(formData, "icon_name");
+  const iconName = menuCategoryIconOptions.some((option) => option.name === iconValue) ? iconValue : null;
 
   if (!nameBg) {
     redirect(withError(formPath, "name"));
@@ -106,7 +109,7 @@ export async function saveMenuCategoryAction(formData: FormData) {
   if (categoryId) {
     const { error } = await supabase
       .from("business_menu_categories")
-      .update({ is_active: isActive })
+      .update({ is_active: isActive, icon_name: iconName })
       .eq("id", categoryId)
       .eq("business_id", business.businessId);
 
@@ -119,6 +122,7 @@ export async function saveMenuCategoryAction(formData: FormData) {
       .insert({
         business_id: business.businessId,
         is_active: isActive,
+        icon_name: iconName,
         sort_order: await nextCategorySortOrder(supabase, business.businessId)
       })
       .select("id")

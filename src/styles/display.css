@@ -1,8 +1,10 @@
 /*
- * Стилът на телевизора. Нарочно без Tailwind 4: браузърът на Samsung Tizen е
- * Chromium 85/94 и не знае @property, color-mix() и @layer. Тук има само grid,
- * flex, clamp() и vh - размерите са спрямо височината на екрана, така че Full HD
- * и 4K изглеждат еднакво. Без aspect-ratio, inset, :has(), container queries.
+ * Подредбата на телевизора. Видът на заглавието, категориите и редовете идва от
+ * menu-paper.css (общ с QR менюто и печата); тук са само екранът, колоните и
+ * размерите. Нарочно без Tailwind 4: браузърът на Samsung Tizen е Chromium
+ * 85/94 и не знае @property, color-mix() и @layer. Само grid, flex, clamp() и
+ * vh - размерите са спрямо височината на екрана, така че Full HD и 4K изглеждат
+ * еднакво. Без aspect-ratio, inset, :has(), container queries.
  */
 
 html,
@@ -17,18 +19,8 @@ body {
 body.display {
   font-family: "Inter Variable", Inter, "Segoe UI", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
-  background: #14201a;
+  background: #f4eee2;
   cursor: none;
-}
-
-.display-root--dark {
-  background: #14201a;
-  color: #f4efe6;
-}
-
-.display-root--light {
-  background: #f6f2ea;
-  color: #1d2b22;
 }
 
 .display-root {
@@ -44,7 +36,7 @@ body.display {
   position: relative;
   flex: 1 1 auto;
   min-width: 0;
-  padding: 3vh 3.5vh;
+  padding: 2.6vh 3.5vh;
   display: flex;
   flex-direction: column;
 }
@@ -72,25 +64,28 @@ body.display {
   object-fit: cover;
 }
 
+/* Заглавието: орнамент, име, линия с точка, „Отворено до…“ под тях */
 .display-head {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
   flex: 0 0 auto;
-  margin-bottom: 2vh;
+  margin-bottom: 1.6vh;
+  font-size: clamp(12px, 2vh, 30px);
 }
 
-.display-title {
-  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
-  font-size: clamp(20px, 4.2vh, 64px);
-  font-weight: 600;
-  margin: 0;
-  letter-spacing: 0;
+.display-head .paper-title {
+  font-size: clamp(20px, 4.4vh, 66px);
+  margin: 0.2vh 0 0.9vh;
+}
+
+.display-head .paper-ornament__icon {
+  width: 2.6vh;
+  height: 2.6vh;
 }
 
 .display-status {
-  font-size: clamp(12px, 2vh, 30px);
-  opacity: 0.75;
+  display: block;
+  margin-top: 0.9vh;
+  color: var(--paper-muted);
+  letter-spacing: 0.06em;
 }
 
 /* Размерът на текста идва оттук и всичко вътре е в em. Скриптът вдига
@@ -107,7 +102,7 @@ body.display {
 .display-column {
   flex: 1 1 0;
   min-width: 0;
-  padding-right: 3vh;
+  padding-right: 3.5vh;
 }
 
 .display-column:last-child {
@@ -115,149 +110,35 @@ body.display {
 }
 
 .display-category {
-  margin-bottom: 1.1em;
+  margin-bottom: 1.2em;
 }
 
-.display-category__name {
-  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
-  font-size: 1.4em;
-  font-weight: 600;
-  margin: 0 0 0.3em;
-  padding-bottom: 0.2em;
-  border-bottom: 1px solid rgba(128, 128, 128, 0.35);
+.display-category .paper-category__head {
+  margin-bottom: 0.25em;
 }
 
-.display-item {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  padding: 0.26em 0;
-  font-size: 1em;
-  line-height: 1.25;
-}
-
-.display-item__name {
-  flex: 1 1 auto;
-  min-width: 0;
-  padding-right: 2vh;
-}
-
-.display-item__alt {
-  opacity: 0.6;
-  font-weight: 400;
-}
-
-.display-item__desc {
-  display: block;
-  font-size: 0.72em;
-  opacity: 0.65;
-  margin-top: 0.2vh;
-}
-
-.display-item__price {
-  flex: 0 0 auto;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.display-item__variants {
-  flex: 0 0 auto;
-  font-weight: 600;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.display-item__variant-name {
-  font-weight: 400;
-  opacity: 0.65;
-  margin-left: 0.6em;
-}
-
-.display-item--sold .display-item__label,
-.display-item--sold .display-item__desc,
-.display-item--sold .display-item__price,
-.display-item--sold .display-item__variants {
-  text-decoration: line-through;
-  opacity: 0.45;
-}
-
-.display-item__sold {
-  display: inline-block;
-  margin-left: 0.6em;
-  padding: 0.1em 0.5em;
-  border-radius: 999px;
-  background: #b2543a;
-  color: #fff;
-  font-size: 0.6em;
-  font-weight: 600;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  vertical-align: middle;
-  text-decoration: none;
-  opacity: 1;
-}
-
-/* Таблица от варианти: всички артикули в категорията имат едни и същи размери */
-.display-table {
-  width: 100%;
-  border-collapse: collapse;
-  font-size: 1em;
-}
-
-.display-table th,
-.display-table td {
-  padding: 0.24em 0;
-  text-align: right;
-  font-variant-numeric: tabular-nums;
-  white-space: nowrap;
-}
-
-.display-table th:first-child,
-.display-table td:first-child {
-  text-align: left;
-  white-space: normal;
-  width: 100%;
-  padding-right: 2vh;
-}
-
-.display-table th {
-  font-size: 0.7em;
-  font-weight: 500;
-  opacity: 0.6;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  padding-left: 2vh;
-}
-
-.display-table td {
-  font-weight: 600;
-  padding-left: 2vh;
-}
-
-.display-table td:first-child {
-  font-weight: 400;
-}
-
-.display-table tr.display-item--sold td + td {
-  text-decoration: line-through;
-  opacity: 0.45;
+.display-category .paper-item__text {
+  padding-right: 0.2em;
 }
 
 .display-foot {
   flex: 0 0 auto;
   margin-top: 1vh;
+  padding-top: 0.8vh;
+  border-top: 1px solid var(--paper-hair);
   font-size: clamp(10px, 1.5vh, 22px);
-  opacity: 0.45;
+  color: var(--paper-muted);
   display: flex;
   justify-content: space-between;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .display-empty {
   margin: auto;
   text-align: center;
   font-size: clamp(16px, 3vh, 48px);
-  opacity: 0.7;
+  color: var(--paper-muted);
 }
 
 /* Точката „офлайн“: след 3 неуспешни проверки, в ъгъла, без текст */

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   title: "Помощ"
 };
 
-const updatedAt = "17 септември 2026";
+const updatedAt = "22 септември 2026";
 
 export default async function BusinessGuidePage() {
   const { business } = await requireBusinessOwner();
@@ -39,6 +39,11 @@ export default async function BusinessGuidePage() {
               артикул с размери („Малко“, „Голямо“) взема цените от вариантите.
             </p>
             <p>„Свърши“ показва артикула зачертан с етикет „Изчерпано“. „Скрий“ го маха от менюто, без да го изтрива.</p>
+            <p>
+              Всяка категория има иконка пред името (чашка за кафе, халба за бира, капка за вода). Страницата я познава сама по
+              името; ако не ти харесва, избираш друга от списъка във формата на категорията. Иконката е една и съща на
+              телевизора, в QR менюто и на печат.
+            </p>
           </GuideSummary>
           <p>
             <Link href="/business/menu" className="font-semibold text-forest underline underline-offset-4">
@@ -50,6 +55,12 @@ export default async function BusinessGuidePage() {
               Редовете са в <code>business_menu_categories</code>, <code>business_menu_items</code> и{" "}
               <code>business_menu_item_variants</code>, а имената и описанията на двата езика - в таблиците{" "}
               <code>*_translations</code>. Липсва ли английско име, гостът на английски вижда българското.
+            </p>
+            <p>
+              Иконката е в <code>business_menu_categories.icon_name</code> (име от Font Awesome, например{" "}
+              <code>mug-saucer</code>); празно означава „познай по името“ - правилата са в{" "}
+              <code>src/lib/business-platform/menu-icons.ts</code>. Видът на менюто на трите места (кремава хартия,
+              кафяви линии, точки до цената) е един файл: <code>src/styles/menu-paper.css</code>.
             </p>
             <p>
               Цената е в евроцентове: „3,90“ и „3.90“ се приемат еднакво. Артикул с варианти няма собствена цена -

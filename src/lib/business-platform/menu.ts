@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { businessMediaUrls, type BusinessMediaUrls } from "@/lib/business-platform/media";
+import { resolveMenuCategoryIcon } from "@/lib/business-platform/menu-icons";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
 import type {
   BusinessMedia,
@@ -52,6 +53,8 @@ export type MenuItem = {
 
 export type MenuCategory = {
   id: string;
+  /** Font Awesome име за заглавието на категорията: избраното или познатото по името. */
+  icon: string;
   name: string;
   names: LocalizedText;
   description: string | null;
@@ -86,7 +89,7 @@ export async function getBusinessMenu(
   const includeHidden = options.includeHidden ?? false;
 
   const [categories, categoryTexts, items, itemTexts, variants, variantTexts] = await Promise.all([
-    supabase.from("business_menu_categories").select("id, sort_order, is_active").eq("business_id", businessId).order("sort_order"),
+    supabase.from("business_menu_categories").select("id, sort_order, is_active, icon_name").eq("business_id", businessId).order("sort_order"),
     supabase.from("business_menu_category_translations").select("category_id, locale, name, description").eq("business_id", businessId),
     supabase
       .from("business_menu_items")
@@ -162,6 +165,7 @@ export async function getBusinessMenu(
     const texts = categoryTextsById.get(category.id) ?? emptyTexts();
     result.push({
       id: category.id,
+      icon: resolveMenuCategoryIcon(category.icon_name, texts.names),
       name: pickText(texts.names, locale),
       names: texts.names,
       description: pickDescription(texts.descriptions, locale),

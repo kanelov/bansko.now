@@ -796,6 +796,7 @@ export type BusinessMenuCategory = {
   business_id: string;
   sort_order: number;
   is_active: boolean;
+  icon_name: string | null;
   created_at: string;
   updated_at: string;
 };

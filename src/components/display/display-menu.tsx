@@ -1,3 +1,4 @@
+import { PaperCategoryHead } from "@/components/public/paper-menu";
 import type { CategoryBlock } from "@/lib/business-platform/display-layout";
 import type { MenuItem } from "@/lib/business-platform/menu";
 import { formatPrice } from "@/lib/business-platform/money";
@@ -5,7 +6,8 @@ import { formatPrice } from "@/lib/business-platform/money";
 /**
  * Менюто на телевизора: двуезичен ред („Капучино · Cappuccino“), цена или
  * варианти, свършилото зачертано с етикет. Само сървър, само класове от
- * display.css - никакъв Tailwind, защото браузърът на телевизора е стар.
+ * menu-paper.css и display.css - никакъв Tailwind, защото браузърът на
+ * телевизора е стар.
  */
 
 function bilingual(names: { bg?: string | null; en?: string | null }) {
@@ -19,13 +21,13 @@ function ItemName({ item, showDescriptions }: { item: MenuItem; showDescriptions
   const sold = item.availability === "sold_out";
 
   return (
-    <span className="display-item__name">
-      <span className="display-item__label">
+    <span className="paper-item__text">
+      <span className="paper-item__name">
         {name.bg}
-        {name.en ? <span className="display-item__alt"> · {name.en}</span> : null}
+        {name.en ? <span className="paper-item__alt"> · {name.en}</span> : null}
       </span>
-      {sold ? <span className="display-item__sold">свърши</span> : null}
-      {showDescriptions && item.description ? <span className="display-item__desc">{item.description}</span> : null}
+      {sold ? <span className="paper-item__sold">свърши</span> : null}
+      {showDescriptions && item.description ? <span className="paper-item__desc">{item.description}</span> : null}
     </span>
   );
 }
@@ -34,20 +36,21 @@ function ItemRow({ item, showDescriptions }: { item: MenuItem; showDescriptions:
   const sold = item.availability === "sold_out";
 
   return (
-    <div className={sold ? "display-item display-item--sold" : "display-item"}>
+    <div className={sold ? "paper-item paper-item--sold" : "paper-item"}>
       <ItemName item={item} showDescriptions={showDescriptions} />
+      <span className="paper-item__dots" aria-hidden />
       {item.variants.length > 0 ? (
-        <span className="display-item__variants">
+        <span className="paper-item__price">
           {item.variants.map((variant, index) => (
             <span key={variant.id}>
               {index > 0 ? " · " : ""}
+              {variant.name ? <span className="paper-item__variant">{variant.name}</span> : null}
               {formatPrice(variant.priceCents)}
-              {variant.name ? <span className="display-item__variant-name">{variant.name}</span> : null}
             </span>
           ))}
         </span>
       ) : item.priceCents !== null ? (
-        <span className="display-item__price">{formatPrice(item.priceCents)}</span>
+        <span className="paper-item__price">{formatPrice(item.priceCents)}</span>
       ) : null}
     </div>
   );
@@ -55,7 +58,7 @@ function ItemRow({ item, showDescriptions }: { item: MenuItem; showDescriptions:
 
 function VariantTable({ block, showDescriptions }: { block: CategoryBlock; showDescriptions: boolean }) {
   return (
-    <table className="display-table">
+    <table className="paper-table">
       <thead>
         <tr>
           <th> </th>
@@ -66,7 +69,7 @@ function VariantTable({ block, showDescriptions }: { block: CategoryBlock; showD
       </thead>
       <tbody>
         {block.category.items.map((item) => (
-          <tr key={item.id} className={item.availability === "sold_out" ? "display-item--sold" : undefined}>
+          <tr key={item.id} className={item.availability === "sold_out" ? "paper-item--sold" : undefined}>
             <td>
               <ItemName item={item} showDescriptions={showDescriptions} />
             </td>
@@ -89,10 +92,7 @@ export function DisplayColumns({ columns, showDescriptions }: { columns: Categor
             const name = bilingual(block.category.names);
             return (
               <section key={block.category.id} className="display-category">
-                <h2 className="display-category__name">
-                  {name.bg}
-                  {name.en ? <span className="display-item__alt"> · {name.en}</span> : null}
-                </h2>
+                <PaperCategoryHead icon={block.category.icon} name={name.bg} alt={name.en} />
                 {block.variantColumns ? (
                   <VariantTable block={block} showDescriptions={showDescriptions} />
                 ) : (

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { DisplayColumns } from "@/components/display/display-menu";
+import { PaperMenuHead } from "@/components/public/paper-menu";
 import { displayScript } from "@/components/display/display-script";
 import { layoutDisplay } from "@/lib/business-platform/display-layout";
 import { getDisplayByToken } from "@/lib/business-platform/displays";
@@ -43,7 +44,7 @@ export default async function DisplayPage({ params, searchParams }: { params: Pa
 
   const withMedia = display.template !== "menu_only" && display.media !== null;
   const layout = layoutDisplay(categories, { showDescriptions: display.showDescriptions, maxColumns: withMedia ? 2 : 3 });
-  const rootClass = ["display-root", `display-root--${display.theme}`, withMedia ? "display-root--media" : ""].filter(Boolean).join(" ");
+  const rootClass = ["display-root", "paper", display.theme === "dark" ? "paper--dark" : "", withMedia ? "display-root--media" : ""].filter(Boolean).join(" ");
   const isPreview = preview === "1";
 
   return (
@@ -51,10 +52,10 @@ export default async function DisplayPage({ params, searchParams }: { params: Pa
       {isPreview ? null : <meta httpEquiv="refresh" content="21600" />}
       <div id="display-root" className={rootClass} data-token={token} data-version={display.version} data-preview={isPreview ? "1" : "0"}>
         <div id="display-menu" className="display-menu">
-          <header className="display-head">
-            <h1 className="display-title">{display.businessName}</h1>
+          <div className="display-head">
+            <PaperMenuHead title={display.businessName} subtitle="Меню" />
             {opening.label ? <span className="display-status">{opening.label}</span> : null}
-          </header>
+          </div>
 
           {layout.columns.every((column) => column.length === 0) ? (
             <p className="display-empty">Менюто се подготвя</p>

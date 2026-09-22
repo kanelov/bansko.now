@@ -3,6 +3,8 @@ import { deleteMenuCategoryAction, saveMenuCategoryAction } from "@/app/business
 import { ConfirmButton } from "@/components/business/confirm-button";
 import { portalUi } from "@/components/business/ui";
 import type { MenuCategoryForEdit } from "@/lib/business-platform/menu";
+import { guessMenuCategoryIcon, menuCategoryIconOptions } from "@/lib/business-platform/menu-icons";
+import { IconGlyph } from "@/components/public/icon-glyph";
 
 const errorMessages: Record<string, string> = {
   name: "Името на български е задължително.",
@@ -21,6 +23,8 @@ export function MenuCategoryForm({
 }) {
   const bg = category?.translations.find((row) => row.locale === "bg");
   const en = category?.translations.find((row) => row.locale === "en");
+  const guessed = guessMenuCategoryIcon({ bg: bg?.name, en: en?.name });
+  const guessedLabel = menuCategoryIconOptions.find((option) => option.name === guessed)?.label ?? guessed;
 
   return (
     <div className="grid gap-6">
@@ -68,6 +72,29 @@ export function MenuCategoryForm({
             </span>
             <textarea id="category-description-en" name="description_en" defaultValue={en?.description ?? ""} maxLength={300} className={portalUi.textarea} />
           </label>
+        </div>
+
+        <div className="grid gap-2">
+          <label className={portalUi.label}>
+            <span>
+              Иконка <span className={portalUi.hint}>пред името на категорията - на телевизора, в QR менюто и на печат</span>
+            </span>
+            <select id="category-icon" name="icon_name" defaultValue={category?.icon_name ?? ""} className={portalUi.input}>
+              <option value="">Автоматично по името{category ? ` (сега: ${guessedLabel})` : ""}</option>
+              {menuCategoryIconOptions.map((option) => (
+                <option key={option.name} value={option.name}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <div className="flex flex-wrap gap-2 text-forest" aria-hidden>
+            {menuCategoryIconOptions.map((option) => (
+              <span key={option.name} title={option.label} className="inline-flex h-8 w-8 items-center justify-center rounded-lg border border-[var(--stone)] bg-white">
+                <IconGlyph name={option.name} className="h-4 w-4" />
+              </span>
+            ))}
+          </div>
         </div>
 
         <label className="flex items-center gap-3 text-sm">

@@ -1,0 +1,268 @@
+/*
+ * „Хартиено меню“ - общият вид на менюто на телевизора, в QR менюто и на печат.
+ * Идва от ламинираното меню на Yum Spot: кремава хартия със зърно, тънки кафяви
+ * линии, иконка пред всяка категория, разредени главни букви, точки до цената.
+ * Само обикновен CSS (телевизорът е Chromium 85): без @layer, color-mix, :has().
+ * Всичко вътре е в em - всеки изглед задава базовия font-size и подредбата
+ * (колони, страници); тук е само видът на заглавието, категориите и редовете.
+ */
+
+.paper {
+  --paper-bg: #f4eee2;
+  --paper-ink: #2a2319;
+  --paper-muted: #6f6355;
+  --paper-accent: #8b6b4b;
+  --paper-line: rgba(90, 70, 50, 0.34);
+  --paper-hair: rgba(90, 70, 50, 0.14);
+  --paper-badge: #b2543a;
+  background-color: var(--paper-bg);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.36 0 0 0 0 0.27 0 0 0 0 0.18 0 0 0 0.09 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  color: var(--paper-ink);
+}
+
+.paper--dark {
+  --paper-bg: #221b15;
+  --paper-ink: #f1e9dc;
+  --paper-muted: #b9ab99;
+  --paper-accent: #c9a57f;
+  --paper-line: rgba(235, 215, 185, 0.34);
+  --paper-hair: rgba(235, 215, 185, 0.14);
+}
+
+/* Заглавие: орнамент, името с разредени главни букви, линия с точка по средата */
+.paper-head {
+  text-align: center;
+}
+
+.paper-ornament {
+  display: block;
+  color: var(--paper-accent);
+  line-height: 1;
+}
+
+.paper-ornament__icon {
+  width: 1.6em;
+  height: 1.6em;
+  vertical-align: top;
+}
+
+.paper-title {
+  font-family: "Playfair Display Variable", "Playfair Display", Georgia, "Times New Roman", serif;
+  font-weight: 500;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
+  text-indent: 0.22em;
+  margin: 0;
+  line-height: 1.15;
+}
+
+.paper-rule {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--paper-accent);
+}
+
+.paper-rule::before,
+.paper-rule::after {
+  content: "";
+  flex: 0 0 4.5em;
+  height: 1px;
+  background: var(--paper-line);
+}
+
+.paper-rule__dot {
+  width: 0.28em;
+  height: 0.28em;
+  margin: 0 0.6em;
+  border-radius: 50%;
+  background: var(--paper-accent);
+}
+
+.paper-subtitle {
+  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  font-weight: 400;
+  font-size: 0.7em;
+  letter-spacing: 0.4em;
+  text-indent: 0.4em;
+  text-transform: uppercase;
+  color: var(--paper-muted);
+  margin: 0;
+}
+
+/* Категория: иконка, разредено име, тънка линия отдолу */
+.paper-category__head {
+  display: flex;
+  align-items: center;
+  margin: 0;
+  padding-bottom: 0.4em;
+  border-bottom: 1px solid var(--paper-line);
+  font-family: "Playfair Display Variable", "Playfair Display", Georgia, serif;
+  font-size: 1.05em;
+  font-weight: 500;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  line-height: 1.2;
+}
+
+.paper-category__icon {
+  flex: 0 0 auto;
+  width: 1.35em;
+  height: 1.35em;
+  margin-right: 0.6em;
+  color: var(--paper-accent);
+}
+
+.paper-category__name {
+  min-width: 0;
+}
+
+.paper-category__alt {
+  font-weight: 400;
+  color: var(--paper-muted);
+  letter-spacing: 0.14em;
+}
+
+.paper-category__note {
+  margin: 0.4em 0 0;
+  font-style: italic;
+  color: var(--paper-muted);
+}
+
+/* Ред: име ... цена, описание в курсив, косъм между редовете */
+.paper-item {
+  display: flex;
+  align-items: baseline;
+  padding: 0.42em 0;
+  border-top: 1px solid var(--paper-hair);
+  line-height: 1.25;
+}
+
+.paper-item:first-of-type {
+  border-top: 0;
+}
+
+.paper-item__text {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.paper-item__name {
+  font-weight: 500;
+}
+
+.paper-item__alt {
+  font-weight: 400;
+  color: var(--paper-muted);
+}
+
+.paper-item__desc {
+  display: block;
+  font-size: 0.82em;
+  font-style: italic;
+  color: var(--paper-muted);
+  margin-top: 0.1em;
+}
+
+.paper-item__dots {
+  flex: 1 0 1.5em;
+  align-self: baseline;
+  margin: 0 0.55em;
+  border-bottom: 1px dotted var(--paper-line);
+  transform: translateY(-0.28em);
+}
+
+.paper-item__price {
+  flex: 0 0 auto;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.paper-item__variant {
+  font-weight: 400;
+  color: var(--paper-muted);
+  margin: 0 0.35em 0 0.6em;
+}
+
+.paper-item--sold .paper-item__name,
+.paper-item--sold .paper-item__desc,
+.paper-item--sold .paper-item__price {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+.paper-item__sold {
+  display: inline-block;
+  margin-left: 0.6em;
+  padding: 0.1em 0.5em;
+  border-radius: 999px;
+  background: var(--paper-badge);
+  color: #fff;
+  font-size: 0.6em;
+  font-weight: 600;
+  font-style: normal;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  text-decoration: none;
+  opacity: 1;
+}
+
+/* Таблица от варианти (всички артикули в категорията с едни и същи размери) */
+.paper-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.paper-table th,
+.paper-table td {
+  padding: 0.38em 0 0.38em 1em;
+  text-align: right;
+  white-space: nowrap;
+  font-variant-numeric: tabular-nums;
+  vertical-align: baseline;
+  border-top: 1px solid var(--paper-hair);
+}
+
+.paper-table th {
+  font-size: 0.68em;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--paper-muted);
+  border-top: 0;
+}
+
+.paper-table td {
+  font-weight: 600;
+}
+
+.paper-table th:first-child,
+.paper-table td:first-child {
+  width: 100%;
+  padding-left: 0;
+  text-align: left;
+  white-space: normal;
+  font-weight: 500;
+}
+
+.paper-table tr.paper-item--sold td + td {
+  text-decoration: line-through;
+  opacity: 0.5;
+}
+
+/* QR менюто на телефона: размерите на заглавието */
+.qr-head .paper-title {
+  font-size: 1.5rem;
+  margin: 0.35rem 0 0.75rem;
+}
+
+.qr-head .paper-subtitle {
+  margin-top: 0.6rem;
+}
+
+.qr-head .paper-ornament__icon {
+  width: 1.4rem;
+  height: 1.4rem;
+}

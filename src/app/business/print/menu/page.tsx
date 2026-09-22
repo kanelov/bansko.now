@@ -1,8 +1,10 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import QRCode from "qrcode";
+import "@/styles/menu-paper.css";
 import "@/styles/print-menu.css";
 import { PrintButton } from "@/components/business/print-button";
+import { PaperCategoryHead, PaperMenuHead } from "@/components/public/paper-menu";
 import { portalUi } from "@/components/business/ui";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
 import { getPortalBusiness } from "@/lib/business-platform/business";
@@ -48,19 +50,19 @@ function PrintItem({ item, language, descriptions }: { item: MenuItem; language:
   const note = descriptions ? description(language, item) : "";
 
   return (
-    <div className="print-item">
-      <span className="print-item__text">
-        <span className="print-item__name">{name.main}</span>
+    <div className="paper-item">
+      <span className="paper-item__text">
+        <span className="paper-item__name">{name.main}</span>
         {name.alt ? <span className="print-item__alt">{name.alt}</span> : null}
-        {note ? <span className="print-item__desc">{note}</span> : null}
+        {note ? <span className="paper-item__desc">{note}</span> : null}
       </span>
-      <span className="print-item__dots" aria-hidden />
-      <span className="print-item__price">
+      <span className="paper-item__dots" aria-hidden />
+      <span className="paper-item__price">
         {item.variants.length > 0
           ? item.variants.map((variant, index) => (
               <span key={variant.id}>
-                {index > 0 ? "  ·  " : ""}
-                {texts(language, variant.names).main ? <span className="print-item__variant">{texts(language, variant.names).main}</span> : null}
+                {index > 0 ? " · " : ""}
+                {texts(language, variant.names).main ? <span className="paper-item__variant">{texts(language, variant.names).main}</span> : null}
                 {formatPrice(variant.priceCents, priceLocale)}
               </span>
             ))
@@ -80,14 +82,11 @@ function PrintCategory({ category, language, descriptions }: { category: MenuCat
 
   return (
     <section className="print-category">
-      <h2 className="print-category__name">
-        {name.main}
-        {name.alt ? <span className="print-category__alt">{name.alt}</span> : null}
-      </h2>
-      {note ? <p className="print-category__note">{note}</p> : null}
+      <PaperCategoryHead icon={category.icon} name={name.main} alt={name.alt} />
+      {note ? <p className="paper-category__note">{note}</p> : null}
 
       {columns ? (
-        <table className="print-table">
+        <table className="paper-table">
           <thead>
             <tr>
               <th> </th>
@@ -103,9 +102,9 @@ function PrintCategory({ category, language, descriptions }: { category: MenuCat
               return (
                 <tr key={item.id}>
                   <td>
-                    <span className="print-item__name">{itemName.main}</span>
+                    <span className="paper-item__name">{itemName.main}</span>
                     {itemName.alt ? <span className="print-item__alt">{itemName.alt}</span> : null}
-                    {itemNote ? <span className="print-item__desc">{itemNote}</span> : null}
+                    {itemNote ? <span className="paper-item__desc">{itemNote}</span> : null}
                   </td>
                   {item.variants.map((variant) => (
                     <td key={variant.id}>{formatPrice(variant.priceCents, priceLocale)}</td>
@@ -164,7 +163,8 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
 
   const sheetClass = [
     "print-sheet",
-    `print-sheet--${options.style}`,
+    "paper",
+    options.style === "dark" ? "paper--dark" : "",
     sheet.width < 130 ? "print-sheet--narrow" : "",
     sheet.width >= 290 ? "print-sheet--large" : ""
   ]
@@ -211,11 +211,7 @@ export default async function PrintMenuPage({ searchParams }: { searchParams: Se
         ) : null}
 
         <div className="print-content">
-          <header className="print-head">
-            <p className="print-eyebrow">{labels.menu}</p>
-            <h1 className="print-title">{portal?.name ?? business.name}</h1>
-            <div className="print-rule" />
-          </header>
+          <PaperMenuHead className="print-head" title={portal?.name ?? business.name} subtitle={labels.menu} />
 
           {categories.length === 0 ? (
             <p style={{ textAlign: "center" }}>{labels.empty}</p>

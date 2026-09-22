@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import "@/styles/fonts.css";
+import "@/styles/menu-paper.css";
 import "@/styles/display.css";
 
 /**

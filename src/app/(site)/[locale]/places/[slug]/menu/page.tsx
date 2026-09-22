@@ -2,8 +2,10 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import "@/styles/fonts.css";
+import "@/styles/menu-paper.css";
 import { BusinessMenuList } from "@/components/public/business-menu-list";
 import { OpeningStatusPill } from "@/components/public/opening-status-pill";
+import { PaperMenuHead } from "@/components/public/paper-menu";
 import { getOpeningStatus } from "@/lib/business-platform/hours";
 import { getBusinessMenu } from "@/lib/business-platform/menu";
 import { getApprovedBusinessTranslation, getBusinessBySlug } from "@/lib/businesses";
@@ -76,57 +78,67 @@ export default async function BusinessMenuPage({ params }: { params: Params }) {
       : { menu: "Меню", profile: "За мястото", call: "Обади се", directions: "Упътване", powered: "Меню от Bansko NOW", switch: "EN" };
 
   return (
-    <div className="font-portal min-h-screen bg-paper text-[var(--ink)]">
-      <header className="sticky top-0 z-10 border-b border-[var(--stone)] bg-paper/95 backdrop-blur">
-        <div className="mx-auto flex max-w-2xl items-start justify-between gap-3 px-4 py-3 sm:px-6">
-          <div className="min-w-0">
-            <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-moss">{labels.menu}</p>
-            <h1 className="font-display truncate text-xl font-semibold text-forest">{business.name}</h1>
-            <div className="mt-1">
-              <OpeningStatusPill status={opening.status} label={opening.label} />
-            </div>
-          </div>
-          {alternate ? (
-            <Link
-              href={localePath(alternateLocale, `/places/${alternate.slug}/menu`)}
-              hrefLang={alternateLocale}
-              className="flex-none rounded-full border border-[var(--stone)] bg-white px-3 py-1 text-xs font-semibold"
-            >
-              {labels.switch}
-            </Link>
-          ) : null}
+    <div className="paper font-portal min-h-screen">
+      {/* Горе стои само лентата с категориите (и EN); заглавието е в самото меню, като на хартия. */}
+      <div className="mx-auto max-w-2xl px-4 pt-8 sm:px-6">
+        <PaperMenuHead title={business.name} subtitle={labels.menu} className="qr-head" />
+        <div className="mt-3 flex justify-center">
+          <OpeningStatusPill status={opening.status} label={opening.label} />
         </div>
-        {menu.categories.length > 1 ? (
-          <nav aria-label={labels.menu} className="mx-auto flex max-w-2xl gap-2 overflow-x-auto px-4 pb-3 sm:px-6">
+      </div>
+
+      {menu.categories.length > 1 || alternate ? (
+        <nav
+          aria-label={labels.menu}
+          className="sticky top-0 z-10 mt-5 border-b border-[var(--paper-hair)] backdrop-blur"
+          style={{ background: "rgba(244, 238, 226, 0.94)" }}
+        >
+          <div className="mx-auto flex max-w-2xl gap-2 overflow-x-auto px-4 py-2.5 sm:px-6">
+            {alternate ? (
+              <Link
+                href={localePath(alternateLocale, `/places/${alternate.slug}/menu`)}
+                hrefLang={alternateLocale}
+                className="flex-none rounded-full border border-[var(--paper-accent)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--paper-accent)]"
+              >
+                {labels.switch}
+              </Link>
+            ) : null}
             {menu.categories.map((category) => (
-              <a key={category.id} href={`#menu-${category.id}`} className="flex-none rounded-full border border-[var(--stone)] bg-white px-3 py-1 text-xs font-semibold">
+              <a
+                key={category.id}
+                href={`#menu-${category.id}`}
+                className="flex-none rounded-full border border-[var(--paper-line)] px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.12em] text-[var(--paper-ink)]"
+              >
                 {category.name}
               </a>
             ))}
-          </nav>
-        ) : null}
-      </header>
+          </div>
+        </nav>
+      ) : null}
 
-      <main className="mx-auto max-w-2xl px-4 py-6 sm:px-6">
+      <main className="mx-auto max-w-2xl px-4 py-7 sm:px-6">
         <BusinessMenuList menu={menu} locale={locale} />
       </main>
 
-      <footer className="mx-auto max-w-2xl px-4 pb-10 pt-6 text-sm text-stone-650 sm:px-6">
-        <div className="border-t border-[var(--stone)] pt-6">
-          <p className="font-semibold text-[var(--ink)]">{business.name}</p>
+      <footer className="mx-auto max-w-2xl px-4 pb-10 pt-4 text-sm text-[var(--paper-muted)] sm:px-6">
+        <div className="paper-rule mb-5" aria-hidden>
+          <span className="paper-rule__dot" />
+        </div>
+        <div className="text-center">
+          <p className="font-semibold text-[var(--paper-ink)]">{business.name}</p>
           <p>{business.address}</p>
-          <div className="mt-3 flex flex-wrap gap-2">
+          <div className="mt-3 flex flex-wrap justify-center gap-2">
             {business.phone ? (
-              <a href={`tel:${business.phone.replace(/\s+/g, "")}`} className="rounded-full bg-forest px-4 py-2 text-xs font-semibold text-white">
+              <a href={`tel:${business.phone.replace(/\s+/g, "")}`} className="rounded-full bg-[var(--paper-accent)] px-4 py-2 text-xs font-semibold text-white">
                 {labels.call}
               </a>
             ) : null}
-            <Link href={profileHref} className="rounded-full border border-[var(--stone)] bg-white px-4 py-2 text-xs font-semibold">
+            <Link href={profileHref} className="rounded-full border border-[var(--paper-line)] px-4 py-2 text-xs font-semibold text-[var(--paper-ink)]">
               {labels.profile}
             </Link>
           </div>
           <p className="mt-6 text-xs">
-            <Link href={localePath(locale, "/")} className="font-semibold text-forest">
+            <Link href={localePath(locale, "/")} className="font-semibold text-[var(--paper-accent)]">
               {labels.powered}
             </Link>
           </p>
