@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { businessSignOutAction, selectBusinessAction } from "@/app/business/actions";
 import { getBusinessSession } from "@/lib/business-platform/auth";
@@ -49,6 +50,18 @@ export default async function SelectBusinessPage({
             </form>
           ))}
         </div>
+
+        {session.isAdmin ? (
+          <div className="mt-6 rounded-2xl border border-dashed border-[var(--stone)] bg-paper p-4 text-sm text-stone-650">
+            <p>
+              Тук са бизнесите, пуснати в платформата. Нов бизнес се създава от админа: „Бизнес платформа“ → „+ Нов бизнес“, после
+              „Отвори портала“ или собственик с имейл.
+            </p>
+            <Link href="/admin/platform" className="mt-3 inline-block rounded-full bg-forest px-4 py-2 text-xs font-semibold text-white transition hover:bg-moss">
+              + Нов бизнес (админ)
+            </Link>
+          </div>
+        ) : null}
 
         <form action={businessSignOutAction} className="mt-8">
           <button className="text-sm font-semibold text-stone-650 underline-offset-4 hover:underline">Изход</button>

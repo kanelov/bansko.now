@@ -12,10 +12,13 @@ import { BusinessNav } from "@/components/business/business-nav";
 export function BusinessShell({
   business,
   memberships,
+  isAdmin = false,
   children
 }: {
   business: BusinessMembership;
   memberships: BusinessMembership[];
+  /** Админът вижда „Смени“ и „Нов бизнес“ винаги, дори с един бизнес. */
+  isAdmin?: boolean;
   children: React.ReactNode;
 }) {
   return (
@@ -37,12 +40,20 @@ export function BusinessShell({
               </p>
             </div>
             <div className="flex items-center gap-2">
-              {memberships.length > 1 ? (
+              {memberships.length > 1 || isAdmin ? (
                 <Link
                   href="/business/select"
                   className="rounded-full border border-[var(--stone)] bg-white px-3 py-1.5 text-xs font-semibold transition hover:border-forest"
                 >
                   Смени
+                </Link>
+              ) : null}
+              {isAdmin ? (
+                <Link
+                  href="/admin/platform"
+                  className="rounded-full border border-[var(--stone)] bg-white px-3 py-1.5 text-xs font-semibold transition hover:border-forest"
+                >
+                  Нов бизнес
                 </Link>
               ) : null}
               <Link

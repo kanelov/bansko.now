@@ -6,7 +6,7 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
   const session = await requireBusinessOwner();
 
   return (
-    <BusinessShell business={session.business} memberships={session.memberships}>
+    <BusinessShell business={session.business} memberships={session.memberships} isAdmin={session.isAdmin}>
       {children}
     </BusinessShell>
   );
