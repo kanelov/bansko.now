@@ -39,11 +39,17 @@ export const displayScript = `
     return menu ? menu.scrollHeight > menu.clientHeight + 2 : false;
   }
 
-  /* Уголемява текста на стъпки, докато менюто още се събира (най-много 1.9 пъти). */
+  /* Уголемява текста на стъпки, докато менюто още се събира (най-много 1.9 пъти);
+     дълго меню се смалява до 0.7, преди да се докладва преливане. */
   function fit() {
     var scale = 1;
     root.style.setProperty('--display-scale', '1');
-    if (!overflows()) {
+    if (overflows()) {
+      while (scale > 0.7 && overflows()) {
+        scale = Math.round((scale - 0.05) * 100) / 100;
+        root.style.setProperty('--display-scale', String(scale));
+      }
+    } else {
       while (scale < 1.9) {
         var next = Math.round((scale + 0.05) * 100) / 100;
         root.style.setProperty('--display-scale', String(next));

@@ -51,6 +51,10 @@ export async function SiteFooter({ settings, locale = "bg" }: { settings: SiteSe
           <div className="mt-4 grid gap-2 text-sm text-stone-100">
             <Link href={localePath(locale, "/privacy") as Route}>{dictionary.privacy}</Link>
             <Link href={localePath(locale, "/terms") as Route}>{dictionary.terms}</Link>
+            <Link href="/business" className="group inline-flex w-fit items-center gap-2 text-stone-100 transition hover:text-white">
+              <IconGlyph name="store" className="h-4 w-4 text-current" />
+              <span>{dictionary.businessPortal}</span>
+            </Link>
             <Link href="/admin" className="group inline-flex w-fit items-center gap-2 text-stone-100 transition hover:text-white">
               <IconGlyph name="user-shield" className="h-4 w-4 text-current" />
               <span>{dictionary.adminPanel}</span>
