@@ -69,6 +69,7 @@ body.display {
   flex: 0 0 auto;
   margin-bottom: 1.6vh;
   font-size: clamp(12px, 2vh, 30px);
+  text-align: center;
 }
 
 .display-head .paper-title {
