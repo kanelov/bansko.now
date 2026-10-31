@@ -196,7 +196,8 @@ function localizeBusiness(business: BusinessWithRelations, translation: Business
     robots_index: translation.robots_index,
     robots_follow: translation.robots_follow,
     schema_type: translation.schema_type,
-    image_alt: translation.image_alt
+    image_alt: translation.image_alt,
+    subcategory: translation.subcategory ?? null
   };
 }
 

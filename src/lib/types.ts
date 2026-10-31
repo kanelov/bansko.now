@@ -681,6 +681,7 @@ export type BusinessTranslation = {
   description: string | null;
   address: string;
   image_alt: string | null;
+  subcategory?: string | null;
   faqs: Json;
   features: string[];
   seo_title: string | null;
@@ -712,6 +713,8 @@ export type BusinessWithRelations = Business & {
   active_plan?: BusinessListingPlan | null;
   /** Alt текст от превода (`business_translations.image_alt`); попълва се при локализиране. */
   image_alt?: string | null;
+  /** Подкатегория („вид“: Механа, Аптека…) от превода (`business_translations.subcategory`). */
+  subcategory?: string | null;
   /** Шаблонната илюстрация на категорията, попълнена при четене, когато бизнесът няма своя снимка (`src/lib/business-placeholders.ts`). Не се записва. */
   placeholder_image_url?: string | null;
 };

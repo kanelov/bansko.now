@@ -62,6 +62,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
     getContactMessages()
   ]);
   const englishTranslationsByBusinessId = new Map(translations.filter((item) => item.locale === "en").map((item) => [item.business_id, item]));
+  const bulgarianTranslationsByBusinessId = new Map(translations.filter((item) => item.locale === "bg").map((item) => [item.business_id, item]));
   const annualPlans = plans.filter((plan) => plan.period_months === 12);
 
   return (
@@ -129,6 +130,10 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                             <option key={category}>{category}</option>
                           ))}
                         </select>
+                      </label>
+                      <label className="grid gap-2 text-sm font-semibold">
+                        Вид (подкатегория)
+                        <input name="subcategory" defaultValue={bulgarianTranslationsByBusinessId.get(business.id)?.subcategory ?? ""} placeholder="напр. Механа, Аптека, Ски училище" className="rounded-xl border border-stone-300 px-4 py-3" />
                       </label>
                       <label className="grid gap-2 text-sm font-semibold">
                         Статус
@@ -272,6 +277,7 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                         <input name="slug_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.slug ?? ""} placeholder="English slug" className="rounded-xl border border-stone-300 px-4 py-3" />
                         <input name="name_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.name ?? ""} placeholder="English business name" className="rounded-xl border border-stone-300 px-4 py-3" />
                         <input name="category_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.category ?? ""} placeholder="English category" className="rounded-xl border border-stone-300 px-4 py-3" />
+                        <input name="subcategory_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.subcategory ?? ""} placeholder="English subcategory (e.g. Tavern)" className="rounded-xl border border-stone-300 px-4 py-3" />
                         <input name="address_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.address ?? ""} placeholder="English address" className="rounded-xl border border-stone-300 px-4 py-3" />
                       </div>
                       <textarea name="description_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.description ?? ""} rows={4} placeholder="English description" className="rounded-xl border border-stone-300 px-4 py-3" />

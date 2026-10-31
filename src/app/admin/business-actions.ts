@@ -238,6 +238,7 @@ export async function updateBusinessAction(formData: FormData) {
     slug: stringValue(formData, `slug${suffix}`) || payload.slug,
     name: stringValue(formData, `name${suffix}`) || payload.name,
     category: stringValue(formData, `category${suffix}`) || payload.category,
+    subcategory: stringValue(formData, `subcategory${suffix}`) || null,
     description: stringValue(formData, `description${suffix}`),
     address: stringValue(formData, `address${suffix}`) || payload.address,
     faqs: faqLinesValue(formData, `faqs_input${suffix}`),

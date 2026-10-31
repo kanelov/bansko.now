@@ -7,7 +7,37 @@ import type { BusinessWithRelations } from "@/lib/types";
 import { getDictionary } from "@/lib/i18n";
 import type { Locale } from "@/lib/types";
 
-export function BusinessCard({ business, wide = false, locale = "bg" }: { business: BusinessWithRelations; wide?: boolean; locale?: Locale }) {
+/** Само полетата, които картата показва: списъкът /places праща тях на браузъра, не целия запис. */
+export type BusinessCardData = Pick<
+  BusinessWithRelations,
+  | "id" | "slug" | "name" | "category" | "subcategory" | "address" | "description" | "features"
+  | "latitude" | "longitude" | "images" | "video_link" | "image_alt" | "placeholder_image_url"
+  | "listing_tier" | "paid_until" | "payment_status"
+>;
+
+export function toBusinessCardData(business: BusinessWithRelations): BusinessCardData {
+  return {
+    id: business.id,
+    slug: business.slug,
+    name: business.name,
+    category: business.category,
+    subcategory: business.subcategory ?? null,
+    address: business.address,
+    description: business.description ? business.description.slice(0, 220) : null,
+    features: business.features ?? [],
+    latitude: business.latitude,
+    longitude: business.longitude,
+    images: business.images?.length ? [business.images[0]] : [],
+    video_link: business.video_link,
+    image_alt: business.image_alt ?? null,
+    placeholder_image_url: business.placeholder_image_url ?? null,
+    listing_tier: business.listing_tier,
+    paid_until: business.paid_until,
+    payment_status: business.payment_status
+  };
+}
+
+export function BusinessCard({ business, wide = false, locale = "bg" }: { business: BusinessCardData; wide?: boolean; locale?: Locale }) {
   const tier = getEffectiveBusinessTier(business);
   const dictionary = getDictionary(locale);
 
@@ -22,6 +52,9 @@ export function BusinessCard({ business, wide = false, locale = "bg" }: { busine
       <div className="flex flex-col p-5">
         <div className="flex flex-wrap items-center gap-2">
           <span className="rounded-full bg-sage px-3 py-1 text-xs font-semibold text-forest">{business.category}</span>
+          {business.subcategory ? (
+            <span className="rounded-full border border-stone-200 px-3 py-1 text-xs font-medium text-stone-600">{business.subcategory}</span>
+          ) : null}
           {tier !== "free" ? (
             <span className="rounded-full bg-forest px-3 py-1 text-xs font-semibold text-white">
               {getBusinessTierLabel(tier, locale)}

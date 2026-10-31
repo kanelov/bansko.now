@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { Metadata } from "next";
+import { toBusinessCardData } from "@/components/public/business-card";
 import { BusinessDirectoryView } from "@/components/public/business-directory-view";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
@@ -58,7 +59,8 @@ export default async function BusinessesPage({ params }: { params: Params }) {
             </Link>
           </div>
         </header>
-        <BusinessDirectoryView businesses={businesses} locale={locale} />
+        {/* Само полетата за картите отиват в браузъра: пълният запис на 258 бизнеса правеше страницата над 1 MB. */}
+        <BusinessDirectoryView businesses={businesses.map(toBusinessCardData)} locale={locale} />
       </main>
       <SiteFooter settings={siteSettings} locale={locale} />
     </div>
