@@ -1419,6 +1419,22 @@ export type Database = {
         Update: Partial<BusinessDisplay>;
         Relationships: [];
       };
+      cinema_programs: {
+        Row: {
+          id: string;
+          cinema_name: string;
+          source_url: string;
+          tickets_url: string;
+          screenings: unknown;
+          fetched_at: string | null;
+          fetch_ok: boolean;
+          fetch_error: string | null;
+          updated_at: string;
+        };
+        Insert: { id: string; cinema_name: string; source_url: string; tickets_url: string; screenings?: unknown; fetched_at?: string | null; fetch_ok?: boolean; fetch_error?: string | null; updated_at?: string };
+        Update: { cinema_name?: string; source_url?: string; tickets_url?: string; screenings?: unknown; fetched_at?: string | null; fetch_ok?: boolean; fetch_error?: string | null; updated_at?: string };
+        Relationships: [];
+      };
       business_display_categories: {
         Row: BusinessDisplayCategory;
         Insert: BusinessDisplayCategory;

@@ -9,6 +9,7 @@ import { FeaturedArticle } from "@/components/public/featured-article";
 import { LatestArticles } from "@/components/public/latest-articles";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
+import { CinemaWidget } from "@/components/public/cinema-widget";
 import { WeatherWidget } from "@/components/public/weather-widget";
 import { getBusinessVideoEmbedUrl } from "@/lib/business-public";
 import { fallbackHeroImage, getCategories, getPublishedArticles, getSiteSettings } from "@/lib/content";
@@ -205,7 +206,11 @@ export default async function HomePage({ params }: { params: Params }) {
 
         <div className="mx-auto grid max-w-7xl gap-16 px-4 py-16 sm:px-6 lg:px-8">
           <section className="grid gap-6 lg:grid-cols-[0.9fr_1.1fr]">
-            <WeatherWidget locale={locale} />
+            <div className="grid content-start gap-6">
+              <WeatherWidget locale={locale} />
+              {/* Кино програмата стои под прогнозата, в същия формат; скрита е, докато няма взети данни. */}
+              <CinemaWidget locale={locale} />
+            </div>
             <div className="grid gap-4 sm:grid-cols-2">
               {cards.map((card) => (
                 <Link key={card.id} href={localePath(locale, card.href) as Route} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-xl">
