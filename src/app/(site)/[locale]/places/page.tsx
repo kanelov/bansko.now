@@ -47,9 +47,12 @@ export default async function BusinessesPage({ params }: { params: Params }) {
             </p>
           </div>
           <div className="flex flex-wrap gap-3 lg:justify-end">
-            <Link href={localePath(locale, "/places/map") as Route} className="rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
-              {locale === "en" ? "View the map" : "Виж картата"}
-            </Link>
+            {/* The illustrated map is offered only once the admin has uploaded one. */}
+            {directorySettings.map_image_url ? (
+              <Link href={localePath(locale, "/places/map") as Route} className="rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white transition hover:bg-moss hover:text-white">
+                {locale === "en" ? "View the map" : "Виж картата"}
+              </Link>
+            ) : null}
             <Link href={localePath(locale, "/places/submit") as Route} className="rounded-full border border-stone-300 px-5 py-3 text-sm font-semibold text-forest transition hover:border-forest hover:bg-forest hover:text-white">
               {dictionary.submitBusiness}
             </Link>

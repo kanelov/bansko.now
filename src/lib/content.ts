@@ -142,7 +142,7 @@ const fallbackPages: EditablePage[] = [
       "Фотография, fine art печат, платна, визуални решения и авторски продукти, вдъхновени от Банско и Пирин.",
     content:
       "Красивите места, събития и лични спомени имат нужда от силно визуално присъствие. Art Studio към Bansko NOW създава арт печат, фотографии, платна и визуални решения с премиум усещане.",
-    hero_image_url: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?auto=format&fit=crop&w=1600&q=80",
+    hero_image_url: null,
     hero_image_alt: "Фотография и печат в Art Studio",
     cta_label: "Свържи се за проект",
     cta_url: "/contact",
@@ -170,7 +170,7 @@ const fallbackArtStudioServices: ArtStudioService[] = [
     title: "Fine Art печат",
     slug: "fine-art-print",
     description: "Премиум печат върху художествена хартия за фотографии, изложби и лични проекти.",
-    image_url: "https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=900&q=80",
+    image_url: null,
     image_alt: "Fine art печат",
     button_label: "Запитай за печат",
     button_url: "/contact",
@@ -189,7 +189,7 @@ const fallbackArtStudioServices: ArtStudioService[] = [
     title: "Canvas печат",
     slug: "canvas-print",
     description: "Платна с визуален характер за дом, студио, хотел, ресторант или подарък от Банско.",
-    image_url: "https://images.unsplash.com/photo-1500530855697-b586d89ba3ee?auto=format&fit=crop&w=900&q=80",
+    image_url: null,
     image_alt: "Canvas печат",
     button_label: "Виж опции",
     button_url: "/contact",
@@ -208,7 +208,7 @@ const fallbackArtStudioServices: ArtStudioService[] = [
     title: "Визуално представяне",
     slug: "visual-storytelling",
     description: "Фотография, дизайн подготовка и кратки визуални истории за събития, места и бизнеси.",
-    image_url: "https://images.unsplash.com/photo-1485846234645-a62644f84728?auto=format&fit=crop&w=900&q=80",
+    image_url: null,
     image_alt: "Визуално представяне",
     button_label: "Обсъди проект",
     button_url: "/contact",
@@ -412,7 +412,15 @@ export async function getSiteSettings(locale: Locale = "bg"): Promise<SiteSettin
     .eq("locale", locale)
     .maybeSingle();
 
-  return localizeSettings(data, translation);
+  const localized = localizeSettings(data, translation);
+
+  /* Without an English row the Bulgarian description would show on /en; an empty value
+     lets the pages fall back to their English dictionary text instead. */
+  if (locale !== "bg" && !translation) {
+    return { ...localized, site_description: "" };
+  }
+
+  return localized;
 }
 
 export async function getNavigationItems(locale: Locale = "bg"): Promise<NavigationItem[]> {
@@ -939,5 +947,14 @@ export async function getArtStudioServices(options?: { includeInactive?: boolean
     .in("service_id", services.map((service) => service.id));
   const byId = new Map((translations ?? []).map((translation) => [translation.service_id, translation]));
 
-  return services.map((service) => localizeService(service, byId.get(service.id)));
+  /* No stock photos on the public site: a service whose picture still points to Unsplash renders the
+     colour panel until the owner uploads a real photo (rule from 2026-09-02, enforced 2026-10-31). */
+  return services.map((service) => {
+    const localized = localizeService(service, byId.get(service.id));
+    return isStockPhotoUrl(localized.image_url) ? { ...localized, image_url: null } : localized;
+  });
+}
+
+function isStockPhotoUrl(url: string | null | undefined) {
+  return /^https?:\/\/(images\.)?unsplash\.com\//i.test(String(url || ""));
 }

@@ -99,8 +99,11 @@ function HeroMedia({ settings, locale }: { settings: SiteSettings; locale: Local
 
 function quickLinks(locale: Locale, categories: Category[]) {
   const dictionary = getDictionary(locale);
-  const links = categories.map((category) => ({
+  // Every card carries its own small label: a category is "today in Bansko", the other three are not.
+  type QuickLink = { id: string; eyebrow: string; title: string; text: string; href: string };
+  const links: QuickLink[] = categories.map((category) => ({
     id: category.id,
+    eyebrow: dictionary.todayInBansko,
     title: category.name,
     text: category.description || "",
     href: `/${category.slug}`
@@ -108,18 +111,21 @@ function quickLinks(locale: Locale, categories: Category[]) {
 
   links.push({
     id: "articles",
+    eyebrow: locale === "en" ? "Articles" : "Статии",
     title: dictionary.allArticles,
     text: locale === "en" ? "Everything published on Bansko NOW, newest first." : "Всичко публикувано в Bansko NOW, най-новото първо.",
     href: "/articles"
   });
   links.push({
     id: "gallery",
+    eyebrow: locale === "en" ? "Art gallery" : "Арт галерия",
     title: locale === "en" ? "Gallery" : "Галерия",
     text: locale === "en" ? "Original T-shirts, prints and mugs from the gallery in Bansko." : "Авторски тениски, принтове и чаши от галерията в Банско.",
     href: "/art-studio/gallery"
   });
   links.push({
     id: "businesses",
+    eyebrow: locale === "en" ? "Directory" : "Каталог",
     title: dictionary.localBusinesses,
     text: dictionary.businessesIntro,
     href: "/places"
@@ -203,7 +209,7 @@ export default async function HomePage({ params }: { params: Params }) {
             <div className="grid gap-4 sm:grid-cols-2">
               {cards.map((card) => (
                 <Link key={card.id} href={localePath(locale, card.href) as Route} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-xl">
-                  <p className="text-xs font-semibold uppercase text-moss">{dictionary.todayInBansko}</p>
+                  <p className="text-xs font-semibold uppercase text-moss">{card.eyebrow}</p>
                   <h2 className="mt-3 font-serif text-2xl font-semibold text-stone-950">{card.title}</h2>
                   {card.text ? <p className="mt-2 line-clamp-3 text-sm leading-6 text-stone-600">{card.text}</p> : null}
                 </Link>
@@ -231,31 +237,10 @@ export default async function HomePage({ params }: { params: Params }) {
             </section>
           ) : null}
 
+          {/* The "Bansko Collection" block and the newsletter box were removed for the launch (2026-10-31):
+              the collection category has no articles and there is no newsletter yet. */}
           <SiteBlock name="art_studio" locale={locale} settings={settings} />
-          <SiteBlock name="collection" locale={locale} settings={settings} />
           <SiteBlock name="facebook" locale={locale} settings={settings} />
-
-          <section className="rounded-3xl border border-stone-200 bg-white p-8 shadow-soft sm:p-10">
-            <div className="grid gap-6 md:grid-cols-[1.2fr_0.8fr] md:items-center">
-              <div>
-                <p className="text-sm font-semibold uppercase text-moss">Newsletter</p>
-                <h2 className="mt-3 font-serif text-3xl font-semibold text-stone-950">
-                  {dictionary.newsletterTitle}
-                </h2>
-              </div>
-              <form className="flex gap-2">
-                <input
-                  type="email"
-                  placeholder={dictionary.email}
-                  className="min-w-0 flex-1 rounded-full border border-stone-300 bg-paper px-5 py-3 text-sm"
-                  disabled
-                />
-                <button type="button" className="rounded-full bg-forest px-5 py-3 text-sm font-semibold text-white">
-                  {dictionary.soon}
-                </button>
-              </form>
-            </div>
-          </section>
         </div>
       </main>
       <SiteFooter settings={settings} locale={locale} />
