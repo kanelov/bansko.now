@@ -812,6 +812,14 @@ The source request app (`https://app.kanelov.com`) has a Content Hub module („
 - **Bulk metadata.** `GET /api/admin/photos/export` returns a CSV of every editable field (plus read-only `image_url` and `photo_page`), `POST /api/admin/photos/import` writes it back, matching rows by `photo_code`; empty cells are left untouched and nothing is created or deleted. Helpers in `src/lib/photo-csv.ts`, UI in `PhotoCsvTools`. Intended flow: export, let an AI fill in the BG/EN titles, descriptions, alt texts, tags and SEO fields, import.
 - Derivatives are built one at a time and uploaded immediately (`createPhotoDerivatives`) to keep the function under the memory and time limits; a failed upload deletes the half made row and records the reason in `photo_import_jobs` (shown at the top of the admin page).
 
+## 27a. Cinema program on the home page (2026-10-31)
+
+- The Kino Arena Bansko program sits under the weather widget on the home page (same card format, compact rows, Днес / Утре / day switch), no extra page and no menu entry (owner's decision). Times and „Билети и цялата седмица“ link to kinoarena.com; posters and synopses are never copied.
+- Table `cinema_programs` (migration `20261031180000_cinema_program`): one row `arena-bansko`, the week as jsonb `screenings`, `fetched_at` / `fetch_ok` / `fetch_error`; anon reads, only the service role writes.
+- `src/lib/cinema-parse.ts` (regex parser for the Stenik markup: day tabs, `.scheduleRow`, movie page details), `src/lib/cinema-fetch.ts` (7 days ahead + one movie page per film, 3–4 parallel), `src/lib/cinema.ts` (`getCinemaProgram`, `cinemaDays`), `CinemaWidget` + `CinemaDayTabs` in `src/components/public/`.
+- `GET /api/cron/cinema` (Vercel cron Tue/Fri 06:20 UTC, `CRON_SECRET` when set) rewrites the row and revalidates `/`; on failure the old program stays with `fetch_error`. The widget renders nothing while the row has no `fetched_at` or no screenings for the next three days.
+- Cloud sessions: `*.kinoarena.com` must be in the environment's Allowed domains (the site lives on `www.`); Node's fetch needs `NODE_USE_ENV_PROXY=1` to reach it from a script.
+
 ## 28. Business Platform (2026-09-16)
 
 - **What it is.** A multi-tenant layer for local businesses (first client: a café) inside this project: one Next.js app, one Supabase, one Vercel deployment, isolation by `business_id`, a separate owner portal under `/business`, one menu shown on four surfaces (public profile, QR menu, TV screens, print). The full architecture, the decisions and the build plan are in `docs/business-platform.md`; keep the „Изпълнение“ table there current.

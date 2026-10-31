@@ -1,11 +1,12 @@
 import { NextResponse } from "next/server";
 import { revalidatePublicPath } from "@/lib/articles-admin";
 import { cinemaProgramId } from "@/lib/cinema";
-import { parseKinoArenaProgram } from "@/lib/cinema-parse";
+import { fetchKinoArenaProgram } from "@/lib/cinema-fetch";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 
-// Взима програмата на Арена Банско от официалната страница на Кино Арена (vercel.json → crons,
-// два пъти седмично) и я записва в cinema_programs. Само факти: заглавие, дата, час, зала, формат, възраст.
+// Взима програмата на Арена Банско от официалния сайт на Кино Арена (vercel.json → crons, вторник и петък
+// сутрин) и я записва в cinema_programs. Само факти: заглавие, дата, час, формат, език, възраст, жанр,
+// продължителност. Около 25 заявки на пускане: лентата с дните, 7 дни напред и по една страница на филм.
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
 
@@ -25,14 +26,7 @@ export async function GET(request: Request) {
 
   const now = new Date().toISOString();
   try {
-    const response = await fetch(program.source_url, {
-      cache: "no-store",
-      headers: { "user-agent": "Mozilla/5.0 (compatible; BanskoNOW/1.0; +https://bansko.now)", accept: "text/html" },
-      signal: AbortSignal.timeout(25_000)
-    });
-    if (!response.ok) throw new Error(`HTTP ${response.status}`);
-    const html = await response.text();
-    const screenings = parseKinoArenaProgram(html, program.source_url);
+    const screenings = await fetchKinoArenaProgram(program.source_url);
     if (!screenings.length) throw new Error("Програмата е прочетена, но не бяха разпознати прожекции.");
 
     const { error } = await supabase
