@@ -710,6 +710,10 @@ export type BusinessWithRelations = Business & {
   business_contacts?: BusinessContact[] | null;
   requested_plan?: BusinessListingPlan | null;
   active_plan?: BusinessListingPlan | null;
+  /** Alt текст от превода (`business_translations.image_alt`); попълва се при локализиране. */
+  image_alt?: string | null;
+  /** Шаблонната илюстрация на категорията, попълнена при четене, когато бизнесът няма своя снимка (`src/lib/business-placeholders.ts`). Не се записва. */
+  placeholder_image_url?: string | null;
 };
 
 /* Business Platform (docs/business-platform.md, CLAUDE.md раздел 28) */

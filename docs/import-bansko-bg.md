@@ -48,8 +48,20 @@ alt текст на шаблонната илюстрация), `business_contac
 
 Профил без собствена снимка показва илюстрацията на категорията си:
 `https://cdn.bansko.now/business/placeholders/placeholder-<slug>.webp` (виж
-`docs/biznes-shabloni-snimki.md`). Кодът за това още не е написан – влиза с качването на десетте
-илюстрации (`BusinessCard`, профилът и `og_image_url`).
+`docs/biznes-shabloni-snimki.md`). Кодът е готов от 2026-10-31 (`src/lib/business-placeholders.ts`,
+попълва се при четене в `src/lib/businesses.ts`; карта, профил, Open Graph и JSON-LD). Остава
+качването на десетте илюстрации в R2 – дотогава картите показват цветния панел.
+
+## Опит за прилагане от облачна сесия (2026-10-31)
+
+Стъпка 1 спря на 403: в облачната среда на Claude прокси-то слага служебно своя Supabase токен
+(акаунта на приложението за заявки, организация „Patreon“) върху **всяка** заявка към
+`api.supabase.com`, така че `SUPABASE_TOKEN_ARTGALLERY` никога не стига до Supabase, а Supabase
+конекторът е вързан към трета организация. Проектът `rzjyawjdhcedddydmfge` не се вижда по нито
+един от двата пътя. Решения: собственикът пуска SQL-а от своя компютър
+(`node scripts/supabase-sql.mjs --file import-bansko-bg.sql` с токена за ART GALLERY в
+`.env.local`), или сменя инжектирания токен за `api.supabase.com` в настройките на средата с
+токена за ART GALLERY. Генерирането на SQL-а (стъпка 2) работи и в облака.
 
 ## Решения на собственика (2026-10-31)
 

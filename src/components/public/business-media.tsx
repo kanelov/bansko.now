@@ -1,8 +1,8 @@
 import { getBusinessVideoEmbedUrl } from "@/lib/business-public";
-import type { Business } from "@/lib/types";
+import type { BusinessWithRelations } from "@/lib/types";
 
 type BusinessMediaProps = {
-  business: Pick<Business, "name" | "images" | "video_link">;
+  business: Pick<BusinessWithRelations, "name" | "images" | "video_link" | "image_alt" | "placeholder_image_url">;
   className?: string;
   imageClassName?: string;
   preferVideo?: boolean;
@@ -37,7 +37,16 @@ export function BusinessMedia({
   if (image) {
     return (
       <div className={className}>
-        <img src={image} alt={business.name} className={imageClassName} loading={loading} />
+        <img src={image} alt={business.image_alt || business.name} className={imageClassName} loading={loading} />
+      </div>
+    );
+  }
+
+  /* Шаблонната илюстрация на категорията (попълнена при четене), докато бизнесът няма своя снимка. */
+  if (business.placeholder_image_url) {
+    return (
+      <div className={className}>
+        <img src={business.placeholder_image_url} alt={business.image_alt || business.name} className={imageClassName} loading={loading} />
       </div>
     );
   }

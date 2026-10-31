@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BusinessMedia } from "@/components/public/business-media";
+import { businessPrimaryImage } from "@/lib/business-placeholders";
 import { SiteBlock } from "@/components/public/site-block";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
@@ -40,6 +41,8 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     languages["x-default"] = canonical;
   }
 
+  const ogImage = business.og_image_url || businessPrimaryImage(business);
+
   return {
     title: { absolute: business.seo_title || `${business.name} в Банско | Bansko NOW` },
     description: business.seo_description || business.description || `${business.name} - ${business.category} в Банско.`,
@@ -47,7 +50,7 @@ export async function generateMetadata({ params }: { params: Params }): Promise<
     openGraph: {
       title: business.og_title || business.seo_title || business.name,
       description: business.og_description || business.seo_description || business.description || business.address,
-      images: business.og_image_url || business.images?.[0] ? [business.og_image_url || business.images?.[0] || ""] : undefined,
+      images: ogImage ? [ogImage] : undefined,
       type: "website"
     },
     robots: {
@@ -71,6 +74,7 @@ export default async function BusinessProfilePage({ params }: { params: Params }
   const alternateLocale: Locale = locale === "bg" ? "en" : "bg";
   const translation = await getApprovedBusinessTranslation(business.id, alternateLocale);
   const businessUrl = localeUrl(locale, `/places/${business.slug}`);
+  const heroImage = businessPrimaryImage(business);
 
   /* Платформата: меню и „отворено сега“ идват от същите таблици като портала. */
   const publicClient = createPublicSupabaseClient();
@@ -84,7 +88,7 @@ export default async function BusinessProfilePage({ params }: { params: Params }
     "@type": business.schema_type || "LocalBusiness",
     name: business.name,
     description: business.description,
-    image: business.images || [],
+    image: business.images?.length ? business.images : business.placeholder_image_url ? [business.placeholder_image_url] : [],
     address: business.address,
     url: businessUrl,
     inLanguage: locale === "en" ? "en" : "bg",
@@ -141,8 +145,8 @@ export default async function BusinessProfilePage({ params }: { params: Params }
       <SiteHeader locale={locale} alternateHref={translation ? localePath(alternateLocale, `/places/${translation.slug}`) : null} />
       <main>
         <section className="relative min-h-[58vh] overflow-hidden bg-forest text-white">
-          {business.images?.[0] ? (
-            <img src={business.images[0]} alt={business.name} className="absolute inset-0 h-full w-full object-cover opacity-70" />
+          {heroImage ? (
+            <img src={heroImage} alt={business.image_alt || business.name} className="absolute inset-0 h-full w-full object-cover opacity-70" />
           ) : null}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/65" />
           <div className="relative mx-auto flex min-h-[58vh] max-w-7xl flex-col justify-end px-4 pb-12 pt-24 sm:px-6 lg:px-8">
@@ -207,7 +211,7 @@ export default async function BusinessProfilePage({ params }: { params: Params }
           {business.images && business.images.length > 1 ? (
             <section className="grid gap-4 sm:grid-cols-2">
               {business.images.slice(1).map((image) => (
-                <img key={image} src={image} alt={business.name} className="aspect-[4/3] rounded-2xl object-cover" loading="lazy" />
+                <img key={image} src={image} alt={business.image_alt || business.name} className="aspect-[4/3] rounded-2xl object-cover" loading="lazy" />
               ))}
             </section>
           ) : null}

@@ -1,6 +1,8 @@
+import { cache } from "react";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
 import { localePath } from "@/lib/i18n";
+import { getAvailableBusinessPlaceholders, withBusinessPlaceholder } from "@/lib/business-placeholders";
 import type {
   Business,
   BusinessDirectorySettings,
@@ -193,8 +195,26 @@ function localizeBusiness(business: BusinessWithRelations, translation: Business
     og_image_url: translation.og_image_url,
     robots_index: translation.robots_index,
     robots_follow: translation.robots_follow,
-    schema_type: translation.schema_type
+    schema_type: translation.schema_type,
+    image_alt: translation.image_alt
   };
+}
+
+/* Карта id → slug на категориите (десет реда), за шаблонните илюстрации. */
+const getBusinessCategorySlugById = cache(async (): Promise<ReadonlyMap<string, string>> => {
+  const supabase = createPublicSupabaseClient();
+  if (!supabase) return new Map();
+  const { data } = await supabase.from("business_categories").select("id, slug");
+  return new Map((data ?? []).map((row) => [row.id, row.slug]));
+});
+
+/** Попълва `placeholder_image_url` при бизнеси без своя снимка (нищо не се записва в базата). */
+async function withBusinessPlaceholders<T extends BusinessWithRelations>(businesses: T[]): Promise<T[]> {
+  if (!businesses.some((business) => !business.images?.length)) {
+    return businesses;
+  }
+  const [categorySlugById, available] = await Promise.all([getBusinessCategorySlugById(), getAvailableBusinessPlaceholders()]);
+  return businesses.map((business) => withBusinessPlaceholder(business, categorySlugById, available));
 }
 
 export async function getApprovedBusinesses(locale: Locale = "bg"): Promise<BusinessWithRelations[]> {
@@ -224,12 +244,14 @@ export async function getApprovedBusinesses(locale: Locale = "bg"): Promise<Busi
     .in("business_id", businesses.map((business) => business.id));
   const byId = new Map((translations ?? []).map((translation) => [translation.business_id, translation]));
 
-  return businesses
+  const localized = businesses
     .flatMap((business) => {
       const translation = byId.get(business.id);
       return translation ? [localizeBusiness(business, translation)] : [];
     })
     .sort(compareBusinesses);
+
+  return withBusinessPlaceholders(localized);
 }
 
 export async function getHomepageSpotlightBusiness(locale: Locale = "bg") {
@@ -268,7 +290,9 @@ export async function getBusinessBySlug(slug: string, locale: Locale = "bg") {
     .eq("status", "approved")
     .maybeSingle();
 
-  return data ? localizeBusiness(normalizeBusiness(data as unknown as BusinessWithRelations), translation) : null;
+  if (!data) return null;
+  const [business] = await withBusinessPlaceholders([localizeBusiness(normalizeBusiness(data as unknown as BusinessWithRelations), translation)]);
+  return business;
 }
 
 export async function getApprovedBusinessTranslation(businessId: string, locale: Locale) {
@@ -296,7 +320,11 @@ export async function getApprovedBusinessTranslation(businessId: string, locale:
     .eq("status", "approved")
     .maybeSingle();
 
-  return data ? localizeBusiness(normalizeBusiness(data as unknown as BusinessWithRelations), translation as BusinessTranslation) : null;
+  if (!data) return null;
+  const [business] = await withBusinessPlaceholders([
+    localizeBusiness(normalizeBusiness(data as unknown as BusinessWithRelations), translation as BusinessTranslation)
+  ]);
+  return business;
 }
 
 export async function getAdminBusinesses(): Promise<BusinessWithRelations[]> {
