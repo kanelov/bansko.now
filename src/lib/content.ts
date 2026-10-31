@@ -83,16 +83,16 @@ const fallbackPages: EditablePage[] = [
     title: "Bansko NOW",
     slug: "about",
     eyebrow: "За проекта",
-    excerpt: "Местна дигитална платформа за събития, култура, природа, хора и ежедневен живот в Банско.",
+    excerpt: "Местна платформа, която помага на бизнесите и хората в Банско да се намират по-лесно – с изкуствен интелект и приложения, направени за града.",
     content:
-      "Bansko NOW е създаден като бързо, красиво и полезно място за откриване на Банско.\n\nПубликуваме статии, местни препоръки, визуални истории, бизнеси и сезонни идеи, които помагат на хората да преживяват града по-близо.",
+      "Bansko NOW е независим проект от Банско. Събираме на едно място това, което градът предлага: новини и идеи за деня, местните бизнеси с актуални менюта и работно време, фотографии от Пирин и Art Studio за продукти по поръчка.\n\nЗад сайта стои малък екип, който разработва работещи приложения за нуждите на хората и бизнеса в Банско: каталог на бизнесите с безплатен профил, QR менюта и екрани за заведенията, печат на менюта, фотоархив с лицензи, уведомления за поръчки. Ползваме изкуствен интелект там, където спестява време – за превод, за подреждане на информацията и за първите чернови – а последната дума винаги е на човек от Банско.\n\nЦелта е проста: местният бизнес да достига до хората, които са в града днес – гости и съседи – без скъпи реклами и сложни системи. Ако имаш бизнес в Банско, профилът ти тук е безплатен. Ако имаш идея за приложение, което би помогнало на града, пиши ни.",
     hero_image_url: null,
     hero_image_alt: "Bansko NOW",
     cta_label: null,
     cta_url: null,
     status: "published",
     seo_title: "За Bansko NOW",
-    seo_description: "Bansko NOW е локална lifestyle и културна платформа за Банско и Пирин.",
+    seo_description: "Bansko NOW: местна платформа и приложения, които помагат на бизнесите и хората в Банско да се намират – с помощта на изкуствен интелект.",
     canonical_url: null,
     og_title: null,
     og_description: null,
@@ -241,11 +241,11 @@ const englishPages: Record<string, Partial<EditablePage>> = {
   about: {
     title: "Bansko NOW",
     eyebrow: "About the project",
-    excerpt: "A local digital platform for events, culture, nature, people and everyday life in Bansko.",
+    excerpt: "A local platform that helps businesses and people in Bansko find each other more easily, with artificial intelligence and apps built for the town.",
     content:
-      "Bansko NOW is a fast, beautiful and useful place for discovering Bansko.\n\nWe publish articles, local recommendations, visual stories, businesses and seasonal ideas that bring people closer to the town.",
+      "Bansko NOW is an independent project from Bansko. It brings together what the town has to offer: news and ideas for the day, local businesses with up-to-date menus and opening hours, photography from Pirin and an Art Studio for made-to-order products.\n\nBehind the site is a small team that builds working apps for the needs of people and businesses in Bansko: a business directory with a free profile, QR menus and screens for cafés and restaurants, menu printing, a photo archive with licences, order notifications. We use artificial intelligence where it saves time, for translation, for organising information and for first drafts, and the final word always belongs to a person from Bansko.\n\nThe goal is simple: local businesses reaching the people who are in town today, visitors and neighbours alike, without expensive advertising or complicated systems. If you run a business in Bansko, your profile here is free. If you have an idea for an app that would help the town, write to us.",
     seo_title: "About Bansko NOW",
-    seo_description: "Learn about Bansko NOW, a local lifestyle, culture and nature platform for Bansko and Pirin."
+    seo_description: "Bansko NOW: a local platform and apps that help businesses and people in Bansko find each other, with the help of artificial intelligence."
   },
   contact: {
     title: "Contact Bansko NOW",
