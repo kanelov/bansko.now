@@ -211,7 +211,7 @@ export default async function HomePage({ params }: { params: Params }) {
               {/* Кино програмата стои под прогнозата, в същия формат; скрита е, докато няма взети данни. */}
               <CinemaWidget locale={locale} />
             </div>
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div className="grid content-start gap-4 sm:grid-cols-2">
               {cards.map((card) => (
                 <Link key={card.id} href={localePath(locale, card.href) as Route} className="rounded-2xl border border-stone-200 bg-white p-5 shadow-soft transition hover:-translate-y-0.5 hover:shadow-xl">
                   <p className="text-xs font-semibold uppercase text-moss">{card.eyebrow}</p>

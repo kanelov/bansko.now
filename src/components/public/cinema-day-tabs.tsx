@@ -12,6 +12,10 @@ export function CinemaDayTabs({ days, locale, eyebrow, ticketsUrl, footer }: { d
   const en = locale === "en";
   const count = day.screenings.length;
   const filmsLabel = en ? `${count} ${count === 1 ? "film" : "films"}` : `${count} ${count === 1 ? "филм" : "филма"}`;
+  /** При дни с много филми картата остава компактна: най-много осем реда, останалите са на сайта на киното. */
+  const maxRows = 8;
+  const shown = day.screenings.slice(0, maxRows);
+  const hidden = day.screenings.length - shown.length;
 
   return (
     <>
@@ -40,7 +44,7 @@ export function CinemaDayTabs({ days, locale, eyebrow, ticketsUrl, footer }: { d
 
       <div className="mt-3 grid">
         {day.screenings.length ? (
-          day.screenings.map((film, index) => {
+          shown.map((film, index) => {
             const meta = [film.times[0]?.hall, film.format, film.language, film.age].filter(Boolean).join(" · ");
             return (
               <div key={`${film.title}-${index}`} className={`flex items-center justify-between gap-3 py-2.5 ${index ? "border-t border-dashed border-stone-300" : "pt-1"}`}>
@@ -65,9 +69,15 @@ export function CinemaDayTabs({ days, locale, eyebrow, ticketsUrl, footer }: { d
               </div>
             );
           })
-        ) : (
+        ) : null}
+        {hidden > 0 ? (
+          <a href={ticketsUrl} target="_blank" rel="noopener noreferrer" className="border-t border-dashed border-stone-300 py-2.5 text-sm font-semibold text-forest hover:underline">
+            {en ? `+ ${hidden} more ${hidden === 1 ? "film" : "films"} at kinoarena.com ↗` : `+ още ${hidden} ${hidden === 1 ? "филм" : "филма"} в kinoarena.com ↗`}
+          </a>
+        ) : null}
+        {!day.screenings.length ? (
           <p className="py-3 text-sm text-stone-600">{en ? "No screenings listed for this day." : "Няма обявени прожекции за този ден."}</p>
-        )}
+        ) : null}
       </div>
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2 border-t border-dashed border-stone-300 pt-3 text-xs text-stone-600">
