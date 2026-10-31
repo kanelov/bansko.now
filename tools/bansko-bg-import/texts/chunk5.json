@@ -1,0 +1,398 @@
+[
+ {
+  "slug": "bansko-fun-holidays",
+  "name_bg": "Bansko Fun Holidays",
+  "name_en": "Bansko Fun Holidays",
+  "description_bg": "Ски и сноуборд център на ул. „Пирин“, по пътя към лифта: наем и сервиз на екипировка, ски и сноуборд училище, магазин за ски обувки и аксесоари и изработка на индивидуални стелки по крака.",
+  "description_en": "Ski and snowboard centre on Pirin Street, on the way to the lift: equipment rental and servicing, a ski and snowboard school, a shop for ski boots and accessories, and custom-made insoles.",
+  "image_alt_bg": "Bansko Fun Holidays, Банско",
+  "image_alt_en": "Bansko Fun Holidays, Bansko"
+ },
+ {
+  "slug": "ski-board-traventuria",
+  "name_bg": "Ski & Board Traventuria",
+  "name_en": "Ski & Board Traventuria",
+  "description_bg": "Магазин за наем на ски и сноуборд оборудване на ул. „Пирин“, с вход от ул. „Питу Гули“: екипировка под наем, сервиз, лифт карти, обучение и трансфери, както и лични шкафчета със сушене.",
+  "description_en": "Ski and snowboard rental shop on Pirin Street, entered from Pitu Guli Street: rental equipment, servicing, lift passes, lessons and transfers, plus personal lockers with drying.",
+  "image_alt_bg": "Ski & Board Traventuria, Банско",
+  "image_alt_en": "Ski & Board Traventuria, Bansko"
+ },
+ {
+  "slug": "veterinarna-klinika-bansko-dara-vet",
+  "name_bg": "Ветеринарна клиника Дара Вет",
+  "name_en": "Dara Vet Veterinary Clinic",
+  "description_bg": "Ветеринарна клиника със зоомагазин на ул. „Иконом К. Чучулайн“ в Банско, за домашни любимци и техните стопани.",
+  "description_en": "Veterinary clinic with a pet shop on Ikonom K. Chuchulayn Street in Bansko, for pets and their owners.",
+  "image_alt_bg": "Ветеринарна клиника Дара Вет, Банско",
+  "image_alt_en": "Dara Vet Veterinary Clinic, Bansko"
+ },
+ {
+  "slug": "zoo-magazin-asya",
+  "name_bg": "Зоомагазин Ася",
+  "name_en": "Asya Pet Shop",
+  "description_bg": "Зоомагазин на ул. „Стефан Стамболов“ в Банско, отворен в началото на 2021 г., с храни и аксесоари за домашни любимци.",
+  "description_en": "Pet shop on Stefan Stambolov Street in Bansko, open since early 2021, with food and accessories for pets.",
+  "image_alt_bg": "Зоомагазин Ася, Банско",
+  "image_alt_en": "Asya Pet Shop, Bansko"
+ },
+ {
+  "slug": "bloom-concept-flowers",
+  "name_bg": "Bloom Concept & Flowers",
+  "name_en": "Bloom Concept & Flowers",
+  "description_bg": "Цветарски магазин в центъра на Банско, на ул. „Цар Симеон“: букети, саксийни цветя и кутии с цветя, аранжировки за заведения, хотели и домове, както и организиране и декорация на частни и фирмени събития.",
+  "description_en": "Flower shop in the centre of Bansko, on Tsar Simeon Street: bouquets, potted plants and flower boxes, arrangements for venues, hotels and homes, and planning and decoration of private and corporate events.",
+  "image_alt_bg": "Bloom Concept & Flowers, Банско",
+  "image_alt_en": "Bloom Concept & Flowers, Bansko"
+ },
+ {
+  "slug": "iva-optik-bansko",
+  "name_bg": "Ива Оптик",
+  "name_en": "Iva Optics",
+  "description_bg": "Семейна оптика на ул. „Цар Симеон“ в Банско с диоптрични и слънчеви очила и контактни лещи; разполага с очен кабинет и предлага прегледи с офталмолог.",
+  "description_en": "Family-run optician on Tsar Simeon Street in Bansko with prescription glasses, sunglasses and contact lenses; it has an eye examination room and offers check-ups with an ophthalmologist.",
+  "image_alt_bg": "Ива Оптик, Банско",
+  "image_alt_en": "Iva Optics, Bansko"
+ },
+ {
+  "slug": "orazheen-magazin-balkan",
+  "name_bg": "Оръжеен магазин Балкан",
+  "name_en": "Balkan Gun Shop",
+  "description_bg": "Оръжеен магазин на ул. „Патриарх Евтимий“ в Банско, отворен през 2021 г.: ловна екипировка, боеприпаси, ловни оръжия и оръжия за самоотбрана, оптика, ножове и фойерверки.",
+  "description_en": "Gun shop on Patriarh Evtimiy Street in Bansko, open since 2021: hunting gear, ammunition, hunting and self-defence weapons, optics, knives and fireworks.",
+  "image_alt_bg": "Оръжеен магазин Балкан, Банско",
+  "image_alt_en": "Balkan Gun Shop, Bansko"
+ },
+ {
+  "slug": "vip-trejd",
+  "name_bg": "ВИП Трейд",
+  "name_en": "VIP Trade",
+  "description_bg": "Фирма за дистрибуция на алкохолни и безалкохолни напитки в Банско, която от 2004 г. обслужва общините Банско, Белица и Разлог.",
+  "description_en": "Drinks distributor in Bansko, supplying alcoholic and soft drinks to the municipalities of Bansko, Belitsa and Razlog since 2004.",
+  "image_alt_bg": "ВИП Трейд, Банско",
+  "image_alt_en": "VIP Trade, Bansko"
+ },
+ {
+  "slug": "ivena-komers",
+  "name_bg": "Ивена Комерс",
+  "name_en": "Ivena Komers",
+  "description_bg": "Фирма за търговия на едро на площад „Трети март“ в Банско, работеща от 2014 г., с доставка до обекти в общината и околността.",
+  "description_en": "Wholesale company on Treti Mart Square in Bansko, trading since 2014, with delivery to businesses across the municipality and the surrounding area.",
+  "image_alt_bg": "Ивена Комерс, Банско",
+  "image_alt_en": "Ivena Komers, Bansko"
+ },
+ {
+  "slug": "bansko-fuud",
+  "name_bg": "Банско Фууд",
+  "name_en": "Bansko Food",
+  "description_bg": "Фирма за търговия на едро в Банско, регистрирана през 2013 г.",
+  "description_en": "Wholesale trading company in Bansko, registered in 2013.",
+  "image_alt_bg": "Банско Фууд, Банско",
+  "image_alt_en": "Bansko Food, Bansko"
+ },
+ {
+  "slug": "singal-trak",
+  "name_bg": "Сингъл Трак",
+  "name_en": "Single Track",
+  "description_bg": "Магазин и професионален велосипеден сервиз на ул. „Гоце Делчев“ в Банско, отворен през лятото на 2019 г.",
+  "description_en": "Bike shop and professional bicycle workshop on Gotse Delchev Street in Bansko, open since the summer of 2019.",
+  "image_alt_bg": "Сингъл Трак, Банско",
+  "image_alt_en": "Single Track, Bansko"
+ },
+ {
+  "slug": "imi-sports",
+  "name_bg": "ИМИ Спортс",
+  "name_en": "IMI Sports",
+  "description_bg": "Организатор на пейнтбол игри и турнири с адрес на ул. „Пирин“ в Банско: игри за аматьори и деца, тиймбилдинг програми и големи фирмени събития с преносими надуваеми игрища и собствена екипировка.",
+  "description_en": "Paintball organiser based on Pirin Street in Bansko: games for amateurs and children, team-building programmes and large corporate events, with portable inflatable fields and its own equipment.",
+  "image_alt_bg": "ИМИ Спортс, Банско",
+  "image_alt_en": "IMI Sports, Bansko"
+ },
+ {
+  "slug": "btour",
+  "name_bg": "BTOUR",
+  "name_en": "BTOUR",
+  "description_bg": "Агенция за тиймбилдинг програми с офис на ул. „Пирин“ в новата част на Банско: подбор на локации и организация на фирмени събития от началото до края.",
+  "description_en": "Team-building agency with an office on Pirin Street in the newer part of Bansko: venue selection and corporate events organised from start to finish.",
+  "image_alt_bg": "BTOUR, Банско",
+  "image_alt_en": "BTOUR, Bansko"
+ },
+ {
+  "slug": "victoria",
+  "name_bg": "Ресторант Victoria",
+  "name_en": "Victoria Restaurant",
+  "description_bg": "Ресторант и пицария от веригата Victoria на ул. „Пирин“, съвсем близо до кабинковия лифт.",
+  "description_en": "Restaurant and pizzeria of the Victoria chain on Pirin Street, a short walk from the gondola lift.",
+  "image_alt_bg": "Ресторант Victoria, Банско",
+  "image_alt_en": "Victoria Restaurant, Bansko"
+ },
+ {
+  "slug": "ethno-restaurant-bansko",
+  "name_bg": "Ethno Restaurant Bansko",
+  "name_en": "Ethno Restaurant Bansko",
+  "description_bg": "Ресторант с традиционна българска кухня в комплекса на хотел „Кемпински Гранд Арена“ на ул. „Пирин“, с изглед към планината.",
+  "description_en": "Traditional Bulgarian restaurant within the Kempinski Grand Arena hotel complex on Pirin Street, with a view of the mountain.",
+  "image_alt_bg": "Ethno Restaurant Bansko, Банско",
+  "image_alt_en": "Ethno Restaurant Bansko, Bansko"
+ },
+ {
+  "slug": "75s-tasty",
+  "name_bg": "75’s Tasty",
+  "name_en": "75’s Tasty",
+  "description_bg": "Заведение за бързо хранене на ул. „Пирин“, открито през 2022 г.: бургери, пици и по-леки ястия, приготвяни на момента.",
+  "description_en": "Fast-food spot on Pirin Street, open since 2022: burgers, pizzas and lighter dishes cooked to order.",
+  "image_alt_bg": "75’s Tasty, Банско",
+  "image_alt_en": "75’s Tasty, Bansko"
+ },
+ {
+  "slug": "george-mary-family-restaurant",
+  "name_bg": "George & Mary Family Restaurant",
+  "name_en": "George & Mary Family Restaurant",
+  "description_bg": "Семеен ресторант на ул. „Глазе“ в Банско с банска, българска и европейска кухня, 150 места вътре и 50 на открито в градината през лятото; подходящ и за семейни и фирмени празници.",
+  "description_en": "Family restaurant on Glaze Street in Bansko serving Bansko, Bulgarian and European dishes, with 150 seats inside and 50 in the garden in summer; it also hosts family and company celebrations.",
+  "image_alt_bg": "George & Mary Family Restaurant, Банско",
+  "image_alt_en": "George & Mary Family Restaurant, Bansko"
+ },
+ {
+  "slug": "mehana-oreha",
+  "name_bg": "Механа Ореха",
+  "name_en": "Oreha Tavern",
+  "description_bg": "Механа с традиционна българска кухня на ул. „Никола Вапцаров“ в центъра на Банско, с открита каменна камина и тераса.",
+  "description_en": "Tavern with traditional Bulgarian cooking on Nikola Vaptsarov Street in the centre of Bansko, with an open stone fireplace and a terrace.",
+  "image_alt_bg": "Механа Ореха, Банско",
+  "image_alt_en": "Oreha Tavern, Bansko"
+ },
+ {
+  "slug": "mehana-hadzhi-georgi",
+  "name_bg": "Механа и хотел Хаджи Георги",
+  "name_en": "Hadzhi Georgi Tavern and Hotel",
+  "description_bg": "Семеен хотел с механа на ул. „Пирин“, на около 150 м от кабинковия лифт, работещ от 1992 г.: единични, двойни и тройни стаи, лятна градина, сауна и ски гардероб; през лятото организира планински походи.",
+  "description_en": "Family hotel with a tavern on Pirin Street, about 150 m from the gondola lift, in business since 1992: single, double and triple rooms, a summer garden, a sauna and ski storage; mountain walks are organised in summer.",
+  "image_alt_bg": "Механа и хотел Хаджи Георги, Банско",
+  "image_alt_en": "Hadzhi Georgi Tavern and Hotel, Bansko"
+ },
+ {
+  "slug": "restorant180-gradusa",
+  "name_bg": "Ресторант 180 градуса",
+  "name_en": "180 Degrees Restaurant",
+  "description_bg": "Италиански ресторант и бар в ски зоната, на финала на писта №4 над Шилигарника, където се събират четири писти; пици и италиански ястия.",
+  "description_en": "Italian restaurant and bar in the ski area, at the bottom of piste No. 4 above Shiligarnika, where four pistes meet; pizzas and Italian dishes.",
+  "image_alt_bg": "Ресторант 180 градуса, Банско",
+  "image_alt_en": "180 Degrees Restaurant, Bansko"
+ },
+ {
+  "slug": "restorant-bla-bla",
+  "name_bg": "Ресторант Бла-бла",
+  "name_en": "Bla-Bla Restaurant",
+  "description_bg": "Ресторант в ски зоната на Шилигарника, близо до няколко писти, с богато меню и селекция от червени и бели вина.",
+  "description_en": "Restaurant in the Shiligarnika ski area, close to several pistes, with a wide menu and a selection of red and white wines.",
+  "image_alt_bg": "Ресторант Бла-бла, Банско",
+  "image_alt_en": "Bla-Bla Restaurant, Bansko"
+ },
+ {
+  "slug": "restorant-bachvite",
+  "name_bg": "Ресторант Бъчвите",
+  "name_en": "Bachvite Restaurant",
+  "description_bg": "Ресторант на Бъндеришка поляна в ски зоната, за по-дълга почивка и пълноценно хранене между спусканията.",
+  "description_en": "Restaurant on Banderishka Polyana in the ski area, for a longer break and a proper meal between runs.",
+  "image_alt_bg": "Ресторант Бъчвите, Банско",
+  "image_alt_en": "Bachvite Restaurant, Bansko"
+ },
+ {
+  "slug": "restorant-za-barzo-hranene-sthekite",
+  "name_bg": "Ресторант за бързо хранене Щеките",
+  "name_en": "Shtekite Fast Food Restaurant",
+  "description_bg": "Заведение за бързо хранене на самообслужване на два етажа на Бъндеришка поляна в ски зоната, с обновен интериор.",
+  "description_en": "Self-service fast-food restaurant on two floors on Banderishka Polyana in the ski area, with a renewed interior.",
+  "image_alt_bg": "Ресторант Щеките, Банско",
+  "image_alt_en": "Shtekite Restaurant, Bansko"
+ },
+ {
+  "slug": "restorant-za-barzo-hranene-kozela",
+  "name_bg": "Ресторант Козела",
+  "name_en": "Kozela Fast Food Restaurant",
+  "description_bg": "Заведение за бързо хранене на самообслужване на Платото в ски зоната, точно до писта №3, за хапване между спусканията.",
+  "description_en": "Self-service fast-food restaurant on the Plateau in the ski area, right next to piste No. 3, for a quick meal between runs.",
+  "image_alt_bg": "Ресторант Козела, Банско",
+  "image_alt_en": "Kozela Restaurant, Bansko"
+ },
+ {
+  "slug": "kafe-bar-chajnika",
+  "name_bg": "Кафе-бар Чайника",
+  "name_en": "Chaynika Café Bar",
+  "description_bg": "Малко кафене на Бъндеришка поляна в ски зоната, за топла напитка между спусканията.",
+  "description_en": "Small café on Banderishka Polyana in the ski area, for a hot drink between runs.",
+  "image_alt_bg": "Кафе-бар Чайника, Банско",
+  "image_alt_en": "Chaynika Café Bar, Bansko"
+ },
+ {
+  "slug": "mehana-vodeniczata",
+  "name_bg": "Механа Воденицата",
+  "name_en": "Vodenitsata Tavern",
+  "description_bg": "Механа с традиционна банска и българска кухня в центъра на Банско, на ул. „Христо Ботев“: интериор от камък и дърво, лятна градина с барбекю, музика на живо и около 100 места.",
+  "description_en": "Tavern with traditional Bansko and Bulgarian cooking in the centre of Bansko, on Hristo Botev Street: stone and timber interior, a summer garden with a barbecue, live music and around 100 seats.",
+  "image_alt_bg": "Механа Воденицата, Банско",
+  "image_alt_en": "Vodenitsata Tavern, Bansko"
+ },
+ {
+  "slug": "mehana-zehtindzhieva-kastha",
+  "name_bg": "Механа Зехтинджиева къща",
+  "name_en": "Zehtindzhieva House Tavern",
+  "description_bg": "Механа на ул. „Георги Ковачев“ в Банско с местна и европейска кухня.",
+  "description_en": "Tavern on Georgi Kovachev Street in Bansko serving local and European dishes.",
+  "image_alt_bg": "Механа Зехтинджиева къща, Банско",
+  "image_alt_en": "Zehtindzhieva House Tavern, Bansko"
+ },
+ {
+  "slug": "motikata",
+  "name_bg": "Механа Мотиката",
+  "name_en": "Motikata Tavern",
+  "description_bg": "Механа с българска кухня на ул. „Пирин“, при входа към Национален парк „Пирин“, построена в битовия стил на града; през двора минава малка рекичка с две мостчета.",
+  "description_en": "Tavern with Bulgarian cooking on Pirin Street, at the entrance to Pirin National Park, built in the town's traditional style; a small stream with two little bridges runs through the yard.",
+  "image_alt_bg": "Механа Мотиката, Банско",
+  "image_alt_en": "Motikata Tavern, Bansko"
+ },
+ {
+  "slug": "alpijski-bar",
+  "name_bg": "Алпийски бар",
+  "name_en": "Alpine Bar",
+  "description_bg": "Барове с прозрачни куполи в ски зоната над Банско, с гледка към пистите и планината; за топъл чай, бира или нещо по-силно между спусканията.",
+  "description_en": "Bars with transparent domes in the ski area above Bansko, looking out over the pistes and the mountain; for hot tea, a beer or something stronger between runs.",
+  "image_alt_bg": "Алпийски бар, ски зона Банско",
+  "image_alt_en": "Alpine Bar, Bansko ski area"
+ },
+ {
+  "slug": "franco",
+  "name_bg": "Кафе Franco",
+  "name_en": "Franco Café",
+  "description_bg": "Кафе на ул. „Пирин“ в Банско, отворено през 2012 г., което организира и събития за своите клиенти.",
+  "description_en": "Café on Pirin Street in Bansko, open since 2012, which also hosts events for its customers.",
+  "image_alt_bg": "Кафе Franco, Банско",
+  "image_alt_en": "Franco Café, Bansko"
+ },
+ {
+  "slug": "snek-bar-emar",
+  "name_bg": "Снек бар Емар",
+  "name_en": "Emar Snack Bar",
+  "description_bg": "Снек бар в центъра на Банско, на ул. „Цар Симеон“, от повече от десет години: собствена машина за печене на кафе, кухня с разнообразни ястия и пици.",
+  "description_en": "Snack bar in the centre of Bansko, on Tsar Simeon Street, open for more than ten years: coffee roasted on its own machine, a varied kitchen and pizzas.",
+  "image_alt_bg": "Снек бар Емар, Банско",
+  "image_alt_en": "Emar Snack Bar, Bansko"
+ },
+ {
+  "slug": "happy-end",
+  "name_bg": "Happy End",
+  "name_en": "Happy End",
+  "description_bg": "Апре-ски бар с ресторант и дискотека точно до началната станция на кабинковия лифт, на ул. „Пирин“: ястия от местни продукти, вина, големи екрани и дансинг.",
+  "description_en": "Après-ski bar with a restaurant and a nightclub right by the bottom station of the gondola lift, on Pirin Street: dishes from local produce, wines, big screens and a dance floor.",
+  "image_alt_bg": "Happy End, Банско",
+  "image_alt_en": "Happy End, Bansko"
+ },
+ {
+  "slug": "coffe-and-go",
+  "name_bg": "Coffe and Go",
+  "name_en": "Coffe and Go",
+  "description_bg": "Кафе за вкъщи на ул. „Охрид“ в Банско: кафе, захарни изделия и безалкохолни напитки, всеки ден от 7:30 ч.",
+  "description_en": "Takeaway coffee spot on Ohrid Street in Bansko: coffee, sweets and soft drinks, every day from 7:30.",
+  "image_alt_bg": "Coffe and Go, Банско",
+  "image_alt_en": "Coffe and Go, Bansko"
+ },
+ {
+  "slug": "planinski-zdravecz",
+  "name_bg": "Къща за гости Планински здравец",
+  "name_en": "Planinski Zdravets Guest House",
+  "description_bg": "Къща за гости на тихо място на ул. „Скопие“ в Банско, която от над 20 години посреща гости с традиционни бански гозби.",
+  "description_en": "Guest house in a quiet spot on Skopie Street in Bansko, welcoming guests with traditional Bansko dishes for more than 20 years.",
+  "image_alt_bg": "Къща за гости Планински здравец, Банско",
+  "image_alt_en": "Planinski Zdravets Guest House, Bansko"
+ },
+ {
+  "slug": "snowflake-chalets-by-mst-hotels",
+  "name_bg": "Snowflake Chalets by MST Hotels",
+  "name_en": "Snowflake Chalets by MST Hotels",
+  "description_bg": "Хижи под наем на ул. „Цар Калоян“ в Банско за групи от четири до двадесет души, с обслужване от готвачи, домакини и шофьори или с напълно самостоятелно настаняване.",
+  "description_en": "Chalets on Tsar Kaloyan Street in Bansko for groups of four to twenty, with chefs, housekeepers and drivers on request or fully self-catered.",
+  "image_alt_bg": "Snowflake Chalets by MST Hotels, Банско",
+  "image_alt_en": "Snowflake Chalets by MST Hotels, Bansko"
+ },
+ {
+  "slug": "kaloyanova-kastha",
+  "name_bg": "Калоянова къща",
+  "name_en": "Kaloyanova House",
+  "description_bg": "Къща за гости в самия център на Банско, на ул. „Шипка“ до хотел „Пирин“ и пощата: осем двойни стаи, повечето с тераси към планината, сауна, малка механа за гостите и лятно барбекю; отворена целогодишно.",
+  "description_en": "Guest house in the very centre of Bansko, on Shipka Street next to the Pirin hotel and the post office: eight double rooms, most with mountain-facing terraces, a sauna, a small tavern room for guests and a summer barbecue; open all year.",
+  "image_alt_bg": "Калоянова къща, Банско",
+  "image_alt_en": "Kaloyanova House, Bansko"
+ },
+ {
+  "slug": "kastha-za-gosti-kiriczovi",
+  "name_bg": "Къща за гости Кирицови",
+  "name_en": "Kiritsovi Guest House",
+  "description_bg": "Къща за гости на ул. „Даме Груев“ в Банско, част от семейна фирма, която развива хотелиерство от 2006 г.",
+  "description_en": "Guest house on Dame Gruev Street in Bansko, run by a family company that has been in hospitality since 2006.",
+  "image_alt_bg": "Къща за гости Кирицови, Банско",
+  "image_alt_en": "Kiritsovi Guest House, Bansko"
+ },
+ {
+  "slug": "kastha-za-gosti-oreha",
+  "name_bg": "Къща за гости Ореха",
+  "name_en": "Oreha Guest House",
+  "description_bg": "Семейна къща за гости в центъра на Банско, на ул. „Никола Вапцаров“, на 50 м от стария град и до църквата „Света Троица“: стаи със собствена баня, някои с балкон и кухня, закуска в механата, детска площадка и безплатен WiFi.",
+  "description_en": "Family guest house in the centre of Bansko, on Nikola Vaptsarov Street, 50 m from the old town and next to the Holy Trinity church: rooms with private bathrooms, some with a balcony and kitchen, breakfast in the tavern, a playground and free WiFi.",
+  "image_alt_bg": "Къща за гости Ореха, Банско",
+  "image_alt_en": "Oreha Guest House, Bansko"
+ },
+ {
+  "slug": "kastha-za-gosti-valentino",
+  "name_bg": "Къща за гости Валентино",
+  "name_en": "Valentino Guest House",
+  "description_bg": "Къща за гости на ул. „Десилица“ в съседното Добринище, на няколко километра от Банско.",
+  "description_en": "Guest house on Desilitsa Street in neighbouring Dobrinishte, a few kilometres from Bansko.",
+  "image_alt_bg": "Къща за гости Валентино, Добринище",
+  "image_alt_en": "Valentino Guest House, Dobrinishte"
+ },
+ {
+  "slug": "kastha-za-gosti-planinski-romans",
+  "name_bg": "Къща за гости Планински романс",
+  "name_en": "Planinski Romans Guest House",
+  "description_bg": "Къща за гости в традиционен бански стил на ул. „Захари Стоянов“, на около 10 минути пеша от лифта и от центъра: студия и апартаменти с кухненски бокс, някои с камина, спа център с джакузи, сауна и парни кабини, механа и транспорт до лифта.",
+  "description_en": "Guest house in traditional Bansko style on Zahari Stoyanov Street, about 10 minutes on foot from the lift and the centre: studios and apartments with kitchenettes, some with a fireplace, a spa with a jacuzzi, sauna and steam rooms, a tavern and transport to the lift.",
+  "image_alt_bg": "Къща за гости Планински романс, Банско",
+  "image_alt_en": "Planinski Romans Guest House, Bansko"
+ },
+ {
+  "slug": "kastha-za-gosti-lila",
+  "name_bg": "Къща за гости Лила",
+  "name_en": "Lila Guest House",
+  "description_bg": "Къща за гости на тиха улица в центъра на Банско, на ул. „Охрид“ до градския парк, с двойни и фамилни стаи със собствена баня, балкон и безплатен WiFi.",
+  "description_en": "Guest house on a quiet street in the centre of Bansko, on Ohrid Street by the town park, with double and family rooms with private bathrooms, balconies and free WiFi.",
+  "image_alt_bg": "Къща за гости Лила, Банско",
+  "image_alt_en": "Lila Guest House, Bansko"
+ },
+ {
+  "slug": "kastha-za-gosti-plevnyata",
+  "name_bg": "Къща за гости Плевнята",
+  "name_en": "Plevnyata Guest House",
+  "description_bg": "Къща за гости на ул. „Мингьо Тодев“, на 50 м от ул. „Пирин“ и на минути от центъра и ски зоната: три спални и две двойни стаи за до 10 възрастни, механа с камина, оборудвана кухня, барбекю, градина и безплатен паркинг.",
+  "description_en": "Guest house on Mingyo Todev Street, 50 m from Pirin Street and minutes from the centre and the ski area: three bedrooms and two double rooms for up to 10 adults, a tavern room with a fireplace, a fitted kitchen, a barbecue, a garden and free parking.",
+  "image_alt_bg": "Къща за гости Плевнята, Банско",
+  "image_alt_en": "Plevnyata Guest House, Bansko"
+ },
+ {
+  "slug": "vila-vera",
+  "name_bg": "Вила Вера",
+  "name_en": "Villa Vera",
+  "description_bg": "Къща за гости на ул. „Цар Борис III“ в Банско с над 35 години история: ресторант само за гостите, колекция от бутикови български вина и винени дегустации с традиционна кухня; организира и детски спортни лагери.",
+  "description_en": "Guest house on Tsar Boris III Street in Bansko with more than 35 years of history: a restaurant for guests only, a collection of boutique Bulgarian wines and wine tastings with traditional food; it also runs children's sports camps.",
+  "image_alt_bg": "Вила Вера, Банско",
+  "image_alt_en": "Villa Vera, Bansko"
+ },
+ {
+  "slug": "apartamenti-sveta-anastasiya",
+  "name_bg": "Апартаменти Света Анастасия",
+  "name_en": "Sveta Anastasia Apartments",
+  "description_bg": "Комплекс в бански архитектурен стил на ул. „Стефан Караджа“, на 5 минути от центъра и на 10 от лифта: две студия и пет едностайни апартамента, спа център с джакузи, парна баня, сауна и фитнес, скиорна, барбекю в градината и гаражи.",
+  "description_en": "Complex in Bansko architectural style on Stefan Karadzha Street, 5 minutes from the centre and 10 from the lift: two studios and five one-bedroom apartments, a spa with a jacuzzi, steam bath, sauna and gym, a ski room, a garden barbecue and garages.",
+  "image_alt_bg": "Апартаменти Света Анастасия, Банско",
+  "image_alt_en": "Sveta Anastasia Apartments, Bansko"
+ }
+]

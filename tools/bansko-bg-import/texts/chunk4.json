@@ -1,0 +1,398 @@
+[
+ {
+  "slug": "hotel-valentino-2",
+  "name_bg": "Хотел Валентино 2",
+  "name_en": "Hotel Valentino 2",
+  "description_bg": "Хотел в Добринище със студия и двойни стаи, ресторант, лятна градина и сауна, с изглед към Пирин, Рила и Родопите. На около 300 м от него има открит минерален басейн.",
+  "description_en": "Hotel in Dobrinishte with studios and double rooms, a restaurant, summer garden and sauna, looking out to Pirin, Rila and the Rhodopes. An open-air mineral pool is about 300 m away.",
+  "image_alt_bg": "Хотел Валентино 2, Добринище",
+  "image_alt_en": "Hotel Valentino 2, Dobrinishte"
+ },
+ {
+  "slug": "todeva-house-todevata-kastha",
+  "name_bg": "Тодевата къща",
+  "name_en": "Todeva House",
+  "description_bg": "Къща за гости в стария град на Банско, близо до църквата „Света Троица“, с традиционна механа в историческа сграда. Стаи и апартаменти, безплатен паркинг и Wi-Fi; механата поднася българска и международна кухня.",
+  "description_en": "Guest house in Bansko's old town near the Holy Trinity church, with a traditional tavern in a historic building. Rooms and apartments, free parking and Wi-Fi; the tavern serves Bulgarian and international dishes.",
+  "image_alt_bg": "Тодевата къща, Банско",
+  "image_alt_en": "Todeva House, Bansko"
+ },
+ {
+  "slug": "hotel-elicza",
+  "name_bg": "Хотел Елица",
+  "name_en": "Hotel Elitsa",
+  "description_bg": "Семеен хотел в центъра на Банско с 20 стаи и ресторант с 50 места.",
+  "description_en": "Family-run hotel in the centre of Bansko with 20 rooms and a 50-seat restaurant.",
+  "image_alt_bg": "Хотел Елица, Банско",
+  "image_alt_en": "Hotel Elitsa, Bansko"
+ },
+ {
+  "slug": "white-lavina-ski-bike-hike",
+  "name_bg": "White Lavina Ski Bike Hike",
+  "name_en": "White Lavina Ski Bike Hike",
+  "description_bg": "Хотел в Банско, насочен към активния туризъм, със стаи и апартаменти, ресторант с италианска и българска кухня, тераса с планински изглед, спа център, фитнес и масажи.",
+  "description_en": "Hotel in Bansko geared to active holidays, with rooms and apartments, a restaurant serving Italian and Bulgarian dishes, a mountain-view terrace, spa, gym and massages.",
+  "image_alt_bg": "Хотел White Lavina, Банско",
+  "image_alt_en": "White Lavina hotel, Bansko"
+ },
+ {
+  "slug": "7-pools-spa-apartmets",
+  "name_bg": "7 Pools Spa & Apartments",
+  "name_en": "7 Pools Spa & Apartments",
+  "description_bg": "Апартаментен комплекс от затворен тип в Банско с 32 апартамента с оборудвани кухни, голям спа център с басейни, сауни, парна баня и масажни кабинети, външен басейн и спортна площадка.",
+  "description_en": "Gated apartment complex in Bansko with 32 apartments with fitted kitchens, a large spa with pools, saunas, steam bath and massage rooms, an outdoor pool and a sports court.",
+  "image_alt_bg": "7 Pools Spa & Apartments, Банско",
+  "image_alt_en": "7 Pools Spa & Apartments, Bansko"
+ },
+ {
+  "slug": "four-leaf-clover-colive-cowork-bansko",
+  "name_bg": "Four Leaf Clover CoLive & CoWork Bansko",
+  "name_en": "Four Leaf Clover CoLive & CoWork Bansko",
+  "description_bg": "Апартаментен комплекс в Банско с общност от пътуващи и дигитални номади: студия, апартаменти и мезонети в четири сгради, басейн, игрална зала и пространство за съвместна работа и събития.",
+  "description_en": "Apartment complex in Bansko with a community of travellers and digital nomads: studios, apartments and maisonettes in four buildings, a pool, games room and a coworking and events space.",
+  "image_alt_bg": "Four Leaf Clover, Банско",
+  "image_alt_en": "Four Leaf Clover, Bansko"
+ },
+ {
+  "slug": "semeen-hotel-kralev-dvor",
+  "name_bg": "Семеен хотел Кралев двор",
+  "name_en": "Kralev Dvor Family Hotel",
+  "description_bg": "Семеен хотел в Банско с 8 двойни стаи и 8 студия с тераси към планината, лоби бар, сауна, ски гардероб и паркинг. Ресторантът с 40 места поднася банскалийски ястия по семейни рецепти, а през лятото има градина.",
+  "description_en": "Family hotel in Bansko with 8 double rooms and 8 studios with mountain-facing terraces, a lobby bar, sauna, ski room and parking. The 40-seat restaurant serves Bansko dishes from family recipes, with a garden in summer.",
+  "image_alt_bg": "Хотел Кралев двор, Банско",
+  "image_alt_en": "Kralev Dvor hotel, Bansko"
+ },
+ {
+  "slug": "famil-hotel",
+  "name_bg": "Фамил Хотел",
+  "name_en": "Famil Hotel",
+  "description_bg": "Семеен хотел в Банско с 10 стаи и вила в двора, на равно разстояние от центъра и кабинковия лифт. Има ресторант с винена листа от регионални изби, сауна и парна баня.",
+  "description_en": "Family hotel in Bansko with 10 rooms and a villa in the yard, midway between the centre and the gondola lift. Restaurant with a wine list from regional cellars, sauna and steam bath.",
+  "image_alt_bg": "Фамил Хотел, Банско",
+  "image_alt_en": "Famil Hotel, Bansko"
+ },
+ {
+  "slug": "hotel-pirina",
+  "name_bg": "Хотел Пирина",
+  "name_en": "Hotel Pirina",
+  "description_bg": "Малък семеен хотел в Банско със ски гардероб, сауна, джакузи, малък фитнес и тенис на маса; предлага трансфери, хранене и спа процедури. Носи сертификата „Зелен ключ“ за устойчив туризъм.",
+  "description_en": "Small family-run hotel in Bansko with a ski room, sauna, jacuzzi, small gym and table tennis; transfers, meals and spa treatments are offered. Holds the Green Key certificate for sustainable tourism.",
+  "image_alt_bg": "Хотел Пирина, Банско",
+  "image_alt_en": "Hotel Pirina, Bansko"
+ },
+ {
+  "slug": "hotel-mura",
+  "name_bg": "Хотел Мура",
+  "name_en": "Hotel Mura",
+  "description_bg": "Хотел със 73 двойни стаи на пътя към ски пистите в Банско, близо до река Глазне и центъра. Гостите ползват безплатно сауна, парна баня и джакузи, както и шатъл до кабинковия лифт.",
+  "description_en": "Hotel with 73 double rooms on the road to the ski slopes in Bansko, near the Glazne river and the centre. Guests have free use of the sauna, steam bath and jacuzzi, plus a shuttle to the gondola lift.",
+  "image_alt_bg": "Хотел Мура, Банско",
+  "image_alt_en": "Hotel Mura, Bansko"
+ },
+ {
+  "slug": "ruskovecz-termal-spa-ski-rezort",
+  "name_bg": "Русковец Термал СПА & Ски Резорт",
+  "name_en": "Ruskovets Thermal SPA & Ski Resort",
+  "description_bg": "Затворен хотелски комплекс на южен склон в Добринище с изглед към Пирин: апартаменти и фамилни вили, ресторант, пицария, спа с басейни с минерална вода, детски клуб и ски гардероб. Работи целогодишно.",
+  "description_en": "Gated resort on a south-facing slope in Dobrinishte looking towards Pirin: apartments and family villas, a restaurant, pizzeria, spa with mineral-water pools, kids' club and ski room. Open all year.",
+  "image_alt_bg": "Русковец Термал СПА & Ски Резорт, Добринище",
+  "image_alt_en": "Ruskovets Thermal SPA & Ski Resort, Dobrinishte"
+ },
+ {
+  "slug": "belvedere-holidej-klub",
+  "name_bg": "Белведере Холидей Клуб",
+  "name_en": "Belvedere Holiday Club",
+  "description_bg": "Хотелски комплекс от затворен тип в Банско, на около 500 м от началната станция на лифта: три сгради около външен басейн, с рецепция, релакс зона, ресторант и апартаменти.",
+  "description_en": "Gated holiday complex in Bansko about 500 m from the gondola base station: three buildings around an outdoor pool, with reception, relaxation area, restaurant and apartments.",
+  "image_alt_bg": "Белведере Холидей Клуб, Банско",
+  "image_alt_en": "Belvedere Holiday Club, Bansko"
+ },
+ {
+  "slug": "mpm-sport-hotel",
+  "name_bg": "МПМ Спорт Хотел",
+  "name_en": "MPM Sport Hotel",
+  "description_bg": "Хотел на ски пътя в Банско, на около 100 м от кабинковия лифт, с двойни стаи и апартаменти с изглед към Пирин и Рила. Има основен и а-ла-карт ресторант, градина с огнище, спа зона с басейн, сауна и парна баня, фитнес и ски гардероб.",
+  "description_en": "Hotel on the ski road in Bansko, about 100 m from the gondola lift, with double rooms and apartments facing Pirin and Rila. Main and à la carte restaurants, a garden with a fire pit, a spa area with pool, sauna and steam bath, a gym and ski storage.",
+  "image_alt_bg": "МПМ Спорт Хотел, Банско",
+  "image_alt_en": "MPM Sport Hotel, Bansko"
+ },
+ {
+  "slug": "mpm-hotel-gines",
+  "name_bg": "МПМ Хотел Гинес",
+  "name_en": "MPM Hotel Guinness",
+  "description_bg": "Хотел с атриум в Банско, на около 200 м от началната станция на кабинковия лифт. Има ресторант, конферентна зала, детска стая, спа зона с басейн, сауна и парна баня, ски гардероб и трансфер до лифта; на рецепцията се продават лифт карти.",
+  "description_en": "Atrium hotel in Bansko about 200 m from the gondola base station. Restaurant, conference room, kids' room, spa area with pool, sauna and steam bath, ski storage and a lift shuttle; lift passes are sold at reception.",
+  "image_alt_bg": "МПМ Хотел Гинес, Банско",
+  "image_alt_en": "MPM Hotel Guinness, Bansko"
+ },
+ {
+  "slug": "hotel-parklands",
+  "name_bg": "Hotel Parklands",
+  "name_en": "Hotel Parklands",
+  "description_bg": "Хотел в подножието на Пирин, на около 500 м от кабинковия лифт, с голяма градина, закрит басейн с минерална вода, джакузи, две сауни, парна баня и фитнес. Има лоби бар, ресторант „Да Джино“ с 65 места и наем на ски оборудване.",
+  "description_en": "Hotel at the foot of Pirin about 500 m from the gondola lift, with a large garden, an indoor mineral-water pool, jacuzzi, two saunas, steam bath and gym. Lobby bar, the 65-seat Da Gino restaurant and ski hire.",
+  "image_alt_bg": "Hotel Parklands, Банско",
+  "image_alt_en": "Hotel Parklands, Bansko"
+ },
+ {
+  "slug": "evelina-palas",
+  "name_bg": "Евелина Палас",
+  "name_en": "Evelina Palace",
+  "description_bg": "Хотел на западния бряг на река Глазне, на около 200 м от центъра на Банско, с 42 двойни стаи и 3 студия, ресторант с българска кухня, лоби бар, лятна градина с барбекю и закрит басейн с детска секция. Предлага трансфер до лифта.",
+  "description_en": "Hotel on the west bank of the Glazne river, about 200 m from Bansko's centre, with 42 double rooms and 3 studios, a restaurant with Bulgarian dishes, lobby bar, summer garden with barbecue and an indoor pool with a children's section. Lift transfer available.",
+  "image_alt_bg": "Хотел Евелина Палас, Банско",
+  "image_alt_en": "Evelina Palace hotel, Bansko"
+ },
+ {
+  "slug": "apartamenten-hotel-grand-royale-bansko",
+  "name_bg": "Апартаментен хотел Гранд Рояле Банско",
+  "name_en": "Grand Royale Apartment Hotel Bansko",
+  "description_bg": "Апартаментен комплекс със спа в подножието на Пирин, на около 600 м от кабинковия лифт в Банско, подходящ за семейна почивка, ски ваканция и корпоративни събития.",
+  "description_en": "Apartment complex with a spa at the foot of Pirin, about 600 m from the gondola lift in Bansko, suited to family holidays, ski breaks and corporate events.",
+  "image_alt_bg": "Гранд Рояле, Банско",
+  "image_alt_en": "Grand Royale, Bansko"
+ },
+ {
+  "slug": "perun-lodge",
+  "name_bg": "Perun Lodge",
+  "name_en": "Perun Lodge",
+  "description_bg": "Планински хотел в тихата част на Банско, на пешеходно разстояние от центъра и на около 350 м от началната станция на кабинковия лифт. Сградата е в алпийски стил със съвременен интериор.",
+  "description_en": "Mountain hotel in a quiet part of Bansko, within walking distance of the centre and about 350 m from the gondola base station. Alpine-style building with a contemporary interior.",
+  "image_alt_bg": "Perun Lodge, Банско",
+  "image_alt_en": "Perun Lodge, Bansko"
+ },
+ {
+  "slug": "vihren-royal-palace",
+  "name_bg": "Vihren Royal Palace",
+  "name_en": "Vihren Royal Palace",
+  "description_bg": "Хотел в Банско за ски почивка през зимата и за планински преходи и активности през лятото.",
+  "description_en": "Hotel in Bansko for ski holidays in winter and for mountain walks and activities in summer.",
+  "image_alt_bg": "Vihren Royal Palace, Банско",
+  "image_alt_en": "Vihren Royal Palace, Bansko"
+ },
+ {
+  "slug": "four-points-by-sheraton-bansko",
+  "name_bg": "Four Points by Sheraton Bansko",
+  "name_en": "Four Points by Sheraton Bansko",
+  "description_bg": "Хотел от веригата Marriott International в Банско, изцяло реновиран през 2023 г. (бившият хотел „Стражите“). Участва в програмите Marriott Bonvoy за гости и за събития.",
+  "description_en": "Marriott International hotel in Bansko, fully renovated in 2023 (the former Hotel Strazhite). Part of the Marriott Bonvoy guest and events programmes.",
+  "image_alt_bg": "Four Points by Sheraton, Банско",
+  "image_alt_en": "Four Points by Sheraton, Bansko"
+ },
+ {
+  "slug": "premier-luxury-mountain-resort",
+  "name_bg": "Premier Luxury Mountain Resort",
+  "name_en": "Premier Luxury Mountain Resort",
+  "description_bg": "Хотел в квартал Грамадето на Банско, близо до ски съоръженията, със 111 стаи и апартаменти, ресторанти и спа център Le Spa. Отворен целогодишно.",
+  "description_en": "Hotel in Bansko's Gramadeto district near the ski facilities, with 111 rooms and suites, restaurants and the Le Spa centre. Open year-round.",
+  "image_alt_bg": "Premier Luxury Mountain Resort, Банско",
+  "image_alt_en": "Premier Luxury Mountain Resort, Bansko"
+ },
+ {
+  "slug": "kempinski-hotel-grand-arena",
+  "name_bg": "Кемпински Хотел Гранд Арена",
+  "name_en": "Kempinski Hotel Grand Arena",
+  "description_bg": "Хотел точно срещу началната станция на кабинковия лифт в Банско, със 157 стаи в алпийски стил, спа център с термални съоръжения, четири конферентни зали и осем ресторанта и бара. Отворен целогодишно.",
+  "description_en": "Hotel directly opposite the gondola base station in Bansko, with 157 alpine-style rooms, a spa with thermal facilities, four conference rooms and eight restaurants and bars. Open all year.",
+  "image_alt_bg": "Кемпински Хотел Гранд Арена, Банско",
+  "image_alt_en": "Kempinski Hotel Grand Arena, Bansko"
+ },
+ {
+  "slug": "aparthotel-laki-bansko-spa-relaks",
+  "name_bg": "Апартхотел Лъки Банско СПА & Релакс",
+  "name_en": "Lucky Bansko Aparthotel SPA & Relax",
+  "description_bg": "Апартхотел в Банско, открит през 2007 г., със студия и апартаменти, аквакомплекс, спа център, италиански ресторант „Леонардо“, ресторант „Фондю“, конферентна зала, детски стаи и площадка. В него работят аюрведична клиника и детски езиков лагер.",
+  "description_en": "Aparthotel in Bansko, opened in 2007, with studios and apartments, a water complex, spa, the Italian restaurant Leonardo, the Fondue restaurant, a conference room, kids' rooms and a playground. Also home to an Ayurveda clinic and a children's language camp.",
+  "image_alt_bg": "Апартхотел Лъки Банско, Банско",
+  "image_alt_en": "Lucky Bansko Aparthotel, Bansko"
+ },
+ {
+  "slug": "amira-butik-hotel",
+  "name_bg": "Амира Бутик Хотел",
+  "name_en": "Amira Boutique Hotel",
+  "description_bg": "Бутиков хотел в Банско, на около пет минути пеша от кабинковия лифт, с 5 двойни стаи, 11 студия и 15 едноспални апартамента, част от тях с камина. Достъпен за инвалидни колички; домашни любимци не се допускат.",
+  "description_en": "Boutique hotel in Bansko about five minutes' walk from the gondola lift, with 5 double rooms, 11 studios and 15 one-bedroom apartments, some with a fireplace. Wheelchair accessible; no pets.",
+  "image_alt_bg": "Амира Бутик Хотел, Банско",
+  "image_alt_en": "Amira Boutique Hotel, Bansko"
+ },
+ {
+  "slug": "sladkarnicza-blachko",
+  "name_bg": "Сладкарница Блачко",
+  "name_en": "Blachko Patisserie",
+  "description_bg": "Малка сладкарница на ул. „Пирин“ в Банско, отворена в края на 2021 г. Предлага бабъл гофрети, сандвичи и бабъл чай, както и собствени сладкиши и торти без консерванти.",
+  "description_en": "Small patisserie on Pirin Street in Bansko, open since late 2021. Bubble waffles, sandwiches and bubble tea, plus its own cakes and pastries made without preservatives.",
+  "image_alt_bg": "Сладкарница Блачко, Банско",
+  "image_alt_en": "Blachko Patisserie, Bansko"
+ },
+ {
+  "slug": "vista-it-services",
+  "name_bg": "Vista IT Services",
+  "name_en": "Vista IT Services",
+  "description_bg": "IT фирма в Банско: продажба и ремонт на нови и употребявани компютри, изграждане на Wi-Fi мрежи и видеонаблюдение, консумативи за принтери, касови апарати и абонаментна поддръжка.",
+  "description_en": "IT company in Bansko: sales and repair of new and used computers, Wi-Fi network and CCTV installation, printer consumables, cash registers and maintenance contracts.",
+  "image_alt_bg": "Vista IT Services, Банско",
+  "image_alt_en": "Vista IT Services, Bansko"
+ },
+ {
+  "slug": "knizharniczi-knizharniczi-daga",
+  "name_bg": "Книжарници Дъга",
+  "name_en": "Daga Bookshops",
+  "description_bg": "Книжарница в Банско, на пазара от 1992 г.: канцеларски материали, книги, учебници и ученически пособия, рекламни материали и детски стоки.",
+  "description_en": "Stationery and book shop in Bansko, trading since 1992: office supplies, books, textbooks and school materials, promotional items and children's goods.",
+  "image_alt_bg": "Книжарници Дъга, Банско",
+  "image_alt_en": "Daga Bookshops, Bansko"
+ },
+ {
+  "slug": "et-zhivko-karpachev",
+  "name_bg": "Живко Кърпачев",
+  "name_en": "Zhivko Karpachev",
+  "description_bg": "Доставка и монтаж на щори, сенници, мрежи против насекоми, ролетни и секционни врати в Банско.",
+  "description_en": "Supply and fitting of blinds, awnings, insect screens, roller shutters and sectional doors in Bansko.",
+  "image_alt_bg": "Живко Кърпачев, щори, Банско",
+  "image_alt_en": "Zhivko Karpachev, blinds, Bansko"
+ },
+ {
+  "slug": "magazin-kiricz",
+  "name_bg": "Магазин Кириц",
+  "name_en": "Kirits Shop",
+  "description_bg": "Магазин за електроматериали в Банско на фирма, основана през 1992 г. и официален дистрибутор на международни производители.",
+  "description_en": "Electrical supplies shop in Bansko, run by a company founded in 1992 that is an official distributor for international manufacturers.",
+  "image_alt_bg": "Магазин Кириц, Банско",
+  "image_alt_en": "Kirits Shop, Bansko"
+ },
+ {
+  "slug": "deni-market",
+  "name_bg": "Дени Маркет",
+  "name_en": "Deni Market",
+  "description_bg": "Хранителен магазин в Банско.",
+  "description_en": "Grocery shop in Bansko.",
+  "image_alt_bg": "Дени Маркет, Банско",
+  "image_alt_en": "Deni Market, Bansko"
+ },
+ {
+  "slug": "riben-magazin-dimina",
+  "name_bg": "Рибен магазин ДимИна",
+  "name_en": "DimIna Fish Shop",
+  "description_bg": "Специализиран магазин за риба и морски продукти в Банско с богат и променящ се избор.",
+  "description_en": "Specialist fish and seafood shop in Bansko with a wide and changing selection.",
+  "image_alt_bg": "Рибен магазин ДимИна, Банско",
+  "image_alt_en": "DimIna Fish Shop, Bansko"
+ },
+ {
+  "slug": "supermarket-pirin",
+  "name_bg": "Супермаркет Пирин",
+  "name_en": "Pirin Supermarket",
+  "description_bg": "Супермаркет в Банско с хранителни стоки и стоки за дома.",
+  "description_en": "Supermarket in Bansko with groceries and household goods.",
+  "image_alt_bg": "Супермаркет Пирин, Банско",
+  "image_alt_en": "Pirin Supermarket, Bansko"
+ },
+ {
+  "slug": "supermarket-grosh",
+  "name_bg": "Супермаркет Грош",
+  "name_en": "Grosh Supermarket",
+  "description_bg": "Супермаркет на площад „3-ти март“ в Банско с 400 кв. м търговска площ, хранителни и нехранителни стоки за дома.",
+  "description_en": "Supermarket on 3-ti Mart Square in Bansko with 400 sq m of shop floor, groceries and household goods.",
+  "image_alt_bg": "Супермаркет Грош, Банско",
+  "image_alt_en": "Grosh Supermarket, Bansko"
+ },
+ {
+  "slug": "the-kabin-bansko",
+  "name_bg": "The Kabin Bansko",
+  "name_en": "The Kabin Bansko",
+  "description_bg": "Магазин за британски продукти в Банско, включително вегански и вегетариански храни.",
+  "description_en": "Shop for British groceries in Bansko, including vegan and vegetarian products.",
+  "image_alt_bg": "The Kabin, Банско",
+  "image_alt_en": "The Kabin, Bansko"
+ },
+ {
+  "slug": "gift-shop",
+  "name_bg": "Gift Shop Bansko",
+  "name_en": "Gift Shop Bansko",
+  "description_bg": "Магазин за подаръци за всякакви поводи в Банско; фирмата поддържа и вендинг машини за топли напитки.",
+  "description_en": "Gift shop in Bansko for every occasion; the company also runs hot-drink vending machines.",
+  "image_alt_bg": "Gift Shop, Банско",
+  "image_alt_en": "Gift Shop, Bansko"
+ },
+ {
+  "slug": "skiproparti",
+  "name_bg": "Скипропърти",
+  "name_en": "SkiProperty",
+  "description_bg": "Агенция за недвижими имоти в Банско, създадена през 2004 г.: покупко-продажба на земя, стари къщи, ваканционни вили, препродажби и новостроящи се имоти.",
+  "description_en": "Estate agency in Bansko founded in 2004: sales of land, old houses, holiday villas, resales and new-build properties.",
+  "image_alt_bg": "Скипропърти, Банско",
+  "image_alt_en": "SkiProperty, Bansko"
+ },
+ {
+  "slug": "interprime-bansko",
+  "name_bg": "Interprime Bansko",
+  "name_en": "Interprime Bansko",
+  "description_bg": "Местна агенция за недвижими имоти в Банско, основана през 2006 г.: продажби и препродажби, оценка и снимки на имота, правна и счетоводна консултация, помощ при кредити, застраховане, обзавеждане и поддръжка.",
+  "description_en": "Local estate agency in Bansko founded in 2006: sales and resales, property valuation and photography, legal and accounting advice, help with loans, insurance, furnishing and maintenance.",
+  "image_alt_bg": "Interprime Bansko, Банско",
+  "image_alt_en": "Interprime Bansko, Bansko"
+ },
+ {
+  "slug": "bower-properties",
+  "name_bg": "Bower Properties",
+  "name_en": "Bower Properties",
+  "description_bg": "Независима британска агенция за недвижими имоти в Банско, специализирана в препродажби на имоти за ваканция и инвестиция, с офис, отворен целогодишно, и многоезичен екип.",
+  "description_en": "Independent British-run estate agency in Bansko specialising in resale holiday and investment properties, with a year-round office and a multilingual team.",
+  "image_alt_bg": "Bower Properties, Банско",
+  "image_alt_en": "Bower Properties, Bansko"
+ },
+ {
+  "slug": "re-max-all-seasons",
+  "name_bg": "RE/MAX All Seasons",
+  "name_en": "RE/MAX All Seasons",
+  "description_bg": "Офис на международната мрежа за недвижими имоти RE/MAX в Банско.",
+  "description_en": "Bansko office of the RE/MAX international estate agency network.",
+  "image_alt_bg": "RE/MAX All Seasons, Банско",
+  "image_alt_en": "RE/MAX All Seasons, Bansko"
+ },
+ {
+  "slug": "kas-properties",
+  "name_bg": "Kas Properties",
+  "name_en": "Kas Properties",
+  "description_bg": "Агенция за недвижими имоти в Банско, основана през 2003 г.: консултантски, посреднически и юридически услуги при покупка, продажба, наем и управление на имоти.",
+  "description_en": "Estate agency in Bansko founded in 2003: consulting, brokerage and legal services for buying, selling, renting and managing property.",
+  "image_alt_bg": "Kas Properties, Банско",
+  "image_alt_en": "Kas Properties, Bansko"
+ },
+ {
+  "slug": "hello-bulgaria",
+  "name_bg": "Hello Bulgaria",
+  "name_en": "Hello Bulgaria",
+  "description_bg": "Агенция за недвижими имоти в Банско с имоти в града и по българското Черноморие: студия, апартаменти, къщи и строителни обекти, с правна проверка на сделките и помощ при отдаване под наем.",
+  "description_en": "Estate agency in Bansko with properties in town and on the Bulgarian Black Sea coast: studios, apartments, houses and development sites, with legal checks on sales and help with letting.",
+  "image_alt_bg": "Hello Bulgaria, Банско",
+  "image_alt_en": "Hello Bulgaria, Bansko"
+ },
+ {
+  "slug": "bansko-ski-and-golf-property",
+  "name_bg": "Bansko Ski and Golf Property",
+  "name_en": "Bansko Ski and Golf Property",
+  "description_bg": "Агенция за недвижими имоти в Банско: покупко-продажба, наем, управление и поддръжка на имоти в Банско, Пирин Голф и Разлог.",
+  "description_en": "Estate agency in Bansko: sales, lettings, management and maintenance of properties in Bansko, Pirin Golf and Razlog.",
+  "image_alt_bg": "Bansko Ski and Golf Property, Банско",
+  "image_alt_en": "Bansko Ski and Golf Property, Bansko"
+ },
+ {
+  "slug": "local-property-expert",
+  "name_bg": "Local Property Expert",
+  "name_en": "Local Property Expert",
+  "description_bg": "Посредничество при сделки с недвижими имоти в Банско и Разложката котловина; екипът работи в сферата от 2005 г.",
+  "description_en": "Property brokerage in Bansko and the Razlog valley; the team has worked in real estate since 2005.",
+  "image_alt_bg": "Local Property Expert, Банско",
+  "image_alt_en": "Local Property Expert, Bansko"
+ },
+ {
+  "slug": "imoti-bansko",
+  "name_bg": "Имоти Банско",
+  "name_en": "Imoti Bansko",
+  "description_bg": "Агенция за недвижими имоти в Банско, на пазара от 2012 г.: консултации, продажби и наеми, предимно завършени и обзаведени апартаменти в Банско, около голф игрището и в околните села.",
+  "description_en": "Estate agency in Bansko, trading since 2012: advice, sales and lettings, mainly finished and furnished apartments in Bansko, around the golf course and in nearby villages.",
+  "image_alt_bg": "Имоти Банско, Банско",
+  "image_alt_en": "Imoti Bansko, Bansko"
+ }
+]

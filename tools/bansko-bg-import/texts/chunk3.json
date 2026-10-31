@@ -1,0 +1,398 @@
+[
+ {
+  "slug": "d-r-mariya-stamova-polimerova",
+  "name_bg": "Д-р Мария Стамова-Полимерова",
+  "name_en": "Dr. Mariya Stamova-Polimerova, general practitioner",
+  "description_bg": "Общопрактикуващ лекар в Добринище. Кабинетът е на първия етаж на сградата на ул. „Никола Вапцаров“ 1.",
+  "description_en": "General practitioner in Dobrinishte. The practice is on the first floor of the building at 1 Nikola Vaptsarov Street.",
+  "image_alt_bg": "Д-р Мария Стамова-Полимерова, Добринище",
+  "image_alt_en": "Dr. Mariya Stamova-Polimerova, Dobrinishte"
+ },
+ {
+  "slug": "d-r-dimitrina-ivanova-tyutyuncheva",
+  "name_bg": "Д-р Димитрина Иванова-Тютюнчева",
+  "name_en": "Dr. Dimitrina Ivanova-Tyutyuncheva, internal medicine",
+  "description_bg": "Лекарски кабинет по вътрешни болести и гастроентерология в Добринище, на втория етаж на сградата на ул. „Никола Вапцаров“ 1.",
+  "description_en": "Medical practice for internal medicine and gastroenterology in Dobrinishte, on the second floor of the building at 1 Nikola Vaptsarov Street.",
+  "image_alt_bg": "Д-р Димитрина Тютюнчева, Добринище",
+  "image_alt_en": "Dr. Dimitrina Tyutyuncheva, Dobrinishte"
+ },
+ {
+  "slug": "d-r-rajna-jordanova-topalova",
+  "name_bg": "Д-р Райна Йорданова-Топалова",
+  "name_en": "Dr. Rayna Yordanova-Topalova, obstetrics and gynaecology",
+  "description_bg": "Кабинет по акушерство и гинекология в Банско, на ул. „Иван Михайлов“ 13.",
+  "description_en": "Obstetrics and gynaecology practice in Bansko, at 13 Ivan Mihaylov Street.",
+  "image_alt_bg": "Д-р Райна Топалова, Банско",
+  "image_alt_en": "Dr. Rayna Topalova, Bansko"
+ },
+ {
+  "slug": "d-r-georgi-lazarov-ruskov",
+  "name_bg": "Д-р Георги Лазаров-Русков",
+  "name_en": "Dr. Georgi Lazarov-Ruskov, endocrinology",
+  "description_bg": "Кабинет по ендокринология и болести на обмяната в Банско, на ул. „Цар Симеон“ 8.",
+  "description_en": "Endocrinology and metabolic disorders practice in Bansko, at 8 Tsar Simeon Street.",
+  "image_alt_bg": "Д-р Георги Русков, Банско",
+  "image_alt_en": "Dr. Georgi Ruskov, Bansko"
+ },
+ {
+  "slug": "d-r-mariya-borisova-aleksandrova-taseva",
+  "name_bg": "Д-р Мария Александрова-Тасева",
+  "name_en": "Dr. Mariya Aleksandrova-Taseva, paediatrics",
+  "description_bg": "Педиатричен кабинет в Банско, на ул. „Юлен“ 2.",
+  "description_en": "Paediatric practice in Bansko, at 2 Yulen Street.",
+  "image_alt_bg": "Д-р Мария Александрова-Тасева, Банско",
+  "image_alt_en": "Dr. Mariya Aleksandrova-Taseva, Bansko"
+ },
+ {
+  "slug": "d-r-georgi-borisov-tasev",
+  "name_bg": "Д-р Георги Борисов-Тасев",
+  "name_en": "Dr. Georgi Borisov-Tasev, gastroenterology and internal medicine",
+  "description_bg": "Кабинет по гастроентерология и вътрешни болести в Банско, на ул. „Юлен“ 2.",
+  "description_en": "Gastroenterology and internal medicine practice in Bansko, at 2 Yulen Street.",
+  "image_alt_bg": "Д-р Георги Тасев, Банско",
+  "image_alt_en": "Dr. Georgi Tasev, Bansko"
+ },
+ {
+  "slug": "d-r-hristina-marinova-ruskova",
+  "name_bg": "Д-р Христина Маринова-Рускова",
+  "name_en": "Dr. Hristina Marinova-Ruskova, general practitioner",
+  "description_bg": "Общопрактикуващ лекар в Банско с кабинет на ул. „Цар Симеон“ 8.",
+  "description_en": "General practitioner in Bansko with a practice at 8 Tsar Simeon Street.",
+  "image_alt_bg": "Д-р Христина Рускова, Банско",
+  "image_alt_en": "Dr. Hristina Ruskova, Bansko"
+ },
+ {
+  "slug": "d-r-georgi-vladov-kushlev",
+  "name_bg": "Д-р Георги Владов-Кушлев",
+  "name_en": "Dr. Georgi Vladov-Kushlev, general practitioner",
+  "description_bg": "Общопрактикуващ лекар в Банско. Кабинетът е в сградата на медицинския център на ул. „Луи Пастьор“ 1.",
+  "description_en": "General practitioner in Bansko. The practice is in the medical centre building at 1 Louis Pasteur Street.",
+  "image_alt_bg": "Д-р Георги Кушлев, Банско",
+  "image_alt_en": "Dr. Georgi Kushlev, Bansko"
+ },
+ {
+  "slug": "d-r-neli-dimitrova-duzmanchina",
+  "name_bg": "Д-р Нели Димитрова-Дузманчина",
+  "name_en": "Dr. Neli Dimitrova-Duzmanchina, general practitioner",
+  "description_bg": "Общопрактикуващ лекар в Банско. Кабинетът е на втория етаж в сградата на ул. „Луи Пастьор“ 1.",
+  "description_en": "General practitioner in Bansko. The practice is on the second floor of the building at 1 Louis Pasteur Street.",
+  "image_alt_bg": "Д-р Нели Дузманчина, Банско",
+  "image_alt_en": "Dr. Neli Duzmanchina, Bansko"
+ },
+ {
+  "slug": "d-r-diana-kostadinova-kadeva",
+  "name_bg": "Д-р Диана Костадинова-Кадева",
+  "name_en": "Dr. Diana Kostadinova-Kadeva, general practitioner",
+  "description_bg": "Общопрактикуващ лекар в Банско с кабинет на ул. „Илинден“ 1.",
+  "description_en": "General practitioner in Bansko with a practice at 1 Ilinden Street.",
+  "image_alt_bg": "Д-р Диана Кадева, Банско",
+  "image_alt_en": "Dr. Diana Kadeva, Bansko"
+ },
+ {
+  "slug": "mediczinski-czentar-sveto-blagovesthenie",
+  "name_bg": "Медицински център „Свето Благовещение“",
+  "name_en": "Sveto Blagoveshtenie Medical Centre",
+  "description_bg": "Медицински център в Банско с денонощна помощ за жители и гости на града. Прави прегледи, диагностика и лечение на деца и възрастни, манипулации и клинични изследвания; разполага с ядрено-магнитен резонанс.",
+  "description_en": "Medical centre in Bansko offering round-the-clock care for residents and visitors. It provides examinations, diagnostics and treatment for children and adults, procedures and laboratory tests, and has an MRI scanner.",
+  "image_alt_bg": "Медицински център „Свето Благовещение“, Банско",
+  "image_alt_en": "Sveto Blagoveshtenie Medical Centre, Bansko"
+ },
+ {
+  "slug": "premium-branding-studio",
+  "name_bg": "Premium-Branding Studio",
+  "name_en": "Premium-Branding Studio",
+  "description_bg": "Студио за онлайн маркетинг, уеб и графичен дизайн в Добринище. Екипът е работил години наред за немския пазар и сега обслужва клиенти в България.",
+  "description_en": "Online marketing, web and graphic design studio in Dobrinishte. The team spent years working for the German market and now serves clients in Bulgaria.",
+  "image_alt_bg": "Premium-Branding Studio, Добринище",
+  "image_alt_en": "Premium-Branding Studio, Dobrinishte"
+ },
+ {
+  "slug": "reklamna-agencziya-universal",
+  "name_bg": "Рекламна агенция Универсал",
+  "name_en": "Universal Advertising Agency",
+  "description_bg": "Рекламна агенция в Банско, на ул. „Цар Симеон“ 51, с повече от двадесет години работа в града. Изработва печатна и външна реклама и предлага маркетинг услуги за фирми от различни сфери.",
+  "description_en": "Advertising agency in Bansko at 51 Tsar Simeon Street, in business for more than twenty years. It produces print and outdoor advertising and offers marketing services to companies in various fields.",
+  "image_alt_bg": "Рекламна агенция Универсал, Банско",
+  "image_alt_en": "Universal Advertising Agency, Bansko"
+ },
+ {
+  "slug": "ramus",
+  "name_bg": "Рамус",
+  "name_en": "Ramus Laboratory",
+  "description_bg": "Медико-диагностична лаборатория в Банско, в сградата на ул. „Луи Пастьор“ 1. Участва в националните и в международни системи за външен контрол на качеството.",
+  "description_en": "Medical diagnostic laboratory in Bansko, in the building at 1 Louis Pasteur Street. It takes part in national and international external quality control schemes.",
+  "image_alt_bg": "Лаборатория Рамус, Банско",
+  "image_alt_en": "Ramus Laboratory, Bansko"
+ },
+ {
+  "slug": "megalab",
+  "name_bg": "Мегалаб",
+  "name_en": "Megalab",
+  "description_bg": "Медико-диагностична лаборатория в Банско, на ул. „Цар Симеон“ 26. Прави качествени и количествени изследвания на място, като много от резултатите са готови за минути.",
+  "description_en": "Medical diagnostic laboratory in Bansko at 26 Tsar Simeon Street. Qualitative and quantitative tests are done on site, and many results are ready within minutes.",
+  "image_alt_bg": "Лаборатория Мегалаб, Банско",
+  "image_alt_en": "Megalab laboratory, Bansko"
+ },
+ {
+  "slug": "speedy-vasil-kanchov",
+  "name_bg": "Speedy – офис Васил Кънчов",
+  "name_en": "Speedy – Vasil Kanchov office",
+  "description_bg": "Офис на куриерската компания Спиди в Банско, на ул. „Васил Кънчов“ 9. Приема и доставя пратки в страната и чужбина чрез мрежата на Спиди и DPD.",
+  "description_en": "Office of the Speedy courier company in Bansko at 9 Vasil Kanchov Street. It accepts and delivers parcels in Bulgaria and abroad through the Speedy and DPD network.",
+  "image_alt_bg": "Офис на Speedy, Банско",
+  "image_alt_en": "Speedy office, Bansko"
+ },
+ {
+  "slug": "speedy-czar-simeon",
+  "name_bg": "Speedy – офис Цар Симеон",
+  "name_en": "Speedy – Tsar Simeon office",
+  "description_bg": "Офис на куриерската компания Спиди в Банско, на ул. „Цар Симеон“ 80 Б. Приема и доставя пратки в страната и чужбина чрез мрежата на Спиди и DPD.",
+  "description_en": "Office of the Speedy courier company in Bansko at 80 B Tsar Simeon Street. It accepts and delivers parcels in Bulgaria and abroad through the Speedy and DPD network.",
+  "image_alt_bg": "Офис на Speedy, Банско",
+  "image_alt_en": "Speedy office, Bansko"
+ },
+ {
+  "slug": "speedy-avtomat",
+  "name_bg": "Speedy – автоматична пощенска станция",
+  "name_en": "Speedy – parcel locker",
+  "description_bg": "Автоматична пощенска станция на Спиди в Банско, на ул. „Цар Симеон“ 28, за получаване и изпращане на пратки по всяко време.",
+  "description_en": "Speedy automated parcel locker in Bansko at 28 Tsar Simeon Street, for collecting and sending parcels at any time.",
+  "image_alt_bg": "Автомат на Speedy, Банско",
+  "image_alt_en": "Speedy parcel locker, Bansko"
+ },
+ {
+  "slug": "econt-express-bansko",
+  "name_bg": "Еконт Експрес – Банско",
+  "name_en": "Econt Express – Bansko",
+  "description_bg": "Офис на Еконт в Банско, на ул. „Васил Кънчов“ 8. Куриерски, логистични и платежни услуги за частни и бизнес клиенти в България, Гърция, Кипър и Румъния.",
+  "description_en": "Econt office in Bansko at 8 Vasil Kanchov Street. Courier, logistics and payment services for private and business customers in Bulgaria, Greece, Cyprus and Romania.",
+  "image_alt_bg": "Офис на Еконт, Банско",
+  "image_alt_en": "Econt office, Bansko"
+ },
+ {
+  "slug": "leo-ekspres",
+  "name_bg": "Лео Експрес",
+  "name_en": "Leo Expres",
+  "description_bg": "Офис на куриерската фирма Лео Експрес в Банско, на ул. „Струма“ 1. Компанията превозва пратки в над сто населени места в страната.",
+  "description_en": "Office of the Leo Expres courier company in Bansko at 1 Struma Street. The company delivers parcels to more than a hundred towns and villages across Bulgaria.",
+  "image_alt_bg": "Лео Експрес, Банско",
+  "image_alt_en": "Leo Expres, Bansko"
+ },
+ {
+  "slug": "yanak-soft",
+  "name_bg": "Янак Софт",
+  "name_en": "Yanak Soft",
+  "description_bg": "Софтуерна фирма в Банско, на ул. „Патриарх Евтимий“ 2, която разработва и внедрява софтуер за магазини, ресторанти, хотели и търговия на едро. Предлага и консултации, техническа поддръжка и оборудване за търговски обекти.",
+  "description_en": "Software company in Bansko at 2 Patriarh Evtimiy Street that develops and installs software for shops, restaurants, hotels and wholesale trade. It also offers consulting, technical support and equipment for retail premises.",
+  "image_alt_bg": "Янак Софт, Банско",
+  "image_alt_en": "Yanak Soft, Bansko"
+ },
+ {
+  "slug": "klyucharski-uslugi",
+  "name_bg": "Ключарски услуги",
+  "name_en": "Locksmith Services",
+  "description_bg": "Ключарско ателие в Банско, на ул. „Гоце Делчев“ 21. Монтира и сменя ключалки, отключва брави и автомобили и дава съвети за сигурността на дома и офиса; при аварии работи денонощно.",
+  "description_en": "Locksmith workshop in Bansko at 21 Gotse Delchev Street. It installs and replaces locks, opens locked doors and cars and advises on home and office security; emergency call-outs are available around the clock.",
+  "image_alt_bg": "Ключарски услуги, Банско",
+  "image_alt_en": "Locksmith services, Bansko"
+ },
+ {
+  "slug": "earth-design",
+  "name_bg": "Earth Design",
+  "name_en": "Earth Design",
+  "description_bg": "Студио за интериорен дизайн в Банско, на ул. „Радон Тодев“ 48. Изготвя идейни проекти и технически чертежи за домове, магазини, заведения и хотели, помага при избора на настилки и мебели и следи изпълнението на обекта.",
+  "description_en": "Interior design studio in Bansko at 48 Radon Todev Street. It prepares concept designs and technical drawings for homes, shops, restaurants and hotels, helps with the choice of flooring and furniture and supervises the work on site.",
+  "image_alt_bg": "Earth Design, Банско",
+  "image_alt_en": "Earth Design, Bansko"
+ },
+ {
+  "slug": "et-agencziya-balgariya-czvetan-kaloyanov",
+  "name_bg": "Агенция България – Цветан Калоянов",
+  "name_en": "Bulgaria Agency – Tsvetan Kaloyanov",
+  "description_bg": "Застрахователна агенция в Банско, на ул. „Шипка“ 4, която предлага всички видове застраховки.",
+  "description_en": "Insurance agency in Bansko at 4 Shipka Street, offering all types of insurance.",
+  "image_alt_bg": "Агенция България, Банско",
+  "image_alt_en": "Bulgaria insurance agency, Bansko"
+ },
+ {
+  "slug": "lev-ins",
+  "name_bg": "Лев Инс",
+  "name_en": "Lev Ins",
+  "description_bg": "Офис на застрахователната компания Лев Инс в Банско, на ул. „Гоце Делчев“ 5. Компанията е основана през 1996 г. в София и е сред големите застрахователи на българския пазар.",
+  "description_en": "Office of the Lev Ins insurance company in Bansko at 5 Gotse Delchev Street. Founded in Sofia in 1996, the company is among the larger insurers on the Bulgarian market.",
+  "image_alt_bg": "Офис на Лев Инс, Банско",
+  "image_alt_en": "Lev Ins office, Bansko"
+ },
+ {
+  "slug": "dneven-czentar-za-stari-hora-s-mesta",
+  "name_bg": "Дневен център за стари хора – с. Места",
+  "name_en": "Day Centre for the Elderly – Mesta village",
+  "description_bg": "Общински дневен център в центъра на село Места с 20 места. Осигурява храна, грижа за здравето и занимания по интереси през деня, така че възрастните хора да останат в семейната си среда.",
+  "description_en": "Municipal day centre in the middle of Mesta village with room for 20 people. It provides meals, health care and daytime activities so that older people can stay in their family environment.",
+  "image_alt_bg": "Дневен център за стари хора, село Места",
+  "image_alt_en": "Day centre for the elderly, Mesta village"
+ },
+ {
+  "slug": "zz-entertainment",
+  "name_bg": "ZZ Entertainment",
+  "name_en": "ZZ Entertainment",
+  "description_bg": "Фирма за хотелска анимация и събития, работеща главно в Банско и региона. Организира детски и фирмени партита, рождени дни, празнични програми и музикално-артистични прояви.",
+  "description_en": "Hotel entertainment and events company working mainly in Bansko and the surrounding area. It organises children's and corporate parties, birthdays, holiday programmes and music and performance events.",
+  "image_alt_bg": "ZZ Entertainment, Банско",
+  "image_alt_en": "ZZ Entertainment, Bansko"
+ },
+ {
+  "slug": "aj-dzhi-konsult",
+  "name_bg": "Ай Джи Консулт",
+  "name_en": "I G Consult",
+  "description_bg": "Счетоводна къща в Банско, на ул. „Серафим Боянов“ 1, основана през 2002 г. Предлага счетоводно обслужване и данъчни консултации за фирми.",
+  "description_en": "Accounting firm in Bansko at 1 Serafim Boyanov Street, established in 2002. It offers bookkeeping services and tax advice for companies.",
+  "image_alt_bg": "Ай Джи Консулт, Банско",
+  "image_alt_en": "I G Consult accounting, Bansko"
+ },
+ {
+  "slug": "schetovodna-kastha-vides-bansko",
+  "name_bg": "Счетоводна къща Видес Банско",
+  "name_en": "Vides Bansko Accounting",
+  "description_bg": "Счетоводна къща в Банско, на ул. „България“ 22, която работи от 2007 г. и обслужва фирми с поверителност и отговорност.",
+  "description_en": "Accounting firm in Bansko at 22 Bulgaria Street, in business since 2007, serving companies with discretion and care.",
+  "image_alt_bg": "Счетоводна къща Видес, Банско",
+  "image_alt_en": "Vides accounting office, Bansko"
+ },
+ {
+  "slug": "izipej-ofis-gorski-tehnikum",
+  "name_bg": "ИзиПей – офис Горски техникум",
+  "name_en": "EasyPay – Gorski Tehnikum office",
+  "description_bg": "Офис на ИзиПей в Банско, на ул. „Охрид“ 10, за плащане на битови сметки, такси, данъци и глоби и за преводи в страната и чужбина. Отворен е от понеделник до събота, а в неделя работи на повикване.",
+  "description_en": "EasyPay office in Bansko at 10 Ohrid Street for paying utility bills, fees, taxes and fines and for transfers in Bulgaria and abroad. Open Monday to Saturday; on Sundays by arrangement.",
+  "image_alt_bg": "Офис на ИзиПей, Банско",
+  "image_alt_en": "EasyPay office, Bansko"
+ },
+ {
+  "slug": "banka-dsk",
+  "name_bg": "Банка ДСК",
+  "name_en": "DSK Bank",
+  "description_bg": "Клон на Банка ДСК в Банско, на ул. „Цар Симеон“ 67. Банката е част от унгарската група OTP и предлага влогове, кредити, платежни услуги и сейфове.",
+  "description_en": "DSK Bank branch in Bansko at 67 Tsar Simeon Street. The bank belongs to Hungary's OTP Group and offers deposits, loans, payment services and safe deposit boxes.",
+  "image_alt_bg": "Клон на Банка ДСК, Банско",
+  "image_alt_en": "DSK Bank branch, Bansko"
+ },
+ {
+  "slug": "fibank",
+  "name_bg": "Fibank",
+  "name_en": "Fibank",
+  "description_bg": "Клон на Първа инвестиционна банка в Банско, на ул. „Цар Симеон“ 68. Банкови продукти и услуги за частни и фирмени клиенти, включително карти, международни разплащания и инвестиционно злато.",
+  "description_en": "First Investment Bank branch in Bansko at 68 Tsar Simeon Street. Banking products and services for private and business customers, including cards, international payments and investment gold.",
+  "image_alt_bg": "Клон на Fibank, Банско",
+  "image_alt_en": "Fibank branch, Bansko"
+ },
+ {
+  "slug": "postbank",
+  "name_bg": "Пощенска банка",
+  "name_en": "Postbank",
+  "description_bg": "Клон на Пощенска банка в Банско, на ул. „Цар Симеон“ 43. Банкиране на дребно и за фирми: карти, жилищни и потребителски кредити, спестовни продукти и дигитални услуги.",
+  "description_en": "Postbank branch in Bansko at 43 Tsar Simeon Street. Retail and business banking: cards, mortgage and consumer loans, savings products and digital services.",
+  "image_alt_bg": "Клон на Пощенска банка, Банско",
+  "image_alt_en": "Postbank branch, Bansko"
+ },
+ {
+  "slug": "unicredit-bulbank",
+  "name_bg": "УниКредит Булбанк",
+  "name_en": "UniCredit Bulbank",
+  "description_bg": "Клон на УниКредит Булбанк в Банско, на ул. „Пирин“ 3. Банкови услуги за частни и фирмени клиенти: влогове, кредити, платежни услуги и депозит на ценности.",
+  "description_en": "UniCredit Bulbank branch in Bansko at 3 Pirin Street. Banking services for private and business customers: deposits, loans, payment services and safe custody.",
+  "image_alt_bg": "Клон на УниКредит Булбанк, Банско",
+  "image_alt_en": "UniCredit Bulbank branch, Bansko"
+ },
+ {
+  "slug": "direkcziya-naczionalen-park-pirin",
+  "name_bg": "Дирекция „Национален парк Пирин“",
+  "name_en": "Pirin National Park Directorate",
+  "description_bg": "Администрацията на Национален парк „Пирин“, който пази природата на планината от 1962 г., когато е обявен като Народен парк „Вихрен“. Офисът е в Банско, на ул. „България“ 4, а посетителският информационен център е на ул. „Пирин“ 104.",
+  "description_en": "Administration of Pirin National Park, which has protected the mountain's nature since 1962, when it was declared Vihren People's Park. The office is in Bansko at 4 Bulgaria Street; the visitor information centre is at 104 Pirin Street.",
+  "image_alt_bg": "Дирекция „Национален парк Пирин“, Банско",
+  "image_alt_en": "Pirin National Park Directorate, Bansko"
+ },
+ {
+  "slug": "obsthinska-administracziya-bansko",
+  "name_bg": "Общинска администрация – Банско",
+  "name_en": "Bansko Municipal Administration",
+  "description_bg": "Общинската администрация на Банско на централния площад „Никола Вапцаров“ 1. Обслужва гражданите на общината, в която влизат Банско, Добринище и селата Места, Кремен, Обидим, Гостун, Филипово и Осеново.",
+  "description_en": "Bansko's municipal administration on the central Nikola Vaptsarov Square. It serves residents of the municipality, which covers Bansko, Dobrinishte and the villages of Mesta, Kremen, Obidim, Gostun, Filipovo and Osenovo.",
+  "image_alt_bg": "Общинска администрация, Банско",
+  "image_alt_en": "Municipal administration, Bansko"
+ },
+ {
+  "slug": "rajonno-policzejsko-upravlenie-bansko",
+  "name_bg": "Районно полицейско управление Банско",
+  "name_en": "Bansko District Police Department",
+  "description_bg": "Районното управление на полицията в Банско отговаря за обществения ред и съдействието на гражданите на територията на цялата община: Банско, Добринище и шестте села. При спешни случаи се набира единният номер 112.",
+  "description_en": "The district police department in Bansko is responsible for public order and assistance to citizens across the whole municipality: Bansko, Dobrinishte and the six villages. In an emergency, dial the single European number 112.",
+  "image_alt_bg": "Районно полицейско управление, Банско",
+  "image_alt_en": "District police department, Bansko"
+ },
+ {
+  "slug": "sluzhba-zavedeniya-za-soczialni-uslugi",
+  "name_bg": "Служба „Заведения за социални услуги“",
+  "name_en": "Social Services Office",
+  "description_bg": "Общинската служба за социални услуги в Банско, на ул. „Радон Тодев“ 14. Управлява дневните центрове за стари хора и за хора с увреждания, защитените жилища, домашния социален патронаж и асистентската подкрепа в общината.",
+  "description_en": "The municipal social services office in Bansko at 14 Radon Todev Street. It runs the day centres for the elderly and for people with disabilities, the sheltered housing, the home care service and the assistant support scheme in the municipality.",
+  "image_alt_bg": "Служба за социални услуги, Банско",
+  "image_alt_en": "Social services office, Bansko"
+ },
+ {
+  "slug": "letni-atrakczii-na-banderishka-polyana",
+  "name_bg": "Летни атракции на Бъндеришка поляна",
+  "name_en": "Summer attractions at Banderishka Polyana",
+  "description_bg": "Малък развлекателен комплекс на Бъндеришка поляна в Пирин, отворен през лятото. Има кула за катерене, стрелбище, игрище за футбол на малки вратички, мини голф, човешки джаги и водна пързалка с дължина 400 метра.",
+  "description_en": "Small recreation area at Banderishka Polyana in the Pirin mountains, open in summer. It has a climbing tower, a shooting range, a five-a-side football pitch, mini golf, human table football and a 400-metre water slide.",
+  "image_alt_bg": "Летни атракции на Бъндеришка поляна, Банско",
+  "image_alt_en": "Summer attractions at Banderishka Polyana, Bansko"
+ },
+ {
+  "slug": "ledena-parzalka",
+  "name_bg": "Ледена пързалка",
+  "name_en": "Ice Rink",
+  "description_bg": "Ледена пързалка с площ 1200 кв. м на ул. „Пирин“ 86 а, по пътя към лифта в Банско. Предлага кънки под наем, гардероб, трибуни и кафене; влиза се на часови сесии и работи през зимния сезон.",
+  "description_en": "Ice rink of 1,200 square metres at 86 A Pirin Street, on the road to the gondola in Bansko. It has skate hire, a cloakroom, seating and a cafe; entry is in timed sessions and it operates during the winter season.",
+  "image_alt_bg": "Ледена пързалка, Банско",
+  "image_alt_en": "Ice rink, Bansko"
+ },
+ {
+  "slug": "simulator-bg",
+  "name_bg": "Simulator.bg",
+  "name_en": "Simulator.bg",
+  "description_bg": "Студио за автомобилни симулатори в Банско, на ул. „Найден Геров“ 12. Симулаторите са с истински волани, скорости и педали и вибриращи седалки; предлагат се инструктаж за начинаещи и редовни турнири.",
+  "description_en": "Driving simulator studio in Bansko at 12 Nayden Gerov Street. The simulators have real steering wheels, gear sticks, pedals and vibrating seats; instruction for beginners and regular tournaments are offered.",
+  "image_alt_bg": "Simulator.bg, Банско",
+  "image_alt_en": "Simulator.bg, Bansko"
+ },
+ {
+  "slug": "planinski-klub-balgariya",
+  "name_bg": "Планински клуб „България“",
+  "name_en": "Bulgaria Mountain Club",
+  "description_bg": "Клуб за активности на открито в Добринище, на ул. „Партизанска“ 10, създаден през 2018 г. Предлага разходки с АТВ, конна езда, въжен парк и други атракции, има и ресторант.",
+  "description_en": "Outdoor activities club in Dobrinishte at 10 Partizanska Street, founded in 2018. It offers ATV rides, horse riding, a rope park and other attractions, and has a restaurant.",
+  "image_alt_bg": "Планински клуб „България“, Добринище",
+  "image_alt_en": "Bulgaria Mountain Club, Dobrinishte"
+ },
+ {
+  "slug": "moto-druzhina-bansko",
+  "name_bg": "Мото дружина Банско",
+  "name_en": "Moto Druzhina Bansko",
+  "description_bg": "Спортен клуб по ендуро в Банско. Организира мото състезания, трасира разрешени маршрути, участва в кръговете на BG-X Ендуро шампионата и прави мото преходи; обучава и нови състезатели.",
+  "description_en": "Enduro motorcycle club in Bansko. It organises races, marks out permitted routes, takes part in the BG-X Enduro championship and runs motorcycle tours; it also trains new riders.",
+  "image_alt_bg": "Мото дружина Банско",
+  "image_alt_en": "Moto Druzhina Bansko motorcycle club"
+ },
+ {
+  "slug": "fitbox-fitness-club-bansko",
+  "name_bg": "Fitbox Fitness Club Bansko",
+  "name_en": "Fitbox Fitness Club Bansko",
+  "description_bg": "Фитнес клуб в Банско на третия етаж на ул. „Цар Симеон“ 52. Оборудван е с уреди Technogym и предлага и хранителни добавки.",
+  "description_en": "Fitness club in Bansko on the third floor at 52 Tsar Simeon Street. It is equipped with Technogym machines and also sells nutritional supplements.",
+  "image_alt_bg": "Fitbox Fitness Club, Банско",
+  "image_alt_en": "Fitbox Fitness Club, Bansko"
+ }
+]

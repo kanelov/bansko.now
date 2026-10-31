@@ -1,0 +1,398 @@
+[
+ {
+  "slug": "ou-sv-kliment-ohridski-gr-dobrinisthe",
+  "name_bg": "ОУ „Св. Климент Охридски“ – Добринище",
+  "name_en": "St. Kliment Ohridski Primary School, Dobrinishte",
+  "description_bg": "Основно училище в Добринище с ученици от първи до седми клас в осем паралелки. Историята му започва с килийно училище през 1854 г., а днешната сграда е завършена през 1934 г.",
+  "description_en": "Primary school in Dobrinishte with pupils from first to seventh grade in eight classes. Its history goes back to a church school opened in 1854; the present building was completed in 1934.",
+  "image_alt_bg": "ОУ „Св. Климент Охридски“, Добринище",
+  "image_alt_en": "St. Kliment Ohridski Primary School, Dobrinishte"
+ },
+ {
+  "slug": "apteka-azarum-1",
+  "name_bg": "Аптека Азарум 1",
+  "name_en": "Azarum 1 Pharmacy",
+  "description_bg": "Местна аптека в Банско на улица Луи Пастьор, част от фирма с над десет години работа във фармацевтичната грижа.",
+  "description_en": "Local pharmacy on Louis Pasteur Street in Bansko, run by a family firm with more than ten years in pharmaceutical care.",
+  "image_alt_bg": "Аптека Азарум 1, Банско",
+  "image_alt_en": "Azarum 1 Pharmacy, Bansko"
+ },
+ {
+  "slug": "apteka-subra",
+  "name_bg": "Аптека Субра",
+  "name_en": "Subra Pharmacy",
+  "description_bg": "Аптека от националната верига Subra на улица Пирин в Банско. Предлага лекарства, медицински изделия, хранителни добавки и дермокозметика; веригата има и онлайн магазин.",
+  "description_en": "Branch of the national Subra pharmacy chain on Pirin Street in Bansko. It stocks medicines, medical supplies, food supplements and dermocosmetics; the chain also runs an online shop.",
+  "image_alt_bg": "Аптека Субра, Банско",
+  "image_alt_en": "Subra Pharmacy, Bansko"
+ },
+ {
+  "slug": "apteka-sigma",
+  "name_bg": "Аптека Сигма",
+  "name_en": "Sigma Pharmacy",
+  "description_bg": "Аптека от веригата Сигма на улица Патриарх Евтимий в Банско.",
+  "description_en": "Branch of the Sigma pharmacy chain on Patriarch Evtimiy Street in Bansko.",
+  "image_alt_bg": "Аптека Сигма, Банско",
+  "image_alt_en": "Sigma Pharmacy, Bansko"
+ },
+ {
+  "slug": "apteka-sanita",
+  "name_bg": "Аптека Санита",
+  "name_en": "Sanita Pharmacy",
+  "description_bg": "Аптека на улица Цар Симеон в Банско, част от веригата SOpharmacy. Работи с НЗОК и предлага лекарства, инсулини, хранителни добавки, дермокозметика и продукти за ежедневна грижа.",
+  "description_en": "Pharmacy on Tsar Simeon Street in Bansko, part of the SOpharmacy chain. It dispenses prescriptions under the national health fund and sells medicines, insulin, supplements, dermocosmetics and everyday care products.",
+  "image_alt_bg": "Аптека Санита, Банско",
+  "image_alt_en": "Sanita Pharmacy, Bansko"
+ },
+ {
+  "slug": "apteka-mareshki",
+  "name_bg": "Аптека Марешки",
+  "name_en": "Mareshki Pharmacy",
+  "description_bg": "Аптека от веригата Марешки на площад Никола Вапцаров в центъра на Банско. Предлага лекарства, козметика и хранителни добавки и работи с НЗОК.",
+  "description_en": "Branch of the Mareshki pharmacy chain on Nikola Vaptsarov Square in the centre of Bansko. It sells medicines, cosmetics and supplements and dispenses national health fund prescriptions.",
+  "image_alt_bg": "Аптека Марешки, Банско",
+  "image_alt_en": "Mareshki Pharmacy, Bansko"
+ },
+ {
+  "slug": "apteka-astra",
+  "name_bg": "Аптека Астра",
+  "name_en": "Astra Pharmacy",
+  "description_bg": "Аптека на улица Пирин в Банско, част от веригата Астра, започнала работа през 1997 г. с денонощна аптека в Русе.",
+  "description_en": "Pharmacy on Pirin Street in Bansko, part of the Astra chain, which started in 1997 with a 24-hour pharmacy in Ruse.",
+  "image_alt_bg": "Аптека Астра, Банско",
+  "image_alt_en": "Astra Pharmacy, Bansko"
+ },
+ {
+  "slug": "apteka-margarita-trencheva",
+  "name_bg": "Аптека Маргарита Тренчева",
+  "name_en": "Margarita Trencheva Pharmacy",
+  "description_bg": "Аптека с над 30 години история на улица Иван Вазов в Банско. Предлага лекарства, хранителни добавки, санитарни материали и козметика, а магистър-фармацевтите консултират на място.",
+  "description_en": "Pharmacy with more than 30 years of history on Ivan Vazov Street in Bansko. It offers medicines, supplements, sanitary products and cosmetics, with pharmacists available for advice.",
+  "image_alt_bg": "Аптека Маргарита Тренчева, Банско",
+  "image_alt_en": "Margarita Trencheva Pharmacy, Bansko"
+ },
+ {
+  "slug": "apteka-azarum-2",
+  "name_bg": "Аптека Азарум 2",
+  "name_en": "Azarum 2 Pharmacy",
+  "description_bg": "Втората аптека на местната фирма Азарум, на улица Цар Симеон в Банско, с над десет години работа във фармацевтичната грижа.",
+  "description_en": "The second pharmacy of the local Azarum firm, on Tsar Simeon Street in Bansko, with more than ten years in pharmaceutical care.",
+  "image_alt_bg": "Аптека Азарум 2, Банско",
+  "image_alt_en": "Azarum 2 Pharmacy, Bansko"
+ },
+ {
+  "slug": "d-r-margarita-ivanova-daneva-stoyanova",
+  "name_bg": "Д-р Маргарита Данева-Стоянова",
+  "name_en": "Dr. Margarita Daneva-Stoyanova, dental practice",
+  "description_bg": "Дентален кабинет на улица Тодор Александров в Банско. Д-р Данева-Стоянова е общопрактикуващ лекар по дентална медицина и работи с диоден лазер.",
+  "description_en": "Dental practice on Todor Aleksandrov Street in Bansko. Dr. Daneva-Stoyanova is a general dentist and works with a diode laser.",
+  "image_alt_bg": "Д-р Маргарита Данева-Стоянова, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Margarita Daneva-Stoyanova, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-rajna-petrova-tomanova-glushkova",
+  "name_bg": "Д-р Райна Томанова-Глушкова",
+  "name_en": "Dr. Rayna Tomanova-Glushkova, dental practice",
+  "description_bg": "Дентален кабинет на улица Неофит Рилски в Банско. Д-р Томанова-Глушкова е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Neofit Rilski Street in Bansko. Dr. Tomanova-Glushkova is a general dentist.",
+  "image_alt_bg": "Д-р Райна Томанова-Глушкова, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Rayna Tomanova-Glushkova, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-milen-kostadinov-glushkov",
+  "name_bg": "Д-р Милен Глушков",
+  "name_en": "Dr. Milen Glushkov, dental practice",
+  "description_bg": "Дентален кабинет на улица Неофит Рилски в Банско. Д-р Глушков е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Neofit Rilski Street in Bansko. Dr. Glushkov is a general dentist.",
+  "image_alt_bg": "Д-р Милен Глушков, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Milen Glushkov, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-aneta-dimitrova-yanchovichina",
+  "name_bg": "Д-р Анета Янчовичина",
+  "name_en": "Dr. Aneta Yanchovichina, dental practice",
+  "description_bg": "Дентален кабинет на улица Цар Симеон в Банско. Д-р Янчовичина е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Tsar Simeon Street in Bansko. Dr. Yanchovichina is a general dentist.",
+  "image_alt_bg": "Д-р Анета Янчовичина, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Aneta Yanchovichina, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-svetla-georgieva-stheryanova-gyumova",
+  "name_bg": "Д-р Светла Щерянова-Гюмова",
+  "name_en": "Dr. Svetla Shteryanova-Gyumova, dental practice",
+  "description_bg": "Дентален кабинет на първия етаж на улица Христо Матов в Банско. Д-р Щерянова-Гюмова е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on the first floor on Hristo Matov Street in Bansko. Dr. Shteryanova-Gyumova is a general dentist.",
+  "image_alt_bg": "Д-р Светла Щерянова-Гюмова, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Svetla Shteryanova-Gyumova, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-nezabravka-kostadinova-yanchovichina-czoneva",
+  "name_bg": "Д-р Незабравка Янчовичина-Цонева",
+  "name_en": "Dr. Nezabravka Yanchovichina-Tsoneva, dental practice",
+  "description_bg": "Дентален кабинет на улица Цар Симеон в Банско. Д-р Янчовичина-Цонева е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Tsar Simeon Street in Bansko. Dr. Yanchovichina-Tsoneva is a general dentist.",
+  "image_alt_bg": "Д-р Незабравка Янчовичина-Цонева, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Nezabravka Yanchovichina-Tsoneva, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-elena-kirilova-ivanova-benina",
+  "name_bg": "Д-р Елена Иванова-Бенина",
+  "name_en": "Dr. Elena Ivanova-Benina, dental practice",
+  "description_bg": "Дентален кабинет на улица България в Банско. Д-р Иванова-Бенина е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Bulgaria Street in Bansko. Dr. Ivanova-Benina is a general dentist.",
+  "image_alt_bg": "Д-р Елена Иванова-Бенина, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Elena Ivanova-Benina, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-mario-sthefen-lajke",
+  "name_bg": "Д-р Марио Щефен Лайке",
+  "name_en": "Dr. Mario Stefan Leike, dental practice",
+  "description_bg": "Дентален кабинет на улица Тодорин връх в Банско. Д-р Лайке е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Todorin Vrah Street in Bansko. Dr. Leike is a general dentist.",
+  "image_alt_bg": "Д-р Марио Щефен Лайке, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Mario Stefan Leike, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-georgi-borisov-furnadzhiev",
+  "name_bg": "Д-р Георги Фурнаджиев",
+  "name_en": "Dr. Georgi Furnadzhiev, dental practice",
+  "description_bg": "Дентален кабинет на площад Никола Вапцаров в центъра на Банско. Д-р Фурнаджиев е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Nikola Vaptsarov Square in the centre of Bansko. Dr. Furnadzhiev is a general dentist.",
+  "image_alt_bg": "Д-р Георги Фурнаджиев, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Georgi Furnadzhiev, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-georgi-atanasov-czonev",
+  "name_bg": "Д-р Георги Цонев",
+  "name_en": "Dr. Georgi Tsonev, dental practice",
+  "description_bg": "Дентален кабинет на втория етаж на Спешния център в Банско, на улица Цар Симеон. Д-р Цонев е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on the second floor of the emergency centre on Tsar Simeon Street in Bansko. Dr. Tsonev is a general dentist.",
+  "image_alt_bg": "Д-р Георги Цонев, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Georgi Tsonev, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-mariya-ivanova-manova",
+  "name_bg": "Д-р Мария Манова",
+  "name_en": "Dr. Mariya Manova, dental practice",
+  "description_bg": "Дентален кабинет на улица Хан Аспарух в Банско. Д-р Манова е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Han Asparuh Street in Bansko. Dr. Manova is a general dentist.",
+  "image_alt_bg": "Д-р Мария Манова, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Mariya Manova, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-bojka-georgieva-chekanova-lazarova",
+  "name_bg": "Д-р Бойка Чеканьова-Лазарова",
+  "name_en": "Dr. Boyka Chekanyova-Lazarova, dental practice",
+  "description_bg": "Дентален кабинет на улица Цар Симеон в Банско. Д-р Чеканьова-Лазарова е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Tsar Simeon Street in Bansko. Dr. Chekanyova-Lazarova is a general dentist.",
+  "image_alt_bg": "Д-р Бойка Чеканьова-Лазарова, дентален кабинет, Банско",
+  "image_alt_en": "Dr. Boyka Chekanyova-Lazarova, dental practice, Bansko"
+ },
+ {
+  "slug": "d-r-kostadin-kirilov-iliev",
+  "name_bg": "Д-р Костадин Илиев",
+  "name_en": "Dr. Kostadin Iliev, dental practice",
+  "description_bg": "Дентален кабинет на улица Иван Галчев в Добринище. Д-р Илиев е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Ivan Galchev Street in Dobrinishte. Dr. Iliev is a general dentist.",
+  "image_alt_bg": "Д-р Костадин Илиев, дентален кабинет, Добринище",
+  "image_alt_en": "Dr. Kostadin Iliev, dental practice, Dobrinishte"
+ },
+ {
+  "slug": "d-r-roza-georgieva-hadzhijska",
+  "name_bg": "Д-р Роза Хаджийска",
+  "name_en": "Dr. Roza Hadzhiyska, dental practice",
+  "description_bg": "Дентален кабинет на улица Никола Вапцаров в Добринище. Д-р Хаджийска е общопрактикуващ лекар по дентална медицина.",
+  "description_en": "Dental practice on Nikola Vaptsarov Street in Dobrinishte. Dr. Hadzhiyska is a general dentist.",
+  "image_alt_bg": "Д-р Роза Хаджийска, дентален кабинет, Добринище",
+  "image_alt_en": "Dr. Roza Hadzhiyska, dental practice, Dobrinishte"
+ },
+ {
+  "slug": "a1",
+  "name_bg": "A1",
+  "name_en": "A1",
+  "description_bg": "Магазин на мобилния оператор A1 на улица Никола Вапцаров в центъра на Банско. Предлага мобилни и фиксирани услуги, интернет и телевизия.",
+  "description_en": "Shop of the mobile operator A1 on Nikola Vaptsarov Street in the centre of Bansko, offering mobile and fixed-line services, internet and television.",
+  "image_alt_bg": "Магазин на A1, Банско",
+  "image_alt_en": "A1 shop, Bansko"
+ },
+ {
+  "slug": "vivacom",
+  "name_bg": "Vivacom",
+  "name_en": "Vivacom",
+  "description_bg": "Магазин на телекомуникационния оператор Vivacom на улица Никола Вапцаров в центъра на Банско. Предлага мобилни и фиксирани услуги, оптичен интернет и цифрова телевизия.",
+  "description_en": "Shop of the telecom operator Vivacom on Nikola Vaptsarov Street in the centre of Bansko, offering mobile and fixed-line services, fibre internet and digital television.",
+  "image_alt_bg": "Магазин на Vivacom, Банско",
+  "image_alt_en": "Vivacom shop, Bansko"
+ },
+ {
+  "slug": "kouorking-bansko",
+  "name_bg": "Coworking Bansko",
+  "name_en": "Coworking Bansko",
+  "description_bg": "Споделени офиси за хора, които работят от разстояние, на улица Тома Вишанов в Банско. Основан от Матиас Цайтлер и Уве Алгойер, разполага с четири офиса и организира фестивала Bansko Nomad Fest.",
+  "description_en": "Shared workspace for remote workers on Toma Vishanov Street in Bansko. Founded by Matthias Zeitler and Uwe Allgäuer, it runs four offices and organises the Bansko Nomad Fest.",
+  "image_alt_bg": "Coworking Bansko, Банско",
+  "image_alt_en": "Coworking Bansko, Bansko"
+ },
+ {
+  "slug": "fest-bg",
+  "name_bg": "Фестивалите в България",
+  "name_en": "Festivals in Bulgaria Association",
+  "description_bg": "Сдружение с нестопанска цел с офис на улица Отец Паисий в Банско. Обединява специалисти по туризъм, култура, екология и комуникации в подкрепа на фестивалния и събитийния туризъм в страната.",
+  "description_en": "Non-profit association with an office on Otets Paisiy Street in Bansko. It brings together tourism, culture, ecology and communication specialists to support festival and event tourism in Bulgaria.",
+  "image_alt_bg": "Асоциация „Фестивалите в България“, Банско",
+  "image_alt_en": "Festivals in Bulgaria Association, Bansko"
+ },
+ {
+  "slug": "posoka-kom",
+  "name_bg": "Посока.ком",
+  "name_en": "Posoka.com travel agency",
+  "description_bg": "Туристическа агенция и туроператор на улица Найден Геров в Банско. В офиса се продават самолетни и автобусни билети, хотелско настаняване, почивки, екскурзии, круизи и медицински застраховки.",
+  "description_en": "Travel agency and tour operator on Nayden Gerov Street in Bansko. The office sells plane and bus tickets, hotel bookings, holidays, excursions, cruises and travel insurance.",
+  "image_alt_bg": "Туристическа агенция Посока.ком, Банско",
+  "image_alt_en": "Posoka.com travel agency, Bansko"
+ },
+ {
+  "slug": "amavi-travel",
+  "name_bg": "Amavi Travel",
+  "name_en": "Amavi Travel",
+  "description_bg": "Туристическа агенция на улица Найден Геров в Банско. Предлага оферти на български и чуждестранни туроператори, самолетни и автобусни билети за Европа, хотели, почивки, екскурзии, круизи и застраховки.",
+  "description_en": "Travel agency on Nayden Gerov Street in Bansko. It sells offers from Bulgarian and foreign tour operators, plane and coach tickets across Europe, hotels, holidays, excursions, cruises and travel insurance.",
+  "image_alt_bg": "Amavi Travel, Банско",
+  "image_alt_en": "Amavi Travel, Bansko"
+ },
+ {
+  "slug": "darveni-kasthi",
+  "name_bg": "Дървени къщи",
+  "name_en": "Darveni Kashti log homes",
+  "description_bg": "Фирма за строителство на къщи от масивни дървени трупи с офис на улица Захари Стоянов в Банско. Има над 15 години опит и над 30 изпълнени къщи, вили и ресторанти в България и чужбина.",
+  "description_en": "Builder of solid log homes with an office on Zahari Stoyanov Street in Bansko. The firm has more than 15 years of experience and over 30 completed houses, villas and restaurants in Bulgaria and abroad.",
+  "image_alt_bg": "Дървени къщи, строителство от трупи, Банско",
+  "image_alt_en": "Darveni Kashti log homes, Bansko"
+ },
+ {
+  "slug": "strakov-log-homs",
+  "name_bg": "Страков Лог Хомс",
+  "name_en": "Strakov Log Homes",
+  "description_bg": "Строител на дървени конструкции от трупи на улица Цар Симеон в Банско: къщи, вили, къщи за гости, ресторанти, навеси и гаражи от 30 до 200 кв. м. Първата сграда е завършена през 2007 г., изработката е ръчна.",
+  "description_en": "Builder of handcrafted log structures on Tsar Simeon Street in Bansko: houses, villas, guest houses, restaurants, sheds and garages from 30 to 200 square metres. The first building was completed in 2007.",
+  "image_alt_bg": "Страков Лог Хомс, дървени къщи, Банско",
+  "image_alt_en": "Strakov Log Homes, Bansko"
+ },
+ {
+  "slug": "magazin-kolor",
+  "name_bg": "Магазин Колор",
+  "name_en": "Kolor paint shop",
+  "description_bg": "Магазин за бои, лакове и латекс за интериор и екстериор на улица Охрид в Банско. Официален представител на Levis Sikkens и Adler за региона.",
+  "description_en": "Shop for paints, varnishes and emulsions for interiors and exteriors on Ohrid Street in Bansko. Official regional dealer for Levis Sikkens and Adler.",
+  "image_alt_bg": "Магазин Колор, бои и лакове, Банско",
+  "image_alt_en": "Kolor paint shop, Bansko"
+ },
+ {
+  "slug": "papi-a-i-b",
+  "name_bg": "Папи А и Б",
+  "name_en": "Papi A & B sewing studio",
+  "description_bg": "Шивашко ателие на улица Глазне в Банско. Изработва официални, булчински и ежедневни дамски тоалети и прави поправки; работи от десет години.",
+  "description_en": "Sewing studio on Glazne Street in Bansko. It makes formal, bridal and everyday women's clothing and does alterations; in business for ten years.",
+  "image_alt_bg": "Шивашко ателие Папи А и Б, Банско",
+  "image_alt_en": "Papi A & B sewing studio, Bansko"
+ },
+ {
+  "slug": "taksi-bansko",
+  "name_bg": "Такси Банско",
+  "name_en": "Taxi Bansko",
+  "description_bg": "Таксиметрова фирма с диспечерски център на улица Пейо Яворов в Банско. Обслужва територията на община Банско с нови автомобили.",
+  "description_en": "Taxi company with a dispatch centre on Peyo Yavorov Street in Bansko, serving the Bansko municipality with a fleet of new cars.",
+  "image_alt_bg": "Такси Банско, Банско",
+  "image_alt_en": "Taxi Bansko, Bansko"
+ },
+ {
+  "slug": "korso-eood",
+  "name_bg": "Корсо",
+  "name_en": "Korso passenger transport",
+  "description_bg": "Лицензиран превозвач на пътници с офис на улица Отец Паисий в Банско. Предлага автобусни превози и транспортни услуги.",
+  "description_en": "Licensed passenger carrier with an office on Otets Paisiy Street in Bansko, offering coach transport and transfer services.",
+  "image_alt_bg": "Корсо, автобусни превози, Банско",
+  "image_alt_en": "Korso passenger transport, Bansko"
+ },
+ {
+  "slug": "did-konsult-inzhenering-grup",
+  "name_bg": "ДИД-Консулт Инженеринг Груп",
+  "name_en": "DID-Consult Engineering Group",
+  "description_bg": "Фирма за строителен надзор и оценки за съответствие на инвестиционни проекти на улица България в Банско. Регистрирана през 2017 г., лицензирана от МРРБ и сертифицирана по ISO 9001:2015.",
+  "description_en": "Construction supervision and investment project compliance assessment firm on Bulgaria Street in Bansko. Registered in 2017, licensed by the Ministry of Regional Development and certified to ISO 9001:2015.",
+  "image_alt_bg": "ДИД-Консулт Инженеринг Груп, строителен надзор, Банско",
+  "image_alt_en": "DID-Consult Engineering Group, Bansko"
+ },
+ {
+  "slug": "inter-bansko",
+  "name_bg": "Inter Bansko",
+  "name_en": "Inter Bansko",
+  "description_bg": "Ски и туристическа фирма от 1996 г. на улица Пирин, по пътя към лифта в Банско. Предлага ски и сноуборд оборудване под наем, уроци и сервиз, коли под наем, трансфери, планински преходи, екскурзии и колоездене.",
+  "description_en": "Ski and tourism company founded in 1996 on Pirin Street, on the way to the gondola in Bansko. It offers ski and snowboard hire, lessons and repairs, car rental, transfers, mountain hikes, excursions and cycling.",
+  "image_alt_bg": "Inter Bansko, ски услуги, Банско",
+  "image_alt_en": "Inter Bansko ski services, Bansko"
+ },
+ {
+  "slug": "bansko-fun-holidays-2",
+  "name_bg": "Bansko Fun Holidays",
+  "name_en": "Bansko Fun Holidays",
+  "description_bg": "Ски център на улица Пирин, по пътя към лифта в Банско, с над десет години опит. Предлага ски и сноуборд под наем, училище за деца и възрастни, сервиз, магазин за ски обувки и изработка на индивидуални стелки.",
+  "description_en": "Ski centre on Pirin Street, on the way to the gondola in Bansko, with more than ten years of experience. It offers ski and snowboard hire, a school for children and adults, a workshop, a ski boot shop and custom-made insoles.",
+  "image_alt_bg": "Bansko Fun Holidays, ски център, Банско",
+  "image_alt_en": "Bansko Fun Holidays ski centre, Bansko"
+ },
+ {
+  "slug": "sankiyski-school",
+  "name_bg": "Sankiyski School",
+  "name_en": "Sankiyski School",
+  "description_bg": "Ски гардероб и ски училище на улица Пирин, по пътя към лифта в Банско. Дава под наем ски, сноуборд, обувки и каски и предлага частни, групови и семейни уроци на български, английски, немски, холандски и руски.",
+  "description_en": "Ski hire and ski school on Pirin Street, on the way to the gondola in Bansko. It rents skis, snowboards, boots and helmets and offers private, group and family lessons in Bulgarian, English, German, Dutch and Russian.",
+  "image_alt_bg": "Sankiyski School, ски училище, Банско",
+  "image_alt_en": "Sankiyski School ski school, Bansko"
+ },
+ {
+  "slug": "ski-garderobi-yulen",
+  "name_bg": "Ски гардероби „Юлен“",
+  "name_en": "Yulen ski rental",
+  "description_bg": "Ски гардеробите на концесионера на ски зоната „Юлен“: на началната лифтена станция, на Бъндеришка поляна и в хотел Кемпински. Оборудването се поддържа от служители на дружеството и се тества на машина Speedtronic.",
+  "description_en": "Ski hire points run by Yulen, the ski area operator: at the gondola base station, at Banderishka Polyana and in the Kempinski hotel. The equipment is maintained by the company's staff and tested on a Speedtronic machine.",
+  "image_alt_bg": "Ски гардероби „Юлен“, Банско",
+  "image_alt_en": "Yulen ski rental, Bansko"
+ },
+ {
+  "slug": "totem-ski-czentar",
+  "name_bg": "Тотем Ски Център",
+  "name_en": "Totem Ski Centre",
+  "description_bg": "Ски център на улица Пирин, по пътя към лифта в Банско, отворен през зимата на 2009 г. Предлага тест на ново оборудване, ски и сноуборд училище за всички нива, сервиз и напасване на обувки.",
+  "description_en": "Ski centre on Pirin Street, on the way to the gondola in Bansko, open since the 2009 winter season. It offers equipment testing, a ski and snowboard school for all levels, a workshop and boot fitting.",
+  "image_alt_bg": "Тотем Ски Център, Банско",
+  "image_alt_en": "Totem Ski Centre, Bansko"
+ },
+ {
+  "slug": "franko-87",
+  "name_bg": "Франко 87",
+  "name_en": "Franko 87 event decoration",
+  "description_bg": "Парти агенция на улица Пирин в Банско за украса и декор на сватби и други събития.",
+  "description_en": "Party agency on Pirin Street in Bansko providing decoration for weddings and other events.",
+  "image_alt_bg": "Франко 87, украса на събития, Банско",
+  "image_alt_en": "Franko 87 event decoration, Bansko"
+ },
+ {
+  "slug": "eti-korekt-eood",
+  "name_bg": "Ети Корект",
+  "name_en": "Eti Korekt translation agency",
+  "description_bg": "Агенция за преводи и легализация на улица Цар Симеон в Банско, с договор с Министерството на външните работи от 1999 г. Превежда от и на над 35 езика, извършва заверки в държавните институции и предлага набор на текст, сканиране и разпечатки.",
+  "description_en": "Translation and legalisation agency on Tsar Simeon Street in Bansko, contracted with the Ministry of Foreign Affairs since 1999. It translates to and from more than 35 languages, handles certifications with state institutions and offers typing, scanning and printing.",
+  "image_alt_bg": "Агенция за преводи Ети Корект, Банско",
+  "image_alt_en": "Eti Korekt translation agency, Bansko"
+ },
+ {
+  "slug": "la-fit-trans",
+  "name_bg": "Ла Фит Транс",
+  "name_en": "La Fit Trans translation agency",
+  "description_bg": "Офис на националната агенция за преводи и легализация Ла Фит Транс на улица Найден Геров в Банско. Предлага писмени, устни, онлайн и специализирани преводи и подготовка на документи за легализация; сертифицирана по ISO 9001 и ISO 17100.",
+  "description_en": "Bansko office of the national translation and legalisation agency La Fit Trans, on Nayden Gerov Street. It offers written, oral, online and specialised translations and prepares documents for legalisation; certified to ISO 9001 and ISO 17100.",
+  "image_alt_bg": "Агенция за преводи Ла Фит Транс, Банско",
+  "image_alt_en": "La Fit Trans translation agency, Bansko"
+ }
+]

@@ -1,0 +1,398 @@
+[
+ {
+  "slug": "mila-stays",
+  "name_bg": "Mila Stays",
+  "name_en": "Mila Stays",
+  "description_bg": "Mila Stays управлява ваканционни апартаменти в Банско от името на собствениците: обяви в Airbnb и Booking.com, цени и наличности, връзка с гостите, координация на почистването и административна подкрепа. Работи с малък брой имоти.",
+  "description_en": "Mila Stays manages holiday apartments in Bansko on behalf of their owners: Airbnb and Booking.com listings, pricing and availability, guest communication, cleaning coordination and administrative support. The company keeps its portfolio small.",
+  "image_alt_bg": "Mila Stays, управление на имоти, Банско",
+  "image_alt_en": "Mila Stays, property management, Bansko"
+ },
+ {
+  "slug": "a-dent",
+  "name_bg": "A-dent",
+  "name_en": "A-dent",
+  "description_bg": "Дентална клиника на ул. „България“ в Банско, част от малка мрежа с още една клиника в Гоце Делчев. Основана е от д-р Рамиз Арнаудов и предлага съвременно стоматологично лечение.",
+  "description_en": "Dental clinic on Bulgaria Street in Bansko, part of a small network with a second clinic in Gotse Delchev. Founded by Dr. Ramiz Arnaudov, it offers modern dental treatment.",
+  "image_alt_bg": "Дентална клиника A-dent, Банско",
+  "image_alt_en": "A-dent dental clinic, Bansko"
+ },
+ {
+  "slug": "darveni-kasthi-eood",
+  "name_bg": "Дървени къщи",
+  "name_en": "Darveni Kashti, log homes",
+  "description_bg": "Фирма за дървени къщи в Банско. Изработва къщи от масивни дървени трупи с голям диаметър; работилницата е на ул. „Захари Стоянов“.",
+  "description_en": "Log home builder in Bansko. The company makes houses from large-diameter solid timber logs; its workshop is on Zahari Stoyanov Street.",
+  "image_alt_bg": "Дървени къщи, дърводелска фирма, Банско",
+  "image_alt_en": "Darveni Kashti log homes, Bansko"
+ },
+ {
+  "slug": "ig-brokers",
+  "name_bg": "I&G Brokers",
+  "name_en": "I&G Brokers",
+  "description_bg": "Офис на застрахователния и презастрахователен брокер I&G Brokers на ул. „Христо Ботев“ в Банско. Компанията е част от международната група Acrisure и предлага застрахователни продукти за фирми и частни лица.",
+  "description_en": "Bansko office of the insurance and reinsurance broker I&G Brokers on Hristo Botev Street. The company is part of the international Acrisure group and offers insurance products for businesses and individuals.",
+  "image_alt_bg": "I&G Brokers, застрахователен брокер, Банско",
+  "image_alt_en": "I&G Brokers insurance office, Bansko"
+ },
+ {
+  "slug": "20514",
+  "name_bg": "Anita's Art Studio & Wine",
+  "name_en": "Anita's Art Studio & Wine",
+  "description_bg": "Творческо студио и винен бар на ул. „Найден Геров“ в Банско. Гостите изработват ароматни свещи и сапуни, а студиото предлага и дегустации на подбрани вина; приема и частни събития като рождени дни и тиймбилдинги.",
+  "description_en": "Creative studio and wine bar on Nayden Gerov Street in Bansko. Guests make scented candles and soaps, and the studio also hosts tastings of selected wines as well as private events such as birthdays and team-building sessions.",
+  "image_alt_bg": "Anita's Art Studio & Wine, Банско",
+  "image_alt_en": "Anita's Art Studio & Wine, Bansko"
+ },
+ {
+  "slug": "km2-konsulting-eood",
+  "name_bg": "КМ2 Консултинг",
+  "name_en": "KM2 Consulting",
+  "description_bg": "Счетоводна кантора на ул. „Христо Ботев“ в Банско. Предлага счетоводно обслужване на фирми и частни лица, финансови отчети и декларации, данъчни и осигурителни консултации, регистрация и закриване на фирми и помощ при административни процедури.",
+  "description_en": "Accounting office on Hristo Botev Street in Bansko. It provides bookkeeping for companies and individuals, financial statements and tax returns, tax and social security advice, company registration and closure, and help with administrative procedures.",
+  "image_alt_bg": "КМ2 Консултинг, счетоводни услуги, Банско",
+  "image_alt_en": "KM2 Consulting accounting office, Bansko"
+ },
+ {
+  "slug": "bansko-pikalbol-klub",
+  "name_bg": "Банско Пикълбол Клуб",
+  "name_en": "Bansko Pickleball Club",
+  "description_bg": "Клуб по пикълбол в Банско, отворен за всички възрасти. Спортът вече е част от часовете по физическо възпитание в СУ „Неофит Рилски“ и НУ „Паисий Хилендарски“; председател на клуба е Петьо Захариев.",
+  "description_en": "Pickleball club in Bansko, open to players of all ages. The sport is now part of the physical education programme at the Neofit Rilski and Paisiy Hilendarski schools; the club is chaired by Petyo Zahariev.",
+  "image_alt_bg": "Банско Пикълбол Клуб",
+  "image_alt_en": "Bansko Pickleball Club"
+ },
+ {
+  "slug": "sk-alpirinski",
+  "name_bg": "СК АлПиринСки",
+  "name_en": "AlPirinSki Sports Club",
+  "description_bg": "Клуб по ски алпинизъм на ул. „Тодор Каблешков“ в Банско с 23 активни състезатели. Тренировките включват планинско бягане, колоездене, ледено катерене и ултрамаратони; клубът участва в държавния и международния календар и организира състезания по ски алпинизъм.",
+  "description_en": "Ski mountaineering club on Todor Kableshkov Street in Bansko with 23 active athletes. Training covers mountain running, cycling, ice climbing and ultramarathons; the club competes in the national and international calendar and organises ski mountaineering races.",
+  "image_alt_bg": "СК АлПиринСки, ски алпинизъм, Банско",
+  "image_alt_en": "AlPirinSki ski mountaineering club, Bansko"
+ },
+ {
+  "slug": "ski-klub-yulen",
+  "name_bg": "Ски клуб Юлен",
+  "name_en": "Yulen Ski Club",
+  "description_bg": "Ски клуб на ул. „Пирин“ в Банско с целогодишна програма за състезатели от първи и втори отбор и четиримесечна подготвителна програма за деца. Осигурява сезонна лифт карта, състезателна екипировка и лагери у нас и в чужбина.",
+  "description_en": "Ski club on Pirin Street in Bansko with a year-round programme for first and second team racers and a four-month preparatory course for children. It provides a season lift pass, racing equipment and training camps in Bulgaria and abroad.",
+  "image_alt_bg": "Ски клуб Юлен, Банско",
+  "image_alt_en": "Yulen Ski Club, Bansko"
+ },
+ {
+  "slug": "klub-po-ski-bansko",
+  "name_bg": "Клуб по ски Банско",
+  "name_en": "Bansko Ski Club",
+  "description_bg": "Ски клуб на ул. „Яне Сандански“ в Банско, член на Българската федерация по ски. Работи с деца и младежи от 6 до 18 години в две направления: ски алпийски дисциплини и ски бягане, от подготвително ниво до картотекирани състезатели.",
+  "description_en": "Ski club on Yane Sandanski Street in Bansko, a member of the Bulgarian Ski Federation. It trains children and teenagers from 6 to 18 in two disciplines, alpine skiing and cross-country skiing, from beginner level to licensed racers.",
+  "image_alt_bg": "Клуб по ски Банско",
+  "image_alt_en": "Bansko Ski Club"
+ },
+ {
+  "slug": "klub-po-biatlon-bansko-2019",
+  "name_bg": "Клуб по биатлон Банско 2019",
+  "name_en": "Bansko 2019 Biathlon Club",
+  "description_bg": "Клуб по биатлон на ул. „Яне Сандански“ в Банско, член на Българската федерация по биатлон. Над 60 състезатели тренират в групи от момичета и момчета до мъже и жени; клубът участва във всички стартове от държавния и международния календар.",
+  "description_en": "Biathlon club on Yane Sandanski Street in Bansko, a member of the Bulgarian Biathlon Federation. More than 60 athletes train in age groups from children to adults, and the club competes in every event of the national and international calendar.",
+  "image_alt_bg": "Клуб по биатлон Банско 2019",
+  "image_alt_en": "Bansko 2019 Biathlon Club"
+ },
+ {
+  "slug": "ski-klub-dobrinisthe-2015",
+  "name_bg": "Ски клуб Добринище 2015",
+  "name_en": "Dobrinishte 2015 Ski Club",
+  "description_bg": "Детски ски клуб в Добринище, член на Българската федерация по ски. Над 40 деца в групите U8 до U14 тренират целогодишно с квалифицирани треньори; клубът осигурява екипировка и транспорт до ски зоните на Банско и Добринище.",
+  "description_en": "Children's ski club in Dobrinishte, a member of the Bulgarian Ski Federation. More than 40 children in the U8 to U14 groups train year-round with qualified coaches; the club provides equipment and transport to the Bansko and Dobrinishte ski areas.",
+  "image_alt_bg": "Ски клуб Добринище 2015",
+  "image_alt_en": "Dobrinishte 2015 Ski Club"
+ },
+ {
+  "slug": "taekuon-do-klub-houk-bansko",
+  "name_bg": "Таекуон-до клуб Хоук-Банско",
+  "name_en": "Hawk-Bansko Taekwon-Do Club",
+  "description_bg": "Клуб по таекуон-до на ул. „Мозговица“ в Банско, основан през 2013 г. от Николай Кехайов. Тренира хора от 5 до 45 години в собствена зала със специална настилка; негови състезатели са участвали на балкански, европейски и световни първенства.",
+  "description_en": "Taekwon-do club on Mozgovitsa Street in Bansko, founded in 2013 by Nikolay Kehayov. It trains members aged 5 to 45 in its own hall with a dedicated floor; its athletes have competed at Balkan, European and world championships.",
+  "image_alt_bg": "Таекуон-до клуб Хоук-Банско",
+  "image_alt_en": "Hawk-Bansko Taekwon-Do Club"
+ },
+ {
+  "slug": "futbolen-klub-bansko",
+  "name_bg": "Футболен клуб Банско",
+  "name_en": "Bansko Football Club",
+  "description_bg": "Футболен клуб в Банско с мъжки отбор в Югозападната трета лига и детско-юношеска школа с над 120 деца. Тренира на стадион „Свети Петър“ и на изкуствените терени на ПЛТГ „Никола Вапцаров“.",
+  "description_en": "Football club in Bansko with a men's team in the South-West Third League and a youth academy of more than 120 children. It trains at the Sveti Petar stadium and on the artificial pitches of the Nikola Vaptsarov forestry school.",
+  "image_alt_bg": "Футболен клуб Банско",
+  "image_alt_en": "Bansko Football Club"
+ },
+ {
+  "slug": "futbolen-klub-balkan-dobrinisthe",
+  "name_bg": "Футболен клуб Балкан – Добринище",
+  "name_en": "Balkan Dobrinishte Football Club",
+  "description_bg": "Детски футболен клуб в Добринище. В тренировките участват 46 деца на възраст от 6 до 12 години; клубът подготвя отборите за регионални първенства и турнири и организира спортни прояви в града.",
+  "description_en": "Youth football club in Dobrinishte. Forty-six children aged 6 to 12 take part in training; the club prepares its teams for regional championships and tournaments and organises sports events in the town.",
+  "image_alt_bg": "Футболен клуб Балкан, Добринище",
+  "image_alt_en": "Balkan Football Club, Dobrinishte"
+ },
+ {
+  "slug": "armsport-klub-bansko",
+  "name_bg": "Армспорт клуб Банско",
+  "name_en": "Bansko Armsport Club",
+  "description_bg": "Клуб по канадска борба на ул. „Христо Ботев“ в Банско с над 20 картотекирани състезатели в различни категории. Работи основно с подрастващи и участва в държавни, европейски и световни първенства; отделя внимание и на младежи с увреждания.",
+  "description_en": "Arm wrestling club on Hristo Botev Street in Bansko with more than 20 licensed competitors in various categories. It focuses on young athletes, takes part in national, European and world championships and also works with young people with disabilities.",
+  "image_alt_bg": "Армспорт клуб Банско",
+  "image_alt_en": "Bansko Armsport Club"
+ },
+ {
+  "slug": "veloklub-dobrinisthe",
+  "name_bg": "Велоклуб Добринище",
+  "name_en": "Dobrinishte Cycling Club",
+  "description_bg": "Колоездачен клуб в Добринище. Поддържа велосипедни трасета и маршрути, участва в състезания в България и чужбина и организира велозанимания и лекции за децата от града.",
+  "description_en": "Cycling club in Dobrinishte. It maintains bike trails and routes, takes part in races in Bulgaria and abroad, and organises cycling sessions and talks for the town's children.",
+  "image_alt_bg": "Велоклуб Добринище",
+  "image_alt_en": "Dobrinishte Cycling Club"
+ },
+ {
+  "slug": "klub-po-shahmat-dobrinisthe",
+  "name_bg": "Клуб по шахмат Добринище",
+  "name_en": "Dobrinishte Chess Club",
+  "description_bg": "Шахматен клуб в Добринище, който работи с деца от втори до седми клас. Организира детски турнири с ученици от пет населени места в района, а всеки септември провежда турнира „Шахфест Добринище“.",
+  "description_en": "Chess club in Dobrinishte that coaches children from the second to the seventh grade. It organises junior tournaments with pupils from five towns and villages in the area and holds the Chessfest Dobrinishte tournament every September.",
+  "image_alt_bg": "Клуб по шахмат Добринище",
+  "image_alt_en": "Dobrinishte Chess Club"
+ },
+ {
+  "slug": "klub-po-hudozhestvena-gimnastika-bansko",
+  "name_bg": "Клуб по художествена гимнастика Банско",
+  "name_en": "Bansko Rhythmic Gymnastics Club",
+  "description_bg": "Клуб по художествена и естетическа групова гимнастика на пл. „Никола Вапцаров“ в Банско, създаден през 2022 г. по инициатива на родители и треньорката Лазарина Димитрова. Тренира момичета от различни възрасти и подготвя състезателки за участие в турнири.",
+  "description_en": "Rhythmic and aesthetic group gymnastics club on Nikola Vaptsarov Square in Bansko, founded in 2022 on the initiative of parents and coach Lazarina Dimitrova. It trains girls of different ages and prepares gymnasts for competitions.",
+  "image_alt_bg": "Клуб по художествена гимнастика Банско",
+  "image_alt_en": "Bansko Rhythmic Gymnastics Club"
+ },
+ {
+  "slug": "sporten-klub-trejl-sistem",
+  "name_bg": "Спортен клуб Трейл Систем",
+  "name_en": "Trail System Sports Club",
+  "description_bg": "Клуб за спортове на открито на ул. „Ангел Кънчев“ в Банско. Организира събития за всички възрасти, детски лагери и курсове за инструктори по планинско колоездене и участва в проектирането на трасета и байк инфраструктура в Пирин над града.",
+  "description_en": "Outdoor sports club on Angel Kanchev Street in Bansko. It organises events for all ages, children's camps and mountain bike instructor courses, and takes part in designing trails and bike infrastructure in the Pirin mountains above the town.",
+  "image_alt_bg": "Спортен клуб Трейл Систем, Банско",
+  "image_alt_en": "Trail System Sports Club, Bansko"
+ },
+ {
+  "slug": "armsport-klub-grizli-bansko",
+  "name_bg": "Армспорт клуб Гризли Банско",
+  "name_en": "Grizzly Bansko Armsport Club",
+  "description_bg": "Клуб по канадска борба в Банско. Привлича към редовни тренировки подрастващи, любители и хора с увреждания и участва със свои състезатели в прояви в страната и чужбина.",
+  "description_en": "Arm wrestling club in Bansko. It brings young people, amateurs and people with disabilities into regular training and sends its competitors to events in Bulgaria and abroad.",
+  "image_alt_bg": "Армспорт клуб Гризли Банско",
+  "image_alt_en": "Grizzly Bansko Armsport Club"
+ },
+ {
+  "slug": "art-ideya",
+  "name_bg": "Арт Идея",
+  "name_en": "Art Idea",
+  "description_bg": "Галерия на ул. „Никола Вапцаров“ в центъра на Банско. Предлага пейзажна фотография в рамка, кадри от дрон и акварели на животни, български моми, кучета и котки от Славейка Аладжова, както и пейзажи от Пирин, Рила и Мелник на художника Стойко Донев.",
+  "description_en": "Gallery on Nikola Vaptsarov Street in the centre of Bansko. It sells framed landscape photography and drone shots, watercolours of animals, Bulgarian maidens, dogs and cats by Slaveyka Aladzhova, and landscapes of Pirin, Rila and Melnik by the painter Stoyko Donev.",
+  "image_alt_bg": "Галерия Арт Идея, Банско",
+  "image_alt_en": "Art Idea gallery, Bansko"
+ },
+ {
+  "slug": "the-art-of-irina",
+  "name_bg": "The Art of Irina",
+  "name_en": "The Art of Irina",
+  "description_bg": "Галерия на Ирина Пандева на ул. „Пирин“ в Банско, отворена през 2020 г. Предлага авторски картини и малки сувенири от местни творци.",
+  "description_en": "Irina Pandeva's gallery on Pirin Street in Bansko, open since 2020. It offers her own paintings and small souvenirs by local artists.",
+  "image_alt_bg": "Галерия The Art of Irina, Банско",
+  "image_alt_en": "The Art of Irina gallery, Bansko"
+ },
+ {
+  "slug": "velyanova-kastha",
+  "name_bg": "Велянова къща",
+  "name_en": "Velyanova House",
+  "description_bg": "Възрожденска къща-крепост от XVIII век на ул. „Велян Огнев“ в стария град, културна ценност с национално значение. Известна е със стенописите и дърворезбата на Велян Огнев от Банската художествена школа; отворена е в делничните дни.",
+  "description_en": "Eighteenth-century fortified house on Velyan Ognev Street in the old town, listed as a cultural monument of national importance. It is known for the murals and woodcarving by Velyan Ognev of the Bansko art school and is open on weekdays.",
+  "image_alt_bg": "Велянова къща, Банско",
+  "image_alt_en": "Velyanova House, Bansko"
+ },
+ {
+  "slug": "duhovno-istoricheski-czentar-sveti-paisij-hilendarski",
+  "name_bg": "Духовно-исторически център „Свети Паисий Хилендарски“",
+  "name_en": "Saint Paisiy Hilendarski Spiritual and Historical Centre",
+  "description_bg": "Център на ул. „Отец Паисий“ в Банско, открит през 2008 г. на мястото на родната къща на Паисий Хилендарски. Включва възстановка на килията му в Хилендарския манастир, копие на параклиса „Свети Иван Рилски“ и зала за конференции и изложби.",
+  "description_en": "Centre on Otets Paisiy Street in Bansko, opened in 2008 on the site of Paisiy Hilendarski's birthplace. It holds a reconstruction of his cell at the Hilandar monastery, a copy of the Saint Ivan Rilski chapel and a hall for conferences and exhibitions.",
+  "image_alt_bg": "Духовно-исторически център „Свети Паисий Хилендарски“, Банско",
+  "image_alt_en": "Saint Paisiy Hilendarski Centre, Bansko"
+ },
+ {
+  "slug": "istoriko-etnografska-ekspozicziya-dobrinisthe",
+  "name_bg": "Историко-етнографска експозиция – Добринище",
+  "name_en": "Dobrinishte Historical and Ethnographic Exhibition",
+  "description_bg": "Музейна сбирка в Добринище, отворена през 2010 г., която проследява историята на селището от древността до днес. Акцентите са върху находките от римския период, възрожденските борби и местния бит; затворена е в неделя и понеделник.",
+  "description_en": "Museum collection in Dobrinishte, open since 2010, tracing the town's history from antiquity to the present. It focuses on Roman-era finds, the national revival struggles and local everyday life; closed on Sundays and Mondays.",
+  "image_alt_bg": "Историко-етнографска експозиция, Добринище",
+  "image_alt_en": "Historical and ethnographic exhibition, Dobrinishte"
+ },
+ {
+  "slug": "istoriko-etnografski-kompleks-radonova-kastha",
+  "name_bg": "Историко-етнографски комплекс „Радонова къща“",
+  "name_en": "Radonova House Historical and Ethnographic Complex",
+  "description_bg": "Музей на ул. „Атон“ в центъра на Банско, в къща от началото на XIX век, дарена от генерал Крум Радонов и открита през 2007 г. Показва историята на града от основаването му до 1912 г., археологически находки от траките до средновековието, носии и снимки.",
+  "description_en": "Museum on Aton Street in the centre of Bansko, in an early nineteenth-century house donated by General Krum Radonov and opened in 2007. It presents the town's history from its founding to 1912, archaeological finds from Thracian to medieval times, folk costumes and photographs.",
+  "image_alt_bg": "Радонова къща, Банско",
+  "image_alt_en": "Radonova House, Bansko"
+ },
+ {
+  "slug": "kastha-muzej-neofit-rilski",
+  "name_bg": "Къща-музей „Неофит Рилски“",
+  "name_en": "Neofit Rilski House Museum",
+  "description_bg": "Родният дом на Неофит Рилски, възрожденска укрепена къща от XVIII век на ул. „Уста Глигора“ в центъра на Банско, музей от 1981 г. Показва етнографска експозиция, писма, снимки и книги от библиотеката му; отворен е в делничните дни.",
+  "description_en": "Birthplace of the educator Neofit Rilski, an eighteenth-century fortified house on Usta Gligora Street in the centre of Bansko, a museum since 1981. It shows an ethnographic display, letters, photographs and books from his library; open on weekdays.",
+  "image_alt_bg": "Къща-музей „Неофит Рилски“, Банско",
+  "image_alt_en": "Neofit Rilski House Museum, Bansko"
+ },
+ {
+  "slug": "kastha-muzej-nikola-vapczarov",
+  "name_bg": "Къща-музей „Никола Вапцаров“",
+  "name_en": "Nikola Vaptsarov House Museum",
+  "description_bg": "Родният дом на поета Никола Вапцаров на централния площад в Банско, музей от 1952 г. На два етажа показва възстановената домашна обстановка, ръкописи, първи публикации и личните му вещи; отворен е всеки ден.",
+  "description_en": "Birthplace of the poet Nikola Vaptsarov on the main square in Bansko, a museum since 1952. Over two floors it shows the restored family home, manuscripts, first publications and his personal belongings; open daily.",
+  "image_alt_bg": "Къща-музей „Никола Вапцаров“, Банско",
+  "image_alt_en": "Nikola Vaptsarov House Museum, Bansko"
+ },
+ {
+  "slug": "muzeen-kompleks-bansko",
+  "name_bg": "Музеен комплекс Банско",
+  "name_en": "Bansko Museum Complex",
+  "description_bg": "Общинският музеен комплекс в Банско обединява осем обекта: къщи-музеи, етнографски сбирки и изложби, посветени на Възрождането и историята на града. Администрацията е на пл. „Никола Вапцаров“ в центъра.",
+  "description_en": "The municipal museum complex in Bansko brings together eight sites: house museums, ethnographic collections and exhibitions devoted to the national revival and the town's history. Its office is on Nikola Vaptsarov Square in the centre.",
+  "image_alt_bg": "Музеен комплекс Банско",
+  "image_alt_en": "Bansko Museum Complex"
+ },
+ {
+  "slug": "postoyannata-izlozhba-na-banskata-hudozhestvena-shkola",
+  "name_bg": "Постоянна изложба на Банската художествена школа",
+  "name_en": "Permanent Exhibition of the Bansko Art School",
+  "description_bg": "Изложба с оригинални икони, копия на стенописи и църковна утвар от майсторите на Банската художествена школа, в сградата на бившия Рилски метох от 1749 г. на ул. „Яне Сандански“. Затворена е в неделя и понеделник, с безплатен ден всяка втора сряда от месеца.",
+  "description_en": "Exhibition of original icons, mural copies and church objects by the masters of the Bansko art school, housed in the former Rila metochion of 1749 on Yane Sandanski Street. Closed on Sundays and Mondays, with free entry on the second Wednesday of each month.",
+  "image_alt_bg": "Изложба на Банската художествена школа, Банско",
+  "image_alt_en": "Bansko Art School exhibition, Bansko"
+ },
+ {
+  "slug": "dom-na-izkustvata",
+  "name_bg": "Дом на изкуствата",
+  "name_en": "House of Arts",
+  "description_bg": "Музейна сграда на пл. „Никола Вапцаров“ в центъра на Банско, свързана с къщата-музей на поета. Приема постоянни и временни изложби, научни форуми, кинолектории и спектакли; постоянната изложба „Банско – книжовен център“ показва приноса на града към българската книжовност.",
+  "description_en": "Museum building on Nikola Vaptsarov Square in the centre of Bansko, connected to the poet's house museum. It hosts permanent and temporary exhibitions, academic forums, film talks and performances; the permanent exhibition Bansko, a Literary Centre shows the town's contribution to Bulgarian letters.",
+  "image_alt_bg": "Дом на изкуствата, Банско",
+  "image_alt_en": "House of Arts, Bansko"
+ },
+ {
+  "slug": "chitalisthe-nikola-vapczarov-1894",
+  "name_bg": "Читалище „Никола Вапцаров – 1894“",
+  "name_en": "Nikola Vaptsarov 1894 Community Centre",
+  "description_bg": "Народно читалище на пл. „Никола Вапцаров“ в центъра на Банско, основано през 1894 г. Пази местните традиции и работи като културен център с достъп до библиотека, информация и творчески занимания.",
+  "description_en": "Community cultural centre on Nikola Vaptsarov Square in the centre of Bansko, founded in 1894. It keeps the local traditions alive and works as a cultural hub with a library, information services and creative activities.",
+  "image_alt_bg": "Читалище „Никола Вапцаров – 1894“, Банско",
+  "image_alt_en": "Nikola Vaptsarov 1894 Community Centre, Bansko"
+ },
+ {
+  "slug": "detska-gradina-zdravecz",
+  "name_bg": "Детска градина „Здравец“",
+  "name_en": "Zdravets Kindergarten",
+  "description_bg": "Общинска детска градина на ул. „Неофит Рилски“ в Банско.",
+  "description_en": "Municipal kindergarten on Neofit Rilski Street in Bansko.",
+  "image_alt_bg": "Детска градина „Здравец“, Банско",
+  "image_alt_en": "Zdravets Kindergarten, Bansko"
+ },
+ {
+  "slug": "dg-mecho-puh-dobrinisthe",
+  "name_bg": "Детска градина „Мечо Пух“ – Добринище",
+  "name_en": "Mecho Puh Kindergarten, Dobrinishte",
+  "description_bg": "Детска градина в Добринище с две подготвителни групи, трета и четвърта, в сградата на ОУ „Св. Климент Охридски“ на ул. „Иван Галчев“.",
+  "description_en": "Kindergarten in Dobrinishte with two preschool groups, third and fourth, housed in the Saint Kliment Ohridski primary school on Ivan Galchev Street.",
+  "image_alt_bg": "Детска градина „Мечо Пух“, Добринище",
+  "image_alt_en": "Mecho Puh Kindergarten, Dobrinishte"
+ },
+ {
+  "slug": "dg-slancze-s-mesta",
+  "name_bg": "Детска градина „Слънце“ – с. Места",
+  "name_en": "Slantse Kindergarten, Mesta village",
+  "description_bg": "Детска градина в село Места, община Банско, с филиал в село Филипово.",
+  "description_en": "Kindergarten in the village of Mesta, Bansko municipality, with a branch in the village of Filipovo.",
+  "image_alt_bg": "Детска градина „Слънце“, село Места",
+  "image_alt_en": "Slantse Kindergarten, Mesta village"
+ },
+ {
+  "slug": "smartykids",
+  "name_bg": "SmartyKids",
+  "name_en": "SmartyKids",
+  "description_bg": "Детски образователен център на ул. „Пирин“ в Банско, част от международната мрежа SmartyKids, отворен през септември 2019 г. Предлага курсове по ментална аритметика и бързо четене с разбиране за деца от 4 до 12 години.",
+  "description_en": "Children's learning centre on Pirin Street in Bansko, part of the international SmartyKids network, open since September 2019. It runs mental arithmetic and speed reading courses for children aged 4 to 12.",
+  "image_alt_bg": "SmartyKids, образователен център, Банско",
+  "image_alt_en": "SmartyKids learning centre, Bansko"
+ },
+ {
+  "slug": "art-school-bansko",
+  "name_bg": "Art School Bansko",
+  "name_en": "Art School Bansko",
+  "description_bg": "Школа по изкуства на ул. „Радон Тодев“ в Банско с групови и индивидуални уроци за деца до 15 години. Организира и творчески работилници по повод празници, както и занимания „Art & Wine“ за възрастни, включително за частни събития и тиймбилдинги.",
+  "description_en": "Art school on Radon Todev Street in Bansko with group and individual lessons for children up to 15. It also runs holiday-themed creative workshops and Art & Wine sessions for adults, including private events and team-building.",
+  "image_alt_bg": "Art School Bansko, школа по изкуства",
+  "image_alt_en": "Art School Bansko"
+ },
+ {
+  "slug": "nachalno-uchilisthe-sv-paisij-hilendarski",
+  "name_bg": "Начално училище „Св. Паисий Хилендарски“",
+  "name_en": "Saint Paisiy Hilendarski Primary School",
+  "description_bg": "Начално училище на ул. „Пирин“ в Банско, в сграда от 1929 г., построена с дарения на банскалии; самостоятелно училище от 1957 г. Обучава деца от първи до четвърти клас.",
+  "description_en": "Primary school on Pirin Street in Bansko, in a building from 1929 funded by local donors; an independent school since 1957. It teaches children from the first to the fourth grade.",
+  "image_alt_bg": "Начално училище „Св. Паисий Хилендарски“, Банско",
+  "image_alt_en": "Saint Paisiy Hilendarski Primary School, Bansko"
+ },
+ {
+  "slug": "osnovno-uchilisthe-sv-sv-kiril-i-metodij-s-mesta",
+  "name_bg": "Основно училище „Св. св. Кирил и Методий“ – с. Места",
+  "name_en": "Saints Cyril and Methodius Primary School, Mesta village",
+  "description_bg": "Основно училище в село Места, община Банско, с история от 1921 г. От 1960 г. е районно училище за децата от околните села Филипово, Осеново, Гостун, Обидим, Кремен и Буково.",
+  "description_en": "Primary and lower secondary school in the village of Mesta, Bansko municipality, with a history going back to 1921. Since 1960 it has served the children of the nearby villages of Filipovo, Osenovo, Gostun, Obidim, Kremen and Bukovo.",
+  "image_alt_bg": "Основно училище „Св. св. Кирил и Методий“, село Места",
+  "image_alt_en": "Saints Cyril and Methodius School, Mesta village"
+ },
+ {
+  "slug": "gimnaziya-po-turizam-aleko-konstantinov-gr-bansko",
+  "name_bg": "Гимназия по туризъм „Алеко Константинов“",
+  "name_en": "Aleko Konstantinov High School of Tourism",
+  "description_bg": "Професионална гимназия на ул. „Цар Самуил“ в Банско с начало като земеделско училище през 1922 г. и дълга история като техникум по селско стопанство. От 2017 г. носи сегашното си име и подготвя ученици в специалности, свързани с туризма.",
+  "description_en": "Vocational high school on Tsar Samuil Street in Bansko, which began as an agricultural school in 1922 and spent decades as an agricultural technical school. It has carried its current name since 2017 and trains students in tourism-related subjects.",
+  "image_alt_bg": "Гимназия по туризъм „Алеко Константинов“, Банско",
+  "image_alt_en": "Aleko Konstantinov High School of Tourism, Bansko"
+ },
+ {
+  "slug": "su-neofit-rilski-gr-bansko",
+  "name_bg": "СУ „Неофит Рилски“",
+  "name_en": "Neofit Rilski Secondary School",
+  "description_bg": "Средно училище на ул. „Тодор Александров“ в Банско с история от 1847 г., когато е открито като новобългарско училище. Предлага профилирано обучение по математика, биология и информатика с разширено изучаване на английски език; в сегашната си сграда е от 1986 г.",
+  "description_en": "Secondary school on Todor Aleksandrov Street in Bansko whose history goes back to 1847, when it opened as a modern Bulgarian school. It offers profiled study in mathematics, biology and informatics with extended English, and has occupied its current building since 1986.",
+  "image_alt_bg": "СУ „Неофит Рилски“, Банско",
+  "image_alt_en": "Neofit Rilski Secondary School, Bansko"
+ },
+ {
+  "slug": "profesionalnata-gimnaziya-po-elektronika-i-energetika",
+  "name_bg": "Професионална гимназия по електроника и енергетика",
+  "name_en": "Vocational High School of Electronics and Energy",
+  "description_bg": "Професионална гимназия на ул. „България“ в Банско, наследник на техникума по електропромишленост от 1967 г. Обучава в специалности като компютърна техника и технологии, компютърни мрежи, приложно програмиране, електрически превозни средства и топлоенергетика.",
+  "description_en": "Vocational high school on Bulgaria Street in Bansko, successor to the electrical engineering technical school founded in 1967. It teaches subjects such as computer hardware and technologies, computer networks, applied programming, electric vehicles and thermal energy.",
+  "image_alt_bg": "Професионална гимназия по електроника и енергетика, Банско",
+  "image_alt_en": "High School of Electronics and Energy, Bansko"
+ },
+ {
+  "slug": "profesionalna-lesotehnicheska-gimnaziya-nikola-vapczarov",
+  "name_bg": "Професионална лесотехническа гимназия „Никола Вапцаров“",
+  "name_en": "Nikola Vaptsarov Vocational Forestry High School",
+  "description_bg": "Лесотехническа гимназия на ул. „България“ в Банско, основана през 1946 г. в Разлог и преместена в града през 1948 г. Обучава в специалностите „Горско и ловно стопанство“ и „Горско стопанство и дърводобив“ със специализирани кабинети по лесовъдство, дендрология и ловно стопанство.",
+  "description_en": "Forestry high school on Bulgaria Street in Bansko, founded in Razlog in 1946 and moved to the town in 1948. It trains students in forestry and game management and in forestry and logging, with specialised classrooms for silviculture, dendrology and hunting.",
+  "image_alt_bg": "Професионална лесотехническа гимназия „Никола Вапцаров“, Банско",
+  "image_alt_en": "Nikola Vaptsarov Forestry High School, Bansko"
+ }
+]

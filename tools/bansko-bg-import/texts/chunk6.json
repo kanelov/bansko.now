@@ -1,0 +1,353 @@
+[
+ {
+  "slug": "zora-kk-georgi-boyadzhijski-2",
+  "name_bg": "Зора-КК – Георги Бояджийски",
+  "name_en": "Zora-KK – Georgi Boyadzhiyski",
+  "description_bg": "Фабрика за мебели и цех за метални изделия в Банско. Изработва мебели по поръчка, голяма част от тях за износ, както и разнообразни метални изделия.",
+  "description_en": "A furniture factory and metalwork shop in Bansko. It makes furniture to order, much of it for export, as well as a wide range of metal products.",
+  "image_alt_bg": "Зора-КК – Георги Бояджийски, Банско",
+  "image_alt_en": "Zora-KK – Georgi Boyadzhiyski, Bansko"
+ },
+ {
+  "slug": "zta-ad",
+  "name_bg": "ЗТА",
+  "name_en": "ZTA – Telephone Equipment Plant",
+  "description_bg": "Бившият Завод за телефонна апаратура в Банско днес работи в три направления: металообработка, галванични, лакови и прахови покрития и производство на електронни възли за западноевропейски компании.",
+  "description_en": "The former Telephone Equipment Plant in Bansko now works in three areas: metal processing, galvanic, lacquer and powder coatings, and the assembly of electronic modules for Western European companies.",
+  "image_alt_bg": "ЗТА, Банско",
+  "image_alt_en": "ZTA, Bansko"
+ },
+ {
+  "slug": "mesarnicza-pri-dinko",
+  "name_bg": "Месарница При Динко",
+  "name_en": "Dinko's Butcher Shop",
+  "description_bg": "Месарница в Банско с прясно българско месо, телешко и агнешко, домашен бански суджук, кървавица и месни заготовки като кюфтета и кебапчета.",
+  "description_en": "A butcher shop in Bansko with fresh Bulgarian meat, including beef and lamb, home-style Bansko sudzhuk, blood sausage and ready-to-cook mince such as kyufte and kebapche.",
+  "image_alt_bg": "Месарница При Динко, Банско",
+  "image_alt_en": "Dinko's Butcher Shop, Bansko"
+ },
+ {
+  "slug": "mebeli-zahov",
+  "name_bg": "Мебели Захов",
+  "name_en": "Zahov Furniture",
+  "description_bg": "Производител на корпусна и мека мебел в Банско от масив, фурнирован и лакиран МДФ и ламинирано ПДЧ. Предлага и цялостно обзавеждане с маси, столове, врати, пердета и килими.",
+  "description_en": "A Bansko maker of cabinet and upholstered furniture in solid wood, veneered or lacquered MDF and laminated chipboard. It also offers complete interior furnishing, from tables and chairs to doors, curtains and rugs.",
+  "image_alt_bg": "Мебели Захов, Банско",
+  "image_alt_en": "Zahov Furniture, Bansko"
+ },
+ {
+  "slug": "zora-kk-georgi-boyadzhijski",
+  "name_bg": "Зора-КК – Георги Бояджийски",
+  "name_en": "Zora-KK – Georgi Boyadzhiyski",
+  "description_bg": "Мебели по поръчка и метални изделия от фабрика и цех в Банско. Голяма част от мебелите са за износ, останалите за вътрешния пазар.",
+  "description_en": "Made-to-order furniture and metal products from a factory and workshop in Bansko. Much of the furniture is exported, the rest goes to the domestic market.",
+  "image_alt_bg": "Зора-КК – Георги Бояджийски, Банско",
+  "image_alt_en": "Zora-KK – Georgi Boyadzhiyski, Bansko"
+ },
+ {
+  "slug": "rupchin-i-sinove",
+  "name_bg": "Рупчин и синове",
+  "name_en": "Rupchin & Sons",
+  "description_bg": "Семейна мебелна работилница в Банско за мебели от масив дъб, чам и бук, МДФ и ПДЧ, включително състарени модели. Обзавежда домове, хотели и ресторанти.",
+  "description_en": "A family furniture workshop in Bansko making pieces in solid oak, pine and beech, as well as MDF and chipboard, including distressed designs. It furnishes homes, hotels and restaurants.",
+  "image_alt_bg": "Рупчин и синове, Банско",
+  "image_alt_en": "Rupchin & Sons, Bansko"
+ },
+ {
+  "slug": "swd-furniture",
+  "name_bg": "SWD Furniture",
+  "name_en": "SWD Furniture",
+  "description_bg": "Мебелна работилница в Банско, която изработва цялостни проекти и нови модели мебели по индивидуална поръчка, с екип от дизайнери, конструктори и майстори.",
+  "description_en": "A Bansko furniture workshop that takes on complete projects and designs new pieces to individual order, with its own designers, engineers and craftsmen.",
+  "image_alt_bg": "SWD Furniture, Банско",
+  "image_alt_en": "SWD Furniture, Bansko"
+ },
+ {
+  "slug": "beauty-salon-lady-million",
+  "name_bg": "Beauty Salon Lady Million",
+  "name_en": "Beauty Salon Lady Million",
+  "description_bg": "Салон за красота в Банско на ул. Отец Паисий с грижа за косата, маникюр и педикюр.",
+  "description_en": "A beauty salon on Otets Paisiy Street in Bansko offering hair care, manicure and pedicure.",
+  "image_alt_bg": "Beauty Salon Lady Million, Банско",
+  "image_alt_en": "Beauty Salon Lady Million, Bansko"
+ },
+ {
+  "slug": "house-of-beauty",
+  "name_bg": "House of Beauty",
+  "name_en": "House of Beauty",
+  "description_bg": "Салон за красота в центъра на Банско с маникюр, педикюр, фризьорски и бръснарски услуги, професионален грим, миглопластика и перманентен грим.",
+  "description_en": "A beauty salon in the centre of Bansko with manicure, pedicure, hairdressing and barber services, professional make-up, lash extensions and permanent make-up.",
+  "image_alt_bg": "House of Beauty, Банско",
+  "image_alt_en": "House of Beauty, Bansko"
+ },
+ {
+  "slug": "sirakova-beauty",
+  "name_bg": "Sirakova Beauty",
+  "name_en": "Sirakova Beauty",
+  "description_bg": "Козметично студио в Банско на ул. Пирин за цялостна грижа за кожата. Предлага и професионално обучение.",
+  "description_en": "A skincare studio on Pirin Street in Bansko offering complete skin care. It also provides professional training.",
+  "image_alt_bg": "Sirakova Beauty, Банско",
+  "image_alt_en": "Sirakova Beauty, Bansko"
+ },
+ {
+  "slug": "kozmetichen-salon-vel",
+  "name_bg": "Козметичен салон Вел",
+  "name_en": "Vel Beauty Salon",
+  "description_bg": "Козметичен салон в Банско с терапии и поддържащи процедури за лице, кола маска и лазерна епилация.",
+  "description_en": "A beauty salon in Bansko offering facial treatments and maintenance care, waxing and laser hair removal.",
+  "image_alt_bg": "Козметичен салон Вел, Банско",
+  "image_alt_en": "Vel Beauty Salon, Bansko"
+ },
+ {
+  "slug": "frizorski-salon-mej",
+  "name_bg": "Фризьорски салон Мей",
+  "name_en": "Mey Hair Salon",
+  "description_bg": "Фризьорски салон в Банско на ул. Ангел Кънчев с дългогодишна практика.",
+  "description_en": "A hair salon on Angel Kanchev Street in Bansko with many years of practice.",
+  "image_alt_bg": "Фризьорски салон Мей, Банско",
+  "image_alt_en": "Mey Hair Salon, Bansko"
+ },
+ {
+  "slug": "ani-m-beauty-salon",
+  "name_bg": "Ani-M Beauty Salon",
+  "name_en": "Ani-M Beauty Salon",
+  "description_bg": "Салон за красота в Банско на ул. Цар Симеон.",
+  "description_en": "A beauty salon on Tsar Simeon Street in Bansko.",
+  "image_alt_bg": "Ani-M Beauty Salon, Банско",
+  "image_alt_en": "Ani-M Beauty Salon, Bansko"
+ },
+ {
+  "slug": "bio-frizorski-salon-magi",
+  "name_bg": "Био фризьорски салон Маги",
+  "name_en": "Magi Organic Hair Salon",
+  "description_bg": "Фризьорски салон в Банско, който работи с био продукти на италианската марка Rolland и има сертификат за био салон.",
+  "description_en": "A hair salon in Bansko working with organic products by the Italian brand Rolland and certified as an organic salon.",
+  "image_alt_bg": "Био фризьорски салон Маги, Банско",
+  "image_alt_en": "Magi Organic Hair Salon, Bansko"
+ },
+ {
+  "slug": "ak-beauty-studio",
+  "name_bg": "AK Beauty Studio",
+  "name_en": "AK Beauty Studio",
+  "description_bg": "Студио за грижа за лицето в Банско с почистващи, хидратиращи и антиейдж терапии с апарати, както и лазерна епилация с диоден лазер.",
+  "description_en": "A facial care studio in Bansko with cleansing, hydrating and anti-ageing treatments using modern devices, as well as diode laser hair removal.",
+  "image_alt_bg": "AK Beauty Studio, Банско",
+  "image_alt_en": "AK Beauty Studio, Bansko"
+ },
+ {
+  "slug": "bu-aesthetic-center",
+  "name_bg": "BU Aesthetic Center",
+  "name_en": "BU Aesthetic Center",
+  "description_bg": "Център за неинвазивни естетични процедури в Банско на ул. Найден Геров: лазерна епилация, Hydrafacial почистване и хидратация на кожата и апаратни процедури за подмладяване.",
+  "description_en": "A centre for non-invasive aesthetic treatments on Nayden Gerov Street in Bansko: laser hair removal, Hydrafacial skin cleansing and hydration, and device-based skin rejuvenation.",
+  "image_alt_bg": "BU Aesthetic Center, Банско",
+  "image_alt_en": "BU Aesthetic Center, Bansko"
+ },
+ {
+  "slug": "magazin-variant",
+  "name_bg": "Магазин Вариант",
+  "name_en": "Variant Shop",
+  "description_bg": "Магазин за дрехи и козметика в Банско на ул. Пирин.",
+  "description_en": "A clothing and cosmetics shop on Pirin Street in Bansko.",
+  "image_alt_bg": "Магазин Вариант, Банско",
+  "image_alt_en": "Variant Shop, Bansko"
+ },
+ {
+  "slug": "balgarska-kozmetika",
+  "name_bg": "Българска козметика",
+  "name_en": "Bulgarian Cosmetics",
+  "description_bg": "Магазин за българска козметика в Банско на ул. Пирин, с консултация при избора на продукти.",
+  "description_en": "A shop for Bulgarian-made cosmetics on Pirin Street in Bansko, with advice on choosing products.",
+  "image_alt_bg": "Българска козметика, Банско",
+  "image_alt_en": "Bulgarian Cosmetics, Bansko"
+ },
+ {
+  "slug": "styler",
+  "name_bg": "Styler",
+  "name_en": "Styler",
+  "description_bg": "Магазин за дрехи и обувки в Банско на ул. Цар Симеон.",
+  "description_en": "A clothing and footwear shop on Tsar Simeon Street in Bansko.",
+  "image_alt_bg": "Styler, Банско",
+  "image_alt_en": "Styler, Bansko"
+ },
+ {
+  "slug": "sanistyle",
+  "name_bg": "Sanistyle",
+  "name_en": "Sanistyle",
+  "description_bg": "Магазин за обувки и дрехи в Банско на ул. Цар Симеон.",
+  "description_en": "A shoe and clothing shop on Tsar Simeon Street in Bansko.",
+  "image_alt_bg": "Sanistyle, Банско",
+  "image_alt_en": "Sanistyle, Bansko"
+ },
+ {
+  "slug": "rosi",
+  "name_bg": "Rosi",
+  "name_en": "Rosi",
+  "description_bg": "Магазин за дрехи и обувки на ул. Цар Симеон в Банско.",
+  "description_en": "A clothing and footwear shop on Tsar Simeon Street in Bansko.",
+  "image_alt_bg": "Rosi, Банско",
+  "image_alt_en": "Rosi, Bansko"
+ },
+ {
+  "slug": "kensol",
+  "name_bg": "Kensol",
+  "name_en": "Kensol",
+  "description_bg": "Магазин за обувки и дрехи на ул. Цар Симеон в Банско.",
+  "description_en": "A shoe and clothing shop on Tsar Simeon Street in Bansko.",
+  "image_alt_bg": "Kensol, Банско",
+  "image_alt_en": "Kensol, Bansko"
+ },
+ {
+  "slug": "best-price-sport-shop-just-play",
+  "name_bg": "Best Price Sport Shop Just Play",
+  "name_en": "Best Price Sport Shop Just Play",
+  "description_bg": "Магазин в Банско на ул. Пирин за дрехи за зимни и водни спортове, нови и втора употреба, както и домакински артикули.",
+  "description_en": "A shop on Pirin Street in Bansko selling new and second-hand clothing for winter and water sports, along with household items.",
+  "image_alt_bg": "Best Price Sport Shop Just Play, Банско",
+  "image_alt_en": "Best Price Sport Shop Just Play, Bansko"
+ },
+ {
+  "slug": "luxima-second-hand-and-outlet",
+  "name_bg": "Luxima Second Hand and Outlet",
+  "name_en": "Luxima Second Hand and Outlet",
+  "description_bg": "Магазин на ул. Пирин в Банско за нови и употребявани спортни стоки: екипировка за планински преходи и водни спортове през лятото и за ски през зимата.",
+  "description_en": "A shop on Pirin Street in Bansko with new and second-hand sports goods: gear for hiking and water sports in summer and for skiing in winter.",
+  "image_alt_bg": "Luxima Second Hand and Outlet, Банско",
+  "image_alt_en": "Luxima Second Hand and Outlet, Bansko"
+ },
+ {
+  "slug": "magazin-maxsport-2",
+  "name_bg": "MaxSport 2",
+  "name_en": "MaxSport 2",
+  "description_bg": "Магазин за спортни облекла и екипировка в Банско на ул. Пирин с марки като Halti, Kjus, Peak Performance, Fischer, Atomic и Volkl.",
+  "description_en": "A sports clothing and equipment shop on Pirin Street in Bansko with brands such as Halti, Kjus, Peak Performance, Fischer, Atomic and Volkl.",
+  "image_alt_bg": "MaxSport 2, Банско",
+  "image_alt_en": "MaxSport 2, Bansko"
+ },
+ {
+  "slug": "magazin-maxsport",
+  "name_bg": "MaxSport",
+  "name_en": "MaxSport",
+  "description_bg": "Магазин за спортни облекла и екипировка в Банско на ул. Глазне с марки като Halti, Kjus, Peak Performance, Fischer, Atomic и Blizzard.",
+  "description_en": "A sports clothing and equipment shop on Glazne Street in Bansko with brands such as Halti, Kjus, Peak Performance, Fischer, Atomic and Blizzard.",
+  "image_alt_bg": "MaxSport, Банско",
+  "image_alt_en": "MaxSport, Bansko"
+ },
+ {
+  "slug": "conte-of-florence",
+  "name_bg": "Conte of Florence",
+  "name_en": "Conte of Florence",
+  "description_bg": "Магазин на италианската марка Conte of Florence в хотел Кемпински Гранд Арена в Банско, с облекло за ски, голф и яхтинг, подходящо и за ежедневието.",
+  "description_en": "The Conte of Florence brand shop in the Kempinski Hotel Grand Arena in Bansko, with clothing for skiing, golf and sailing that also works for everyday wear.",
+  "image_alt_bg": "Conte of Florence, Банско",
+  "image_alt_en": "Conte of Florence, Bansko"
+ },
+ {
+  "slug": "butik-kozheno-czarstvo",
+  "name_bg": "Бутик Кожено царство",
+  "name_en": "Leather Kingdom Boutique",
+  "description_bg": "Бутик на ул. Пирин в Банско за кожени изделия, палта от кашмир и косъм и италиански обувки от кожа и велур. Изработва и модели по индивидуална поръчка.",
+  "description_en": "A boutique on Pirin Street in Bansko with leather goods, cashmere and fur coats and Italian leather and suede footwear. It also makes pieces to individual order.",
+  "image_alt_bg": "Бутик Кожено царство, Банско",
+  "image_alt_en": "Leather Kingdom Boutique, Bansko"
+ },
+ {
+  "slug": "kids-room",
+  "name_bg": "Kids Room",
+  "name_en": "Kids Room",
+  "description_bg": "Магазин за бебешки и детски стоки в центъра на Банско, до книжарница Techno Office.",
+  "description_en": "A shop for baby and children's goods in the centre of Bansko, next to the Techno Office bookshop.",
+  "image_alt_bg": "Kids Room, Банско",
+  "image_alt_en": "Kids Room, Bansko"
+ },
+ {
+  "slug": "benzinostancziya-petrol-0113",
+  "name_bg": "Бензиностанция Petrol 0113",
+  "name_en": "Petrol Filling Station 0113",
+  "description_bg": "Бензиностанция от веригата Petrol на ул. Патриарх Евтимий в Банско.",
+  "description_en": "A Petrol chain filling station on Patriarh Evtimiy Street in Bansko.",
+  "image_alt_bg": "Бензиностанция Petrol, Банско",
+  "image_alt_en": "Petrol filling station, Bansko"
+ },
+ {
+  "slug": "benzinostancziya-eko-1153",
+  "name_bg": "Бензиностанция EKO 1153",
+  "name_en": "EKO Filling Station 1153",
+  "description_bg": "Бензиностанция от веригата EKO на ул. Никола Голев в Банско, с горива и масла.",
+  "description_en": "An EKO chain filling station on Nikola Golev Street in Bansko, selling fuels and oils.",
+  "image_alt_bg": "Бензиностанция EKO, Банско",
+  "image_alt_en": "EKO filling station, Bansko"
+ },
+ {
+  "slug": "benzinostancziya-lukoil-b008",
+  "name_bg": "Бензиностанция Lukoil Б008",
+  "name_en": "Lukoil Filling Station B008",
+  "description_bg": "Бензиностанция от веригата Лукойл в Банско с горива.",
+  "description_en": "A Lukoil chain filling station in Bansko.",
+  "image_alt_bg": "Бензиностанция Lukoil, Банско",
+  "image_alt_en": "Lukoil filling station, Bansko"
+ },
+ {
+  "slug": "benzinostanczii-gazprom",
+  "name_bg": "Бензиностанция Газпром",
+  "name_en": "Gazprom Filling Station",
+  "description_bg": "Бензиностанция от веригата Газпром в Банско с горива по стандарт Евро 5.",
+  "description_en": "A Gazprom chain filling station in Bansko with Euro 5 fuels.",
+  "image_alt_bg": "Бензиностанция Газпром, Банско",
+  "image_alt_en": "Gazprom filling station, Bansko"
+ },
+ {
+  "slug": "avtoshkola-zlatev",
+  "name_bg": "Автошкола Златев",
+  "name_en": "Zlatev Driving School",
+  "description_bg": "Автошкола в Банско на ул. Бъндерица със собствен автопарк. Обучава кандидат-водачи и предлага курсове за професионална квалификация на водачи.",
+  "description_en": "A driving school on Banderitsa Street in Bansko with its own fleet. It trains new drivers and runs professional qualification courses for licence holders.",
+  "image_alt_bg": "Автошкола Златев, Банско",
+  "image_alt_en": "Zlatev Driving School, Bansko"
+ },
+ {
+  "slug": "injector-experts",
+  "name_bg": "Injector Experts",
+  "name_en": "Injector Experts",
+  "description_bg": "Сервиз в Добринище за ремонт, тестване и рециклиране на дизелови Common Rail дюзи за автомобили, камиони, автобуси и земеделска техника. Предлага и продажба на дюзи.",
+  "description_en": "A workshop in Dobrinishte that repairs, tests and refurbishes diesel common rail injectors for cars, trucks, buses and agricultural machinery. It also sells injectors.",
+  "image_alt_bg": "Injector Experts, Добринище",
+  "image_alt_en": "Injector Experts, Dobrinishte"
+ },
+ {
+  "slug": "denonosthna-patna-pomosth-cziklovski",
+  "name_bg": "Денонощна пътна помощ Цикловски",
+  "name_en": "Tsiklovski 24-hour Roadside Assistance",
+  "description_bg": "Денонощна пътна помощ в Банско за леки, лекотоварни и тежкотоварни автомобили и техника, лицензирана от Изпълнителна агенция „Автомобилна администрация“. Работи с редица застрахователи и покрива региона, страната и съседните държави.",
+  "description_en": "Round-the-clock roadside assistance based in Bansko for cars, vans, trucks and machinery, licensed by the Automobile Administration agency. It works with a number of insurers and covers the region, the country and neighbouring states.",
+  "image_alt_bg": "Пътна помощ Цикловски, Банско",
+  "image_alt_en": "Tsiklovski Roadside Assistance, Bansko"
+ },
+ {
+  "slug": "avtomivka-kiricz",
+  "name_bg": "Автомивка Кириц",
+  "name_en": "Kirits Car Wash",
+  "description_bg": "Автомивка в Банско на ул. Тодорин връх. Предлага и монтаж и демонтаж на гуми.",
+  "description_en": "A car wash on Todorin Vrah Street in Bansko that also fits and removes tyres.",
+  "image_alt_bg": "Автомивка Кириц, Банско",
+  "image_alt_en": "Kirits Car Wash, Bansko"
+ },
+ {
+  "slug": "auto-ivan-kar-2009",
+  "name_bg": "Ауто Иван Кар 2009",
+  "name_en": "Auto Ivan Car 2009",
+  "description_bg": "Магазин за авточасти и консумативи за автомобили в Банско на ул. Цар Симеон.",
+  "description_en": "A shop for car parts and consumables on Tsar Simeon Street in Bansko.",
+  "image_alt_bg": "Ауто Иван Кар 2009, Банско",
+  "image_alt_en": "Auto Ivan Car 2009, Bansko"
+ },
+ {
+  "slug": "kondev-auto",
+  "name_bg": "Кондев Ауто",
+  "name_en": "Kondev Auto",
+  "description_bg": "Магазини за авточасти и автосервиз за ремонт на автомобили в Банско, на ул. Цар Симеон.",
+  "description_en": "Car parts shops and a repair garage in Bansko, on Tsar Simeon Street.",
+  "image_alt_bg": "Кондев Ауто, Банско",
+  "image_alt_en": "Kondev Auto, Bansko"
+ }
+]
