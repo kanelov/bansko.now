@@ -105,13 +105,13 @@ insert into public.businesses (id, name, slug, category, category_id, descriptio
   images, faqs, features, status, listing_tier, payment_status, priority, show_on_illustrated_map, requested_services, admin_notes, robots_index, robots_follow, schema_type)
 select id, name_bg, slug_bg, (select name from public.business_category_translations where category_id = n.category_id and locale = 'bg'), category_id, desc_bg, address, lat, lng,
   website, facebook, instagram, phone, null,
-  '{{}}', '[]', '{{}}', 'approved', 'free', 'unpaid', 100, false, '{{}}', notes, true, true, 'LocalBusiness'
+  '{{}}'::text[], '[]'::jsonb, '{{}}'::text[], 'approved', 'free', 'unpaid', 100, false, '{{}}'::text[], notes, true, true, 'LocalBusiness'
 from import_new n;
 
 insert into public.business_translations (business_id, locale, slug, name, category, description, address, image_alt, faqs, features, schema_type)
-select id, 'bg', slug_bg, name_bg, (select name from public.business_category_translations where category_id = n.category_id and locale = 'bg'), desc_bg, address, alt_bg, '[]', '{{}}', 'LocalBusiness' from import_new n
+select id, 'bg', slug_bg, name_bg, (select name from public.business_category_translations where category_id = n.category_id and locale = 'bg'), desc_bg, address, alt_bg, '[]'::jsonb, '{{}}'::text[], 'LocalBusiness' from import_new n
 union all
-select id, 'en', slug_en, name_en, (select name from public.business_category_translations where category_id = n.category_id and locale = 'en'), desc_en, address_en, alt_en, '[]', '{{}}', 'LocalBusiness' from import_new n;
+select id, 'en', slug_en, name_en, (select name from public.business_category_translations where category_id = n.category_id and locale = 'en'), desc_en, address_en, alt_en, '[]'::jsonb, '{{}}'::text[], 'LocalBusiness' from import_new n;
 
 insert into public.business_contacts (business_id, owner_name, owner_phone, owner_email)
 select id, name_bg, phone, email from import_new where email is not null;
