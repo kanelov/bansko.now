@@ -44,7 +44,7 @@ There are three different projects in the owner's workspace.
 - Production: `https://bansko.now`
 - Vercel project: `bansko-now`
 - Vercel project ID: `prj_RBSY4G7tNRU7Gw7HHV6P16gPf4LZ`
-- Vercel team ID: `team_Ijdyu2h997ot1mqArESTOW53`
+- Vercel team ID: `team_0TLhgjdaW1bpws95D9bSqm39` (`lukekanelov-5469`, Pro, lukekanelov@gmail.com; прехвърлен от `kanelov-s-projects` на 2026-10-29)
 - Supabase project ref: `rzjyawjdhcedddydmfge`
 
 ### B. Source inventory/request/kiosk application
