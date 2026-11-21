@@ -2,11 +2,15 @@
  * Скриптът на телевизора - вграден в страницата, ES5 без bundle, защото
  * браузърът на Samsung Tizen е Chromium 85/94 и не се обновява.
  *
- * Какво прави: на 60 s пита /api/display/<token>/version; при различна версия
- * презарежда; след 3 неуспешни проверки показва точка „офлайн“ (менюто остава);
- * веднъж на нощ в 04:00 презарежда за памет, но само ако последната проверка е
- * минала; уголемява текста, докато менюто още се събира, и казва на прегледа в
- * портала, ако не се събира изобщо.
+ * Какво прави (от 21.11.2026, по искане на собственика – минимален товар):
+ *  – зарежда се наново само 3 пъти на ден, в 06:00, 12:00 и 18:00; преди това
+ *    пита /api/display/<token>/version (единствените заявки към Vercel и базата)
+ *    и презарежда само ако отговорът е дошъл – без интернет менюто остава;
+ *  – на 2 минути зарежда малкия файл „опресни“ от cdn.bansko.now (Cloudflare,
+ *    без Vercel и база); щом собственикът натисне „Опресни телевизорите“ или
+ *    запише екран, стойността се сменя и телевизорът се презарежда;
+ *  – уголемява текста, докато менюто още се събира, и казва на прегледа в
+ *    портала, ако не се събира изобщо.
  * С ?preview=1 не проверява и не презарежда.
  *
  * Шаблон „Слайдове“: показва по един слайд; снимката стои data-duration
@@ -25,7 +29,6 @@ export const displayScript = `
   var version = root.getAttribute('data-version');
   var token = root.getAttribute('data-token');
   var preview = root.getAttribute('data-preview') === '1';
-  var failures = 0;
 
   function setClass(name, on) {
     var classes = (root.className || '').split(' ').filter(function (c) { return c && c !== name; });
@@ -146,37 +149,61 @@ export const displayScript = `
 
   if (preview || !token) return;
 
-  function check() {
+  var refreshUrl = root.getAttribute('data-refresh') || '';
+  var baseline = null;
+  var firstSignal = true;
+
+  /* Сигналът е JS файл: <script> не иска CORS, а на Tizen върви навсякъде. */
+  window.bnTvRefresh = function (value) {
+    if (firstSignal) { firstSignal = false; baseline = value; return; }
+    if (value !== baseline) { location.reload(); }
+  };
+
+  function pollSignal() {
+    if (!refreshUrl) return;
+    var tag = document.createElement('script');
+    tag.src = refreshUrl + '?t=' + new Date().getTime();
+    tag.onload = function () { if (tag.parentNode) tag.parentNode.removeChild(tag); };
+    tag.onerror = function () {
+      /* Липсващ файл при първата проверка = още няма сигнал; следващият го включва. */
+      if (firstSignal) { firstSignal = false; baseline = 'none'; }
+      if (tag.parentNode) tag.parentNode.removeChild(tag);
+    };
+    document.getElementsByTagName('head')[0].appendChild(tag);
+  }
+
+  pollSignal();
+  setInterval(pollSignal, 120000);
+
+  /* Зареждане по график: само ако сървърът отговаря, иначе пак след 10 минути. */
+  function scheduledReload() {
     var xhr = new XMLHttpRequest();
-    xhr.open('GET', '/api/display/' + token + '/version', true);
+    xhr.open('GET', '/api/display/' + token + '/version?t=' + new Date().getTime(), true);
     xhr.onreadystatechange = function () {
       if (xhr.readyState !== 4) return;
       if (xhr.status === 200) {
-        failures = 0;
         setClass('is-offline', false);
-        try {
-          var data = JSON.parse(xhr.responseText);
-          if (data && data.v && data.v !== version) { location.reload(); }
-        } catch (e) {}
+        location.reload();
       } else {
-        failures += 1;
-        if (failures >= 3) setClass('is-offline', true);
+        setClass('is-offline', true);
+        setTimeout(scheduledReload, 600000);
       }
     };
     xhr.send();
   }
 
-  setInterval(check, 60000);
-
-  function scheduleNightly() {
+  function scheduleNext() {
+    var hours = [6, 12, 18];
     var now = new Date();
-    var next = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 4, 0, 0, 0);
-    if (next <= now) next.setDate(next.getDate() + 1);
-    setTimeout(function () {
-      if (failures === 0) { location.reload(); } else { setTimeout(scheduleNightly, 3600000); }
-    }, next - now);
+    var next = null;
+    for (var i = 0; i < hours.length; i++) {
+      var candidate = new Date(now.getFullYear(), now.getMonth(), now.getDate(), hours[i], 0, 0, 0);
+      if (candidate > now) { next = candidate; break; }
+    }
+    if (!next) { next = new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1, hours[0], 0, 0, 0); }
+    setTimeout(scheduledReload, next - now);
   }
 
-  scheduleNightly();
+  scheduleNext();
 })();
 `;

@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
-import { generateDisplayToken, generateShortCode, slideDurationDefault, slideDurationMax, slideDurationMin } from "@/lib/business-platform/displays";
+import { generateDisplayToken, sendTvRefreshSignal, slideDurationDefault, slideDurationMax, slideDurationMin } from "@/lib/business-platform/displays";
 import { slideHtmlMaxLength } from "@/lib/business-platform/display-slides";
 import {
   businessMediaConfigured,
@@ -139,7 +139,7 @@ export async function saveDisplayAction(formData: FormData) {
   } else {
     const { data, error } = await supabase
       .from("business_displays")
-      .insert({ ...values, business_id: business.businessId, token: generateDisplayToken(), short_code: generateShortCode() })
+      .insert({ ...values, business_id: business.businessId, token: generateDisplayToken() })
       .select("id")
       .single();
     if (error || !data) redirect(withError(formPath, "save"));
@@ -187,9 +187,34 @@ export async function saveDisplayAction(formData: FormData) {
     if (slidesError) redirect(withError(`${displaysPath}/${displayId}`, "slides-save"));
   }
 
+  /* Записан екран = телевизорите на бизнеса се опресняват до 2 минути. */
+  try {
+    await sendTvRefreshSignal(business.businessId);
+  } catch (error) {
+    console.error("[tv refresh after save]", error);
+  }
+
   revalidatePath(displaysPath);
   revalidatePath("/business");
   redirect(`${displaysPath}/${displayId}?saved=1`);
+}
+
+/**
+ * „Опресни телевизорите“: след промени в менюто или слайдовете. Телевизорите
+ * поглеждат сигнала на 2 минути и се презареждат. Иначе се зареждат сами
+ * само 3 пъти на ден (06, 12 и 18 ч.).
+ */
+export async function refreshDisplaysAction(formData: FormData) {
+  const { business } = await requireBusinessOwner({ businessId: stringValue(formData, "business_id") });
+
+  try {
+    await sendTvRefreshSignal(business.businessId);
+  } catch (error) {
+    console.error("[tv refresh]", error);
+    redirect(withError(displaysPath, "refresh"));
+  }
+
+  redirect(`${displaysPath}?saved=refresh`);
 }
 
 export async function deleteDisplayAction(formData: FormData) {
@@ -215,7 +240,7 @@ export async function regenerateDisplayTokenAction(formData: FormData) {
 
   const { error } = await supabase
     .from("business_displays")
-    .update({ token: generateDisplayToken(), short_code: generateShortCode() })
+    .update({ token: generateDisplayToken() })
     .eq("id", id)
     .eq("business_id", business.businessId);
   if (error) redirect(withError(`${displaysPath}/${id}`, "save"));

@@ -4,7 +4,7 @@ import { DisplaySlides } from "@/components/display/display-slides";
 import { PaperMenuHead } from "@/components/public/paper-menu";
 import { displayScript } from "@/components/display/display-script";
 import { layoutDisplay } from "@/lib/business-platform/display-layout";
-import { getDisplayByToken } from "@/lib/business-platform/displays";
+import { getDisplayByToken, tvRefreshUrl } from "@/lib/business-platform/displays";
 import { getOpeningStatus } from "@/lib/business-platform/hours";
 import { getBusinessMenu } from "@/lib/business-platform/menu";
 import { themeClassName, themeStyle } from "@/lib/business-platform/theme";
@@ -31,13 +31,13 @@ export default async function DisplayPage({ params, searchParams }: { params: Pa
   }
 
   const isPreview = preview === "1";
+  const refreshUrl = tvRefreshUrl(display.businessId);
 
   /* Шаблон „Слайдове“: само снимките и видеата на цял екран, без меню. */
   if (display.template === "slides") {
     const dark = display.theme === "dark";
     return (
       <>
-        {isPreview ? null : <meta httpEquiv="refresh" content="21600" />}
         <div
           id="display-root"
           className={["display-root", "display-root--slides", themeClassName(display.brand, { dark })].join(" ")}
@@ -45,6 +45,7 @@ export default async function DisplayPage({ params, searchParams }: { params: Pa
           data-token={token}
           data-version={display.version}
           data-preview={isPreview ? "1" : "0"}
+          data-refresh={refreshUrl ?? ""}
         >
           <DisplaySlides slides={display.slides} businessName={display.businessName} />
           <span className="display-offline" aria-hidden />
@@ -79,8 +80,8 @@ export default async function DisplayPage({ params, searchParams }: { params: Pa
 
   return (
     <>
-      {isPreview ? null : <meta httpEquiv="refresh" content="21600" />}
-      <div id="display-root" className={rootClass} style={rootStyle} data-token={token} data-version={display.version} data-preview={isPreview ? "1" : "0"}>
+      <div id="display-root" className={rootClass} style={rootStyle} data-token={token} data-version={display.version} data-preview={isPreview ? "1" : "0"}
+          data-refresh={refreshUrl ?? ""}>
         <div id="display-menu" className="display-menu">
           <div className="display-head">
             <PaperMenuHead

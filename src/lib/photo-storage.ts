@@ -87,6 +87,23 @@ export async function uploadPhoto(key: string, body: Buffer, contentType: string
   return key;
 }
 
+/** Малък публичен файл със собствен Cache-Control (например сигналът „опресни телевизорите“). */
+export async function putPublicObject(key: string, body: string, contentType: string, cacheControl: string) {
+  const payload = new TextEncoder().encode(body);
+  const signed = await client().sign(objectUrl(key), {
+    method: "PUT",
+    body: payload,
+    headers: { "Content-Type": contentType, "Cache-Control": cacheControl }
+  });
+  const headers = new Headers(signed.headers);
+  headers.set("Content-Length", String(payload.byteLength));
+  const response = await fetch(signed.url, { method: "PUT", headers, body: payload });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(`R2 upload failed (${response.status}) for ${key}${detail ? `: ${detail.slice(0, 200)}` : ""}`);
+  }
+}
+
 /**
  * Presigned PUT URL so the admin browser can send a large master straight to R2.
  * Vercel caps request bodies at a few megabytes, so the file never passes through the server.

@@ -22,8 +22,8 @@ const errorMessages: Record<string, string> = {
 };
 
 const savedMessages: Record<string, string> = {
-  "1": "Екранът е записан. Телевизорът ще го покаже до минута.",
-  token: "Адресът е сменен. Въведи новия в телевизора; старият вече не работи."
+  "1": "Екранът е записан. Телевизорите ще се опреснят до 2 минути.",
+  token: "Тайният адрес е сменен. Отвори номера на телевизора отново; старият таен адрес вече не работи."
 };
 
 export function DisplayForm({
@@ -81,8 +81,8 @@ export function DisplayForm({
               <p className="font-mono text-lg font-semibold tracking-wide text-forest">{shortDisplayAddress(display.short_code)}</p>
             ) : null}
             <p className={portalUi.hint}>
-              Пише се веднъж в браузъра на телевизора (Samsung: „URL Launcher“; други: Android TV stick с kiosk браузър), с
-              малки букви. Телевизорът сам минава на дългия таен адрес по-долу. В „Помощ“ има стъпки.
+              Пише се веднъж в браузъра на телевизора (Samsung: „URL Launcher“ или приложението „Internet“; други: Android TV
+              stick с kiosk браузър). Телевизорът сам минава на дългия таен адрес по-долу. В „Помощ“ има стъпки.
             </p>
             <p className="break-all font-mono text-[11px] text-stone-500">{url}</p>
             <div className="flex flex-wrap gap-2 pt-1">
@@ -92,8 +92,8 @@ export function DisplayForm({
               <form action={regenerateDisplayTokenAction}>
                 <input type="hidden" name="business_id" value={businessId} />
                 <input type="hidden" name="id" value={display.id} />
-                <ConfirmButton message="Да сменя ли адреса? И късият, и дългият стават нови; старите спират веднага и трябва да въведеш новия в телевизора." className={portalUi.smallButton}>
-                  Смени адреса
+                <ConfirmButton message="Да сменя ли тайния адрес? Номерът остава същият; телевизорът трябва да отвори номера отново." className={portalUi.smallButton}>
+                  Смени тайния адрес
                 </ConfirmButton>
               </form>
             </div>

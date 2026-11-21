@@ -2,9 +2,9 @@ import { NextResponse } from "next/server";
 import { getDisplayVersion } from "@/lib/business-platform/displays";
 
 /**
- * Версията на един екран: ~40 байта, които телевизорът пита на 60 s.
- * Edge кешът държи отговора 30 s, така че базата се пита най-много веднъж на
- * 30 s за всички телевизори с този token; браузърът не го кешира (max-age=0).
+ * Версията на един екран (~40 байта). От 21.11.2026 телевизорът я пита само
+ * 3 пъти на ден, преди зареждането по график, за да провери, че сървърът
+ * отговаря; записва и „видян“ (last_seen_at). Edge кешът е 30 s.
  */
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";

@@ -7,7 +7,8 @@ import { slideDurationDefault, type DisplayMediaOption, type DisplaySlideForEdit
 export { slideDurationDefault, slideDurationMax, slideDurationMin } from "@/lib/business-platform/display-slides";
 export type { DisplayMediaOption, DisplaySlideForEdit } from "@/lib/business-platform/display-slides";
 import { resolveTheme, type BusinessTheme } from "@/lib/business-platform/theme";
-import { siteUrl } from "@/lib/env";
+import { businessMediaPublicBaseUrl, siteUrl } from "@/lib/env";
+import { putPublicObject } from "@/lib/photo-storage";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 import type { BusinessDisplay, BusinessDisplayTemplate, BusinessDisplayTheme, BusinessMediaType, Database, Json } from "@/lib/types";
@@ -43,12 +44,32 @@ export function displayUrl(token: string) {
   return `${siteUrl}/display/${token}`;
 }
 
-/* 5 знака без объркващи (0/O, 1/l/I): ~28 милиона комбинации, лесни за писане с дистанционно. */
-const shortCodeAlphabet = "abcdefghjkmnpqrstuvwxyz23456789";
+/* Късият адрес е поредно число (001, 002 …): дава го базата при създаване на
+   екрана (sequence business_display_number_seq), не се сменя при „Смени адреса“. */
 
-export function generateShortCode() {
-  const bytes = randomBytes(5);
-  return Array.from(bytes, (byte) => shortCodeAlphabet[byte % shortCodeAlphabet.length]).join("");
+/**
+ * Сигналът „опресни телевизорите“: малък публичен JS файл в R2 за целия бизнес.
+ * Телевизорът го зарежда на 2 минути направо от cdn.bansko.now (без Vercel и
+ * без базата); щом стойността се смени, се презарежда. Пише се при „Опресни
+ * телевизорите“ и при запис на екран.
+ */
+export function tvRefreshKey(businessId: string) {
+  return `business/${businessId}/tv-refresh.js`;
+}
+
+export function tvRefreshUrl(businessId: string) {
+  return businessMediaPublicBaseUrl ? `${businessMediaPublicBaseUrl}/${tvRefreshKey(businessId)}` : null;
+}
+
+export async function sendTvRefreshSignal(businessId: string) {
+  const stamp = String(Date.now());
+  await putPublicObject(
+    tvRefreshKey(businessId),
+    `window.bnTvRefresh && window.bnTvRefresh(${JSON.stringify(stamp)});\n`,
+    "application/javascript; charset=utf-8",
+    "no-store, max-age=0"
+  );
+  return stamp;
 }
 
 /** Късият адрес за телевизора, без https:// - така се показва и така се пише на телевизора. */
@@ -59,14 +80,14 @@ export function shortDisplayAddress(code: string) {
 /** Токенът по къс код (за /tv/<code>). null = няма такъв / спрян / модулът е изключен. */
 export async function getDisplayTokenByCode(code: string): Promise<string | null> {
   const supabase = createPublicSupabaseClient();
-  if (!supabase || !/^[a-z0-9]{4,12}$/i.test(code)) return null;
+  if (!supabase || !/^[a-z0-9]{1,12}$/i.test(code)) return null;
   const { data } = await supabase.rpc("display_token_by_code", { p_code: code.toLowerCase() });
   return typeof data === "string" && data ? data : null;
 }
 
-/** Екранът е „онлайн“, когато е питал за версията през последните 3 минути. */
+/** Телевизорът се обажда при зареждане по график (06, 12, 18 ч.): „свързан“ = видян през последните 13 часа. */
 export function isDisplayOnline(lastSeenAt: string | null, now = Date.now()) {
-  return Boolean(lastSeenAt) && now - new Date(lastSeenAt as string).getTime() < 3 * 60 * 1000;
+  return Boolean(lastSeenAt) && now - new Date(lastSeenAt as string).getTime() < 13 * 60 * 60 * 1000;
 }
 
 export type DisplayListItem = BusinessDisplay & {
