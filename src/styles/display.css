@@ -172,3 +172,86 @@ body.display {
   outline: 0.4vh solid #b2543a;
   outline-offset: -0.4vh;
 }
+
+
+/* ------------------------------------------------- шаблон „Слайдове“ */
+/* Слайдовете са един върху друг и се сменят с плавно избледняване. Само
+   opacity и transition – Chromium 85 ги прави гладко. */
+.display-root--slides {
+  background: #000;
+}
+
+.display-slides {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #000;
+}
+
+.display-slide {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  opacity: 0;
+  transition: opacity 0.9s ease;
+}
+
+.display-slide.is-active {
+  opacity: 1;
+}
+
+.display-slide img,
+.display-slide video {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.display-slide-text {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 14vh 6vh 6vh;
+  color: #fff;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.72), rgba(0, 0, 0, 0.35) 55%, rgba(0, 0, 0, 0));
+}
+
+.display-slide-text h2 {
+  margin: 0;
+  font-family: var(--paper-title-font, "Playfair Display Variable", Georgia, serif);
+  font-size: 7vh;
+  font-weight: 600;
+  line-height: 1.08;
+  letter-spacing: -0.01em;
+  text-shadow: 0 0.3vh 1.2vh rgba(0, 0, 0, 0.35);
+}
+
+.display-slide-text p {
+  margin: 1.6vh 0 0;
+  max-width: 60%;
+  font-family: var(--paper-body-font, "Inter Variable", Inter, sans-serif);
+  font-size: 3vh;
+  line-height: 1.35;
+  opacity: 0.92;
+}
+
+.display-root--slides .display-empty {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  margin: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 4vh;
+}

@@ -12,6 +12,9 @@ const errorMessages: Record<string, string> = {
   template: "Избери шаблон.",
   media: "За този шаблон трябва снимка или видео.",
   "media-kind": "Избраната медия не е от вида на шаблона: снимка за „Меню + снимка“, видео за „Меню + видео“.",
+  "slides-empty": "Добави поне един слайд – снимка или видео.",
+  slides: "Някой от слайдовете е без файл или файлът е изтрит. Провери списъка.",
+  "slides-save": "Екранът е записан, но слайдовете не се записаха. Опитай пак.",
   categories: "Екранът е записан, но категориите не се записаха. Опитай пак.",
   save: "Записът не успя. Опитай пак.",
   delete: "Изтриването не успя."
@@ -46,8 +49,8 @@ export function DisplayForm({
         <p className={portalUi.eyebrow}>Екрани</p>
         <h1 className={portalUi.h1}>{display ? display.name : "Нов екран"}</h1>
         <p className="mt-2 max-w-xl text-sm text-stone-650">
-          Екранът показва менюто от „Меню“ – тук се избира само кои категории, кой шаблон и коя снимка или видео. Промените в
-          менюто стигат до телевизора сами.
+          Екранът показва менюто от „Меню“ или, с шаблон „Слайдове“, твои снимки и видеа на цял екран. Промените стигат до
+          телевизора сами до минута.
         </p>
       </header>
 
@@ -108,11 +111,16 @@ export function DisplayForm({
           <input name="name" defaultValue={display?.name ?? ""} required maxLength={60} className={portalUi.input} />
         </label>
 
-        <DisplayMediaField options={media} initialMediaId={display?.media_id ?? null} initialTemplate={display?.template ?? "menu_only"} />
+        <DisplayMediaField
+          options={media}
+          initialMediaId={display?.media_id ?? null}
+          initialTemplate={display?.template ?? "menu_only"}
+          initialSlides={display?.slides ?? []}
+        />
 
         <fieldset className="grid gap-2">
           <legend className="text-sm font-semibold">Категории на този екран</legend>
-          <p className={portalUi.hint}>Без отметка екранът показва цялото меню. Редът е като в „Меню“.</p>
+          <p className={portalUi.hint}>Без отметка екранът показва цялото меню. Редът е като в „Меню“. При „Слайдове“ не се ползват.</p>
           {categories.length === 0 ? (
             <p className="text-sm text-stone-650">
               Още няма категории.{" "}

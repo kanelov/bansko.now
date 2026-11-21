@@ -886,7 +886,7 @@ export type BusinessHourException = {
   updated_at: string;
 };
 
-export type BusinessDisplayTemplate = "menu_only" | "menu_image" | "menu_video";
+export type BusinessDisplayTemplate = "menu_only" | "menu_image" | "menu_video" | "slides";
 export type BusinessDisplayTheme = "dark" | "light";
 
 export type BusinessDisplay = {
@@ -904,6 +904,19 @@ export type BusinessDisplay = {
   last_seen_at: string | null;
   created_at: string;
   updated_at: string;
+};
+
+/** Слайд на екран с шаблон „Слайдове“: снимка или видео на цял екран с надпис. */
+export type BusinessDisplaySlide = {
+  id: string;
+  display_id: string;
+  business_id: string;
+  media_id: string;
+  title: string;
+  subtitle: string;
+  duration_seconds: number;
+  sort_order: number;
+  created_at: string;
 };
 
 export type BusinessDisplayCategory = {
@@ -1439,6 +1452,12 @@ export type Database = {
         Row: BusinessDisplayCategory;
         Insert: BusinessDisplayCategory;
         Update: Partial<BusinessDisplayCategory>;
+        Relationships: [];
+      };
+      business_display_slides: {
+        Row: BusinessDisplaySlide;
+        Insert: Partial<BusinessDisplaySlide> & Pick<BusinessDisplaySlide, "display_id" | "business_id" | "media_id">;
+        Update: Partial<BusinessDisplaySlide>;
         Relationships: [];
       };
     };

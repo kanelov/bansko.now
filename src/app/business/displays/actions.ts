@@ -3,13 +3,14 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
-import { generateDisplayToken, generateShortCode } from "@/lib/business-platform/displays";
+import { generateDisplayToken, generateShortCode, slideDurationDefault, slideDurationMax, slideDurationMin } from "@/lib/business-platform/displays";
 import {
   businessMediaConfigured,
   businessMediaUrls,
   createBusinessUploadTicket,
   deleteBusinessMedia,
-  finalizeBusinessImage
+  finalizeBusinessImage,
+  finalizeBusinessVideo
 } from "@/lib/business-platform/media";
 import type { BusinessDisplayTemplate, BusinessDisplayTheme } from "@/lib/types";
 
@@ -21,7 +22,8 @@ import type { BusinessDisplayTemplate, BusinessDisplayTheme } from "@/lib/types"
 
 const displaysPath = "/business/displays";
 const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-const templates: BusinessDisplayTemplate[] = ["menu_only", "menu_image", "menu_video"];
+const templates: BusinessDisplayTemplate[] = ["menu_only", "menu_image", "menu_video", "slides"];
+const maxSlides = 30;
 const themes: BusinessDisplayTheme[] = ["dark", "light"];
 
 function stringValue(formData: FormData, key: string) {
@@ -37,6 +39,30 @@ function boolValue(formData: FormData, key: string) {
 function idValue(formData: FormData, key: string) {
   const value = stringValue(formData, key);
   return uuidPattern.test(value) ? value : null;
+}
+
+type SlideInput = { mediaId: string; title: string; subtitle: string; duration: number };
+
+/** Слайдовете идват като JSON от клиентското поле; приема се само познат вид и граници. */
+function slidesValue(formData: FormData): SlideInput[] | null {
+  const raw = stringValue(formData, "slides_json");
+  if (!raw) return [];
+  try {
+    const parsed: unknown = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return null;
+    return parsed.slice(0, maxSlides).map((item) => {
+      const entry = (item ?? {}) as Record<string, unknown>;
+      const duration = Math.round(Number(entry.duration));
+      return {
+        mediaId: typeof entry.mediaId === "string" && uuidPattern.test(entry.mediaId) ? entry.mediaId : "",
+        title: typeof entry.title === "string" ? entry.title.trim().slice(0, 80) : "",
+        subtitle: typeof entry.subtitle === "string" ? entry.subtitle.trim().slice(0, 160) : "",
+        duration: Number.isFinite(duration) ? Math.min(slideDurationMax, Math.max(slideDurationMin, duration)) : slideDurationDefault
+      };
+    });
+  } catch {
+    return null;
+  }
 }
 
 function withError(path: string, code: string) {
@@ -63,7 +89,16 @@ export async function saveDisplayAction(formData: FormData) {
   if (!name) redirect(withError(formPath, "name"));
   if (!templates.includes(template)) redirect(withError(formPath, "template"));
   if (!themes.includes(theme)) redirect(withError(formPath, "template"));
-  if (template !== "menu_only" && !mediaId) redirect(withError(formPath, "media"));
+  const slides = template === "slides" ? slidesValue(formData) : [];
+  if (template === "slides") {
+    if (!slides || slides.some((slide) => !slide.mediaId)) redirect(withError(formPath, "slides"));
+    if (slides.length === 0) redirect(withError(formPath, "slides-empty"));
+    /* Всяка медия на слайд трябва да е на този бизнес. */
+    const ids = Array.from(new Set(slides.map((slide) => slide.mediaId)));
+    const { data: owned } = await supabase.from("business_media").select("id").eq("business_id", business.businessId).in("id", ids);
+    if ((owned ?? []).length !== ids.length) redirect(withError(formPath, "slides"));
+  }
+  if ((template === "menu_image" || template === "menu_video") && !mediaId) redirect(withError(formPath, "media"));
 
   /* Снимка към шаблон „видео“ или обратното не се приема: избраната медия трябва да е от вида на шаблона. */
   if (mediaId) {
@@ -82,7 +117,7 @@ export async function saveDisplayAction(formData: FormData) {
     name,
     template,
     theme,
-    media_id: template === "menu_only" ? null : mediaId,
+    media_id: template === "menu_image" || template === "menu_video" ? mediaId : null,
     show_descriptions: showDescriptions,
     is_active: isActive
   };
@@ -115,6 +150,30 @@ export async function saveDisplayAction(formData: FormData) {
       }))
     );
     if (error) redirect(withError(`${displaysPath}/${displayId}`, "categories"));
+  }
+
+  /* Слайдовете също наведнъж. При друг шаблон редовете остават, за да не се
+     губят, ако собственикът се върне към „Слайдове“. */
+  if (template === "slides" && slides) {
+    const { error: clearError } = await supabase
+      .from("business_display_slides")
+      .delete()
+      .eq("display_id", displayId)
+      .eq("business_id", business.businessId);
+    if (clearError) redirect(withError(`${displaysPath}/${displayId}`, "slides-save"));
+
+    const { error: slidesError } = await supabase.from("business_display_slides").insert(
+      slides.map((slide, index) => ({
+        display_id: displayId as string,
+        business_id: business.businessId,
+        media_id: slide.mediaId,
+        title: slide.title,
+        subtitle: slide.subtitle,
+        duration_seconds: slide.duration,
+        sort_order: (index + 1) * 10
+      }))
+    );
+    if (slidesError) redirect(withError(`${displaysPath}/${displayId}`, "slides-save"));
   }
 
   revalidatePath(displaysPath);
@@ -160,8 +219,9 @@ export async function regenerateDisplayTokenAction(formData: FormData) {
 
 type UploadTicket = { ok: true; key: string; url: string } | { ok: false; error: string };
 
-export async function createDisplayImageUploadAction(input: { contentType: string; bytes: number }): Promise<UploadTicket> {
+export async function createDisplayImageUploadAction(input: { contentType: string; bytes: number; mediaType?: "image" | "video" }): Promise<UploadTicket> {
   const { business } = await requireBusinessOwner();
+  const mediaType = input.mediaType === "video" ? "video" : "image";
 
   if (!businessMediaConfigured()) {
     return { ok: false, error: "Хранилището за снимки не е настроено." };
@@ -172,7 +232,7 @@ export async function createDisplayImageUploadAction(input: { contentType: strin
       businessId: business.businessId,
       contentType: String(input.contentType || ""),
       bytes: Number(input.bytes),
-      mediaType: "image"
+      mediaType
     });
     return { ok: true, ...ticket };
   } catch (error) {
@@ -190,6 +250,18 @@ export async function finalizeDisplayImageAction(input: { key: string }): Promis
     return { ok: true, id: media.id, url: businessMediaUrls(media).w480 };
   } catch (error) {
     return { ok: false, error: error instanceof Error ? error.message : "Обработката на снимката не успя." };
+  }
+}
+
+/** Видео за екран, качено от собственика (MP4 до 150 MB, направо в R2). */
+export async function finalizeDisplayVideoAction(input: { key: string }): Promise<FinalizeResult> {
+  const { supabase, business } = await requireBusinessOwner();
+
+  try {
+    const media = await finalizeBusinessVideo({ supabase, businessId: business.businessId, key: String(input.key || ""), kind: "display", alt: null });
+    return { ok: true, id: media.id, url: businessMediaUrls(media).original };
+  } catch (error) {
+    return { ok: false, error: error instanceof Error ? error.message : "Обработката на видеото не успя." };
   }
 }
 

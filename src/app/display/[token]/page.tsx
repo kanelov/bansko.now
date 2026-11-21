@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { DisplayColumns } from "@/components/display/display-menu";
+import { DisplaySlides } from "@/components/display/display-slides";
 import { PaperMenuHead } from "@/components/public/paper-menu";
 import { displayScript } from "@/components/display/display-script";
 import { layoutDisplay } from "@/lib/business-platform/display-layout";
@@ -29,6 +30,30 @@ export default async function DisplayPage({ params, searchParams }: { params: Pa
     notFound();
   }
 
+  const isPreview = preview === "1";
+
+  /* Шаблон „Слайдове“: само снимките и видеата на цял екран, без меню. */
+  if (display.template === "slides") {
+    const dark = display.theme === "dark";
+    return (
+      <>
+        {isPreview ? null : <meta httpEquiv="refresh" content="21600" />}
+        <div
+          id="display-root"
+          className={["display-root", "display-root--slides", themeClassName(display.brand, { dark })].join(" ")}
+          style={themeStyle(display.brand, { dark, tv: true })}
+          data-token={token}
+          data-version={display.version}
+          data-preview={isPreview ? "1" : "0"}
+        >
+          <DisplaySlides slides={display.slides} businessName={display.businessName} />
+          <span className="display-offline" aria-hidden />
+        </div>
+        <script dangerouslySetInnerHTML={{ __html: displayScript }} />
+      </>
+    );
+  }
+
   const [menu, opening] = await Promise.all([
     getBusinessMenu(supabase, display.businessId, {
       locale: "bg",
@@ -51,7 +76,6 @@ export default async function DisplayPage({ params, searchParams }: { params: Pa
   const rootClass = ["display-root", themeClassName(display.brand, { dark }), withMedia ? "display-root--media" : ""].filter(Boolean).join(" ");
   const rootStyle = themeStyle(display.brand, { dark, tv: true });
   const logoSrc = display.logo?.w960 ?? display.logo?.w480 ?? display.logo?.original ?? null;
-  const isPreview = preview === "1";
 
   return (
     <>

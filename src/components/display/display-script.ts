@@ -8,6 +8,11 @@
  * минала; уголемява текста, докато менюто още се събира, и казва на прегледа в
  * портала, ако не се събира изобщо.
  * С ?preview=1 не проверява и не презарежда.
+ *
+ * Шаблон „Слайдове“: показва по един слайд; снимката стои data-duration
+ * секунди, видеото върви до края си (най-много 10 минути, ако не съобщи края).
+ * Адресът на видеото се слага чак когато е на ред и се маха след това.
+ * Един-единствен слайд-видео се върти в цикъл.
  */
 export const displayScript = `
 (function () {
@@ -60,10 +65,70 @@ export const displayScript = `
     measure();
   }
 
-  fit();
-  window.addEventListener('resize', fit);
-  if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fit); }
-  setTimeout(fit, 1500);
+  var slideBox = document.getElementById('display-slides');
+  if (slideBox) {
+    var slides = slideBox.getElementsByTagName('section');
+    var current = 0;
+    var timer = null;
+
+    var videoOf = function (slide) {
+      var list = slide.getElementsByTagName('video');
+      return list.length ? list[0] : null;
+    };
+
+    var stop = function (slide) {
+      var video = videoOf(slide);
+      if (video) {
+        video.onended = null;
+        try { video.pause(); } catch (e) {}
+        video.removeAttribute('src');
+        try { video.load(); } catch (e) {}
+      }
+    };
+
+    var show = function (index) {
+      if (timer) { clearTimeout(timer); timer = null; }
+      var previous = slides[current];
+      current = index;
+      var slide = slides[current];
+      if (previous && previous !== slide) {
+        previous.className = 'display-slide';
+        stop(previous);
+      }
+      slide.className = 'display-slide is-active';
+      var video = videoOf(slide);
+      if (video) {
+        var single = slides.length === 1;
+        video.loop = single;
+        if (!video.getAttribute('src')) { video.setAttribute('src', video.getAttribute('data-src') || ''); }
+        if (!single) {
+          video.onended = next;
+          timer = setTimeout(next, 600000);
+        }
+        try { var played = video.play(); if (played && played['catch']) played['catch'](function () { timer = setTimeout(next, 10000); }); } catch (e) {}
+      } else if (slides.length > 1) {
+        var seconds = parseInt(slide.getAttribute('data-duration'), 10) || 10;
+        timer = setTimeout(next, seconds * 1000);
+      }
+    };
+
+    var next = function () {
+      show((current + 1) % slides.length);
+    };
+
+    if (slides.length) { show(0); }
+  }
+
+  if (!slideBox) {
+    fit();
+    window.addEventListener('resize', fit);
+  } else {
+    measure();
+  }
+  if (!slideBox) {
+    if (document.fonts && document.fonts.ready) { document.fonts.ready.then(fit); }
+    setTimeout(fit, 1500);
+  }
 
   if (preview || !token) return;
 

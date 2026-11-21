@@ -2,6 +2,10 @@ import "server-only";
 import { randomBytes } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { businessMediaUrls, type BusinessMediaUrls } from "@/lib/business-platform/media";
+import { slideDurationDefault, type DisplayMediaOption, type DisplaySlideForEdit } from "@/lib/business-platform/display-slides";
+
+export { slideDurationDefault, slideDurationMax, slideDurationMin } from "@/lib/business-platform/display-slides";
+export type { DisplayMediaOption, DisplaySlideForEdit } from "@/lib/business-platform/display-slides";
 import { resolveTheme, type BusinessTheme } from "@/lib/business-platform/theme";
 import { siteUrl } from "@/lib/env";
 import { createPublicSupabaseClient } from "@/lib/supabase/public";
@@ -21,7 +25,8 @@ type Client = SupabaseClient<Database>;
 export const displayTemplates: { value: BusinessDisplayTemplate; label: string; hint: string }[] = [
   { value: "menu_only", label: "Само меню", hint: "Целият екран е менюто." },
   { value: "menu_image", label: "Меню + снимка", hint: "Менюто вляво, снимка вдясно." },
-  { value: "menu_video", label: "Меню + видео", hint: "Менюто вляво, видео в цикъл вдясно, без звук." }
+  { value: "menu_video", label: "Меню + видео", hint: "Менюто вляво, видео в цикъл вдясно, без звук." },
+  { value: "slides", label: "Слайдове", hint: "Снимки и видеа на цял екран, едно след друго, с надпис." }
 ];
 
 export const displayThemes: { value: BusinessDisplayTheme; label: string }[] = [
@@ -89,7 +94,7 @@ export async function listDisplays(supabase: Client, businessId: string): Promis
   }));
 }
 
-export type DisplayForEdit = BusinessDisplay & { categoryIds: string[] };
+export type DisplayForEdit = BusinessDisplay & { categoryIds: string[]; slides: DisplaySlideForEdit[] };
 
 export async function getDisplayForEdit(supabase: Client, businessId: string, id: string): Promise<DisplayForEdit | null> {
   const { data: display } = await supabase.from("business_displays").select("*").eq("business_id", businessId).eq("id", id).maybeSingle();
@@ -98,23 +103,27 @@ export async function getDisplayForEdit(supabase: Client, businessId: string, id
     return null;
   }
 
-  const { data: links } = await supabase
-    .from("business_display_categories")
-    .select("category_id, sort_order")
-    .eq("display_id", display.id)
-    .order("sort_order");
+  const [{ data: links }, { data: slides }] = await Promise.all([
+    supabase.from("business_display_categories").select("category_id, sort_order").eq("display_id", display.id).order("sort_order"),
+    supabase
+      .from("business_display_slides")
+      .select("media_id, title, subtitle, duration_seconds, sort_order")
+      .eq("display_id", display.id)
+      .eq("business_id", businessId)
+      .order("sort_order")
+  ]);
 
-  return { ...display, categoryIds: (links ?? []).map((link) => link.category_id) };
+  return {
+    ...display,
+    categoryIds: (links ?? []).map((link) => link.category_id),
+    slides: (slides ?? []).map((slide) => ({
+      mediaId: slide.media_id,
+      title: slide.title,
+      subtitle: slide.subtitle,
+      duration: slide.duration_seconds
+    }))
+  };
 }
-
-/** Снимките и видеата на бизнеса, между които екранът избира. */
-export type DisplayMediaOption = {
-  id: string;
-  mediaType: BusinessMediaType;
-  alt: string | null;
-  urls: BusinessMediaUrls;
-  createdAt: string;
-};
 
 export async function listDisplayMedia(supabase: Client, businessId: string): Promise<DisplayMediaOption[]> {
   const { data } = await supabase
@@ -162,6 +171,15 @@ export async function listBusinessVideosForAdmin(): Promise<Map<string, AdminBus
 
 /* ----------------------------------------------------------- телевизорът */
 
+export type PublicDisplaySlide = {
+  mediaType: BusinessMediaType;
+  alt: string | null;
+  urls: BusinessMediaUrls;
+  title: string;
+  subtitle: string;
+  duration: number;
+};
+
 export type PublicDisplay = {
   id: string;
   businessId: string;
@@ -174,6 +192,8 @@ export type PublicDisplay = {
   version: string;
   categoryIds: string[];
   media: { mediaType: BusinessMediaType; alt: string | null; urls: BusinessMediaUrls } | null;
+  /** Слайдовете на шаблон „Слайдове“, в реда на показване. */
+  slides: PublicDisplaySlide[];
   /** Темата на бизнеса (цветове, шрифтове, орнамент) - обща за QR менюто, телевизора и печата. */
   brand: BusinessTheme;
   /** Логото от темата (business_media от вида 'logo'), ако е избрано и съществува. */
@@ -193,6 +213,7 @@ type DisplayPayload = {
   content_version: number;
   category_ids: string[];
   media: { media_type: BusinessMediaType; original_key: string; variant_keys: Json; alt: string | null } | null;
+  slides?: { media_type: BusinessMediaType; original_key: string; variant_keys: Json; alt: string | null; title: string; subtitle: string; duration: number }[];
   branding?: Json;
   logo?: { original_key: string; variant_keys: Json; alt: string | null } | null;
 };
@@ -229,6 +250,16 @@ export async function getDisplayByToken(token: string): Promise<PublicDisplay | 
     media: payload.media
       ? { mediaType: payload.media.media_type, alt: payload.media.alt, urls: businessMediaUrls({ original_key: payload.media.original_key, variant_keys: payload.media.variant_keys }) }
       : null,
+    slides: Array.isArray(payload.slides)
+      ? payload.slides.map((slide) => ({
+          mediaType: slide.media_type,
+          alt: slide.alt,
+          urls: businessMediaUrls({ original_key: slide.original_key, variant_keys: slide.variant_keys }),
+          title: slide.title ?? "",
+          subtitle: slide.subtitle ?? "",
+          duration: Number(slide.duration) || slideDurationDefault
+        }))
+      : [],
     brand: resolveTheme(payload.branding),
     logo: payload.logo ? businessMediaUrls({ original_key: payload.logo.original_key, variant_keys: payload.logo.variant_keys }) : null,
     logoAlt: payload.logo?.alt ?? null
