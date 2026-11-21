@@ -9,7 +9,7 @@ export default async function BusinessPortalLayout({ children }: { children: Rea
   const session = await requireBusinessOwner();
   const billing = await getBillingOverview(session.supabase, session.business.businessId);
   const badge = billing.active
-    ? { paid: true, text: `до ${formatBgDate(billing.paidUntil).slice(0, 5)}` }
+    ? { paid: true, text: billing.paidUntil ? `до ${formatBgDate(billing.paidUntil).slice(0, 5)}` : "платен" }
     : { paid: false, text: "неплатен" };
 
   return (

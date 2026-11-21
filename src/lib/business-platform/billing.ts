@@ -28,6 +28,13 @@ export const businessPlans = {
 
 export type BusinessPlanKey = keyof typeof businessPlans;
 
+/**
+ * Решение на собственика (21.11.2026): засега всеки бизнес се води платен,
+ * докато не настрои месечните подновявания в Stripe. Плащанията пак се
+ * записват. За да започне истинската проверка – false.
+ */
+export const everyBusinessCountsAsPaid = true;
+
 /** Какво отключва планът „Бизнес“ (засега – всичко в портала). */
 export const basicPlanFeatures = [
   "Профил в каталога на Bansko NOW",
@@ -75,7 +82,8 @@ export async function getBillingOverview(supabase: Client, businessId: string): 
   ]);
 
   const paidUntil = billing?.paid_until ?? null;
-  return { billing: billing ?? null, payments: payments ?? [], active: Boolean(paidUntil && paidUntil >= todayIso()), paidUntil };
+  const paid = Boolean(paidUntil && paidUntil >= todayIso());
+  return { billing: billing ?? null, payments: payments ?? [], active: paid || everyBusinessCountsAsPaid, paidUntil: paid ? paidUntil : null };
 }
 
 type RecordInput = {

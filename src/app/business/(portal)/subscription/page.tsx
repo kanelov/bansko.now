@@ -102,7 +102,13 @@ export default async function SubscriptionPage({
         {overview.active ? (
           <p className="text-base">
             <span className={portalUi.badge + " mr-2 bg-sage text-forest"}>Платен</span>
-            План „{basic.name}“ е платен до <strong>{formatBgDate(overview.paidUntil)}</strong>.
+            {overview.paidUntil ? (
+              <>
+                План „{basic.name}“ е платен до <strong>{formatBgDate(overview.paidUntil)}</strong>.
+              </>
+            ) : (
+              <>План „{basic.name}“ е включен. Засега Bansko NOW го води като платен.</>
+            )}
           </p>
         ) : (
           <p className="text-base">

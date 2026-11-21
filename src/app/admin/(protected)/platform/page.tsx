@@ -11,7 +11,7 @@ import { BusinessVideoUploader } from "@/components/admin/business-video-uploade
 import { AddOwnerForm, ResetPasswordForm } from "@/components/admin/platform-owner-forms";
 import { getPlatformBusinesses, getPlatformCategoryOptions, manageableModules, platformStatusOptions } from "@/lib/business-platform/admin";
 import { siteUrl } from "@/lib/env";
-import { businessPlans, formatBgDate, formatEuro, todayIso } from "@/lib/business-platform/billing";
+import { businessPlans, everyBusinessCountsAsPaid, formatBgDate, formatEuro, todayIso } from "@/lib/business-platform/billing";
 
 type SearchParams = Promise<{ saved?: string; error?: string }>;
 
@@ -148,6 +148,8 @@ export default async function AdminPlatformPage({ searchParams }: { searchParams
                   <p className="text-sm">
                     {business.billing.paidUntil && business.billing.paidUntil >= todayIso() ? (
                       <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-900">Платен до {formatBgDate(business.billing.paidUntil)}</span>
+                    ) : everyBusinessCountsAsPaid ? (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-900">Води се платен (временно за всички)</span>
                     ) : (
                       <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-900">
                         {business.billing.paidUntil ? `Изтекъл на ${formatBgDate(business.billing.paidUntil)}` : "Неплатен"}
