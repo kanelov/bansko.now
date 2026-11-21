@@ -520,3 +520,57 @@ a {
 .article-block__chips + .article-block__actions {
   margin-top: 0.75rem;
 }
+
+/* ---------------------------------------------------------------------------
+   Обратна връзка при натискане (портал и админ, 2026-11-21). Включва се от
+   PortalClickFeedback, който слага data-click-feedback на <html>.
+   :active = бутонът „потъва“ под пръста; [data-pending] = формата е изпратена,
+   бутонът чака отговор и не се натиска втори път.
+   --------------------------------------------------------------------------- */
+[data-click-feedback] button:not(:disabled),
+[data-click-feedback] a[href] {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity, filter;
+}
+
+[data-click-feedback] button:not(:disabled):active,
+[data-click-feedback] a[href][class*="rounded"]:active {
+  transform: translateY(1px) scale(0.97);
+  filter: brightness(0.94);
+}
+
+[data-click-feedback] [data-pending] {
+  position: relative;
+  pointer-events: none;
+  cursor: progress;
+  opacity: 0.75;
+}
+
+[data-click-feedback] [data-pending]::after {
+  content: "";
+  display: inline-block;
+  width: 0.9em;
+  height: 0.9em;
+  margin-left: 0.55em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 999px;
+  vertical-align: -0.12em;
+  animation: click-feedback-spin 0.7s linear infinite;
+}
+
+@keyframes click-feedback-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-click-feedback] button:not(:disabled):active,
+  [data-click-feedback] a[href][class*="rounded"]:active {
+    transform: none;
+  }
+
+  [data-click-feedback] [data-pending]::after {
+    animation-duration: 2s;
+  }
+}

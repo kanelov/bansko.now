@@ -36,6 +36,7 @@ export type PlatformBusiness = {
   members: { id: string; userId: string | null; role: BusinessMemberRole; email: string | null; createdAt: string }[];
   displays: { id: string; name: string; token: string; isActive: boolean; online: boolean; lastSeenAt: string | null }[];
   videos: AdminBusinessVideo[];
+  billing: { paidUntil: string | null; subscriptionStatus: string; payments: { id: string; periodStart: string; periodEnd: string; amountCents: number; source: string; note: string }[] };
 };
 
 export type PlatformCategoryOption = { id: string; name: string };
@@ -64,14 +65,17 @@ export async function getPlatformBusinesses(): Promise<PlatformBusiness[]> {
     return [];
   }
 
-  const [{ data: businesses }, { data: settings }, { data: modules }, { data: members }, { data: displays }, videos] = await Promise.all([
+  const [{ data: businesses }, { data: settings }, { data: modules }, { data: members }, { data: displays }, videos, { data: billings }, { data: payments }] = await Promise.all([
     supabase.from("businesses").select("id, name, slug, status, category").order("name"),
     supabase.from("business_platform_settings").select("business_id, platform_status, plan, content_version"),
     supabase.from("business_modules").select("business_id, module, enabled"),
     supabase.from("business_members").select("id, business_id, user_id, role, invited_email, created_at").order("created_at"),
     supabase.from("business_displays").select("id, business_id, name, token, is_active, last_seen_at").order("created_at"),
-    listBusinessVideosForAdmin()
+    listBusinessVideosForAdmin(),
+    supabase.from("business_billing").select("business_id, paid_until, subscription_status"),
+    supabase.from("business_payments").select("id, business_id, period_start, period_end, amount_cents, source, note, created_at").order("created_at", { ascending: false }).limit(300)
   ]);
+  const billingById = new Map((billings ?? []).map((row) => [row.business_id, row]));
 
   const settingsById = new Map((settings ?? []).map((row) => [row.business_id, row]));
 
@@ -96,7 +100,15 @@ export async function getPlatformBusinesses(): Promise<PlatformBusiness[]> {
         displays: (displays ?? [])
           .filter((row) => row.business_id === business.id)
           .map((row) => ({ id: row.id, name: row.name, token: row.token, isActive: row.is_active, online: isDisplayOnline(row.last_seen_at), lastSeenAt: row.last_seen_at })),
-        videos: videos.get(business.id) ?? []
+        videos: videos.get(business.id) ?? [],
+        billing: {
+          paidUntil: billingById.get(business.id)?.paid_until ?? null,
+          subscriptionStatus: billingById.get(business.id)?.subscription_status ?? "none",
+          payments: (payments ?? [])
+            .filter((row) => row.business_id === business.id)
+            .slice(0, 6)
+            .map((row) => ({ id: row.id, periodStart: row.period_start, periodEnd: row.period_end, amountCents: row.amount_cents, source: row.source, note: row.note }))
+        }
       };
     })
     /* Активните на платформата излизат най-отгоре. */

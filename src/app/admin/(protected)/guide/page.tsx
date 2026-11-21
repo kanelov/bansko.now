@@ -191,7 +191,7 @@ export default function AdminGuidePage() {
         <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--admin-muted)]">
           Практично описание на функциите в сайта. Документът е част от проекта и трябва да се допълва при всяка нова възможност или промяна в работния процес.
         </p>
-        <p className="mt-3 text-xs font-semibold uppercase text-stone-500">Актуализирано: 31 октомври 2026 (шаблонни илюстрации за бизнеси без снимка)</p>
+        <p className="mt-3 text-xs font-semibold uppercase text-stone-500">Актуализирано: 21 ноември 2026 (абонаменти на бизнесите)</p>
       </header>
 
       <nav aria-label="Бързи действия" className="flex flex-wrap gap-3">
@@ -663,6 +663,14 @@ key: art_studio
             <li>Собственикът влиза на <code>bansko.now/business</code>, сменя паролата от „Парола“ и започва с „Меню“. В портала има „Помощ“ със стъпките.</li>
             <li>За шаблон „Меню + видео“ качи MP4 от „Видеа за екраните“ (1080p, до 60 секунди, до 150 MB). Собственикът после го избира в „Екрани“.</li>
           </ol>
+          <h3 className="mt-6 font-semibold text-stone-950">Абонаменти (от 21 ноември 2026)</h3>
+          <ul className="mt-3 grid list-disc gap-2 pl-5">
+            <li><strong>Един план:</strong> „Бизнес“ – 10 € на месец, отключва всичко. „Бизнес Плюс“ е обявен в портала само като „Очаквайте скоро“. Засега плащането само се записва; нищо не се заключва при неплатен абонамент.</li>
+            <li><strong>Собственикът плаща сам</strong> от „Абонамент“ в портала: месечен абонамент или един месец през Stripe. Плащането се записва при връщането от Stripe.</li>
+            <li><strong>Плащане в брой или по банка:</strong> „Бизнес платформа“ → бизнеса → „Абонамент“ → избери месеци, сума (празно = 10 € на месец) и бележка → <strong>„Маркирай като платен“</strong>. Удължава „платен до“ и се вижда и в портала.</li>
+            <li><strong>Месечните подновявания</strong> идват от Stripe по webhook. В Stripe → Developers → Webhooks добави адрес <code>https://bansko.now/api/stripe/business-billing</code> със събитията <code>checkout.session.completed</code>, <code>invoice.paid</code>, <code>customer.subscription.updated</code>, <code>customer.subscription.deleted</code> и сложи ключа му във Vercel като <code>STRIPE_BUSINESS_WEBHOOK_SECRET</code>. Без него първото плащане се записва, но подновяванията – не.</li>
+            <li>Таблици: <code>business_billing</code> (платен до, абонамент в Stripe) и <code>business_payments</code> (история). Собственикът ги чете, пишат само админът и сървърът.</li>
+          </ul>
           <h3 className="mt-6 font-semibold text-stone-950">Твоят акаунт и порталът</h3>
           <ul className="mt-3 grid list-disc gap-2 pl-5">
             <li><strong>Един акаунт – една парола.</strong> Админ акаунтът ти отваря и админа, и бизнес портала. Смениш ли паролата на едното място, сменя се и на другото – това е същият вход. Паролата се сменя от бутона <strong>„Парола“</strong> долу вляво в админа (или от „Парола“ в портала).</li>

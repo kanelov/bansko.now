@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { businessSignOutAction } from "@/app/business/actions";
 import type { BusinessMembership } from "@/lib/business-platform/auth";
-import { BusinessNav } from "@/components/business/business-nav";
+import { BusinessNav, type BillingBadge } from "@/components/business/business-nav";
 
 /**
  * Рамката на портала: горе името на бизнеса и изход, долу лента с петте
@@ -13,12 +13,15 @@ export function BusinessShell({
   business,
   memberships,
   isAdmin = false,
+  billing = null,
   children
 }: {
   business: BusinessMembership;
   memberships: BusinessMembership[];
   /** Админът вижда „Смени“ и „Нов бизнес“ винаги, дори с един бизнес. */
   isAdmin?: boolean;
+  /** Статусът на абонамента за менюто вляво и за знака горе на телефона. */
+  billing?: BillingBadge | null;
   children: React.ReactNode;
 }) {
   return (
@@ -26,7 +29,7 @@ export function BusinessShell({
       <aside className="print:hidden hidden border-r border-[var(--stone)] bg-white/60 px-5 py-6 lg:block">
         <p className="text-xs font-semibold uppercase tracking-[0.2em] text-moss">Bansko NOW</p>
         <p className="font-display mt-1 text-lg font-semibold text-forest">Бизнес</p>
-        <BusinessNav variant="side" />
+        <BusinessNav variant="side" billing={billing} />
       </aside>
 
       <div className="flex min-h-screen flex-col">
@@ -40,6 +43,18 @@ export function BusinessShell({
               </p>
             </div>
             <div className="flex items-center gap-2">
+              {billing ? (
+                <Link
+                  href="/business/subscription"
+                  className={
+                    billing.paid
+                      ? "rounded-full bg-sage px-3 py-1.5 text-xs font-semibold text-forest lg:hidden"
+                      : "rounded-full bg-clay/15 px-3 py-1.5 text-xs font-semibold text-clay lg:hidden"
+                  }
+                >
+                  Абонамент
+                </Link>
+              ) : null}
               {memberships.length > 1 || isAdmin ? (
                 <Link
                   href="/business/select"

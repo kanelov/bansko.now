@@ -8,17 +8,21 @@ import { usePathname } from "next/navigation";
  * да се вижда какво идва; долната лента на телефона носи само готовите, иначе
  * не се чете.
  */
-const items: { href: string; label: string; ready: boolean }[] = [
+const items: { href: string; label: string; ready: boolean; phone?: boolean }[] = [
   { href: "/business", label: "Табло", ready: true },
   { href: "/business/menu", label: "Меню", ready: true },
   { href: "/business/hours", label: "Часове", ready: true },
   { href: "/business/displays", label: "Екрани", ready: true },
   { href: "/business/print", label: "Печат", ready: true },
   { href: "/business/branding", label: "Бранд", ready: true },
+  { href: "/business/subscription", label: "Абонамент", ready: true, phone: false },
   { href: "/business/guide", label: "Помощ", ready: true }
 ];
 
-export function BusinessNav({ variant }: { variant: "side" | "bottom" }) {
+/** Статусът на абонамента до „Абонамент“: зелено = платен, глина = неплатен. */
+export type BillingBadge = { paid: boolean; text: string };
+
+export function BusinessNav({ variant, billing }: { variant: "side" | "bottom"; billing?: BillingBadge | null }) {
   const pathname = usePathname();
 
   const isActive = (href: string) => (href === "/business" ? pathname === href : pathname.startsWith(href));
@@ -38,7 +42,24 @@ export function BusinessNav({ variant }: { variant: "side" | "bottom" }) {
                   : "rounded-xl px-3 py-2 text-sm font-medium transition hover:bg-sage"
               }
             >
-              {item.label}
+              {item.href === "/business/subscription" && billing ? (
+                <span className="flex items-center justify-between gap-2">
+                  {item.label}
+                  <span
+                    className={
+                      isActive(item.href)
+                        ? "rounded-full bg-white/20 px-2 py-0.5 text-[10px] font-semibold"
+                        : billing.paid
+                          ? "rounded-full bg-sage px-2 py-0.5 text-[10px] font-semibold text-forest"
+                          : "rounded-full bg-clay/15 px-2 py-0.5 text-[10px] font-semibold text-clay"
+                    }
+                  >
+                    {billing.text}
+                  </span>
+                </span>
+              ) : (
+                item.label
+              )}
             </Link>
           ) : (
             <span key={item.href} className="flex items-center justify-between rounded-xl px-3 py-2 text-sm text-stone-650">
@@ -51,7 +72,7 @@ export function BusinessNav({ variant }: { variant: "side" | "bottom" }) {
     );
   }
 
-  const ready = items.filter((item) => item.ready);
+  const ready = items.filter((item) => item.ready && item.phone !== false);
 
   return (
     <nav

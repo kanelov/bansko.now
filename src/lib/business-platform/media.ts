@@ -2,7 +2,14 @@ import "server-only";
 import { randomUUID } from "node:crypto";
 import sharp from "sharp";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { createUploadUrl, deletePhoto, getPhotoObject, getPublicPhotoUrl, headObject, photoStorageConfigured, uploadPhoto } from "@/lib/photo-storage";
+import { businessMediaPublicBaseUrl } from "@/lib/env";
+import { createUploadUrl, deletePhoto, getPhotoObject, headObject, photoStorageConfigured, setImmutableCacheControl, uploadPhoto } from "@/lib/photo-storage";
+
+/** Публичен адрес на файл на бизнес (през cdn.bansko.now, ако е зададен). */
+function businessPublicUrl(key: string | null | undefined) {
+  if (!key || !businessMediaPublicBaseUrl || key.startsWith("photos/private/")) return null;
+  return `${businessMediaPublicBaseUrl}/${key.replace(/^\//, "")}`;
+}
 import type { BusinessMedia, BusinessMediaKind, Database, Json } from "@/lib/types";
 
 /**
@@ -138,6 +145,13 @@ export async function finalizeBusinessImage(input: {
     throw new Error(error?.message || "Записът на снимката не успя.");
   }
 
+  /* Оригиналът се показва за лого и фон за печат: и той да се пази в кеша. */
+  try {
+    await setImmutableCacheControl(input.key, head.contentType || "image/jpeg");
+  } catch (cacheError) {
+    console.error("[business image cache-control]", cacheError);
+  }
+
   return data;
 }
 
@@ -158,6 +172,13 @@ export async function finalizeBusinessVideo(input: {
   if (head.bytes > maxBusinessVideoBytes || !businessVideoTypes[head.contentType]) {
     await deletePhoto(input.key);
     throw new Error("Позволен е само MP4 до 150 MB.");
+  }
+
+  /* Видеото се пуска на телевизора отново и отново: браузърът трябва да го пази. */
+  try {
+    await setImmutableCacheControl(input.key, head.contentType);
+  } catch (error) {
+    console.error("[business video cache-control]", error);
   }
 
   const { data, error } = await input.supabase
@@ -184,10 +205,10 @@ export async function finalizeBusinessVideo(input: {
 export function businessMediaUrls(media: Pick<BusinessMedia, "original_key" | "variant_keys">): BusinessMediaUrls {
   const variants = (media.variant_keys ?? {}) as Record<string, string>;
   return {
-    original: getPublicPhotoUrl(media.original_key),
-    w480: getPublicPhotoUrl(variants["480"]),
-    w960: getPublicPhotoUrl(variants["960"]),
-    w1600: getPublicPhotoUrl(variants["1600"])
+    original: businessPublicUrl(media.original_key),
+    w480: businessPublicUrl(variants["480"]),
+    w960: businessPublicUrl(variants["960"]),
+    w1600: businessPublicUrl(variants["1600"])
   };
 }
 

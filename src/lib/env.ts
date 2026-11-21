@@ -33,6 +33,11 @@ function webhookSecretList(...values: Array<string | undefined>) {
 }
 
 export const stripeWebhookSecret = webhookSecretList(process.env.STRIPE_WEBHOOK_SECRET, process.env.STRIPE_WEBHOOK_SECRET_TEST);
+/** Абонаментите на бизнесите: собствен webhook (/api/stripe/business-billing) със свой ключ. */
+export const stripeBusinessWebhookSecret = webhookSecretList(
+  process.env.STRIPE_BUSINESS_WEBHOOK_SECRET,
+  process.env.STRIPE_BUSINESS_WEBHOOK_SECRET_TEST
+);
 /** The photo license endpoint has its own signing secret; falls back to the Art Studio one. */
 export const stripePhotoWebhookSecret = webhookSecretList(
   process.env.STRIPE_PHOTO_WEBHOOK_SECRET,
@@ -55,3 +60,10 @@ export const r2SecretAccessKey = process.env.R2_SECRET_ACCESS_KEY || null;
 export const r2BucketName = process.env.R2_BUCKET_NAME || null;
 /** Public base URL of the bucket (r2.dev subdomain today, photos.bansko.now later). */
 export const photoPublicBaseUrl = (process.env.PHOTO_PUBLIC_BASE_URL || "").replace(/\/$/, "") || null;
+/**
+ * Публичният адрес на файловете на бизнесите (менюта, екрани, лога). Същият
+ * bucket като снимките, но през собствения домейн (cdn.bansko.now), защото
+ * r2.dev е с ограничение на заявките и без кеш, а телевизорите теглят оттук
+ * цял ден. Без стойност – като снимките.
+ */
+export const businessMediaPublicBaseUrl = (process.env.BUSINESS_MEDIA_PUBLIC_BASE_URL || "").replace(/\/$/, "") || photoPublicBaseUrl;

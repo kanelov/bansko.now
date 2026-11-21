@@ -906,6 +906,36 @@ export type BusinessDisplay = {
   updated_at: string;
 };
 
+export type BusinessPaymentSource = "stripe_subscription" | "stripe_one_time" | "manual";
+
+/** Абонаментът на бизнес: само чете се от собственика, пише се от админа и сървъра. */
+export type BusinessBilling = {
+  business_id: string;
+  plan: "basic" | "plus";
+  paid_until: string | null;
+  subscription_status: "none" | "active" | "canceling" | "canceled" | "past_due";
+  stripe_customer_id: string | null;
+  stripe_subscription_id: string | null;
+  updated_at: string;
+};
+
+export type BusinessPayment = {
+  id: string;
+  business_id: string;
+  plan: "basic" | "plus";
+  source: BusinessPaymentSource;
+  amount_cents: number;
+  currency: string;
+  months: number;
+  period_start: string;
+  period_end: string;
+  stripe_session_id: string | null;
+  stripe_invoice_id: string | null;
+  note: string;
+  created_by: string | null;
+  created_at: string;
+};
+
 /** Слайд на екран с шаблон „Слайдове“: снимка или видео на цял екран с надпис. */
 export type BusinessDisplaySlide = {
   id: string;
@@ -1455,6 +1485,18 @@ export type Database = {
         Row: BusinessDisplayCategory;
         Insert: BusinessDisplayCategory;
         Update: Partial<BusinessDisplayCategory>;
+        Relationships: [];
+      };
+      business_billing: {
+        Row: BusinessBilling;
+        Insert: Partial<BusinessBilling> & Pick<BusinessBilling, "business_id">;
+        Update: Partial<BusinessBilling>;
+        Relationships: [];
+      };
+      business_payments: {
+        Row: BusinessPayment;
+        Insert: Partial<BusinessPayment> & Pick<BusinessPayment, "business_id" | "source" | "amount_cents" | "period_start" | "period_end">;
+        Update: Partial<BusinessPayment>;
         Relationships: [];
       };
       business_display_slides: {

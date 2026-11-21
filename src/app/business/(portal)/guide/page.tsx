@@ -286,6 +286,32 @@ export default async function BusinessGuidePage() {
             </p>
           </GuideDetails>
         </GuideSection>
+
+        <GuideSection number="8" title="Абонамент">
+          <GuideSummary>
+            <p>План „Бизнес“ струва 10 € на месец и отключва всичко в портала. В менюто вляво до „Абонамент“ пише до кога е платен.</p>
+            <ol className="list-decimal space-y-1 pl-5">
+              <li>Отвори „Абонамент“ и натисни „Абонирай се“.</li>
+              <li>Избери „Месечен абонамент“ (картата се таксува сама всеки месец) или „Плати един месец“ (веднъж).</li>
+              <li>Плащаш на страницата на Stripe и се връщаш в портала. Там пише „Платен до …“.</li>
+              <li>Месечният абонамент се спира с „Спри абонамента“. Остава активен до края на платения месец.</li>
+            </ol>
+            <p>Ако си платил в брой или по банка, Bansko NOW го отбелязва и то също се вижда в „Плащания“.</p>
+          </GuideSummary>
+          <p>
+            <Link href="/business/subscription" className="font-semibold text-forest underline underline-offset-4">
+              Отвори „Абонамент“
+            </Link>
+          </p>
+          <GuideDetails title="Подробно: как се записва плащането">
+            <p>
+              Плащането е през Stripe Checkout (картата не минава през Bansko NOW). След плащане порталът проверява сесията в Stripe и
+              записва плащането в <code>business_payments</code>; „платен до“ е в <code>business_billing.paid_until</code>. Новият месец
+              почва от днес или от края на текущия платен период. Месечните подновявания идват от Stripe през{" "}
+              <code>/api/stripe/business-billing</code>. Засега нищо не се заключва, ако абонаментът изтече.
+            </p>
+          </GuideDetails>
+        </GuideSection>
       </section>
 
       <p className="text-sm text-stone-650">

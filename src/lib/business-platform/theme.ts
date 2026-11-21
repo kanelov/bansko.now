@@ -424,7 +424,7 @@ type Client = SupabaseClient<Database>;
 
 /** Публичните адреси на медия в R2 - копие на businessMediaUrls(), без да дърпа "server-only" модула тук. */
 function publicMediaUrls(media: { original_key: string; variant_keys: Json }): BusinessMediaUrls {
-  const base = (process.env.PHOTO_PUBLIC_BASE_URL || "").replace(/\/$/, "");
+  const base = (process.env.BUSINESS_MEDIA_PUBLIC_BASE_URL || process.env.PHOTO_PUBLIC_BASE_URL || "").replace(/\/$/, "");
   const url = (key: string | null | undefined) => (key && base && !key.startsWith("photos/private/") ? `${base}/${key.replace(/^\//, "")}` : null);
   const variants = (media.variant_keys ?? {}) as Record<string, string>;
   return { original: url(media.original_key), w480: url(variants["480"]), w960: url(variants["960"]), w1600: url(variants["1600"]) };

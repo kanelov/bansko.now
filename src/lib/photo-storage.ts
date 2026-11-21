@@ -117,6 +117,27 @@ export async function objectExists(key: string) {
   return response.ok;
 }
 
+/**
+ * Слага „пази в кеша за година“ на вече качен обект (копие върху себе си с
+ * нови метаданни). Файловете, качени от браузъра с подписан адрес, идват без
+ * Cache-Control; без това телевизорът тегли видеото наново всеки път.
+ */
+export async function setImmutableCacheControl(key: string, contentType: string) {
+  const response = await client().fetch(objectUrl(key), {
+    method: "PUT",
+    headers: {
+      "x-amz-copy-source": `/${r2BucketName}/${key.replace(/^\//, "")}`,
+      "x-amz-metadata-directive": "REPLACE",
+      "Content-Type": contentType,
+      "Cache-Control": "public, max-age=31536000, immutable"
+    }
+  });
+  if (!response.ok) {
+    const detail = await response.text().catch(() => "");
+    throw new Error(`R2 cache update failed (${response.status}) for ${key}${detail ? `: ${detail.slice(0, 200)}` : ""}`);
+  }
+}
+
 /** Размер и тип на качен обект, без да се тегли (проверка след подписан PUT от браузъра). */
 export async function headObject(key: string) {
   const response = await client().fetch(objectUrl(key), { method: "HEAD" });

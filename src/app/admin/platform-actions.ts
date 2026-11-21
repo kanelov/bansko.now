@@ -11,6 +11,7 @@ import { revalidateBusinessPublic } from "@/lib/business-platform/revalidate";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { requireAdmin } from "@/lib/supabase/auth";
 import type { BusinessPlatformStatus } from "@/lib/types";
+import { businessPlans, recordBusinessPayment } from "@/lib/business-platform/billing";
 
 /**
  * Управлението на Бизнес платформата от админа: статус, план, модули и
@@ -113,6 +114,41 @@ export async function openBusinessPortalAction(formData: FormData) {
   const store = await cookies();
   store.set(currentBusinessCookie, businessId, currentBusinessCookieOptions());
   redirect("/business");
+}
+
+/**
+ * „Маркирай като платен“: плащане в брой, по банка или каквото не е минало
+ * през Stripe. Удължава „платен до“ с избраните месеци (от днес или от края
+ * на текущия период) и остава в историята като „Отбелязано от Bansko NOW“.
+ */
+export async function markBusinessPaidAction(formData: FormData) {
+  const { supabase, claims } = await requireAdmin();
+  const businessId = businessIdValue(formData);
+  const months = Math.min(12, Math.max(1, Number.parseInt(stringValue(formData, "months"), 10) || 1));
+  const amountText = stringValue(formData, "amount").replace(",", ".");
+  const amount = amountText ? Math.round(Number(amountText) * 100) : businessPlans.basic.priceCents * months;
+  const note = stringValue(formData, "note").slice(0, 300);
+
+  if (!businessId || !Number.isFinite(amount) || amount < 0) {
+    redirect(`${platformPath}?error=${encodeURIComponent("Провери месеците и сумата.")}`);
+  }
+
+  try {
+    await recordBusinessPayment(supabase, {
+      businessId,
+      source: "manual",
+      amountCents: amount,
+      months,
+      note,
+      createdBy: typeof (claims as { sub?: unknown } | null)?.sub === "string" ? ((claims as { sub: string }).sub) : null
+    });
+  } catch (error) {
+    redirect(`${platformPath}?error=${encodeURIComponent(error instanceof Error ? error.message : "Плащането не се записа.")}#b-${businessId}`);
+  }
+
+  revalidatePath(platformPath);
+  revalidatePath("/business/subscription");
+  redirect(`${platformPath}?saved=paid#b-${businessId}`);
 }
 
 export async function savePlatformSettingsAction(formData: FormData) {

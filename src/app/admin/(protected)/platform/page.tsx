@@ -1,6 +1,7 @@
 import Link from "next/link";
 import {
   createPlatformBusinessAction,
+  markBusinessPaidAction,
   openBusinessPortalAction,
   removeBusinessMemberAction,
   saveBusinessModulesAction,
@@ -10,12 +11,14 @@ import { BusinessVideoUploader } from "@/components/admin/business-video-uploade
 import { AddOwnerForm, ResetPasswordForm } from "@/components/admin/platform-owner-forms";
 import { getPlatformBusinesses, getPlatformCategoryOptions, manageableModules, platformStatusOptions } from "@/lib/business-platform/admin";
 import { siteUrl } from "@/lib/env";
+import { businessPlans, formatBgDate, formatEuro, todayIso } from "@/lib/business-platform/billing";
 
 type SearchParams = Promise<{ saved?: string; error?: string }>;
 
 const savedMessages: Record<string, string> = {
   status: "Статусът на платформата е записан.",
   modules: "Модулите са записани.",
+  paid: "Плащането е записано и абонаментът е удължен.",
   member: "Собственикът е премахнат от бизнеса.",
   created: "Бизнесът е създаден като чернова. Довърши профила и го одобри в „Бизнеси“, после тук го направи „Активна“ и добави собственик."
 };
@@ -137,6 +140,55 @@ export default async function AdminPlatformPage({ searchParams }: { searchParams
                     <input name="plan" defaultValue={business.plan ?? "free"} maxLength={40} className="rounded-xl border border-[var(--admin-line)] bg-white px-3 py-2 text-sm" />
                   </label>
                   <button className="admin-button admin-button-primary w-fit px-4 py-2 text-sm font-semibold">Запази статуса</button>
+                </form>
+
+                <form action={markBusinessPaidAction} className={panelClass}>
+                  <input type="hidden" name="business_id" value={business.id} />
+                  <p className="text-sm font-semibold">Абонамент</p>
+                  <p className="text-sm">
+                    {business.billing.paidUntil && business.billing.paidUntil >= todayIso() ? (
+                      <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-xs font-semibold text-emerald-900">Платен до {formatBgDate(business.billing.paidUntil)}</span>
+                    ) : (
+                      <span className="rounded-full bg-red-100 px-2 py-0.5 text-xs font-semibold text-red-900">
+                        {business.billing.paidUntil ? `Изтекъл на ${formatBgDate(business.billing.paidUntil)}` : "Неплатен"}
+                      </span>
+                    )}
+                    {business.billing.subscriptionStatus === "active" ? <span className="ml-2 text-xs text-[var(--admin-muted)]">месечен абонамент в Stripe</span> : null}
+                    {business.billing.subscriptionStatus === "canceling" ? <span className="ml-2 text-xs text-[var(--admin-muted)]">абонаментът е спрян, изтича в края на месеца</span> : null}
+                    {business.billing.subscriptionStatus === "past_due" ? <span className="ml-2 text-xs text-red-700">последното плащане в Stripe не мина</span> : null}
+                  </p>
+                  {business.billing.payments.length ? (
+                    <ul className="grid gap-1 text-xs text-[var(--admin-muted)]">
+                      {business.billing.payments.map((payment) => (
+                        <li key={payment.id}>
+                          {formatBgDate(payment.periodStart)} – {formatBgDate(payment.periodEnd)} · {formatEuro(payment.amountCents)} ·{" "}
+                          {payment.source === "manual" ? "ръчно" : payment.source === "stripe_subscription" ? "абонамент" : "еднократно"}
+                          {payment.note ? ` · ${payment.note}` : ""}
+                        </li>
+                      ))}
+                    </ul>
+                  ) : null}
+                  <div className="flex flex-wrap items-end gap-2 text-sm">
+                    <label className="grid gap-1">
+                      <span className="text-xs text-[var(--admin-muted)]">Месеци</span>
+                      <select name="months" defaultValue="1" className="rounded-lg border border-[var(--admin-line)] px-2 py-1.5">
+                        {[1, 2, 3, 6, 12].map((value) => (
+                          <option key={value} value={value}>
+                            {value}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="grid gap-1">
+                      <span className="text-xs text-[var(--admin-muted)]">Сума в € (празно = {formatEuro(businessPlans.basic.priceCents)} на месец)</span>
+                      <input name="amount" inputMode="decimal" placeholder="10" className="w-28 rounded-lg border border-[var(--admin-line)] px-2 py-1.5" />
+                    </label>
+                    <label className="grid min-w-40 flex-1 gap-1">
+                      <span className="text-xs text-[var(--admin-muted)]">Бележка</span>
+                      <input name="note" maxLength={300} placeholder="в брой, по банка…" className="rounded-lg border border-[var(--admin-line)] px-2 py-1.5" />
+                    </label>
+                  </div>
+                  <button className="admin-button admin-button-primary w-fit px-4 py-2 text-sm font-semibold">Маркирай като платен</button>
                 </form>
 
                 <form action={saveBusinessModulesAction} className={panelClass}>
