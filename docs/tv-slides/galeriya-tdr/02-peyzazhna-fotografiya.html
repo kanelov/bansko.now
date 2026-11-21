@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="bg">
+<head>
+<meta charset="utf-8">
+<title>Галерия TDR – пейзажна фотография</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;1,500&family=Inter:wght@400;500;600&display=swap">
+<style>
+  html, body { margin: 0; height: 100%; overflow: hidden; background: #1d1a17; }
+  body { font-family: Inter, "Segoe UI", Arial, sans-serif; color: #f6efe6; }
+  .stage { position: absolute; left: 6vh; top: 6vh; width: 88vh; height: 88vh; overflow: hidden; box-shadow: 0 4vh 9vh rgba(0,0,0,.45); }
+  .shot { position: absolute; left: 0; top: 0; width: 100%; height: 100%; background: #2a2622 center / cover no-repeat; opacity: 0; transition: opacity 1.4s ease; }
+  .shot.on { opacity: 1; animation: zoom 6s ease-out forwards; }
+  @keyframes zoom { from { transform: scale(1.0); } to { transform: scale(1.07); } }
+  .text { position: absolute; left: 104vh; right: 8vh; top: 0; bottom: 0; display: flex; flex-direction: column; justify-content: center; }
+  .kicker { font-size: 2.3vh; font-weight: 600; letter-spacing: .4em; text-transform: uppercase; color: #f0a46e; opacity: 0; animation: up .9s .2s ease-out forwards; }
+  h1 { margin: 2.5vh 0 0; font-family: "Playfair Display", Georgia, serif; font-weight: 600; font-size: 10vh; line-height: 1; opacity: 0; animation: up 1s .5s ease-out forwards; }
+  .lead { margin: 4vh 0 0; font-size: 3.4vh; line-height: 1.45; color: #d9cfc3; max-width: 70vh; opacity: 0; animation: up 1s .9s ease-out forwards; }
+  .caption { margin-top: 7vh; padding-top: 3vh; border-top: .2vh solid rgba(246,239,230,.25); font-family: "Playfair Display", Georgia, serif; font-style: italic; font-size: 3.6vh; min-height: 9vh; transition: opacity .6s ease; }
+  .dots { margin-top: 3vh; }
+  .dots i { display: inline-block; width: 1.2vh; height: 1.2vh; margin-right: 1.2vh; border-radius: 50%; background: rgba(246,239,230,.3); transition: background .6s ease; }
+  .dots i.on { background: #f0a46e; }
+  @keyframes up { from { opacity: 0; transform: translateY(3vh); } to { opacity: 1; transform: none; } }
+</style>
+</head>
+<body>
+  <div class="stage" id="stage"></div>
+  <div class="text">
+    <div class="kicker">Галерия TDR · Банско</div>
+    <h1>Пейзажна фотография</h1>
+    <p class="lead">Планински езера, залези и заснежени върхове – отпечатани и поставени в рамка, готови за стената.</p>
+    <div class="caption" id="caption"></div>
+    <div class="dots" id="dots"></div>
+  </div>
+<script>
+  /* ES5 – браузърът на телевизора е стар. Четири кадъра за около 15 секунди. */
+  var shots = [
+    { src: "https://cdn.bansko.now/shop/LNK4309_frame.webp", text: "Огнени облаци, отразени в планинско езеро" },
+    { src: "https://cdn.bansko.now/shop/LNK1198_frame.webp", text: "Млечният път над планинско езеро" },
+    { src: "https://cdn.bansko.now/shop/LNK3167_frame.webp", text: "Огрени върхове, отразени в езеро" },
+    { src: "https://cdn.bansko.now/shop/LNK4489_frame.webp", text: "Заснежен планински склон под синьо небе" }
+  ];
+  var stage = document.getElementById("stage"), caption = document.getElementById("caption"), dots = document.getElementById("dots");
+  var layers = [], marks = [], i;
+  for (i = 0; i < shots.length; i++) {
+    var layer = document.createElement("div");
+    layer.className = "shot";
+    layer.style.backgroundImage = "url(" + shots[i].src + ")";
+    stage.appendChild(layer); layers.push(layer);
+    var dot = document.createElement("i"); dots.appendChild(dot); marks.push(dot);
+  }
+  var current = -1;
+  function show(n) {
+    if (current >= 0) { layers[current].className = "shot"; marks[current].className = ""; }
+    current = n;
+    layers[n].className = "shot on"; marks[n].className = "on";
+    caption.style.opacity = 0;
+    setTimeout(function () { caption.innerHTML = shots[n].text; caption.style.opacity = 1; }, 400);
+  }
+  show(0);
+  setInterval(function () { show((current + 1) % shots.length); }, 3800);
+</script>
+</body>
+</html>

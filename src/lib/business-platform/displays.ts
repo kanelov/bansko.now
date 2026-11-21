@@ -107,7 +107,7 @@ export async function getDisplayForEdit(supabase: Client, businessId: string, id
     supabase.from("business_display_categories").select("category_id, sort_order").eq("display_id", display.id).order("sort_order"),
     supabase
       .from("business_display_slides")
-      .select("media_id, title, subtitle, duration_seconds, sort_order")
+      .select("kind, media_id, html, title, subtitle, duration_seconds, sort_order")
       .eq("display_id", display.id)
       .eq("business_id", businessId)
       .order("sort_order")
@@ -117,7 +117,9 @@ export async function getDisplayForEdit(supabase: Client, businessId: string, id
     ...display,
     categoryIds: (links ?? []).map((link) => link.category_id),
     slides: (slides ?? []).map((slide) => ({
-      mediaId: slide.media_id,
+      kind: slide.kind === "html" ? ("html" as const) : ("media" as const),
+      mediaId: slide.media_id ?? "",
+      html: slide.html ?? "",
       title: slide.title,
       subtitle: slide.subtitle,
       duration: slide.duration_seconds
@@ -172,7 +174,9 @@ export async function listBusinessVideosForAdmin(): Promise<Map<string, AdminBus
 /* ----------------------------------------------------------- телевизорът */
 
 export type PublicDisplaySlide = {
-  mediaType: BusinessMediaType;
+  kind: "media" | "html";
+  html: string;
+  mediaType: BusinessMediaType | null;
   alt: string | null;
   urls: BusinessMediaUrls;
   title: string;
@@ -213,7 +217,17 @@ type DisplayPayload = {
   content_version: number;
   category_ids: string[];
   media: { media_type: BusinessMediaType; original_key: string; variant_keys: Json; alt: string | null } | null;
-  slides?: { media_type: BusinessMediaType; original_key: string; variant_keys: Json; alt: string | null; title: string; subtitle: string; duration: number }[];
+  slides?: {
+    kind?: string;
+    html?: string | null;
+    media_type: BusinessMediaType | null;
+    original_key: string | null;
+    variant_keys: Json;
+    alt: string | null;
+    title: string;
+    subtitle: string;
+    duration: number;
+  }[];
   branding?: Json;
   logo?: { original_key: string; variant_keys: Json; alt: string | null } | null;
 };
@@ -252,9 +266,13 @@ export async function getDisplayByToken(token: string): Promise<PublicDisplay | 
       : null,
     slides: Array.isArray(payload.slides)
       ? payload.slides.map((slide) => ({
+          kind: slide.kind === "html" ? ("html" as const) : ("media" as const),
+          html: slide.kind === "html" ? slide.html ?? "" : "",
           mediaType: slide.media_type,
           alt: slide.alt,
-          urls: businessMediaUrls({ original_key: slide.original_key, variant_keys: slide.variant_keys }),
+          urls: slide.original_key
+            ? businessMediaUrls({ original_key: slide.original_key, variant_keys: slide.variant_keys })
+            : { original: null, w480: null, w960: null, w1600: null },
           title: slide.title ?? "",
           subtitle: slide.subtitle ?? "",
           duration: Number(slide.duration) || slideDurationDefault

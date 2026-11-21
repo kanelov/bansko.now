@@ -911,7 +911,10 @@ export type BusinessDisplaySlide = {
   id: string;
   display_id: string;
   business_id: string;
-  media_id: string;
+  /** media = снимка или видео (media_id); html = готова страница в затворена рамка (html). */
+  kind: "media" | "html";
+  media_id: string | null;
+  html: string | null;
   title: string;
   subtitle: string;
   duration_seconds: number;
@@ -1456,7 +1459,7 @@ export type Database = {
       };
       business_display_slides: {
         Row: BusinessDisplaySlide;
-        Insert: Partial<BusinessDisplaySlide> & Pick<BusinessDisplaySlide, "display_id" | "business_id" | "media_id">;
+        Insert: Partial<BusinessDisplaySlide> & Pick<BusinessDisplaySlide, "display_id" | "business_id">;
         Update: Partial<BusinessDisplaySlide>;
         Relationships: [];
       };

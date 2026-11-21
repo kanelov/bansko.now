@@ -82,7 +82,7 @@ export function DisplayMediaField({
       }
       setItems((current) => [...added.reverse(), ...current]);
       if (template === "slides") {
-        setSlides((current) => [...current, ...added.reverse().map((item) => ({ mediaId: item.id, title: "", subtitle: "", duration: slideDurationDefault }))]);
+        setSlides((current) => [...current, ...added.reverse().map((item) => ({ kind: "media" as const, mediaId: item.id, html: "", title: "", subtitle: "", duration: slideDurationDefault }))]);
       } else {
         setSelected(added[0].id);
       }

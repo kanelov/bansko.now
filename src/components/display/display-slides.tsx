@@ -16,14 +16,19 @@ export function DisplaySlides({ slides, businessName }: { slides: PublicDisplayS
       {slides.map((slide, index) => {
         const image = slide.urls.w1600 ?? slide.urls.original ?? "";
         const hasText = Boolean(slide.title || slide.subtitle);
+        const kind = slide.kind === "html" ? "html" : slide.mediaType ?? "image";
         return (
           <section
             key={index}
             className={index === 0 ? "display-slide is-active" : "display-slide"}
-            data-kind={slide.mediaType}
+            data-kind={kind}
             data-duration={slide.duration}
           >
-            {slide.mediaType === "video" ? (
+            {slide.kind === "html" ? (
+              /* Затворена рамка: скриптовете вървят, но без достъп до bansko.now, бисквитки и навигация.
+                 Съдържанието се слага от скрипта на телевизора, когато слайдът е на ред (анимацията почва отначало). */
+              <iframe title={slide.title || businessName} sandbox="allow-scripts" data-html={slide.html} tabIndex={-1} />
+            ) : slide.mediaType === "video" ? (
               <video data-src={slide.urls.original ?? ""} muted playsInline preload="none" />
             ) : image ? (
               // eslint-disable-next-line @next/next/no-img-element

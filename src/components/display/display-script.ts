@@ -12,7 +12,9 @@
  * Шаблон „Слайдове“: показва по един слайд; снимката стои data-duration
  * секунди, видеото върви до края си (най-много 10 минути, ако не съобщи края).
  * Адресът на видеото се слага чак когато е на ред и се маха след това.
- * Един-единствен слайд-видео се върти в цикъл.
+ * Един-единствен слайд-видео се върти в цикъл. HTML слайдът е <iframe
+ * sandbox> със съдържание в data-html; слага се при показване и се маха
+ * след това, за да почне анимацията отначало и да не яде памет.
  */
 export const displayScript = `
 (function () {
@@ -76,7 +78,14 @@ export const displayScript = `
       return list.length ? list[0] : null;
     };
 
+    var frameOf = function (slide) {
+      var list = slide.getElementsByTagName('iframe');
+      return list.length ? list[0] : null;
+    };
+
     var stop = function (slide) {
+      var frame = frameOf(slide);
+      if (frame) { frame.removeAttribute('srcdoc'); }
       var video = videoOf(slide);
       if (video) {
         video.onended = null;
@@ -96,6 +105,10 @@ export const displayScript = `
         stop(previous);
       }
       slide.className = 'display-slide is-active';
+      var frame = frameOf(slide);
+      if (frame && (!frame.getAttribute('srcdoc') || slides.length > 1)) {
+        frame.setAttribute('srcdoc', frame.getAttribute('data-html') || '');
+      }
       var video = videoOf(slide);
       if (video) {
         var single = slides.length === 1;

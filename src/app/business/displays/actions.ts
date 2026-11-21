@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireBusinessOwner } from "@/lib/business-platform/auth";
 import { generateDisplayToken, generateShortCode, slideDurationDefault, slideDurationMax, slideDurationMin } from "@/lib/business-platform/displays";
+import { slideHtmlMaxLength } from "@/lib/business-platform/display-slides";
 import {
   businessMediaConfigured,
   businessMediaUrls,
@@ -41,7 +42,8 @@ function idValue(formData: FormData, key: string) {
   return uuidPattern.test(value) ? value : null;
 }
 
-type SlideInput = { mediaId: string; title: string; subtitle: string; duration: number };
+type SlideInput = { kind: "media" | "html"; mediaId: string; html: string; title: string; subtitle: string; duration: number };
+const maxSlidesHtmlTotal = 3_000_000;
 
 /** Слайдовете идват като JSON от клиентското поле; приема се само познат вид и граници. */
 function slidesValue(formData: FormData): SlideInput[] | null {
@@ -53,8 +55,12 @@ function slidesValue(formData: FormData): SlideInput[] | null {
     return parsed.slice(0, maxSlides).map((item) => {
       const entry = (item ?? {}) as Record<string, unknown>;
       const duration = Math.round(Number(entry.duration));
+      const kind = entry.kind === "html" ? "html" : "media";
+      const html = kind === "html" && typeof entry.html === "string" ? entry.html.trim() : "";
       return {
-        mediaId: typeof entry.mediaId === "string" && uuidPattern.test(entry.mediaId) ? entry.mediaId : "",
+        kind,
+        html: html.length <= slideHtmlMaxLength ? html : "",
+        mediaId: kind === "media" && typeof entry.mediaId === "string" && uuidPattern.test(entry.mediaId) ? entry.mediaId : "",
         title: typeof entry.title === "string" ? entry.title.trim().slice(0, 80) : "",
         subtitle: typeof entry.subtitle === "string" ? entry.subtitle.trim().slice(0, 160) : "",
         duration: Number.isFinite(duration) ? Math.min(slideDurationMax, Math.max(slideDurationMin, duration)) : slideDurationDefault
@@ -91,12 +97,15 @@ export async function saveDisplayAction(formData: FormData) {
   if (!themes.includes(theme)) redirect(withError(formPath, "template"));
   const slides = template === "slides" ? slidesValue(formData) : [];
   if (template === "slides") {
-    if (!slides || slides.some((slide) => !slide.mediaId)) redirect(withError(formPath, "slides"));
+    if (!slides || slides.some((slide) => (slide.kind === "html" ? !slide.html : !slide.mediaId))) redirect(withError(formPath, "slides"));
     if (slides.length === 0) redirect(withError(formPath, "slides-empty"));
+    if (slides.reduce((sum, slide) => sum + slide.html.length, 0) > maxSlidesHtmlTotal) redirect(withError(formPath, "slides-html-size"));
     /* Всяка медия на слайд трябва да е на този бизнес. */
-    const ids = Array.from(new Set(slides.map((slide) => slide.mediaId)));
-    const { data: owned } = await supabase.from("business_media").select("id").eq("business_id", business.businessId).in("id", ids);
-    if ((owned ?? []).length !== ids.length) redirect(withError(formPath, "slides"));
+    const ids = Array.from(new Set(slides.filter((slide) => slide.kind === "media").map((slide) => slide.mediaId)));
+    if (ids.length > 0) {
+      const { data: owned } = await supabase.from("business_media").select("id").eq("business_id", business.businessId).in("id", ids);
+      if ((owned ?? []).length !== ids.length) redirect(withError(formPath, "slides"));
+    }
   }
   if ((template === "menu_image" || template === "menu_video") && !mediaId) redirect(withError(formPath, "media"));
 
@@ -166,7 +175,9 @@ export async function saveDisplayAction(formData: FormData) {
       slides.map((slide, index) => ({
         display_id: displayId as string,
         business_id: business.businessId,
-        media_id: slide.mediaId,
+        kind: slide.kind,
+        media_id: slide.kind === "media" ? slide.mediaId : null,
+        html: slide.kind === "html" ? slide.html : null,
         title: slide.title,
         subtitle: slide.subtitle,
         duration_seconds: slide.duration,
