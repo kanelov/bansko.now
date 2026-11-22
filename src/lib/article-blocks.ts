@@ -32,30 +32,44 @@ export type ArticleBlockPreview = { key: string; toggle: ArticleToggleKey | null
 const artStudioBg = `<section class="article-block article-block--cream">
   <p class="article-block__eyebrow">Арт Студио Канелов · Банско</p>
   <h2 class="article-block__title">Направете си нещо свое от Банско</h2>
-  <p class="article-block__text">Тениски, чаши, възглавници и картини с дизайн, нарисуван на момента, с Ваша снимка или с готов модел. Поръчвате на kanelov.com, взимате от галерията в Банско или с доставка.</p>
-  <div class="article-block__tiles">
-    <a class="article-block__tile" href="https://kanelov.com/teniski/sazday/ideya">{{icon:pen-nib}}<span>Нарисувай на момента</span></a>
-    <a class="article-block__tile" href="https://kanelov.com/studio/produkti">{{icon:image}}<span>Поръчай с твой дизайн</span></a>
-    <a class="article-block__tile" href="https://kanelov.com/teniski#dizayni">{{icon:shirt}}<span>Избери от готовите модели</span></a>
+  <p class="article-block__text">Тениски, чаши, възглавници и картини с Ваша идея, снимка или готов модел. Поръчвате на kanelov.com, взимате от галерията в Банско или с доставка.</p>
+  <div class="article-block__ways">
+    <a class="article-block__way" href="https://kanelov.com/teniski/sazday/ideya"><span class="article-block__blob" style="background-color:#f2cd6c"><img src="/art-studio/ukrasa-ideya.webp" alt="" width="120" height="120" loading="lazy"></span><strong>Нарисувай на момента</strong><span>Опишете идеята си и дизайнът се рисува пред очите Ви.</span><em>Поръчай на kanelov.com{{icon:arrow-right}}</em></a>
+    <a class="article-block__way" href="https://kanelov.com/studio/produkti"><span class="article-block__blob" style="background-color:#bfdeea"><img src="/art-studio/za-sebe.webp" alt="" width="120" height="120" loading="lazy"></span><strong>Поръчай с твой дизайн</strong><span>Качете своя снимка, рисунка или лого.</span><em>Поръчай на kanelov.com{{icon:arrow-right}}</em></a>
+    <a class="article-block__way" href="https://kanelov.com/teniski#dizayni"><span class="article-block__blob" style="background-color:#b5d1aa"><img src="/art-studio/stapka-dizain.webp" alt="" width="120" height="120" loading="lazy"></span><strong>Избери от готовите модели</strong><span>Надписи, поводи, животни и Пирин.</span><em>Поръчай на kanelov.com{{icon:arrow-right}}</em></a>
+  </div>
+  <div class="article-block__products">
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/teniska"><span class="article-block__blob article-block__blob--small" style="background-color:#f2cd6c"><img src="/art-studio/teniska.webp" alt="" width="64" height="64" loading="lazy"></span><span>Тениски</span></a>
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/chasha"><span class="article-block__blob article-block__blob--small" style="background-color:#f0b593"><img src="/art-studio/chasha.webp" alt="" width="64" height="64" loading="lazy"></span><span>Чаши</span></a>
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/vazglavnitsa"><span class="article-block__blob article-block__blob--small" style="background-color:#d3c4ee"><img src="/art-studio/vazglavnitsa.webp" alt="" width="64" height="64" loading="lazy"></span><span>Възглавници</span></a>
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/print-hartia"><span class="article-block__blob article-block__blob--small" style="background-color:#b5d1aa"><img src="/art-studio/print-hartia.webp" alt="" width="64" height="64" loading="lazy"></span><span>Принтове</span></a>
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/kanava"><span class="article-block__blob article-block__blob--small" style="background-color:#a6cfe2"><img src="/art-studio/kanava.webp" alt="" width="64" height="64" loading="lazy"></span><span>Канави</span></a>
   </div>
   <div class="article-block__actions">
-    <a class="article-block__button article-block__button--primary" href="https://kanelov.com/studio/produkti">{{icon:palette}}Поръчай на kanelov.com</a>
-    <a class="article-block__button article-block__button--ghost" href="{{path:/art-studio/gallery}}">{{icon:bag-shopping}}Готовите дизайни в галерията</a>
+    <a class="article-block__button article-block__button--primary" href="https://kanelov.com/studio/produkti">Поръчай на kanelov.com{{icon:arrow-right}}</a>
+    <a class="article-block__button article-block__button--ghost" href="{{path:/art-studio}}">Как се поръчва{{icon:arrow-right}}</a>
   </div>
 </section>`;
 
 const artStudioEn = `<section class="article-block article-block--cream">
   <p class="article-block__eyebrow">Kanelov Art Studio · Bansko</p>
   <h2 class="article-block__title">Make something of your own from Bansko</h2>
-  <p class="article-block__text">T-shirts, mugs, cushions and prints with a design drawn on the spot, your own photo or a ready-made design. Order on kanelov.com, pick up at the gallery in Bansko or have it delivered.</p>
-  <div class="article-block__tiles">
-    <a class="article-block__tile" href="https://kanelov.com/teniski/sazday/ideya">{{icon:pen-nib}}<span>Draw it on the spot</span></a>
-    <a class="article-block__tile" href="https://kanelov.com/studio/produkti">{{icon:image}}<span>Order with your design</span></a>
-    <a class="article-block__tile" href="https://kanelov.com/teniski#dizayni">{{icon:shirt}}<span>Pick a ready-made design</span></a>
+  <p class="article-block__text">T-shirts, mugs, cushions and prints with your idea, your photo or a ready-made design. Order on kanelov.com, pick up at the gallery in Bansko or have it delivered.</p>
+  <div class="article-block__ways">
+    <a class="article-block__way" href="https://kanelov.com/teniski/sazday/ideya"><span class="article-block__blob" style="background-color:#f2cd6c"><img src="/art-studio/ukrasa-ideya.webp" alt="" width="120" height="120" loading="lazy"></span><strong>Draw it on the spot</strong><span>Describe your idea and the design is drawn before your eyes.</span><em>Order on kanelov.com{{icon:arrow-right}}</em></a>
+    <a class="article-block__way" href="https://kanelov.com/studio/produkti"><span class="article-block__blob" style="background-color:#bfdeea"><img src="/art-studio/za-sebe.webp" alt="" width="120" height="120" loading="lazy"></span><strong>Order with your design</strong><span>Upload your photo, drawing or logo.</span><em>Order on kanelov.com{{icon:arrow-right}}</em></a>
+    <a class="article-block__way" href="https://kanelov.com/teniski#dizayni"><span class="article-block__blob" style="background-color:#b5d1aa"><img src="/art-studio/stapka-dizain.webp" alt="" width="120" height="120" loading="lazy"></span><strong>Pick a ready-made design</strong><span>Lettering, occasions, animals and Pirin.</span><em>Order on kanelov.com{{icon:arrow-right}}</em></a>
+  </div>
+  <div class="article-block__products">
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/teniska"><span class="article-block__blob article-block__blob--small" style="background-color:#f2cd6c"><img src="/art-studio/teniska.webp" alt="" width="64" height="64" loading="lazy"></span><span>T-shirts</span></a>
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/chasha"><span class="article-block__blob article-block__blob--small" style="background-color:#f0b593"><img src="/art-studio/chasha.webp" alt="" width="64" height="64" loading="lazy"></span><span>Mugs</span></a>
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/vazglavnitsa"><span class="article-block__blob article-block__blob--small" style="background-color:#d3c4ee"><img src="/art-studio/vazglavnitsa.webp" alt="" width="64" height="64" loading="lazy"></span><span>Cushions</span></a>
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/print-hartia"><span class="article-block__blob article-block__blob--small" style="background-color:#b5d1aa"><img src="/art-studio/print-hartia.webp" alt="" width="64" height="64" loading="lazy"></span><span>Prints</span></a>
+    <a class="article-block__product" href="https://kanelov.com/studio/produkti/kanava"><span class="article-block__blob article-block__blob--small" style="background-color:#a6cfe2"><img src="/art-studio/kanava.webp" alt="" width="64" height="64" loading="lazy"></span><span>Canvases</span></a>
   </div>
   <div class="article-block__actions">
-    <a class="article-block__button article-block__button--primary" href="https://kanelov.com/studio/produkti">{{icon:palette}}Order on kanelov.com</a>
-    <a class="article-block__button article-block__button--ghost" href="{{path:/art-studio/gallery}}">{{icon:bag-shopping}}Ready designs in the gallery</a>
+    <a class="article-block__button article-block__button--primary" href="https://kanelov.com/studio/produkti">Order on kanelov.com{{icon:arrow-right}}</a>
+    <a class="article-block__button article-block__button--ghost" href="{{path:/art-studio}}">How ordering works{{icon:arrow-right}}</a>
   </div>
 </section>`;
 
