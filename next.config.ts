@@ -23,6 +23,23 @@ const nextConfig: NextConfig = {
       { source: "/businesses/:path*", destination: "/places/:path*", permanent: true },
       { source: "/en/businesses", destination: "/en/places", permanent: true },
       { source: "/en/businesses/:path*", destination: "/en/places/:path*", permanent: true },
+      // Art Studio е в kanelov.com (2026-11-22): старите страници на видовете продукти водят към същия продукт там.
+      { source: "/art-studio/teniski-po-porachka", destination: "https://kanelov.com/studio/produkti/teniska", permanent: true },
+      { source: "/art-studio/teniski-po-porachka/:path*", destination: "https://kanelov.com/studio/produkti/teniska", permanent: true },
+      { source: "/en/art-studio/custom-tshirts", destination: "https://kanelov.com/studio/produkti/teniska", permanent: true },
+      { source: "/en/art-studio/custom-tshirts/:path*", destination: "https://kanelov.com/studio/produkti/teniska", permanent: true },
+      { source: "/art-studio/fine-art-printove", destination: "https://kanelov.com/studio/produkti/print-hartia", permanent: true },
+      { source: "/art-studio/fine-art-printove/:path*", destination: "https://kanelov.com/studio/produkti/print-hartia", permanent: true },
+      { source: "/en/art-studio/fine-art-prints", destination: "https://kanelov.com/studio/produkti/print-hartia", permanent: true },
+      { source: "/en/art-studio/fine-art-prints/:path*", destination: "https://kanelov.com/studio/produkti/print-hartia", permanent: true },
+      { source: "/art-studio/chashi-i-termosi", destination: "https://kanelov.com/studio/produkti/chasha", permanent: true },
+      { source: "/art-studio/chashi-i-termosi/:path*", destination: "https://kanelov.com/studio/produkti/chasha", permanent: true },
+      { source: "/en/art-studio/mugs-and-drinkware", destination: "https://kanelov.com/studio/produkti/chasha", permanent: true },
+      { source: "/en/art-studio/mugs-and-drinkware/:path*", destination: "https://kanelov.com/studio/produkti/chasha", permanent: true },
+      { source: "/art-studio/ikoni", destination: "https://kanelov.com/studio", permanent: true },
+      { source: "/art-studio/ikoni/:path*", destination: "https://kanelov.com/studio", permanent: true },
+      { source: "/en/art-studio/icons", destination: "https://kanelov.com/studio", permanent: true },
+      { source: "/en/art-studio/icons/:path*", destination: "https://kanelov.com/studio", permanent: true },
       // Articles that used to live under the "art-studio" blog category (shadowed by the shop route).
       {
         source: "/art-studio/izkustvo-ritama-dzhaza-galeriya-art-ideya",

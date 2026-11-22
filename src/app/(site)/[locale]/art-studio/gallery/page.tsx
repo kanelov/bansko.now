@@ -134,7 +134,7 @@ export default async function ArtStudioGalleryPage({
             src="https://cdn.bansko.now/business/f8230326-fec0-4006-aa1d-ba1e59db04c7/image/e7df84db-a516-4458-a96f-6af316d9d090-w1600.webp"
             alt=""
             aria-hidden
-            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-40 saturate-[0.6]"
+            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-55 saturate-[0.6]"
             fetchPriority="high"
           />
           <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-stone-100 via-stone-100/85 to-stone-100/55" />

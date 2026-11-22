@@ -11,7 +11,6 @@
 
 ## Планирани промени
 
-- **Art Studio към kanelov.com (чака одобрение на макета).** `/art-studio` става страница с линкове направо към продуктите в kanelov.com (`/studio/produkti/<teniska|chasha|vazglavnitsa|print-hartia|kanava>`), без собствени продукти; старите `/art-studio/<вид>` пренасочват към същия продукт; нов бизнес „Арт Студио Канелов“ на адреса на галерията. Макет: https://claude.ai/artifact/WC3amWA9zbwuKRL5ybBz15
 - **Абонаменти: Stripe webhook и истинска проверка (напомняне за собственика).** Засега всеки бизнес се води платен (`everyBusinessCountsAsPaid = true` в `src/lib/business-platform/billing.ts`). Когато собственикът реши: (1) в Stripe → Developers → Webhooks да добави `https://bansko.now/api/stripe/business-billing` със събитията `checkout.session.completed`, `invoice.paid`, `customer.subscription.updated`, `customer.subscription.deleted`; (2) ключа `whsec_…` във Vercel като `STRIPE_BUSINESS_WEBHOOK_SECRET`; (3) да се смени флагът на `false`.
 
 - [ ] Импорт на 257 бизнеса от каталога на bansko.bg (подготвен на 2026-10-31, одобрен от собственика; стъпките са в `docs/import-bansko-bg.md`; SQL файлът е при собственика, не в Git). **Блокиран от облачна сесия** (31.10): прокси-то подменя токена към `api.supabase.com` с този на приложението за заявки – да се пусне от компютъра на собственика или да се смени инжектираният токен (виж раздела „Опит за прилагане“ в документа). След него: Yum Spot с адрес/координати и без „Демо“; качване на десетте шаблонни илюстрации в R2 (`docs/biznes-shabloni-snimki.md`; кодът, който ги показва, е готов от 31.10).
@@ -31,6 +30,13 @@
 - Страници, които се рендират при всяка заявка (например `/art-studio/gallery`, `/contact`, формата за бизнеси), винаги показват актуалното меню. Затова промяна може да се види първо там – това е нормално, не е грешка.
 
 ## История
+
+### 2026-11-22 – Art Studio води към kanelov.com
+
+- `/art-studio` (BG и EN) е нова входна страница: три бутона за начина на поръчка („Нарисувай на момента“ → kanelov.com/teniski/sazday/ideya, „Поръчай с твой дизайн“ → kanelov.com/studio/produkti, „Избери от готовите модели“ → kanelov.com/teniski#dizayni), пет продукта с илюстрациите от kanelov.com (`public/art-studio/`), всеки с „Поръчай на kanelov.com →“ към продукта си, адресът на галерията и линк към онлайн галерията. Без продукти и форми в Bansko NOW.
+- Страниците на видовете продукти (`/art-studio/[typeSlug]...`) са махнати; старите адреси пренасочват (301) към същия продукт в kanelov.com (`next.config.ts`), иконите – към kanelov.com/studio. Махнати са и от sitemap. Таблиците `art_studio_*`, старите поръчки и админът остават за справка.
+- Нов бизнес „Арт Студио Канелов“ (`art-studio-kanelov`, EN `kanelov-art-studio`, категория „Магазини“) на адреса на галерията, с линк към kanelov.com/studio.
+- Корицата на `/art-studio/gallery`: снимката е с 15% по-видима (`opacity-55`). Категорията „Фотография“ е със снимката на Кончето в рамка (`LNK8968_frame.webp`).
 
 ### 2026-11-22 – Галерия: снимки на категориите, корица, линкове от Арт Идея
 

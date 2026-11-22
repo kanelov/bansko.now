@@ -782,6 +782,8 @@ The source request app (`https://app.kanelov.com`) has a Content Hub module („
 
 ## 26. Art Studio selling pages and enquiry orders (2026-09-02)
 
+- **Superseded 2026-11-22:** Art Studio orders moved to kanelov.com. `/art-studio` is a static landing page (`src/app/(site)/[locale]/art-studio/page.tsx`, copy in the file, illustrations in `public/art-studio/`) linking to kanelov.com products and the three ways of ordering; the `[typeSlug]` routes were deleted and their old URLs 301 to kanelov.com in `next.config.ts`; they are out of the sitemap. Tables, actions, admin and old orders below are kept for reference only. Business listing „Арт Студио Канелов“ (`art-studio-kanelov`) sits at the gallery address.
+
 - `/art-studio` has no hero: intro + clickable product type cards (`ArtStudioProductTypeCard`, image = type image or first product image), then trust strip, CMS content, gallery collections, services, steps, custom projects, FAQ.
 - `/art-studio/[typeSlug]` is a selling landing page: copy from `art_studio_product_type_translations.content` (Markdown, optional `:::faq`) or defaults in `src/lib/art-studio-copy.ts` keyed by `internal_name`; designs grid; sticky `ArtStudioEnquiryForm`; Product (AggregateOffer), FAQPage, BreadcrumbList and ItemList schema; ISR 15 min with `generateStaticParams`.
 - `/art-studio/[typeSlug]/[productSlug]` uses the same enquiry form (plus product options and price options). Stripe checkout code (`ArtStudioOrderForm`, `createArtStudioOrderAction`, webhook) stays in the repo but is not rendered; the owner chose contact-form ordering.

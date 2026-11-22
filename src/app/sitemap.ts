@@ -1,6 +1,5 @@
 import type { MetadataRoute } from "next";
 import { isComingSoonEnabled } from "@/lib/coming-soon";
-import { getArtStudioProducts, getArtStudioProductTypes } from "@/lib/art-studio";
 import { getBusinessIdsWithPublicMenu } from "@/lib/business-platform/menu";
 import { getApprovedBusinesses } from "@/lib/businesses";
 import { getArticlePath, getCategories, getPublishedArticleCounts, getPublishedArticles } from "@/lib/content";
@@ -40,17 +39,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     return [];
   }
 
-  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, bgProductTypes, enProductTypes, bgProducts, enProducts, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts, photoFeed, photoFacets, businessesWithMenu] = await Promise.all([
+  const [bgCategories, enCategories, bgArticles, enArticles, bgBusinesses, enBusinesses, galleryFeed, bgGalleryCategories, enGalleryCategories, bgCounts, enCounts, photoFeed, photoFacets, businessesWithMenu] = await Promise.all([
     getCategories("bg"),
     getCategories("en"),
     getPublishedArticles({ limit: 500, locale: "bg" }),
     getPublishedArticles({ limit: 500, locale: "en" }),
     getApprovedBusinesses("bg"),
     getApprovedBusinesses("en"),
-    getArtStudioProductTypes({ locale: "bg" }),
-    getArtStudioProductTypes({ locale: "en" }),
-    getArtStudioProducts({ locale: "bg" }),
-    getArtStudioProducts({ locale: "en" }),
     getGallerySitemapProducts(),
     getLocalizedGalleryCategories("bg"),
     getLocalizedGalleryCategories("en"),
@@ -65,8 +60,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const enCategoryById = new Map(enCategories.map((category) => [category.id, category]));
   const articleByGroup = new Map<string, { bg?: (typeof bgArticles)[number]; en?: (typeof enArticles)[number] }>();
   const enBusinessById = new Map(enBusinesses.map((business) => [business.id, business]));
-  const enProductTypeById = new Map(enProductTypes.map((productType) => [productType.id, productType]));
-  const enProductById = new Map(enProducts.map((product) => [product.id, product]));
   const enGalleryCategoryById = new Map(enGalleryCategories.map((category) => [category.id, category]));
 
   for (const article of [...bgArticles, ...enArticles]) {
@@ -128,39 +121,6 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       if (english) entries.push({ ...entries[entries.length - 1], url: localeUrl("en", enMenuPath) });
     }
 
-    return entries;
-  });
-  const artStudioTypeEntries = bgProductTypes.flatMap((productType) => {
-    const english = enProductTypeById.get(productType.id);
-    const bgPath = `/art-studio/${productType.slug}`;
-    const enPath = english ? `/art-studio/${english.slug}` : bgPath;
-    const alternates = english ? languageAlternates(bgPath, enPath) : undefined;
-    const entries: SitemapEntry[] = [{
-      url: localeUrl("bg", bgPath),
-      lastModified: new Date(productType.updated_at),
-      changeFrequency: "weekly",
-      priority: 0.7,
-      images: productType.image_url ? [productType.image_url] : undefined,
-      alternates
-    }];
-    if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
-    return entries;
-  });
-  const artStudioProductEntries = bgProducts.flatMap((product) => {
-    const english = enProductById.get(product.id);
-    const bgPath = `/art-studio/${product.product_type.slug}/${product.slug}`;
-    const enPath = english ? `/art-studio/${english.product_type.slug}/${english.slug}` : bgPath;
-    const alternates = english ? languageAlternates(bgPath, enPath) : undefined;
-    const images = [product.image_url, ...(product.gallery_urls || [])].filter((image): image is string => Boolean(image));
-    const entries: SitemapEntry[] = [{
-      url: localeUrl("bg", bgPath),
-      lastModified: new Date(product.updated_at),
-      changeFrequency: "weekly",
-      priority: 0.75,
-      images: images.length ? images : undefined,
-      alternates
-    }];
-    if (english) entries.push({ ...entries[0], url: localeUrl("en", enPath) });
     return entries;
   });
   const galleryCategoryEntries = bgGalleryCategories.filter((category) => category.product_count > 0).flatMap((category) => {
@@ -234,5 +194,5 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     }));
   });
 
-  return [...staticEntries, ...categoryEntries, ...articleEntries, ...businessEntries, ...artStudioTypeEntries, ...artStudioProductEntries, ...galleryCategoryEntries, ...galleryProductEntries, ...photoCategoryEntries, ...photoEntries];
+  return [...staticEntries, ...categoryEntries, ...articleEntries, ...businessEntries, ...galleryCategoryEntries, ...galleryProductEntries, ...photoCategoryEntries, ...photoEntries];
 }
