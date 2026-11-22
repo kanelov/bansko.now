@@ -146,7 +146,11 @@ export default async function BusinessProfilePage({ params }: { params: Params }
       <main>
         <section className="relative min-h-[58vh] overflow-hidden bg-forest text-white">
           {heroImage ? (
-            <img src={heroImage} alt={business.image_alt || business.name} className="absolute inset-0 h-full w-full object-cover opacity-70" />
+            <img
+              src={heroImage}
+              alt={business.image_alt || business.name}
+              className={`absolute inset-0 h-full w-full object-cover opacity-70 ${business.images?.length ? "" : "saturate-[0.5]"}`}
+            />
           ) : null}
           <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-black/65" />
           <div className="relative mx-auto flex min-h-[58vh] max-w-7xl flex-col justify-end px-4 pb-12 pt-24 sm:px-6 lg:px-8">

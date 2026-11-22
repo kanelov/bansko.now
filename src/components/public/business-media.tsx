@@ -2,7 +2,7 @@ import { getBusinessVideoEmbedUrl } from "@/lib/business-public";
 import type { BusinessWithRelations } from "@/lib/types";
 
 type BusinessMediaProps = {
-  business: Pick<BusinessWithRelations, "name" | "images" | "video_link" | "image_alt" | "placeholder_image_url">;
+  business: Pick<BusinessWithRelations, "name" | "images" | "video_link" | "image_alt" | "placeholder_image_url"> & { category?: string | null };
   className?: string;
   imageClassName?: string;
   preferVideo?: boolean;
@@ -42,11 +42,19 @@ export function BusinessMedia({
     );
   }
 
-  /* Шаблонната илюстрация на категорията (попълнена при четене), докато бизнесът няма своя снимка. */
+  /* Шаблонната илюстрация на категорията (попълнена при четене), докато бизнесът няма своя снимка.
+     Приглушена (по-малко наситени цветове и тъмен преход отдолу) и с името на категорията, за да
+     не спори с истинските снимки и да личи, че е обща картинка (решение на собственика, 22.11.2026). */
   if (business.placeholder_image_url) {
     return (
-      <div className={className}>
-        <img src={business.placeholder_image_url} alt={business.image_alt || business.name} className={imageClassName} loading={loading} />
+      <div className={`${className} relative`}>
+        <img src={business.placeholder_image_url} alt={business.image_alt || business.name} className={`${imageClassName} saturate-[0.5]`} loading={loading} />
+        <div aria-hidden className="pointer-events-none absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-transparent" />
+        {business.category ? (
+          <span className="pointer-events-none absolute bottom-3 left-4 right-4 font-serif text-xl font-semibold text-white drop-shadow-sm">
+            {business.category}
+          </span>
+        ) : null}
       </div>
     );
   }
