@@ -10,6 +10,7 @@ import { usePathname } from "next/navigation";
  */
 const items: { href: string; label: string; ready: boolean; phone?: boolean }[] = [
   { href: "/business", label: "Табло", ready: true },
+  { href: "/business/profile", label: "Профил", ready: true, phone: false },
   { href: "/business/menu", label: "Меню", ready: true },
   { href: "/business/hours", label: "Часове", ready: true },
   { href: "/business/displays", label: "Екрани", ready: true },

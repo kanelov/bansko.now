@@ -202,9 +202,14 @@ function localizeBusiness(business: BusinessWithRelations, translation: Business
     robots_follow: translation.robots_follow,
     schema_type: translation.schema_type,
     image_alt: translation.image_alt,
-    subcategory: translation.subcategory ?? null
+    subcategory: translation.subcategory ?? null,
+    custom_html: translation.custom_html ?? null
   };
 }
+
+/* Колоните на превода за списъците: без собствената HTML част, която трябва само на профила. */
+const businessTranslationListColumns =
+  "business_id,locale,slug,name,category,description,address,image_alt,subcategory,faqs,features,seo_title,seo_description,canonical_url,og_title,og_description,og_image_url,robots_index,robots_follow,schema_type,created_at,updated_at";
 
 /* Карта id → slug на категориите (десет реда), за шаблонните илюстрации. */
 const getBusinessCategorySlugById = cache(async (): Promise<ReadonlyMap<string, string>> => {
@@ -245,7 +250,7 @@ export async function getApprovedBusinesses(locale: Locale = "bg"): Promise<Busi
 
   const { data: translations } = await supabase
     .from("business_translations")
-    .select("*")
+    .select(businessTranslationListColumns)
     .eq("locale", locale)
     .in("business_id", businesses.map((business) => business.id));
   const byId = new Map((translations ?? []).map((translation) => [translation.business_id, translation]));

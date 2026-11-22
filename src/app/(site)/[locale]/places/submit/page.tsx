@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { BusinessSolutionsBanner } from "@/components/public/business-solutions-banner";
 import { BusinessSubmitForm } from "@/components/public/business-submit-form";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
@@ -36,6 +37,7 @@ export default async function SubmitBusinessPage({ searchParams, params }: { sea
     <div>
       <SiteHeader locale={locale} alternateHref={localePath(locale === "bg" ? "en" : "bg", "/places/submit")} />
       <main className="mx-auto grid w-full max-w-5xl gap-10 px-4 py-12 sm:px-6 sm:py-16 lg:px-8">
+        <BusinessSolutionsBanner locale={locale} />
         <header className="mx-auto w-full max-w-4xl text-center sm:text-left">
           <p className="text-sm font-semibold uppercase text-moss">{locale === "en" ? "List a business" : "Добави бизнес"}</p>
           <h1 className="mt-3 max-w-3xl font-serif text-4xl font-semibold leading-tight text-stone-950 sm:text-5xl">

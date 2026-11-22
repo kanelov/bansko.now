@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   title: "Помощ"
 };
 
-const updatedAt = "21 ноември 2026";
+const updatedAt = "22 ноември 2026";
 
 export default async function BusinessGuidePage() {
   const { business } = await requireBusinessOwner();
@@ -301,6 +301,31 @@ export default async function BusinessGuidePage() {
             <p>
               Логото е ред в <code>business_media</code> с вид <code>logo</code> (три размера WebP в R2, прозрачността се пази);
               „Махни логото“ трие реда и файловете. QR кодът взема цвета на акцента, ако е достатъчно тъмен за четене.
+            </p>
+          </GuideDetails>
+        </GuideSection>
+
+        <GuideSection number="9" title="Профил: страницата в каталога">
+          <GuideSummary>
+            <p>„Профил“ е страницата на заведението в каталога на Bansko NOW. Сменяш я сам:</p>
+            <ol className="list-decimal space-y-1 pl-5">
+              <li>Снимки: качи няколко, най-добре хоризонтални. Първата е главната – тя е в картата в каталога и горе в страницата. „Направи главна“ сменя коя е първа.</li>
+              <li>Описание на български и на английски. Без английско описание страницата на английски не се показва.</li>
+              <li>Адрес, телефон, имейл за гостите, сайт, Facebook и Instagram, после „Запази профила“.</li>
+            </ol>
+            <p>Името, адресът на страницата, категорията, премиум мястото и специално оформената част на страницата ги сменя Bansko NOW.</p>
+          </GuideSummary>
+          <p>
+            <Link href="/business/profile" className="font-semibold text-forest underline underline-offset-4">
+              Отвори „Профил“
+            </Link>
+          </p>
+          <GuideDetails title="Подробно: къде се пазят">
+            <p>
+              Текстовете са в <code>businesses</code> и <code>business_translations</code> (по език); снимките се качват в Cloudflare R2 под{" "}
+              <code>business/&lt;бизнес&gt;/</code> (три размера WebP, в <code>business_media</code> с вид <code>gallery</code>), а в профила влиза големият
+              (1600 px). Без своя снимка страницата показва общата илюстрация на категорията. Специално оформената част е в{" "}
+              <code>business_translations.custom_html</code> и базата не позволява на собственика да я сменя.
             </p>
           </GuideDetails>
         </GuideSection>

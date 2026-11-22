@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { BusinessMedia } from "@/components/public/business-media";
 import { businessPrimaryImage } from "@/lib/business-placeholders";
+import { renderArticleBlock } from "@/lib/article-blocks";
 import { SiteBlock } from "@/components/public/site-block";
 import { SiteFooter } from "@/components/public/site-footer";
 import { SiteHeader } from "@/components/public/site-header";
@@ -75,6 +76,8 @@ export default async function BusinessProfilePage({ params }: { params: Params }
   const translation = await getApprovedBusinessTranslation(business.id, alternateLocale);
   const businessUrl = localeUrl(locale, `/places/${business.slug}`);
   const heroImage = businessPrimaryImage(business);
+  /* Собствената HTML част (пише я Bansko NOW): чисти се както блоковете под статиите и разбира същите {{path:}} и {{icon:}}. */
+  const customHtml = business.custom_html ? renderArticleBlock({ html_bg: business.custom_html, html_en: business.custom_html }, locale) : "";
 
   /* Платформата: меню и „отворено сега“ идват от същите таблици като портала. */
   const publicClient = createPublicSupabaseClient();
@@ -191,6 +194,8 @@ export default async function BusinessProfilePage({ params }: { params: Params }
               <p>{business.description}</p>
             </section>
           ) : null}
+
+          {customHtml ? <div className="business-page grid gap-8" dangerouslySetInnerHTML={{ __html: customHtml }} /> : null}
 
           {hasMenu && menu ? (
             <section>

@@ -111,7 +111,12 @@ import {
   faUserShield,
   faUsers,
   faUtensils,
-  faXmark
+  faXmark,
+  faQrcode,
+  faTv,
+  faPrint,
+  faCalendarCheck,
+  faMobileScreenButton
 } from "@fortawesome/free-solid-svg-icons";
 import {
   faFacebookF,
@@ -206,6 +211,11 @@ const iconDefinitions: Record<string, FontAwesomeIconDefinition> = {
   "hot-tub-person": faHotTubPerson,
   horse: faHorse,
   dumbbell: faDumbbell,
+  qrcode: faQrcode,
+  tv: faTv,
+  print: faPrint,
+  "calendar-check": faCalendarCheck,
+  "mobile-screen-button": faMobileScreenButton,
   "cable-car": faCableCar,
   sleigh: faSleigh,
   snowflake: faSnowflake,

@@ -180,6 +180,20 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                       <textarea name="description" defaultValue={business.description ?? ""} rows={4} className="rounded-xl border border-stone-300 px-4 py-3" />
                     </label>
                     <label className="grid gap-2 text-sm font-semibold">
+                      Собствена HTML част на страницата (BG)
+                      <textarea
+                        name="custom_html"
+                        defaultValue={bulgarianTranslationsByBusinessId.get(business.id)?.custom_html ?? ""}
+                        rows={6}
+                        spellCheck={false}
+                        placeholder={'<section class="article-block article-block--cream">…</section>'}
+                        className="rounded-xl border border-stone-300 px-4 py-3 font-mono text-xs"
+                      />
+                      <span className="text-xs font-normal text-[var(--admin-muted)]">
+                        Показва се под описанието на страницата на бизнеса. Класовете са като на блоковете под статиите (article-block…); работят {"{{path:/…}}"} и {"{{icon:…}}"}. Собственикът не може да я променя.
+                      </span>
+                    </label>
+                    <label className="grid gap-2 text-sm font-semibold">
                       Адрес
                       <input name="address" defaultValue={business.address} className="rounded-xl border border-stone-300 px-4 py-3" />
                     </label>
@@ -312,6 +326,14 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                         <input name="address_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.address ?? ""} placeholder="English address" className="rounded-xl border border-stone-300 px-4 py-3" />
                       </div>
                       <textarea name="description_en" defaultValue={englishTranslationsByBusinessId.get(business.id)?.description ?? ""} rows={4} placeholder="English description" className="rounded-xl border border-stone-300 px-4 py-3" />
+                      <textarea
+                        name="custom_html_en"
+                        defaultValue={englishTranslationsByBusinessId.get(business.id)?.custom_html ?? ""}
+                        rows={6}
+                        spellCheck={false}
+                        placeholder="Custom HTML part of the page (EN)"
+                        className="rounded-xl border border-stone-300 px-4 py-3 font-mono text-xs"
+                      />
                       <div className="grid gap-4 md:grid-cols-2">
                         <textarea name="features_input_en" defaultValue={textAreaValue(englishTranslationsByBusinessId.get(business.id)?.features)} rows={4} placeholder="English features, one per line" className="rounded-xl border border-stone-300 px-4 py-3" />
                         <textarea name="faqs_input_en" defaultValue={faqTextAreaValue(englishTranslationsByBusinessId.get(business.id)?.faqs)} rows={4} placeholder="Question | Answer" className="rounded-xl border border-stone-300 px-4 py-3" />

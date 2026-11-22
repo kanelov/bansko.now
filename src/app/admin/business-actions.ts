@@ -255,6 +255,7 @@ export async function updateBusinessAction(formData: FormData) {
     name: stringValue(formData, `name${suffix}`) || payload.name,
     category: categoryNameFor(locale) ?? (stringValue(formData, `category${suffix}`) || payload.category),
     subcategory: stringValue(formData, `subcategory${suffix}`) || null,
+    custom_html: (stringValue(formData, `custom_html${suffix}`) || "").slice(0, 60000) || null,
     description: stringValue(formData, `description${suffix}`),
     address: stringValue(formData, `address${suffix}`) || payload.address,
     faqs: faqLinesValue(formData, `faqs_input${suffix}`),
