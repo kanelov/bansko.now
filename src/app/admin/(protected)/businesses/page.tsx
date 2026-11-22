@@ -2,6 +2,7 @@ import {
   approveBusinessAction,
   deleteBusinessAction,
   markContactMessageAction,
+  moveBusinessImagesToR2Action,
   saveBusinessDirectorySettingsAction,
   updateBusinessAction,
   upsertBusinessPlanAction
@@ -361,6 +362,13 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
                           <img key={image} src={image} alt={business.name} className="aspect-square rounded-xl object-cover" />
                         ))}
                       </div>
+                    ) : null}
+                    {business.images?.some((image) => !image.startsWith("https://cdn.bansko.now/")) ? (
+                      <form action={moveBusinessImagesToR2Action}>
+                        <input type="hidden" name="id" value={business.id} />
+                        <button className="admin-button w-full px-5 py-3 text-sm font-semibold">Премести снимките в Cloudflare</button>
+                        <p className="mt-1 text-xs text-[var(--admin-muted)]">Свива ги до лек WebP и ги тегли от cdn.bansko.now вместо от базата.</p>
+                      </form>
                     ) : null}
                     <form action={approveBusinessAction}>
                       <input type="hidden" name="id" value={business.id} />

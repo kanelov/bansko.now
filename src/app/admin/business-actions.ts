@@ -5,7 +5,9 @@ import { revalidatePath } from "next/cache";
 import { revalidateLocalePath, revalidatePublicPath } from "@/lib/articles-admin";
 import { redirect } from "next/navigation";
 import { sendNotificationEmail } from "@/lib/email";
-import { siteUrl } from "@/lib/env";
+import sharp from "sharp";
+import { businessMediaPublicBaseUrl, siteUrl } from "@/lib/env";
+import { photoStorageConfigured, uploadPhoto } from "@/lib/photo-storage";
 import { slugify } from "@/lib/slug";
 import { requireAdmin } from "@/lib/supabase/auth";
 import type { BusinessPaymentStatus, BusinessStatus, BusinessTier } from "@/lib/types";
@@ -335,6 +337,54 @@ export async function updateBusinessAction(formData: FormData) {
   if (stringValue(formData, "slug_en")) {
     revalidateLocalePath("en", `/places/${stringValue(formData, "slug_en")}`);
   }
+  redirect("/admin/businesses?saved=1");
+}
+
+/**
+ * „Премести снимките в Cloudflare“: всяка снимка на бизнеса, която още не е в R2
+ * (например в Supabase Storage), се сваля, свива се до 1600 px WebP и се
+ * записва под business/<id>/image/. Така картата и профилът не теглят от
+ * базата (egress) и са по-леки. Старите файлове не се трият.
+ */
+export async function moveBusinessImagesToR2Action(formData: FormData) {
+  const { supabase } = await requireAdmin();
+  const id = uuidValue(formData, "id");
+
+  if (!id) {
+    redirect("/admin/businesses?error=missing-id");
+  }
+  if (!photoStorageConfigured() || !businessMediaPublicBaseUrl) {
+    redirect(`/admin/businesses?error=${encodeURIComponent("Cloudflare R2 не е настроен тук.")}`);
+  }
+
+  const { data: business } = await supabase.from("businesses").select("images").eq("id", id).maybeSingle();
+  const images = (business?.images ?? []).filter(Boolean) as string[];
+  const moved: string[] = [];
+
+  for (const url of images) {
+    if (url.startsWith(`${businessMediaPublicBaseUrl}/`)) {
+      moved.push(url);
+      continue;
+    }
+    try {
+      const response = await fetch(url, { signal: AbortSignal.timeout(20000) });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const webp = await sharp(Buffer.from(await response.arrayBuffer()), { failOn: "none" })
+        .rotate()
+        .resize({ width: 1600, withoutEnlargement: true })
+        .webp({ quality: 76, effort: 5 })
+        .toBuffer();
+      const key = `business/${id}/image/${randomUUID()}-w1600.webp`;
+      await uploadPhoto(key, webp, "image/webp");
+      moved.push(`${businessMediaPublicBaseUrl}/${key}`);
+    } catch (error) {
+      console.error("[move business image]", url, error);
+      moved.push(url);
+    }
+  }
+
+  await supabase.from("businesses").update({ images: moved }).eq("id", id);
+  revalidateBusinessPaths();
   redirect("/admin/businesses?saved=1");
 }
 
