@@ -30,34 +30,32 @@ export function isArticleToggleKey(value: unknown): value is ArticleToggleKey {
 export type ArticleBlockPreview = { key: string; toggle: ArticleToggleKey | null; html: Record<Locale, string> };
 
 const artStudioBg = `<section class="article-block article-block--cream">
-  <p class="article-block__eyebrow">Art Studio Банско</p>
-  <h2 class="article-block__title">Направи си нещо свое от Банско</h2>
-  <p class="article-block__text">Тениски, fine art принтове, чаши и икони по поръчка – със собствен дизайн, с твоя снимка или с кадър от Пирин. Печатаме в Банско и потвърждаваме всяка поръчка лично.</p>
+  <p class="article-block__eyebrow">Арт Студио Канелов · Банско</p>
+  <h2 class="article-block__title">Направете си нещо свое от Банско</h2>
+  <p class="article-block__text">Тениски, чаши, възглавници и картини с дизайн, нарисуван на момента, с Ваша снимка или с готов модел. Поръчвате на kanelov.com, взимате от галерията в Банско или с доставка.</p>
   <div class="article-block__tiles">
-    <a class="article-block__tile" href="{{path:/art-studio/teniski-po-porachka}}">{{icon:shirt}}<span>Тениски по поръчка</span></a>
-    <a class="article-block__tile" href="{{path:/art-studio/fine-art-printove}}">{{icon:image}}<span>Fine Art принтове</span></a>
-    <a class="article-block__tile" href="{{path:/art-studio/chashi-i-termosi}}">{{icon:mug-hot}}<span>Чаши и термоси</span></a>
-    <a class="article-block__tile" href="{{path:/art-studio/ikoni}}">{{icon:church}}<span>Икони</span></a>
+    <a class="article-block__tile" href="https://kanelov.com/teniski/sazday/ideya">{{icon:pen-nib}}<span>Нарисувай на момента</span></a>
+    <a class="article-block__tile" href="https://kanelov.com/studio/produkti">{{icon:image}}<span>Поръчай с твой дизайн</span></a>
+    <a class="article-block__tile" href="https://kanelov.com/teniski#dizayni">{{icon:shirt}}<span>Избери от готовите модели</span></a>
   </div>
   <div class="article-block__actions">
-    <a class="article-block__button article-block__button--primary" href="{{path:/art-studio}}">{{icon:palette}}Виж Art Studio</a>
-    <a class="article-block__button article-block__button--ghost" href="{{path:/art-studio/gallery}}">{{icon:bag-shopping}}Готовите продукти в галерията</a>
+    <a class="article-block__button article-block__button--primary" href="https://kanelov.com/studio/produkti">{{icon:palette}}Поръчай на kanelov.com</a>
+    <a class="article-block__button article-block__button--ghost" href="{{path:/art-studio/gallery}}">{{icon:bag-shopping}}Готовите дизайни в галерията</a>
   </div>
 </section>`;
 
 const artStudioEn = `<section class="article-block article-block--cream">
-  <p class="article-block__eyebrow">Art Studio Bansko</p>
+  <p class="article-block__eyebrow">Kanelov Art Studio · Bansko</p>
   <h2 class="article-block__title">Make something of your own from Bansko</h2>
-  <p class="article-block__text">Custom t-shirts, fine art prints, mugs and icons – with your own design, your photo or a shot of Pirin. Printed in Bansko, every order confirmed personally.</p>
+  <p class="article-block__text">T-shirts, mugs, cushions and prints with a design drawn on the spot, your own photo or a ready-made design. Order on kanelov.com, pick up at the gallery in Bansko or have it delivered.</p>
   <div class="article-block__tiles">
-    <a class="article-block__tile" href="{{path:/art-studio/custom-tshirts}}">{{icon:shirt}}<span>Custom T-shirts</span></a>
-    <a class="article-block__tile" href="{{path:/art-studio/fine-art-prints}}">{{icon:image}}<span>Fine Art Prints</span></a>
-    <a class="article-block__tile" href="{{path:/art-studio/mugs-and-drinkware}}">{{icon:mug-hot}}<span>Mugs and Drinkware</span></a>
-    <a class="article-block__tile" href="{{path:/art-studio/icons}}">{{icon:church}}<span>Icons</span></a>
+    <a class="article-block__tile" href="https://kanelov.com/teniski/sazday/ideya">{{icon:pen-nib}}<span>Draw it on the spot</span></a>
+    <a class="article-block__tile" href="https://kanelov.com/studio/produkti">{{icon:image}}<span>Order with your design</span></a>
+    <a class="article-block__tile" href="https://kanelov.com/teniski#dizayni">{{icon:shirt}}<span>Pick a ready-made design</span></a>
   </div>
   <div class="article-block__actions">
-    <a class="article-block__button article-block__button--primary" href="{{path:/art-studio}}">{{icon:palette}}View Art Studio</a>
-    <a class="article-block__button article-block__button--ghost" href="{{path:/art-studio/gallery}}">{{icon:bag-shopping}}Ready products in the gallery</a>
+    <a class="article-block__button article-block__button--primary" href="https://kanelov.com/studio/produkti">{{icon:palette}}Order on kanelov.com</a>
+    <a class="article-block__button article-block__button--ghost" href="{{path:/art-studio/gallery}}">{{icon:bag-shopping}}Ready designs in the gallery</a>
   </div>
 </section>`;
 
