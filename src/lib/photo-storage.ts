@@ -88,8 +88,8 @@ export async function uploadPhoto(key: string, body: Buffer, contentType: string
 }
 
 /** Малък публичен файл със собствен Cache-Control (например сигналът „опресни телевизорите“). */
-export async function putPublicObject(key: string, body: string, contentType: string, cacheControl: string) {
-  const payload = new TextEncoder().encode(body);
+export async function putPublicObject(key: string, body: string | Uint8Array, contentType: string, cacheControl: string) {
+  const payload = typeof body === "string" ? new TextEncoder().encode(body) : new Uint8Array(body);
   const signed = await client().sign(objectUrl(key), {
     method: "PUT",
     body: payload,

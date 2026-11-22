@@ -23,6 +23,21 @@ import {
   getBusinessTierLabel
 } from "@/lib/business-plan-labels";
 import { emailFrom, resendApiKey } from "@/lib/env";
+import { BusinessPlaceholderUploader } from "@/components/admin/business-placeholder-uploader";
+import { businessPlaceholderBaseUrl } from "@/lib/business-placeholders";
+
+const placeholderRows = [
+  { slug: "restaurants", label: "Ресторанти" },
+  { slug: "cafes", label: "Кафета" },
+  { slug: "hotels", label: "Хотели" },
+  { slug: "guest-houses", label: "Къщи за гости" },
+  { slug: "services", label: "Услуги" },
+  { slug: "shops", label: "Магазини" },
+  { slug: "activities", label: "Активности" },
+  { slug: "health-sport", label: "Здраве и спорт" },
+  { slug: "transport", label: "Транспорт" },
+  { slug: "culture", label: "Култура" }
+];
 
 type SearchParams = Promise<{ saved?: string; approved?: string; deleted?: string; error?: string }>;
 
@@ -85,6 +100,17 @@ export default async function AdminBusinessesPage({ searchParams }: { searchPara
           {params.error}
         </div>
       ) : null}
+
+      <details className="grid gap-4 rounded-2xl border border-[var(--admin-line)] bg-[var(--admin-panel)] p-5">
+        <summary className="cursor-pointer text-lg font-semibold">Илюстрации за бизнеси без снимка</summary>
+        <p className="mt-2 max-w-3xl text-sm leading-6 text-[var(--admin-muted)]">
+          По една рисунка на категория. Показва се в каталога, на картата и в профила, докато бизнесът няма своя снимка. Качи PNG,
+          JPEG или WebP (най-добре 3:2, например 1536 × 1024); сайтът я смалява и я записва сам.
+        </p>
+        <div className="mt-4">
+          <BusinessPlaceholderUploader rows={placeholderRows} baseUrl={businessPlaceholderBaseUrl} />
+        </div>
+      </details>
 
       <section className="grid gap-4">
         <div>

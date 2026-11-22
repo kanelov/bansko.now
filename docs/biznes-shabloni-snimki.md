@@ -4,7 +4,26 @@
 показва една обща илюстрация за своя тип бизнес. Илюстрациите са нарочно **нереалистични**
 (рисувани, без лица и без надписи), за да не изглеждат като снимка на конкретното заведение.
 
-## Общ стил (слага се в началото на всеки промпт)
+## Избран стил (22.11.2026): „ретро линия“
+
+Собственикът избра стил А от три проби (ретро линия като рисунките на kanelov.com, линогравюра,
+гваш плакат). Илюстрациите се правят с Codex на Mac-а (`codex exec … "<промпт>"`, вграденият
+генератор на картинки, 1536 × 1024 PNG) и се качват от Админ → „Бизнес каталог“ →
+„Илюстрации за бизнеси без снимка“: сайтът ги смалява до 1536 px WebP (качество 80) и ги записва
+като `business/placeholders/placeholder-<slug>.webp`. Работната папка на Mac-а е
+`~/bansko-now-placeholders` (скриптът `gen.py` с промптовете); след качването се трие.
+
+Стилът, който се слага във всеки промпт:
+
+```
+Style: retro risograph-style illustration with thin dark brown outlines and flat fills slightly
+offset from the lines like a two-pass print, subtle paper grain, mid-century illustration feel,
+warm vintage postcard look. Wide landscape 3:2 (1536x1024). No people, no faces, no text, no
+letters, no numbers, no logos, no signage, no watermark. Palette: warm cream paper (#f4eee2),
+forest green (#1f3d2b), moss green, clay orange, mustard, soft wood tones.
+```
+
+## Първоначален общ стил (16.10.2026, заменен)
 
 ```
 Editorial flat illustration for a mountain-town lifestyle magazine, Bansko, Bulgaria.
