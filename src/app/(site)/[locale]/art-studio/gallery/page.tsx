@@ -128,8 +128,17 @@ export default async function ArtStudioGalleryPage({
         alternateHref={localePath(locale === "bg" ? "en" : "bg", "/art-studio/gallery")}
       />
       <main>
-        <section className="border-b border-stone-200 bg-stone-100 pt-28">
-          <div className="mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
+        <section className="relative isolate overflow-hidden border-b border-stone-200 bg-stone-100 pt-28">
+          {/* Бледа снимка на галерията под светъл слой – текстът остава ясно четим. */}
+          <img
+            src="https://cdn.bansko.now/business/f8230326-fec0-4006-aa1d-ba1e59db04c7/image/e7df84db-a516-4458-a96f-6af316d9d090-w1600.webp"
+            alt=""
+            aria-hidden
+            className="absolute inset-0 -z-10 h-full w-full object-cover opacity-40 saturate-[0.6]"
+            fetchPriority="high"
+          />
+          <div aria-hidden className="absolute inset-0 -z-10 bg-gradient-to-r from-stone-100 via-stone-100/85 to-stone-100/55" />
+          <div className="relative mx-auto max-w-7xl px-4 py-14 sm:px-6 lg:px-8">
             <p className="text-sm font-semibold uppercase text-moss">Art Studio · Bansko NOW</p>
             <h1 className="mt-4 max-w-4xl font-serif text-5xl font-semibold leading-tight text-stone-950 sm:text-7xl">
               {isEnglish ? "Online gallery" : "Онлайн галерия"}

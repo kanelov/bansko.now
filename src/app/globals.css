@@ -591,6 +591,20 @@ a {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 }
+.article-block__gallery a {
+  display: block;
+  border-radius: 1rem;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.article-block__gallery a:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 24px rgb(0 0 0 / 0.18);
+}
+.article-block__gallery a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
 .article-block__gallery img {
   display: block;
   width: 100%;
