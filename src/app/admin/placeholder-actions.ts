@@ -10,7 +10,7 @@ import { requireAdmin } from "@/lib/supabase/auth";
 /**
  * Илюстрациите за бизнеси без своя снимка (по една на категория). Браузърът
  * качва файла направо в R2 на временно място (подписан адрес, без лимита на
- * Vercel), сървърът го смалява до 1536 px WebP и го записва като
+ * Vercel), сървърът го смалява до 1200 px WebP (около 120–200 KB) и го записва като
  * business/placeholders/placeholder-<slug>.webp. Кешът е за ден, защото
  * илюстрацията може да се смени под същото име.
  */
@@ -48,11 +48,16 @@ export async function finalizePlaceholderAction(input: { slug: string; key: stri
     const head = await headObject(key);
     if (!head || head.bytes > maxBytes) throw new Error("Файлът не е стигнал до хранилището.");
     const original = await getPhotoObject(key);
-    const webp = await sharp(original, { failOn: "none" })
-      .rotate()
-      .resize({ width: 1536, withoutEnlargement: true })
-      .webp({ quality: 80, effort: 4 })
-      .toBuffer();
+    const meta = await sharp(original, { failOn: "none" }).metadata();
+    /* Вече оптимизиран WebP (до 1200 px и 300 KB) се пази както е, без второ компресиране. */
+    const alreadyOptimized = meta.format === "webp" && (meta.width ?? 0) <= 1200 && original.length <= 300 * 1024;
+    const webp = alreadyOptimized
+      ? original
+      : await sharp(original, { failOn: "none" })
+          .rotate()
+          .resize({ width: 1200, withoutEnlargement: true })
+          .webp({ quality: 72, effort: 6, smartSubsample: true })
+          .toBuffer();
     await putPublicObject(`business/placeholders/placeholder-${slug}.webp`, webp, "image/webp", "public, max-age=86400");
     await deletePhoto(key);
   } catch (error) {

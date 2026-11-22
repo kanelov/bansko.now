@@ -33,7 +33,7 @@
 
 ### 2026-11-22 – качване на илюстрациите за бизнеси от админа
 
-- **Какво:** в Админ → „Бизнес каталог“ има нова част „Илюстрации за бизнеси без снимка“: десет полета, по едно за категория, с текущата картинка. Качваш PNG, JPEG или WebP; сайтът я смалява до 1536 px WebP и я записва в Cloudflare като `business/placeholders/placeholder-<категория>.webp`, а каталогът я вижда веднага.
+- **Какво:** в Админ → „Бизнес каталог“ има нова част „Илюстрации за бизнеси без снимка“: десет полета, по едно за категория, с текущата картинка. Качваш PNG, JPEG или WebP; сайтът я смалява до 1200 px WebP (около 150 KB) и я записва в Cloudflare като `business/placeholders/placeholder-<категория>.webp`, а каталогът я вижда веднага.
 - **Стил:** собственикът избра „ретро линия“ (като рисунките на kanelov.com) от три проби. Десетте илюстрации са направени с Codex на Mac-а.
 - **Файлове:** `src/app/admin/placeholder-actions.ts` (нов), `src/components/admin/business-placeholder-uploader.tsx` (нов), `src/app/admin/(protected)/businesses/page.tsx`, `src/lib/photo-storage.ts` (`putPublicObject` приема и файл), помощта в админа (раздел 04), `docs/biznes-shabloni-snimki.md`, `CLAUDE.md`.
 
