@@ -226,7 +226,23 @@ export async function updateBusinessAction(formData: FormData) {
     schema_type: stringValue(formData, "schema_type") || "LocalBusiness"
   };
 
-  const { error } = await supabase.from("businesses").update(payload).eq("id", id);
+  /* Категорията е и данни (business_categories): по избраното българско име се
+     записва и category_id, а английското име идва от превода на категорията. */
+  const { data: categoryRow } = await supabase
+    .from("business_category_translations")
+    .select("category_id")
+    .eq("locale", "bg")
+    .eq("name", payload.category)
+    .maybeSingle();
+  const { data: categoryNames } = categoryRow
+    ? await supabase.from("business_category_translations").select("locale, name").eq("category_id", categoryRow.category_id)
+    : { data: null };
+  const categoryNameFor = (locale: "bg" | "en") => categoryNames?.find((row) => row.locale === locale)?.name ?? null;
+
+  const { error } = await supabase
+    .from("businesses")
+    .update(categoryRow ? { ...payload, category_id: categoryRow.category_id } : payload)
+    .eq("id", id);
 
   if (error) {
     redirect(`/admin/businesses?error=${encodeURIComponent(error.message)}`);
@@ -237,7 +253,7 @@ export async function updateBusinessAction(formData: FormData) {
     locale,
     slug: stringValue(formData, `slug${suffix}`) || payload.slug,
     name: stringValue(formData, `name${suffix}`) || payload.name,
-    category: stringValue(formData, `category${suffix}`) || payload.category,
+    category: categoryNameFor(locale) ?? (stringValue(formData, `category${suffix}`) || payload.category),
     subcategory: stringValue(formData, `subcategory${suffix}`) || null,
     description: stringValue(formData, `description${suffix}`),
     address: stringValue(formData, `address${suffix}`) || payload.address,

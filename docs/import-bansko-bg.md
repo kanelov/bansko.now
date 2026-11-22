@@ -14,7 +14,8 @@
   `import-preview.csv` от CSV-то и готовите текстове в `texts/chunk*.json` (новите BG/EN имена, описания,
   alt текстове – написани на 2026-10-31). Резултатът е идентичен с одобрения от собственика. Готовите
   SQL/CSV **не** се качват в Git (имат имейли за връзка).
-- Съответствие на категориите: подкатегориите на общината → нашите десет (`business_categories.slug`):
+- **22.11.2026:** категориите вече са 15 (вж. миграция `20261122120000_business_categories_split`): „Здраве и спорт“ е разделена на `health` и `sport`, добавени са `ski`, `beauty`, `real-estate`, `education`, автоуслугите са в `transport`. `parse.py` ползва новото съответствие.
+- Първоначално съответствие на категориите (31.10.2026): подкатегориите на общината → нашите десет (`business_categories.slug`):
   restaurants 13, cafes 8, hotels 23, guest-houses 13, services 84, shops 34, activities 8,
   health-sport 55, transport 6, culture 13.
 

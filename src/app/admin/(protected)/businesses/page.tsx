@@ -34,7 +34,12 @@ const placeholderRows = [
   { slug: "services", label: "Услуги" },
   { slug: "shops", label: "Магазини" },
   { slug: "activities", label: "Активности" },
-  { slug: "health-sport", label: "Здраве и спорт" },
+  { slug: "health", label: "Здраве" },
+  { slug: "sport", label: "Спорт" },
+  { slug: "ski", label: "Ски и сноуборд" },
+  { slug: "beauty", label: "Красота и спа" },
+  { slug: "real-estate", label: "Недвижими имоти" },
+  { slug: "education", label: "Образование" },
   { slug: "transport", label: "Транспорт" },
   { slug: "culture", label: "Култура" }
 ];

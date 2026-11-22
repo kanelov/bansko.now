@@ -21,8 +21,8 @@ def slugify(s):
     s = re.sub(r"[^a-z0-9]+", "-", s).strip("-")
     return s[:80] or "biznes"
 
-CATEGORY_BG = {"restaurants":"Ресторанти","cafes":"Кафета","hotels":"Хотели","guest-houses":"Къщи за гости","services":"Услуги","shops":"Магазини","activities":"Активности","health-sport":"Здраве и спорт","transport":"Транспорт","culture":"Култура"}
-CATEGORY_EN = {"restaurants":"Restaurants","cafes":"Cafés","hotels":"Hotels","guest-houses":"Guest houses","services":"Services","shops":"Shops","activities":"Activities","health-sport":"Health & sport","transport":"Transport","culture":"Culture"}
+CATEGORY_BG = {"restaurants":"Ресторанти","cafes":"Кафета","hotels":"Хотели","guest-houses":"Къщи за гости","services":"Услуги","shops":"Магазини","activities":"Активности","health":"Здраве","sport":"Спорт","ski":"Ски и сноуборд","beauty":"Красота и спа","real-estate":"Недвижими имоти","education":"Образование","transport":"Транспорт","culture":"Култура"}
+CATEGORY_EN = {"restaurants":"Restaurants","cafes":"Cafés","hotels":"Hotels","guest-houses":"Guest houses","services":"Services","shops":"Shops","activities":"Activities","health":"Health","sport":"Sport","ski":"Ski & snowboard","beauty":"Beauty & spa","real-estate":"Real estate","education":"Education","transport":"Transport","culture":"Culture"}
 
 def phone_fmt(p):
     d = re.sub(r"[^0-9+]", "", p)

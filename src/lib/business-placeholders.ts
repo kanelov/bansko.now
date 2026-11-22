@@ -20,9 +20,14 @@ export const businessPlaceholderSlugs = [
   "services",
   "shops",
   "activities",
-  "health-sport",
+  "health",
+  "sport",
   "transport",
-  "culture"
+  "culture",
+  "ski",
+  "beauty",
+  "real-estate",
+  "education"
 ] as const;
 
 export type BusinessPlaceholderSlug = (typeof businessPlaceholderSlugs)[number];
@@ -44,8 +49,18 @@ const placeholderSlugByCategoryName: Record<string, BusinessPlaceholderSlug> = {
   Shops: "shops",
   Активности: "activities",
   Activities: "activities",
-  "Здраве и спорт": "health-sport",
-  "Health & sport": "health-sport",
+  Здраве: "health",
+  Health: "health",
+  Спорт: "sport",
+  Sport: "sport",
+  "Ски и сноуборд": "ski",
+  "Ski & snowboard": "ski",
+  "Красота и спа": "beauty",
+  "Beauty & spa": "beauty",
+  "Недвижими имоти": "real-estate",
+  "Real estate": "real-estate",
+  Образование: "education",
+  Education: "education",
   Транспорт: "transport",
   Transport: "transport",
   Култура: "culture",
